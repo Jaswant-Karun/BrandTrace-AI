@@ -119,7 +119,7 @@ def test_phase9_module_endpoints_audit():
     assert atlas_res.json()["index_name"] == "vector_index"
 
     # 10. Governance Analytics
-    analytics_res = client.get("/api/analytics?brand_id=aurelle-tech", headers=headers)
+    analytics_res = client.get("/api/analytics/governance?brand_id=aurelle-tech", headers=headers)
     assert analytics_res.status_code == 200
 
     # 11. Audit Trust Center Releases
