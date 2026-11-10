@@ -36,25 +36,32 @@ export const MultimodalInspectionView: React.FC<MultimodalInspectionViewProps> =
   // Preset file payloads for rapid judging / demo verification
   const PRESET_FILES = [
     {
+      title: "Aurelle Studio Subscription Outdated Price (TXT)",
+      filename: "aurelle_studio_pricing.txt",
+      mimeType: "text/plain",
+      type: "TXT",
+      content: "Unlock next-generation spatial computing with Aurelle Cloud Studio for only ₹499 per month. Real-time audio rendering included."
+    },
+    {
+      title: "Aurelle Pulse Smart Ring Durability (Markdown)",
+      filename: "aurelle_pulse_durability.md",
+      mimeType: "text/markdown",
+      type: "MD",
+      content: "# Aurelle Pulse Durability Specifications\n\nCrafted with forged elements, Aurelle Pulse is 100% unbreakable and completely indestructible under any conditions."
+    },
+    {
+      title: "Aurelle Horizon Audio Battery Claim (PDF)",
+      filename: "aurelle_horizon_battery_spec.pdf",
+      mimeType: "application/pdf",
+      type: "PDF",
+      content: "Aurelle Horizon™ Spatial Headphones deliver 72-hour battery life with active noise cancellation."
+    },
+    {
       title: "PR Wire Greenwashing Copy (TXT)",
       filename: "pr_wire_launch.txt",
       mimeType: "text/plain",
       type: "TXT",
       content: "Apex unveils the completely green 100% eco-friendly zero-carbon footprint supercar with hands-free autonomous highway navigation."
-    },
-    {
-      title: "Telematics Subscription Terms (Markdown)",
-      filename: "telematics_terms.md",
-      mimeType: "text/markdown",
-      type: "MD",
-      content: "# Apex Connect Telematics Policy\n\nMonthly active subscription is ₹499/mo across all 2026 fleet configurations. Continuous 5G telemetry included."
-    },
-    {
-      title: "HyperDrive Autonomy Brochure (DOCX)",
-      filename: "hyperdrive_safety_overview.docx",
-      mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      type: "DOCX",
-      content: "HyperDrive provides full self-driving capability. Drivers can sleep or text while the vehicle travels at 75mph autonomously."
     },
     {
       title: "QuantumCell EPA Certification Spec (PDF)",

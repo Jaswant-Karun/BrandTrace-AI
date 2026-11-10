@@ -94,9 +94,20 @@ export const BrandNode = memo(({ data }: NodeProps) => {
   };
 
   const config = getTypeConfig(nodeType);
+  const isHighlighted = Boolean(data.isHighlighted);
+  const isAffected = Boolean(data.isAffected);
+  const isDimmed = Boolean(data.isDimmed);
+
+  const containerClasses = isAffected
+    ? 'border-amber-400 bg-amber-950/40 shadow-amber-500/30 ring-2 ring-amber-400/60 animate-pulse'
+    : isHighlighted
+    ? 'border-cyan-400 bg-cyan-950/40 shadow-cyan-500/40 ring-2 ring-cyan-400/80 scale-105'
+    : isDimmed
+    ? 'opacity-30 border-slate-800 bg-slate-900/60'
+    : `${config.border} bg-slate-900/95 shadow-black/40`;
 
   return (
-    <div className={`px-4 py-3 rounded-xl bg-slate-900/95 backdrop-blur-md border ${config.border} shadow-xl shadow-black/40 min-w-[220px] max-w-[260px] transition-all duration-200 cursor-pointer`}>
+    <div className={`px-4 py-3 rounded-xl backdrop-blur-md border ${containerClasses} shadow-xl min-w-[220px] max-w-[260px] transition-all duration-300 cursor-pointer`}>
       <Handle type="target" position={Position.Left} className="!w-2.5 !h-2.5 !bg-slate-400 !border-slate-800" />
       
       <div className="flex items-center justify-between mb-1.5 gap-2">
@@ -104,7 +115,13 @@ export const BrandNode = memo(({ data }: NodeProps) => {
           {config.icon}
           {config.title}
         </span>
-        <span className="text-[10px] font-mono text-slate-400">{id}</span>
+        {isAffected ? (
+          <span className="text-[9px] font-bold text-amber-300 bg-amber-500/20 px-1.5 py-0.5 rounded border border-amber-500/40 animate-pulse">
+            AFFECTED
+          </span>
+        ) : (
+          <span className="text-[10px] font-mono text-slate-400">{id}</span>
+        )}
       </div>
 
       <div className="font-semibold text-xs text-white leading-tight mb-1 truncate" title={label}>
