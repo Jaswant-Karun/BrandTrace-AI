@@ -3,7 +3,7 @@ from typing import Dict, Any, List, Optional
 from brandtrace.database.mongo import mongo_manager
 from brandtrace.database.schemas import (
     ApprovedFactDoc, ContentAssetDoc, GraphRelationshipDoc,
-    AuditEntryDoc, ReviewAssignmentDoc
+    AuditEventDoc, ReviewAssignmentDoc
 )
 from brandtrace.data.seed_data import BRAND_SEEDS, APPROVED_FACTS_CATALOG
 from brandtrace.graph.engine import BrandKnowledgeGraph

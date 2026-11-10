@@ -65,7 +65,7 @@ async def seed_aurelle_organisation(repo: BrandTraceRepository) -> Dict[str, Any
             user_id=uid,
             organisation_id=org_id,
             email=email,
-            full_name=name,
+            name=name,
             role=role
         )
         await repo.create_user(u_doc)
