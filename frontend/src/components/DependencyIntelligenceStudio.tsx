@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   GitFork, CheckCircle2,
   Users, Building, FileSpreadsheet, Lock, Sparkles,
-  Search, ShieldAlert, History
+  ShieldAlert, History
 } from 'lucide-react';
 import {
   ReactFlow,

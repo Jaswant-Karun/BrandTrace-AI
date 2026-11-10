@@ -7,7 +7,7 @@ import { BlastRadiusSimulator } from './components/BlastRadiusSimulator';
 import { ReleaseLedgerView } from './components/ReleaseLedgerView';
 import { DatabaseStatusModal } from './components/DatabaseStatusModal';
 import { BrandProfile, DatabaseStatus, VerificationResult } from './types';
-import { ShieldCheck, Network, Activity, Layers, GitFork } from 'lucide-react';
+import { ShieldCheck, Activity, Layers, GitFork } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<string>('bdig');
@@ -113,13 +113,13 @@ export const App: React.FC = () => {
 
           <div className="bg-slate-900/70 border border-slate-800/80 p-4 rounded-2xl shadow-lg">
             <div className="flex items-center justify-between text-slate-400 mb-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider">Knowledge Graph Substrate</span>
-              <Network className="w-4 h-4 text-cyan-400" />
+              <span className="text-[10px] font-bold uppercase tracking-wider">Dependency Intelligence</span>
+              <GitFork className="w-4 h-4 text-rose-400" />
             </div>
             <div className="text-base font-bold text-white">
               {currentBrand?.node_count || 32} Interconnected Nodes
             </div>
-            <div className="text-[11px] text-slate-400">Claims, regulations, trademarks & assets</div>
+            <div className="text-[11px] text-slate-400">Claims, prices, ads, websites & docs</div>
           </div>
 
           <div className="bg-slate-900/70 border border-slate-800/80 p-4 rounded-2xl shadow-lg">
