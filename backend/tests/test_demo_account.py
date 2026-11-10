@@ -1,5 +1,6 @@
 import pytest
 from brandtrace.modules.auth.service import auth_service
+from brandtrace.modules.auth.models import RegisterRequest
 from brandtrace.core.security import decode_access_token, UserRole
 
 def test_demo_account_valid_authentication():
@@ -30,3 +31,24 @@ def test_demo_account_token_generation_and_claims():
     assert payload.get("org_id") == "ORG-AURELLE"
     assert payload.get("workspace_id") == "aurelle-tech"
 
+@pytest.mark.anyio
+async def test_register_account_and_login():
+    """Verify new user registration registers the user and creates valid JWT token."""
+    reg_req = RegisterRequest(
+        name="Julian Vance",
+        email="julian.vance@aurelle.com",
+        password="SecureAurellePassword2026!",
+        role=UserRole.BRAND_MANAGER,
+        workspace_id="aurelle-tech"
+    )
+    user = await auth_service.register_user(reg_req)
+    assert user is not None
+    assert user.email == "julian.vance@aurelle.com"
+    assert user.name == "Julian Vance"
+    assert user.org_id == "ORG-AURELLE"
+    assert user.workspace_id == "aurelle-tech"
+
+    # Now verify login with these newly registered credentials
+    logged_in = auth_service.authenticate_user("julian.vance@aurelle.com", "SecureAurellePassword2026!")
+    assert logged_in is not None
+    assert logged_in.user_id == user.user_id
