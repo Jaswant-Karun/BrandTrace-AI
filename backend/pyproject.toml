@@ -30,3 +30,7 @@ build-backend = "setuptools.build_meta"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+filterwarnings = [
+    "ignore::Warning:starlette.testclient",
+    "ignore::Warning:fastapi.testclient"
+]

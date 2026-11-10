@@ -6,8 +6,8 @@ services:
     name: brandtrace-backend
     env: python
     rootDir: backend
-    buildCommand: uv venv && uv pip install -r requirements.txt
-    startCommand: .venv/bin/uvicorn brandtrace.main:app --host 0.0.0.0 --port $PORT
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn brandtrace.main:app --host 0.0.0.0 --port $PORT
     plan: standard
     region: oregon
     healthCheckPath: /health
