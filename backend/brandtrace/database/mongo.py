@@ -39,6 +39,10 @@ class MongoManager:
     _memory_orgs: Dict[str, Dict[str, Any]] = {}
     _memory_embeddings: List[Dict[str, Any]] = []
 
+    def __init__(self):
+        from brandtrace.database.repository import BrandTraceRepository
+        self.repo = BrandTraceRepository(self)
+
     async def connect(self):
         """Attempts connection to MongoDB Atlas with connection pooling and timeouts."""
         try:
