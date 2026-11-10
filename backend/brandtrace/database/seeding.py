@@ -150,7 +150,7 @@ async def seed_aurelle_organisation(repo: BrandTraceRepository) -> Dict[str, Any
                 organisation_id=org_id,
                 workspace_id=workspace_id,
                 user_id=uid,
-                role=role
+                role_name=role
             )
             await repo.add_workspace_membership(m_doc)
 
