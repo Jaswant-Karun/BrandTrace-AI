@@ -1,23 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { Navbar } from './components/Navbar';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Sidebar, NavigationTab } from './components/Sidebar';
+import { LandingPage } from './components/LandingPage';
+import { CommandCenter } from './components/CommandCenter';
 import { DependencyIntelligenceStudio } from './components/DependencyIntelligenceStudio';
 import { AssetInspector } from './components/AssetInspector';
-import { KnowledgeGraphView } from './components/KnowledgeGraphView';
 import { BlastRadiusSimulator } from './components/BlastRadiusSimulator';
-import { ReleaseLedgerView } from './components/ReleaseLedgerView';
+import { MultimodalInspectionView } from './components/MultimodalInspectionView';
+import { CampaignIntelligenceView } from './components/CampaignIntelligenceView';
+import { RiskIntelligenceView } from './components/RiskIntelligenceView';
+import { ApprovalCenterView } from './components/ApprovalCenterView';
+import { BrandKnowledgeBaseView } from './components/BrandKnowledgeBaseView';
+import { GovernanceAnalyticsView } from './components/GovernanceAnalyticsView';
+import { AuditTrustCenterView } from './components/AuditTrustCenterView';
+import { SettingsView } from './components/SettingsView';
 import { DatabaseStatusModal } from './components/DatabaseStatusModal';
 import { BrandProfile, DatabaseStatus, VerificationResult } from './types';
-import { ShieldCheck, Activity, Layers, GitFork } from 'lucide-react';
+import { ExternalLink, Database, RefreshCw, ShieldCheck } from 'lucide-react';
 
 export const App: React.FC = () => {
-  const [currentTab, setCurrentTab] = useState<string>('bdig');
+  const [viewMode, setViewMode] = useState<'landing' | 'app'>('app');
+  const [currentTab, setCurrentTab] = useState<NavigationTab>('command-center');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
   const [brands, setBrands] = useState<BrandProfile[]>([]);
   const [selectedBrandId, setSelectedBrandId] = useState<string>('apex-dynamics');
   const [dbStatus, setDbStatus] = useState<DatabaseStatus | null>(null);
   const [isDbModalOpen, setIsDbModalOpen] = useState<boolean>(false);
   const [isReseeding, setIsReseeding] = useState<boolean>(false);
 
-  // Load brands and DB status
+  // Load brands and DB telemetry
   const loadInitialData = async () => {
     try {
       const [brandsRes, statusRes] = await Promise.all([
@@ -79,99 +90,167 @@ export const App: React.FC = () => {
 
   const currentBrand = brands.find((b) => b.brand_id === selectedBrandId);
 
+  // If user requests Public Landing Page
+  if (viewMode === 'landing') {
+    return (
+      <LandingPage
+        brandName={currentBrand?.brand_name}
+        onEnterApp={(targetTab) => {
+          if (targetTab) setCurrentTab(targetTab as NavigationTab);
+          setViewMode('app');
+        }}
+      />
+    );
+  }
+
+  const getTabTitle = (tab: NavigationTab) => {
+    switch (tab) {
+      case 'command-center': return 'Executive Command Center';
+      case 'bdig': return 'Brand Dependency Intelligence Graph';
+      case 'content-studio': return 'Content Studio & Multi-Agent Inspection';
+      case 'impact-simulator': return 'Cascading Blast Radius Simulator';
+      case 'multimodal': return 'Multimodal & Creative Inspection';
+      case 'campaigns': return 'Campaign Intelligence Portfolio';
+      case 'risks': return 'Enterprise Risk Intelligence & Taxonomy';
+      case 'approvals': return 'Governance Approval Center';
+      case 'knowledge-base': return 'Brand Knowledge Base & Truth-Set';
+      case 'analytics': return 'Governance Velocity & Analytics';
+      case 'audit-trust': return 'Audit & Trust Center (Ledger)';
+      case 'settings': return 'Control Plane Enterprise Settings';
+      default: return 'BrandTrace AI';
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-brand-500 selection:text-white">
-      {/* Top Enterprise Navbar */}
-      <Navbar
+    <div className="min-h-screen bg-[#070B14] text-slate-100 flex font-sans selection:bg-cyan-500 selection:text-black">
+      {/* Enterprise Sidebar Navigation (12 Sections) */}
+      <Sidebar
         currentTab={currentTab}
         setCurrentTab={setCurrentTab}
         brands={brands}
         selectedBrandId={selectedBrandId}
         setSelectedBrandId={setSelectedBrandId}
         dbStatus={dbStatus}
-        onOpenDbModal={() => setIsDbModalOpen(true)}
-        onReseed={handleReseed}
-        isReseeding={isReseeding}
+        isCollapsed={isSidebarCollapsed}
+        setIsCollapsed={setIsSidebarCollapsed}
+        onOpenLanding={() => setViewMode('landing')}
       />
 
-      {/* Main Container */}
-      <main className="flex-1 p-6 max-w-7xl mx-auto w-full space-y-6">
-        {/* Executive Stats Bar */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-slate-900/70 border border-slate-800/80 p-4 rounded-2xl shadow-lg">
-            <div className="flex items-center justify-between text-slate-400 mb-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider">Active Brand Profile</span>
-              <ShieldCheck className="w-4 h-4 text-brand-400" />
-            </div>
-            <div className="text-base font-bold text-white truncate">
+      {/* Main App Workspace */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Top Control Bar */}
+        <header className="border-b border-slate-800/80 bg-[#0B0F19]/80 backdrop-blur-xl px-6 py-3 flex items-center justify-between sticky top-0 z-30">
+          <div className="flex items-center gap-3">
+            <h1 className="text-sm font-bold text-white tracking-tight">
+              {getTabTitle(currentTab)}
+            </h1>
+            <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-slate-600" />
+            <span className="hidden sm:inline-block text-xs text-slate-400 font-mono">
               {currentBrand ? currentBrand.brand_name : 'Apex Dynamics'}
-            </div>
-            <div className="text-[11px] text-slate-400 truncate">
-              {currentBrand ? currentBrand.industry : 'Clean Electric Mobility'}
-            </div>
+            </span>
           </div>
 
-          <div className="bg-slate-900/70 border border-slate-800/80 p-4 rounded-2xl shadow-lg">
-            <div className="flex items-center justify-between text-slate-400 mb-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider">Dependency Intelligence</span>
-              <GitFork className="w-4 h-4 text-rose-400" />
-            </div>
-            <div className="text-base font-bold text-white">
-              {currentBrand?.node_count || 32} Interconnected Nodes
-            </div>
-            <div className="text-[11px] text-slate-400">Claims, prices, ads, websites & docs</div>
+          <div className="flex items-center gap-3">
+            {/* View Public Landing Page Button */}
+            <button
+              onClick={() => setViewMode('landing')}
+              className="text-xs text-slate-400 hover:text-white px-2.5 py-1 rounded-lg border border-slate-800 hover:border-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer"
+              title="View Public Overview Landing Page"
+            >
+              <ExternalLink className="w-3.5 h-3.5 text-cyan-400" />
+              <span className="hidden md:inline">Public Landing Page</span>
+            </button>
+
+            {/* Quick Re-seed */}
+            <button
+              onClick={handleReseed}
+              disabled={isReseeding}
+              title="Re-seed MongoDB and Graph Data"
+              className="p-1.5 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 hover:text-white hover:border-slate-700 transition-colors"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isReseeding ? 'animate-spin text-cyan-400' : ''}`} />
+            </button>
+
+            {/* DB Status Button */}
+            <button
+              onClick={() => setIsDbModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border bg-slate-950 border-slate-800 hover:border-slate-700 transition-colors cursor-pointer"
+            >
+              <Database className={`w-3.5 h-3.5 ${dbStatus?.connected ? 'text-emerald-400' : 'text-amber-400'}`} />
+              <span className="text-slate-300 font-mono text-[11px] hidden sm:inline">
+                {dbStatus?.connected ? 'MongoDB' : 'Memory'}
+              </span>
+              <span className={`w-1.5 h-1.5 rounded-full ${dbStatus?.connected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+            </button>
           </div>
+        </header>
 
-          <div className="bg-slate-900/70 border border-slate-800/80 p-4 rounded-2xl shadow-lg">
-            <div className="flex items-center justify-between text-slate-400 mb-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider">Governance Agents</span>
-              <Activity className="w-4 h-4 text-indigo-400" />
-            </div>
-            <div className="text-base font-bold text-emerald-400 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              4 Agents Active
-            </div>
-            <div className="text-[11px] text-slate-400">Voice, Claim, Regulatory & Blast Radius</div>
-          </div>
+        {/* Viewport Canvas with Framer Motion */}
+        <main className="flex-1 p-6 overflow-y-auto max-w-7xl w-full mx-auto">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentTab}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.22, ease: 'easeOut' }}
+            >
+              {currentTab === 'command-center' && (
+                <CommandCenter brandId={selectedBrandId} onNavigate={setCurrentTab} />
+              )}
 
-          <div className="bg-slate-900/70 border border-slate-800/80 p-4 rounded-2xl shadow-lg">
-            <div className="flex items-center justify-between text-slate-400 mb-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider">Data Persistence</span>
-              <Layers className="w-4 h-4 text-amber-400" />
-            </div>
-            <div className="text-base font-bold text-white font-mono text-sm">
-              {dbStatus?.connected ? 'MongoDB Motor' : 'In-Memory Fallback'}
-            </div>
-            <div className="text-[11px] text-slate-400">
-              {dbStatus?.connected ? 'Live document store' : 'Offline judging resilience'}
-            </div>
-          </div>
-        </div>
+              {currentTab === 'bdig' && (
+                <DependencyIntelligenceStudio brandId={selectedBrandId} />
+              )}
 
-        {/* Tab Views */}
-        {currentTab === 'bdig' && (
-          <DependencyIntelligenceStudio brandId={selectedBrandId} />
-        )}
+              {currentTab === 'content-studio' && (
+                <AssetInspector brandId={selectedBrandId} onSignRelease={handleSignRelease} />
+              )}
 
-        {currentTab === 'inspector' && (
-          <AssetInspector
-            brandId={selectedBrandId}
-            onSignRelease={handleSignRelease}
-          />
-        )}
+              {currentTab === 'impact-simulator' && (
+                <BlastRadiusSimulator brandId={selectedBrandId} />
+              )}
 
-        {currentTab === 'graph' && (
-          <KnowledgeGraphView brandId={selectedBrandId} />
-        )}
+              {currentTab === 'multimodal' && (
+                <MultimodalInspectionView brandId={selectedBrandId} />
+              )}
 
-        {currentTab === 'blast-radius' && (
-          <BlastRadiusSimulator brandId={selectedBrandId} />
-        )}
+              {currentTab === 'campaigns' && (
+                <CampaignIntelligenceView brandId={selectedBrandId} />
+              )}
 
-        {currentTab === 'ledger' && (
-          <ReleaseLedgerView brandId={selectedBrandId} />
-        )}
-      </main>
+              {currentTab === 'risks' && (
+                <RiskIntelligenceView brandId={selectedBrandId} />
+              )}
+
+              {currentTab === 'approvals' && (
+                <ApprovalCenterView brandId={selectedBrandId} />
+              )}
+
+              {currentTab === 'knowledge-base' && (
+                <BrandKnowledgeBaseView brandId={selectedBrandId} />
+              )}
+
+              {currentTab === 'analytics' && (
+                <GovernanceAnalyticsView brandId={selectedBrandId} />
+              )}
+
+              {currentTab === 'audit-trust' && (
+                <AuditTrustCenterView brandId={selectedBrandId} />
+              )}
+
+              {currentTab === 'settings' && (
+                <SettingsView
+                  brand={currentBrand}
+                  dbStatus={dbStatus}
+                  onReseed={handleReseed}
+                  isReseeding={isReseeding}
+                />
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </main>
+      </div>
 
       {/* Database Status Modal */}
       <DatabaseStatusModal
@@ -179,16 +258,6 @@ export const App: React.FC = () => {
         onClose={() => setIsDbModalOpen(false)}
         status={dbStatus}
       />
-
-      {/* Footer */}
-      <footer className="border-t border-slate-800/80 py-4 px-6 text-center text-xs text-slate-400 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <span className="font-bold text-slate-300">BRANDTRACE AI</span> — The Autonomous Brand Intelligence & Governance Control Plane
-        </div>
-        <div className="font-mono text-[11px] text-slate-400">
-          Every brand decision connected. Every risk traceable. Every release accountable.
-        </div>
-      </footer>
     </div>
   );
 };
