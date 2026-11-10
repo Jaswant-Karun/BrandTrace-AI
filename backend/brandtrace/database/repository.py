@@ -337,17 +337,26 @@ class BrandTraceRepository:
             finding_docs.append(f_doc)
 
         if self.mm.is_connected and self.mm.db is not None:
+            update_set, set_on_insert = self._split_doc_for_upsert(job_doc)
             await self.mm.db.inspection_jobs.update_one(
                 {"organisation_id": job.organisation_id, "job_id": job.job_id},
-                {"$set": job_doc},
+                {"$set": update_set, "$setOnInsert": set_on_insert},
                 upsert=True
             )
             if finding_docs:
                 await self.mm.db.inspection_findings.insert_many(finding_docs)
 
-        self._memory_collections["inspection_jobs"].append(job_doc)
-        self._memory_collections["inspection_findings"].extend(finding_docs)
+        existing_job_idx = next(
+            (i for i, j in enumerate(self._memory_collections["inspection_jobs"])
+             if j.get("organisation_id") == job.organisation_id and j.get("job_id") == job.job_id),
+            None
+        )
+        if existing_job_idx is not None:
+            self._memory_collections["inspection_jobs"][existing_job_idx] = job_doc
+        else:
+            self._memory_collections["inspection_jobs"].append(job_doc)
 
+        self._memory_collections["inspection_findings"].extend(finding_docs)
         return {"job": job_doc, "findings_count": len(finding_docs)}
 
     async def get_findings_for_asset(self, organisation_id: str, asset_id: str) -> List[Dict[str, Any]]:
@@ -372,6 +381,7 @@ class BrandTraceRepository:
             doc["_id"] = str(ObjectId())
 
         if self.mm.is_connected and self.mm.db is not None:
+            update_set, set_on_insert = self._split_doc_for_upsert(doc)
             await self.mm.db.graph_relationships.update_one(
                 {
                     "organisation_id": rel.organisation_id,
@@ -379,9 +389,16 @@ class BrandTraceRepository:
                     "target_node_id": rel.target_node_id,
                     "relationship_type": rel.relationship_type
                 },
-                {"$set": doc},
+                {"$set": update_set, "$setOnInsert": set_on_insert},
                 upsert=True
             )
+        self._memory_collections["graph_relationships"] = [
+            r for r in self._memory_collections["graph_relationships"]
+            if not (r.get("organisation_id") == rel.organisation_id and
+                    r.get("source_node_id") == rel.source_node_id and
+                    r.get("target_node_id") == rel.target_node_id and
+                    r.get("relationship_type") == rel.relationship_type)
+        ]
         self._memory_collections["graph_relationships"].append(doc)
         return doc
 
@@ -431,10 +448,11 @@ class BrandTraceRepository:
             doc["_id"] = str(ObjectId())
 
         if self.mm.is_connected and self.mm.db is not None:
+            update_set, set_on_insert = self._split_doc_for_upsert(doc)
             # Upsert decision
             await self.mm.db.approval_decisions.update_one(
                 {"organisation_id": decision.organisation_id, "decision_id": decision.decision_id},
-                {"$set": doc},
+                {"$set": update_set, "$setOnInsert": set_on_insert},
                 upsert=True
             )
             # Update content asset status atomically
