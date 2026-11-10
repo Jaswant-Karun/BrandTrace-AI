@@ -565,6 +565,8 @@ class VerifyRecordRequest(BaseModel):
     identifier: str
     content_to_test: Optional[str] = None
 
+from brandtrace.core.security import validate_file_upload
+
 @router.post("/multimodal/upload-and-inspect", response_model=MultimodalInspectionReport)
 async def upload_and_inspect_multimodal_file(
     file: UploadFile = File(...),
@@ -572,13 +574,14 @@ async def upload_and_inspect_multimodal_file(
 ):
     """
     Parses and inspects uploaded file:
-    Supports TXT, MD, PDF, DOCX, PNG, JPG, and MP4/MOV videos.
+    Enforces <=25MB limit and format whitelist (TXT, MD, PDF, DOCX, PNG, JPG, MP4/MOV).
     """
     bkg = get_or_load_graph(brand_id)
     content_bytes = await file.read()
     filename = file.filename or "uploaded_asset"
+    clean_filename = validate_file_upload(filename, len(content_bytes))
     
-    report = multimodal_engine.inspect_file(filename, content_bytes, bkg)
+    report = multimodal_engine.inspect_file(clean_filename, content_bytes, bkg)
     return report
 
 @router.post("/explainable/review", response_model=ExplainableReviewReport)
