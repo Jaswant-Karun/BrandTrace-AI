@@ -109,17 +109,13 @@ class AuthService:
     def authenticate_user(self, email: str, password: str) -> Optional[UserProfile]:
         user_record = PRESET_USERS.get(email.lower().strip())
         if not user_record:
-            # Fallback user for judging flexibility
-            return UserProfile(
-                user_id="USR-DEMO-01",
-                email=email,
-                name="Authorized Governance Officer",
-                role=UserRole.COMPLIANCE_REVIEWER,
-                org_id="ORG-APEX",
-                workspace_id="apex-dynamics"
-            )
+            return None
         
-        # Valid user found
+        # Verify hashed password securely
+        if not verify_password(password, user_record.get("password_hash", "")):
+            return None
+        
+        # Valid user found with verified credentials
         return UserProfile(
             user_id=user_record["user_id"],
             email=user_record["email"],
