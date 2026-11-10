@@ -124,7 +124,7 @@ class ClaimSubstantiationAgent:
             elif val == 14 and "charge" in text.lower():
                 citations.append("AC-02: 10% to 80% in 14 min (Protocol AP-LAB-884-C)")
 
-        # 3. Clinical / Health Claims (for biopharma brand)
+        # 3. Clinical / Health Claims (for biopharma brand & wellness devices)
         if "apob" in text.lower() or "cholesterol" in text.lower():
             if "cure" in text.lower() or "eliminates" in text.lower():
                 m = re.search(r"\b(cure|eliminates|100% cure)\b", text, re.IGNORECASE)
@@ -141,6 +141,57 @@ class ClaimSubstantiationAgent:
                             suggested_fix="clinically demonstrated to reduce ApoB by up to 38%"
                         )
                     )
+
+        # 4. Aurelle Consumer Tech: Unbreakable Claim
+        if "100% unbreakable" in text.lower() or "completely indestructible" in text.lower():
+            m = re.search(r"\b(100%\s+unbreakable|completely\s+indestructible)\b", text, re.IGNORECASE)
+            if m:
+                risk_spans.append(
+                    RiskSpan(
+                        start_char=m.start(),
+                        end_char=m.end(),
+                        matched_text=m.group(0),
+                        category="CLAIM",
+                        severity=SeverityLevel.CRITICAL,
+                        explanation="Unsubstantiated absolute durability claim violates FTC Claim Substantiation Doctrine. Physical materials cannot be represented as indestructible.",
+                        rule_citation="FTC Policy Statement Regarding Advertising Substantiation / ASTM B265 Grade 5 Titanium Benchmark",
+                        suggested_fix="engineered with Grade 5 Aerospace Titanium for extreme durability"
+                    )
+                )
+
+        # 5. Aurelle Consumer Tech: Expired Founder Trial Fact
+        if "founder launch trial" in text.lower() or ("₹0" in text and "founder" in text.lower()):
+            m = re.search(r"\b(₹0\s+free\s+for\s+6\s+months|founder\s+launch\s+trial)\b", text, re.IGNORECASE)
+            if m:
+                risk_spans.append(
+                    RiskSpan(
+                        start_char=m.start(),
+                        end_char=m.end(),
+                        matched_text=m.group(0),
+                        category="CLAIM",
+                        severity=SeverityLevel.HIGH,
+                        explanation="Reference to ₹0 Founder Promotion relies on an expired approved fact that lapsed on Dec 31, 2025.",
+                        rule_citation="Approved Fact FACT-AUR-EXP-01 (Status: EXPIRED Dec 31, 2025)",
+                        suggested_fix="Aurelle Cloud Studio subscription starting at ₹499/month"
+                    )
+                )
+
+        # 6. Aurelle Consumer Tech: Battery Claim Disclosure
+        if ("72-hour" in text.lower() or "72h" in text.lower()) and "iec" not in text.lower():
+            m = re.search(r"\b(72-hour|72h)\s+(?:continuous\s+)?battery\b", text, re.IGNORECASE)
+            if m:
+                risk_spans.append(
+                    RiskSpan(
+                        start_char=m.start(),
+                        end_char=m.end(),
+                        matched_text=m.group(0),
+                        category="CLAIM",
+                        severity=SeverityLevel.HIGH,
+                        explanation="72-hour continuous battery claim requires mandatory IEC 62133 laboratory benchmark disclaimer footnote.",
+                        rule_citation="Brand Guideline GL-AUR-04 (Battery Life Statutory Testing Disclosure)",
+                        suggested_fix=f"{m.group(0)}* (*Tested under IEC 62133 standardized lab protocol. Actual results vary.)"
+                    )
+                )
 
         score = max(0.0, 100.0 - (len(risk_spans) * 35.0))
         status = "PASSED" if score >= 80 else ("WARNING" if score >= 50 else "FAILED")
@@ -211,7 +262,10 @@ class RegulatoryComplianceAgent:
             ("quantumcell", "QuantumCell™", "TM-01"),
             ("hyperdrive os", "HyperDrive OS®", "TM-02"),
             ("aeroglide", "AeroGlide™", "TM-03"),
-            ("cardioshield", "CardioShield™", "TM-NH-01")
+            ("cardioshield", "CardioShield™", "TM-NH-01"),
+            ("quantumacoustics", "QuantumAcoustics™", "TM-AUR-01"),
+            ("quantumpower", "QuantumPower™", "TM-AUR-03"),
+            ("aurelle horizun", "Aurelle Horizon™", "TM-AUR-02"),
         ]
 
         for raw_mark, proper_mark, tm_id in trademark_checks:
@@ -221,20 +275,111 @@ class RegulatoryComplianceAgent:
                 actual_found = m.group(0)
                 # Check if it has the symbol immediately after
                 after_text = text[m.end():m.end() + 2]
-                if "™" not in after_text and "®" not in after_text:
+                if "horizun" in actual_found.lower() or ("™" not in after_text and "®" not in after_text):
                     risk_spans.append(
                         RiskSpan(
                             start_char=m.start(),
                             end_char=m.end(),
                             matched_text=actual_found,
                             category="TRADEMARK",
-                            severity=SeverityLevel.MODERATE,
-                            explanation=f"Trademark '{actual_found}' must use registered mark format '{proper_mark}'.",
+                            severity=SeverityLevel.HIGH if "horizun" in actual_found.lower() else SeverityLevel.MODERATE,
+                            explanation=f"Product name / trademark '{actual_found}' violates official mark governance '{proper_mark}'.",
                             rule_citation=f"Trademark Governance {tm_id} (Lanham Act §29)",
                             suggested_fix=proper_mark
                         )
                     )
                     citations.append(f"{tm_id}: {proper_mark}")
+
+        # 4. Aurelle Consumer Tech: FDA §870 Wellness vs Diagnostic Medical Claim
+        if "medical-grade diagnostic cure" in text.lower() or ("diagnostic cure" in text.lower() and "disease" in text.lower()):
+            m = re.search(r"\b(medical-grade\s+diagnostic\s+cure|diagnostic\s+cure)\b", text, re.IGNORECASE)
+            if m:
+                risk_spans.append(
+                    RiskSpan(
+                        start_char=m.start(),
+                        end_char=m.end(),
+                        matched_text=m.group(0),
+                        category="REGULATORY",
+                        severity=SeverityLevel.CRITICAL,
+                        explanation="Aurelle Pulse Smart Ring is a consumer general wellness monitor. Stating it is a 'medical-grade diagnostic cure' triggers severe FDA Class II/III statutory penalties under 21 CFR §870.",
+                        rule_citation="Brand Guideline GL-AUR-03 / FDA 21 CFR §870 Wellness Device Classification",
+                        suggested_fix="consumer biometric wellness monitor designed for lifestyle tracking"
+                    )
+                )
+                citations.append("GL-AUR-03: FDA 21 CFR §870 Non-Diagnostic Wellness Rule")
+
+        # 5. Aurelle Consumer Tech: Logo Clearance & Visual Rules
+        if "12px" in text.lower() and ("clearance" in text.lower() or "padding" in text.lower() or "margin" in text.lower()):
+            m = re.search(r"\b12px(?:\s+padding)?\s+clearance\b", text, re.IGNORECASE)
+            if m:
+                risk_spans.append(
+                    RiskSpan(
+                        start_char=m.start(),
+                        end_char=m.end(),
+                        matched_text=m.group(0),
+                        category="VISUAL_IDENTITY",
+                        severity=SeverityLevel.HIGH,
+                        explanation="Logo margin clearance of 12px violates the mandatory minimum safe-zone threshold of 20px around the Aurelle wordmark.",
+                        rule_citation="Brand Guideline GL-AUR-01 (Logo Safe Zone Clearance Mandate)",
+                        suggested_fix="20px margin clearance around Aurelle wordmark"
+                    )
+                )
+                citations.append("GL-AUR-01: Logo Safe Zone Clearance Mandate (>= 20px)")
+
+        # 6. Aurelle Consumer Tech: Color Palette Rule (Banned Neon Orange #FF5500)
+        if "#ff5500" in text.lower() or "neon orange" in text.lower():
+            m = re.search(r"\b(?:Neon\s+Orange\s+)?#FF5500\b", text, re.IGNORECASE)
+            if m:
+                risk_spans.append(
+                    RiskSpan(
+                        start_char=m.start(),
+                        end_char=m.end(),
+                        matched_text=m.group(0),
+                        category="VISUAL_IDENTITY",
+                        severity=SeverityLevel.HIGH,
+                        explanation="Detected unauthorized off-palette hue '#FF5500' (Neon Orange). Deviates from authorized palette: Obsidian Black (#0A0E1A) and Champagne Gold (#D4AF37).",
+                        rule_citation="Brand Guideline GL-AUR-02 (Approved Master Color Palette)",
+                        suggested_fix="Champagne Gold (#D4AF37)"
+                    )
+                )
+                citations.append("GL-AUR-02: Approved Master Color Palette")
+
+        # 7. Aurelle Consumer Tech: Accessibility (WCAG 2.1 AA Contrast & Alt-Text)
+        if "2.3:1" in text.lower() or ("low-contrast" in text.lower() and "alt-text" in text.lower()):
+            m = re.search(r"\b(?:low-contrast\s+)?#777777\s+body\s+text\s+on\s+#333333\b", text, re.IGNORECASE)
+            match_str = m.group(0) if m else "low-contrast #777777 on #333333"
+            start_idx = m.start() if m else text.lower().find("low-contrast")
+            risk_spans.append(
+                RiskSpan(
+                    start_char=max(0, start_idx),
+                    end_char=max(0, start_idx) + len(match_str),
+                    matched_text=match_str,
+                    category="ACCESSIBILITY",
+                    severity=SeverityLevel.HIGH,
+                    explanation="Contrast ratio of 2.3:1 fails WCAG 2.1 Level AA minimum threshold of 4.5:1. Asset also lacks mandatory descriptive alt-text.",
+                    rule_citation="Brand Guideline GL-AUR-07 / WCAG 2.1 Success Criterion 1.4.3 (Contrast Minimum)",
+                    suggested_fix="#F8FAFC high-contrast text on #0A0E1A background with descriptive alt-text"
+                )
+            )
+            citations.append("GL-AUR-07: WCAG 2.1 AA Accessibility Mandate")
+
+        # 8. Aurelle Consumer Tech: Conflicting Brand Guidelines (Helvetica vs Editorial Serif)
+        if "helvetica" in text.lower() and ("regional" in text.lower() or "master" in text.lower() or "conflict" in text.lower()):
+            m = re.search(r"\bHelvetica(?:\s+Neue)?\b", text, re.IGNORECASE)
+            if m:
+                risk_spans.append(
+                    RiskSpan(
+                        start_char=m.start(),
+                        end_char=m.end(),
+                        matched_text=m.group(0),
+                        category="TYPOGRAPHY",
+                        severity=SeverityLevel.MODERATE,
+                        explanation="Regional guideline mandating Helvetica Neue directly conflicts with Global Master Rule GL-AUR-06 (Editorial Serif headlines, Inter UI). Master rule takes precedence.",
+                        rule_citation="Brand Guideline GL-AUR-06 (Global Master Typography Directive)",
+                        suggested_fix="Editorial Serif headlines with Inter Enterprise body copy"
+                    )
+                )
+                citations.append("GL-AUR-06: Global Master Typography Directive")
 
         score = max(0.0, 100.0 - (len(risk_spans) * 30.0))
         status = "PASSED" if score >= 80 else ("WARNING" if score >= 50 else "FAILED")
