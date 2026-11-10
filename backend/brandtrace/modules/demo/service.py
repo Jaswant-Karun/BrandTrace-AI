@@ -513,7 +513,7 @@ class DemoWorkflowService:
 
         agent_scores = {}
         for k, v in v_res.agent_reports.items():
-            agent_scores[k] = v.score if hasattr(v, "score") else v.get("score")
+            agent_scores[k] = getattr(v, "score", 0.0)
 
         return {
             "case_id": case.case_id,

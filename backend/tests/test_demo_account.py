@@ -1,7 +1,7 @@
 import pytest
 from brandtrace.modules.auth.service import auth_service
-from brandtrace.modules.auth.models import RegisterRequest
-from brandtrace.core.security import decode_access_token, UserRole
+from brandtrace.modules.auth.models import RegisterRequest, UserRole
+from brandtrace.core.security import decode_access_token
 
 def test_demo_account_valid_authentication():
     """Verify demo@brandtrace.ai authenticates successfully with designated credentials."""

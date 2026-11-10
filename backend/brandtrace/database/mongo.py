@@ -5,6 +5,7 @@ from typing import Optional, Dict, Any, List
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from pymongo import ASCENDING, DESCENDING, IndexModel
 from pymongo.errors import PyMongoError
+from bson import ObjectId
 from brandtrace.core.config import settings
 
 logger = logging.getLogger("brandtrace.database")

@@ -91,7 +91,7 @@ class MultimodalContentEngine:
     def analyze_image_bytes(
         self,
         image_bytes: bytes,
-        bkg: BrandKnowledgeGraph,
+        bkg: Optional[BrandKnowledgeGraph] = None,
         asset_name: str = "Uploaded Image"
     ) -> Tuple[List[MultimodalFinding], List[str], Dict[str, Any]]:
         """Analyzes an image for brand color harmony, contrast, and visual rules."""
@@ -166,7 +166,7 @@ class MultimodalContentEngine:
     def analyze_video_frames(
         self,
         video_temp_path: str,
-        bkg: BrandKnowledgeGraph,
+        bkg: Optional[BrandKnowledgeGraph] = None,
         max_frames: int = 4
     ) -> Tuple[List[MultimodalFinding], int, List[str]]:
         """Extracts representative frames from video using OpenCV and runs visual compliance."""
@@ -257,7 +257,7 @@ class MultimodalContentEngine:
     def analyze_text_content(
         self,
         text: str,
-        bkg: BrandKnowledgeGraph
+        bkg: Optional[BrandKnowledgeGraph] = None
     ) -> List[MultimodalFinding]:
         """
         Executes complete text intelligence on extracted or plain text:
@@ -413,7 +413,7 @@ class MultimodalContentEngine:
         self,
         filename: str,
         file_bytes: bytes,
-        bkg: BrandKnowledgeGraph
+        bkg: Optional[BrandKnowledgeGraph] = None
     ) -> MultimodalInspectionReport:
         """
         Complete multimodal pipeline on any uploaded file:
