@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Network, Flame, FileSpreadsheet, Database, RefreshCw } from 'lucide-react';
+import { ShieldCheck, Network, Flame, FileSpreadsheet, Database, RefreshCw, GitFork } from 'lucide-react';
 import { BrandProfile, DatabaseStatus } from '../types';
 
 interface NavbarProps {
@@ -30,17 +30,17 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* Brand & Identity */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-teal-400 flex items-center justify-center shadow-lg shadow-brand-500/20">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-500 via-brand-500 to-teal-400 flex items-center justify-center shadow-lg shadow-brand-500/20">
             <ShieldCheck className="w-5 h-5 text-slate-950 stroke-[2.5]" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <span className="font-extrabold tracking-tight text-white text-base">BRANDTRACE</span>
-              <span className="text-[10px] font-bold uppercase tracking-wider bg-brand-500/10 text-brand-400 border border-brand-500/30 px-1.5 py-0.5 rounded">
-                Control Plane
+              <span className="text-[10px] font-bold uppercase tracking-wider bg-rose-500/20 text-rose-300 border border-rose-500/40 px-1.5 py-0.5 rounded">
+                BDIG Engine
               </span>
             </div>
-            <p className="text-[11px] text-slate-400">Autonomous Brand Intelligence & Governance</p>
+            <p className="text-[11px] text-slate-400">Brand Dependency Intelligence & Governance</p>
           </div>
         </div>
 
@@ -64,6 +64,18 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Navigation Tabs */}
       <nav className="flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl border border-slate-800/80">
+        <button
+          onClick={() => setCurrentTab('bdig')}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            currentTab === 'bdig'
+              ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-white shadow-md shadow-rose-500/20'
+              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+          }`}
+        >
+          <GitFork className="w-3.5 h-3.5" />
+          Dependency Intelligence
+        </button>
+
         <button
           onClick={() => setCurrentTab('inspector')}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${

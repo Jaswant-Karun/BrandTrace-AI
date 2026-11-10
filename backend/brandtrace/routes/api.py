@@ -4,10 +4,12 @@ from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 
 from brandtrace.database.mongo import mongo_manager
-from brandtrace.data.seed_data import BRAND_SEEDS
+from brandtrace.data.seed_data import BRAND_SEEDS, APPROVED_FACTS_CATALOG
 from brandtrace.graph.engine import BrandKnowledgeGraph
+from brandtrace.graph.dependency_engine import dependency_engine
 from brandtrace.graph.schema import (
-    BrandGraphData, BlastRadiusResponse, SeverityLevel
+    BrandGraphData, BlastRadiusResponse, SeverityLevel,
+    FactMutationRequest, DependencyIntelligenceResult, RevisionTask
 )
 from brandtrace.agents.schema import (
     VerificationRequest, VerificationResult
@@ -47,6 +49,12 @@ class ReleaseSignRequest(BaseModel):
     content: str
     reviewer: str = "Brand Director"
     decision: str = "APPROVED"
+
+class TaskResolutionRequest(BaseModel):
+    reviewer_name: str
+    decision: str = "APPROVED" # "APPROVED" or "REJECTED"
+    final_content: Optional[str] = None
+    resolution_notes: Optional[str] = None
 
 # 1. System & DB Status
 @router.get("/db/status")
@@ -191,4 +199,82 @@ async def seed_database():
         "message": f"Successfully seeded {len(loaded_brands)} enterprise brand profiles into MongoDB & Graph Engine.",
         "brands": loaded_brands
     }
+
+# ==============================================================================
+# BRAND DEPENDENCY INTELLIGENCE GRAPH (BDIG) ENDPOINTS
+# ==============================================================================
+
+@router.get("/facts")
+async def list_approved_facts(brand_id: Optional[str] = Query(None)):
+    """List approved facts (prices, claims, specifications, policies)."""
+    facts = list(APPROVED_FACTS_CATALOG.values())
+    if brand_id:
+        facts = [f for f in facts if f.brand_id == brand_id]
+    return [f.model_dump() for f in facts]
+
+@router.post("/facts/mutate", response_model=DependencyIntelligenceResult)
+async def mutate_approved_fact(req: FactMutationRequest):
+    """
+    Core BDIG Workflow:
+    1. Identifies the modified approved fact (e.g. Price from ₹499 to ₹599).
+    2. Finds all content assets referencing old value.
+    3. Identifies connected advertisements, campaigns, and documents.
+    4. Calculates cross-departmental impact & commercial risk.
+    5. Displays affected resources in a dependency graph.
+    6. Creates revision tasks and routes to authorized reviewers.
+    7. Preserves old versions and historical approval records.
+    8. Never silently modifies or republishes approved content.
+    """
+    bkg = get_or_load_graph(req.brand_id)
+    result = dependency_engine.analyze_and_mutate_fact(bkg, req)
+    
+    # Save tasks to MongoDB
+    for task in result.revision_tasks:
+        await mongo_manager.save_task(task.model_dump())
+        
+    return result
+
+@router.get("/tasks")
+async def list_revision_tasks(brand_id: Optional[str] = Query(None)):
+    """List all actionable revision tasks created by dependency intelligence."""
+    # First check memory engine tasks
+    memory_tasks = list(dependency_engine.revision_tasks.values())
+    if memory_tasks:
+        if brand_id:
+            memory_tasks = [t for t in memory_tasks if t.brand_id == brand_id]
+        return [t.model_dump() for t in memory_tasks]
+    return await mongo_manager.list_tasks(brand_id)
+
+@router.post("/tasks/{task_id}/resolve")
+async def resolve_revision_task(task_id: str, req: TaskResolutionRequest):
+    """
+    Human-controlled sign-off on a revision task.
+    Authorizes update, promotes version, and stamps with cryptographic proof.
+    """
+    success, message, task = dependency_engine.resolve_revision_task(
+        task_id=task_id,
+        reviewer_name=req.reviewer_name,
+        decision=req.decision,
+        final_content=req.final_content or "",
+        resolution_notes=req.resolution_notes or ""
+    )
+    if not success:
+        raise HTTPException(status_code=400, detail=message)
+
+    if task:
+        await mongo_manager.save_task(task.model_dump())
+
+    return {
+        "status": "success",
+        "message": message,
+        "task": task.model_dump() if task else None
+    }
+
+@router.get("/assets/{asset_id}/history")
+async def get_asset_version_history(asset_id: str):
+    """Retrieve immutable version history and prior approvals for an asset."""
+    if asset_id in dependency_engine.version_history:
+        return [v.model_dump() for v in dependency_engine.version_history[asset_id]]
+    return await mongo_manager.get_version_history(asset_id)
+
 

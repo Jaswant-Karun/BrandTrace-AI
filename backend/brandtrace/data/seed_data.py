@@ -237,6 +237,19 @@ APEX_DYNAMICS_DATA = BrandGraphData(
                 "status": "APPROVED",
                 "content": "520 Miles of Zero Compromise. Powered by QuantumCell™ 800V Architecture. The Apex GT arrives."
             }
+        ),
+        Node(
+            id="AST-04",
+            label="PR Wire: The Completely Eco-Friendly Super-Saloon",
+            type=NodeType.ASSET,
+            description="Draft press release: 'Apex Dynamics launches 100% eco-friendly zero-emissions super-saloon.'",
+            properties={
+                "channel": "PR Newswire",
+                "department": "Public Relations",
+                "reviewer_role": "PR Communications Lead",
+                "status": "FLAGGED_FOR_REMEDIATION",
+                "content": "Apex Dynamics unveils the world's most completely eco-friendly vehicle with zero carbon footprint and 85% post-consumer recycled aluminum."
+            }
         )
     ],
     edges=[
@@ -268,6 +281,7 @@ APEX_DYNAMICS_DATA = BrandGraphData(
         # Other claim dependencies
         Edge(source="AST-01", target="AC-01", type=EdgeType.CONTAINS_CLAIM),
         Edge(source="AST-01", target="TM-01", type=EdgeType.DEPENDS_ON),
+        Edge(source="AST-04", target="PC-01", type=EdgeType.DEPENDS_ON, label="violates_greenwashing"),
     ]
 )
 

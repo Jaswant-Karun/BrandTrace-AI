@@ -2,7 +2,7 @@ import time
 import uuid
 import re
 import networkx as nx
-from typing import Dict, List, Any, Set, Tuple
+from typing import Dict, List, Any, Set, Tuple, Optional
 from brandtrace.graph.engine import BrandKnowledgeGraph
 from brandtrace.graph.schema import (
     NodeType, EdgeType, SeverityLevel,
