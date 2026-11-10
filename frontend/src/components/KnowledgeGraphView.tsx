@@ -154,7 +154,7 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
       const matchesRel = relationshipFilter === 'ALL' || edgeType === relationshipFilter;
 
       let isHighlighted = false;
-      let strokeColor = '#334155';
+      let strokeColor = '#CBD5E1';
       let strokeWidth = 1.5;
 
       if (traversedSubgraph) {
@@ -164,10 +164,10 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
           (traversedSubgraph.subgraphNodeIds.includes(edge.source) && traversedSubgraph.subgraphNodeIds.includes(edge.target))
         ) {
           isHighlighted = true;
-          strokeColor = '#06B6D4';
+          strokeColor = '#0F172A';
           strokeWidth = 2.5;
         } else {
-          strokeColor = '#1e293b';
+          strokeColor = '#E2E8F0';
           strokeWidth = 1;
         }
       }
@@ -191,24 +191,26 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
 
   return (
     <div className="space-y-4">
-      {/* Control Bar */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-xl">
+      {/* Top Control Bar */}
+      <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-xs">
         <div className="flex items-center gap-4 flex-wrap">
-          <div className="flex items-center gap-2">
-            <Layers className="w-5 h-5 text-brand-400" />
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center border border-slate-200">
+              <Layers className="w-4 h-4 text-slate-800" />
+            </div>
             <div>
-              <span className="text-xs font-bold text-white uppercase tracking-wider block">
+              <span className="text-xs font-bold text-slate-900 uppercase tracking-wider block">
                 Brand Dependency Intelligence Graph (BDIG)
               </span>
-              <span className="text-[11px] text-slate-400">
+              <span className="text-[11px] text-slate-500">
                 Live MongoDB Atlas Knowledge Ontology
               </span>
             </div>
           </div>
 
           {/* Brand Workspace Switcher */}
-          <div className="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
-            <span className="text-[10px] uppercase font-bold text-slate-400 px-2">Brand:</span>
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs">
+            <span className="text-[10px] uppercase font-bold text-slate-500 px-2">Brand:</span>
             {[
               { id: 'aurelle-tech', label: 'AURELLE (Consumer Tech)' },
               { id: 'apex-dynamics', label: 'APEX (EV Mobility)' },
@@ -217,10 +219,10 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
               <button
                 key={b.id}
                 onClick={() => setActiveBrandId(b.id)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
                   activeBrandId === b.id
-                    ? 'bg-brand-500/20 text-brand-300 border border-brand-500/40'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-white text-slate-900 border border-slate-200 shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 {b.label}
@@ -228,20 +230,20 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
             ))}
           </div>
 
-          <span className="text-xs font-mono text-slate-400 bg-slate-950/60 px-2.5 py-1 rounded-lg border border-slate-800">
+          <span className="text-xs font-mono text-slate-600 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200">
             {nodes.length} nodes · {edges.length} edges
           </span>
         </div>
 
         {/* Filters, Search & Trace Reset */}
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-2.5 flex-wrap">
           {traversedSubgraph && (
             <button
               onClick={handleClearTrace}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-semibold hover:bg-amber-500/30 transition-all animate-pulse"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-300 text-xs font-semibold hover:bg-amber-100 transition-all"
             >
               <X className="w-3.5 h-3.5" />
-              Clear Dependency Trace ({traversedSubgraph.subgraphNodeIds.length} nodes)
+              Clear Trace ({traversedSubgraph.subgraphNodeIds.length} nodes)
             </button>
           )}
 
@@ -250,20 +252,20 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search node name, ID, desc..."
+              placeholder="Search node name, ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500 w-52"
+              className="bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-400 w-48 shadow-xs"
             />
           </div>
 
           {/* Node Category Filter */}
           <div className="flex items-center gap-1.5">
-            <Filter className="w-3.5 h-3.5 text-slate-400" />
+            <Filter className="w-3.5 h-3.5 text-slate-500" />
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500"
+              className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-slate-400 shadow-xs"
             >
               <option value="ALL">All Categories</option>
               <option value="APPROVED_FACT">Approved Facts</option>
@@ -280,11 +282,11 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
 
           {/* Relationship Filter */}
           <div className="flex items-center gap-1.5">
-            <GitFork className="w-3.5 h-3.5 text-slate-400" />
+            <GitFork className="w-3.5 h-3.5 text-slate-500" />
             <select
               value={relationshipFilter}
               onChange={(e) => setRelationshipFilter(e.target.value)}
-              className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500"
+              className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-slate-400 shadow-xs"
             >
               <option value="ALL">All Relationships</option>
               <option value="DEPENDS_ON_FACT">DEPENDS_ON_FACT</option>
@@ -299,7 +301,7 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
           <button
             onClick={loadGraph}
             title="Reload from MongoDB"
-            className="p-1.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-400 hover:text-white"
+            className="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 shadow-xs cursor-pointer"
           >
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -309,11 +311,11 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
       {/* Main Canvas + Detail Drawer */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 h-[700px]">
         {/* Canvas */}
-        <div className={`${selectedNode ? 'lg:col-span-8' : 'lg:col-span-12'} h-full bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden relative shadow-2xl transition-all`}>
+        <div className={`${selectedNode ? 'lg:col-span-8' : 'lg:col-span-12'} h-full bg-white border border-slate-200 rounded-xl overflow-hidden relative shadow-xs transition-all`}>
           {isLoading ? (
-            <div className="w-full h-full flex flex-col items-center justify-center space-y-3">
-              <div className="w-8 h-8 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
-              <p className="text-xs text-slate-400">Loading Brand Knowledge Graph ontology from MongoDB Atlas...</p>
+            <div className="w-full h-full flex flex-col items-center justify-center space-y-3 bg-white">
+              <div className="w-8 h-8 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
+              <p className="text-xs text-slate-500 font-medium">Loading Brand Knowledge Graph ontology from MongoDB Atlas...</p>
             </div>
           ) : (
             <ReactFlow
@@ -326,31 +328,31 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
               fitView
               minZoom={0.2}
               maxZoom={1.5}
-              className="bg-slate-950"
+              className="bg-white"
             >
-              <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="#1e293b" />
-              <Controls className="!bg-slate-900 !border-slate-800 !fill-white" />
+              <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="#E2E8F0" />
+              <Controls className="!bg-white !border-slate-200 !fill-slate-700 !shadow-xs" />
               <MiniMap
                 nodeColor={(node) => {
-                  if (node.data.isHighlighted) return '#06B6D4';
+                  if (node.data.isHighlighted) return '#0F172A';
                   if (node.data.isAffected) return '#F59E0B';
-                  return '#334155';
+                  return '#94A3B8';
                 }}
-                maskColor="rgba(8, 13, 26, 0.75)"
-                className="!bg-slate-900 !border-slate-800 rounded-xl"
+                maskColor="rgba(248, 250, 252, 0.75)"
+                className="!bg-white !border-slate-200 rounded-lg !shadow-xs"
               />
             </ReactFlow>
           )}
 
           {/* Active Trace Legend Overlay */}
           {traversedSubgraph && (
-            <div className="absolute bottom-4 left-4 bg-slate-900/90 border border-slate-800 rounded-xl p-3 text-xs backdrop-blur-md shadow-xl max-w-sm space-y-1 animate-fadeIn">
-              <div className="flex items-center gap-1.5 font-bold text-cyan-300">
-                <Sparkles className="w-3.5 h-3.5" />
+            <div className="absolute bottom-4 left-4 bg-white/95 border border-slate-200 rounded-xl p-3 text-xs backdrop-blur-xs shadow-md max-w-sm space-y-1">
+              <div className="flex items-center gap-1.5 font-bold text-slate-900">
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                 Active Dependency Subgraph
               </div>
-              <p className="text-[11px] text-slate-300">
-                Root: <span className="font-mono text-cyan-400">{traversedSubgraph.startNodeId}</span> · Highlighting {traversedSubgraph.subgraphNodeIds.length} connected touchpoints and {traversedSubgraph.evidenceCitations.length} evidence links.
+              <p className="text-[11px] text-slate-600">
+                Root: <span className="font-mono text-slate-900 font-semibold">{traversedSubgraph.startNodeId}</span> · Highlighting {traversedSubgraph.subgraphNodeIds.length} connected touchpoints and {traversedSubgraph.evidenceCitations.length} evidence links.
               </p>
             </div>
           )}
@@ -358,35 +360,35 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
 
         {/* Selected Node Inspector Drawer (4 cols) */}
         {selectedNode && (
-          <div className="lg:col-span-4 bg-slate-900/95 border border-slate-800 rounded-2xl p-5 shadow-2xl flex flex-col justify-between overflow-y-auto max-h-[700px] animate-fadeIn">
+          <div className="lg:col-span-4 bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col justify-between overflow-y-auto max-h-[700px]">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-wider bg-brand-500/10 text-brand-400 border border-brand-500/30 px-2.5 py-1 rounded">
+                <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-800 border border-slate-200 px-2.5 py-1 rounded">
                   {selectedNode.nodeType || 'GRAPH_NODE'}
                 </span>
                 <button
                   onClick={() => setSelectedNode(null)}
-                  className="text-xs text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800"
+                  className="text-xs text-slate-400 hover:text-slate-700 p-1 rounded-md hover:bg-slate-100"
                 >
                   ✕ Close
                 </button>
               </div>
 
               <div>
-                <h3 className="text-base font-bold text-white mb-1 leading-snug">{selectedNode.label}</h3>
-                <span className="text-xs font-mono text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">
+                <h3 className="text-base font-bold text-slate-900 mb-1 leading-snug">{selectedNode.label}</h3>
+                <span className="text-xs font-mono text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                   {selectedNode.id}
                 </span>
               </div>
 
               {/* Action: Trace Dependencies */}
-              <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80 space-y-2">
+              <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-slate-300">Trace Blast & Dependencies</span>
+                  <span className="text-xs font-semibold text-slate-800">Trace Blast & Dependencies</span>
                   <button
                     onClick={() => handleTraceDependencies(selectedNode.id)}
                     disabled={isTracing}
-                    className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-brand-500 text-slate-950 font-bold text-xs hover:bg-brand-400 transition-all disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-white font-semibold text-xs hover:bg-slate-800 transition-all disabled:opacity-50 cursor-pointer shadow-xs"
                   >
                     {isTracing ? (
                       <span className="animate-spin text-[10px]">⏳</span>
@@ -396,15 +398,15 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
                     Trace DAG
                   </button>
                 </div>
-                <p className="text-[11px] text-slate-400">
+                <p className="text-[11px] text-slate-500 leading-relaxed">
                   Calculates all upstream governing sources and downstream affected marketing assets.
                 </p>
               </div>
 
               {selectedNode.description && (
                 <div className="space-y-1">
-                  <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Description</div>
-                  <p className="text-xs text-slate-300 leading-relaxed bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Description</div>
+                  <p className="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-200">
                     {selectedNode.description}
                   </p>
                 </div>
@@ -413,12 +415,12 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
               {/* Node Properties */}
               {selectedNode.properties && Object.keys(selectedNode.properties).length > 0 && (
                 <div className="space-y-2">
-                  <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Metadata & Citations</div>
-                  <div className="bg-slate-950/60 p-3 rounded-xl border border-slate-800/80 space-y-2 max-h-48 overflow-y-auto">
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Metadata & Citations</div>
+                  <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2 max-h-48 overflow-y-auto">
                     {Object.entries(selectedNode.properties).map(([k, v]) => (
                       <div key={k} className="text-xs">
-                        <span className="text-slate-400 capitalize">{k.replace(/_/g, ' ')}:</span>{' '}
-                        <span className="text-slate-200 font-medium">
+                        <span className="text-slate-500 capitalize">{k.replace(/_/g, ' ')}:</span>{' '}
+                        <span className="text-slate-900 font-medium">
                           {typeof v === 'object' ? JSON.stringify(v) : String(v)}
                         </span>
                       </div>
@@ -430,17 +432,17 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
               {/* Evidence-backed relationship citations for this node */}
               {traversedSubgraph && traversedSubgraph.evidenceCitations.length > 0 && (
                 <div className="space-y-2">
-                  <div className="text-[11px] font-semibold text-cyan-400 uppercase tracking-wider flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3 text-cyan-400" />
+                  <div className="text-[10px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                     Evidence-Backed Relationships
                   </div>
                   <div className="space-y-1.5 max-h-40 overflow-y-auto">
                     {traversedSubgraph.evidenceCitations.map((c, idx) => (
-                      <div key={idx} className="bg-slate-950/80 p-2.5 rounded-lg border border-cyan-900/40 text-[11px]">
-                        <div className="font-mono text-cyan-300 font-semibold mb-0.5">
-                          {c.source_node} <span className="text-slate-400">({c.relationship})</span> → {c.target_node}
+                      <div key={idx} className="bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-[11px]">
+                        <div className="font-mono text-slate-900 font-semibold mb-0.5">
+                          {c.source_node} <span className="text-slate-500">({c.relationship})</span> → {c.target_node}
                         </div>
-                        <div className="text-slate-300 text-[10px] italic">
+                        <div className="text-slate-600 text-[10px] italic">
                           "{c.evidence}"
                         </div>
                       </div>
@@ -450,9 +452,9 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
               )}
             </div>
 
-            <div className="pt-4 border-t border-slate-800 mt-4 text-[11px] text-slate-400 flex items-center justify-between">
-              <span className="flex items-center gap-1.5 text-slate-400">
-                <Shield className="w-3.5 h-3.5 text-brand-400" />
+            <div className="pt-4 border-t border-slate-200 mt-4 text-[11px] text-slate-500 flex items-center justify-between">
+              <span className="flex items-center gap-1.5 text-slate-600 font-medium">
+                <Shield className="w-3.5 h-3.5 text-slate-700" />
                 Live MongoDB DAG Node
               </span>
               <span className="font-mono text-[10px] text-slate-500">{activeBrandId}</span>

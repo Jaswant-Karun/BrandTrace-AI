@@ -197,27 +197,27 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-5">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-gradient-to-tr from-rose-600 to-amber-500 text-slate-950 font-bold shadow-lg shadow-rose-500/20">
-              <GitFork className="w-5 h-5 stroke-[2.5]" />
+      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-xs">
+              <GitFork className="w-5 h-5 stroke-[2.2]" />
             </div>
             <div>
-              <h2 className="text-base font-extrabold text-white tracking-tight flex items-center gap-2">
+              <h2 className="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
                 Brand Dependency Intelligence Graph (BDIG)
-                <span className="text-[10px] font-bold uppercase tracking-wider bg-rose-500/20 text-rose-300 border border-rose-500/40 px-2 py-0.5 rounded">
+                <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200 px-2 py-0.5 rounded">
                   Connected Control Plane
                 </span>
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500 mt-0.5">
                 Connects distributed marketing copy, advertisements, websites, and sales documents to the foundational facts on which they depend.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-xs font-mono text-slate-400 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
-            <Lock className="w-3.5 h-3.5 text-brand-400" />
+          <div className="flex items-center gap-2 text-xs font-mono text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
+            <Lock className="w-3.5 h-3.5 text-slate-700" />
             Zero-Silent-Overwrite Policy Active
           </div>
         </div>
@@ -227,21 +227,21 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Mutation Studio (4 Cols) */}
         <div className="lg:col-span-4 space-y-4">
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-rose-400" />
+          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-slate-700" />
                 Approved Fact Mutation Studio
               </h3>
             </div>
 
             {/* Fact Selector */}
             <div>
-              <label className="text-xs text-slate-400 font-medium block mb-1">Select Approved Fact</label>
+              <label className="text-xs text-slate-600 font-semibold block mb-1">Select Approved Fact</label>
               <select
                 value={selectedFactId}
                 onChange={(e) => handleFactChange(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500 font-medium"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-slate-400 font-medium shadow-xs"
               >
                 {facts.map((f) => (
                   <option key={f.id} value={f.id}>
@@ -254,22 +254,22 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
             {/* Old Value vs New Value */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs text-slate-400 font-medium block mb-1">Current Approved Value</label>
+                <label className="text-xs text-slate-600 font-medium block mb-1">Current Approved</label>
                 <input
                   type="text"
                   value={oldValue}
                   onChange={(e) => setOldValue(e.target.value)}
-                  className="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 font-mono"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-700 font-mono"
                   placeholder="e.g. ₹499"
                 />
               </div>
               <div>
-                <label className="text-xs text-rose-400 font-bold block mb-1">New Proposed Value</label>
+                <label className="text-xs text-slate-900 font-bold block mb-1">New Proposed</label>
                 <input
                   type="text"
                   value={newValue}
                   onChange={(e) => setNewValue(e.target.value)}
-                  className="w-full bg-slate-950 border border-rose-500/50 rounded-xl px-3 py-2 text-xs text-white font-mono font-bold focus:outline-none focus:border-rose-400"
+                  className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 font-mono font-bold focus:outline-none focus:border-slate-900 shadow-xs"
                   placeholder="e.g. ₹599"
                 />
               </div>
@@ -277,13 +277,13 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
 
             {/* Mutation Rationale */}
             <div>
-              <label className="text-xs text-slate-400 font-medium block mb-1">Business Context & Authority</label>
+              <label className="text-xs text-slate-600 font-medium block mb-1">Business Context & Authority</label>
               <textarea
                 rows={3}
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder="Reason for change..."
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-500 font-mono resize-none leading-relaxed"
+                className="w-full bg-white border border-slate-200 rounded-lg p-3 text-xs text-slate-900 focus:outline-none focus:border-slate-400 font-mono resize-none leading-relaxed shadow-xs"
               />
             </div>
 
@@ -291,7 +291,7 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
             <button
               onClick={handleRunAnalysis}
               disabled={isAnalyzing || !oldValue || !newValue}
-              className="w-full py-2.5 rounded-xl bg-gradient-to-r from-rose-600 via-pink-600 to-amber-500 hover:from-rose-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-rose-500/25 transition-all cursor-pointer disabled:opacity-50"
+              className="w-full py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer disabled:opacity-50"
             >
               {isAnalyzing ? (
                 <>
@@ -300,7 +300,7 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
                 </>
               ) : (
                 <>
-                  <GitFork className="w-4 h-4 stroke-[2.5]" />
+                  <GitFork className="w-4 h-4 stroke-[2.2]" />
                   Execute Dependency Impact Analysis
                 </>
               )}
@@ -308,15 +308,15 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
           </div>
 
           {/* Quick Scenario Preset Box */}
-          <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800/80 text-xs space-y-2">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
               Flagship Scenario Loaded
             </span>
-            <div className="text-slate-200 font-semibold">
-              Product Price Change: <span className="text-amber-400 font-mono">₹499</span> ➔{' '}
-              <span className="text-rose-400 font-mono">₹599</span>
+            <div className="text-slate-900 font-semibold">
+              Product Price Change: <span className="text-slate-600 font-mono line-through">₹499</span> ➔{' '}
+              <span className="text-emerald-700 font-mono font-bold">₹599</span>
             </div>
-            <p className="text-[11px] text-slate-400 leading-relaxed">
+            <p className="text-[11px] text-slate-500 leading-relaxed">
               Demonstrates automatic discovery of connected Meta ads, Google PPC ads, checkout pricing pages, and B2B sales PDFs without blind keyword search.
             </p>
           </div>
@@ -325,12 +325,12 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
         {/* Right Column: Visual Dependency Canvas & Impact Metrics (8 Cols) */}
         <div className="lg:col-span-8 space-y-4">
           {!result && !isAnalyzing && (
-            <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-12 text-center flex flex-col items-center justify-center min-h-[420px]">
-              <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center mb-4 text-slate-400">
-                <GitFork className="w-6 h-6 text-rose-400" />
+            <div className="bg-white border border-slate-200 rounded-xl p-12 text-center flex flex-col items-center justify-center min-h-[420px] shadow-xs">
+              <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center mb-4 text-slate-700 border border-slate-200">
+                <GitFork className="w-6 h-6" />
               </div>
-              <h4 className="text-base font-bold text-white mb-1">Brand Dependency Intelligence Ready</h4>
-              <p className="text-xs text-slate-400 max-w-md">
+              <h4 className="text-sm font-bold text-slate-900 mb-1">Brand Dependency Intelligence Ready</h4>
+              <p className="text-xs text-slate-500 max-w-md">
                 Click <strong>Execute Dependency Impact Analysis</strong> to trace all marketing assets, campaigns, and documents dependent on this approved fact.
               </p>
             </div>
@@ -339,25 +339,29 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
           {result && (
             <div className="space-y-4">
               {/* Impact Banner Card */}
-              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-3">
+              <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold uppercase bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase ${
+                        result.risk_level === 'CRITICAL' || result.risk_level === 'HIGH'
+                          ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                          : 'bg-amber-50 text-amber-700 border border-amber-200'
+                      }`}>
                         {result.risk_level} Impact
                       </span>
-                      <span className="text-xs font-mono text-slate-400">
+                      <span className="text-xs font-mono text-slate-600">
                         Fact: {result.fact_name} ({result.old_value} ➔ {result.new_value})
                       </span>
                     </div>
-                    <p className="text-xs text-slate-300 max-w-xl leading-relaxed">
+                    <p className="text-xs text-slate-600 max-w-xl leading-relaxed">
                       {result.impact_summary}
                     </p>
                   </div>
 
                   <div className="text-right">
-                    <div className="text-2xl font-black text-rose-400">{result.commercial_risk_score}</div>
-                    <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                    <div className="text-2xl font-black text-slate-900">{result.commercial_risk_score}</div>
+                    <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                       Exposure Index
                     </div>
                   </div>
@@ -365,31 +369,31 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
 
                 {/* 3 Metric Pills */}
                 <div className="grid grid-cols-3 gap-3 pt-2">
-                  <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
-                    <div className="flex items-center justify-between text-slate-400 mb-1">
+                  <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <div className="flex items-center justify-between text-slate-500 mb-1">
                       <span className="text-[10px] font-bold uppercase">Affected Assets</span>
-                      <FileSpreadsheet className="w-3.5 h-3.5 text-brand-400" />
+                      <FileSpreadsheet className="w-3.5 h-3.5 text-slate-700" />
                     </div>
-                    <div className="text-lg font-bold text-white">{result.total_affected_assets}</div>
-                    <div className="text-[10px] text-slate-400">Ads, Websites, PDFs</div>
+                    <div className="text-lg font-bold text-slate-900">{result.total_affected_assets}</div>
+                    <div className="text-[10px] text-slate-500">Ads, Websites, PDFs</div>
                   </div>
 
-                  <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
-                    <div className="flex items-center justify-between text-slate-400 mb-1">
+                  <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <div className="flex items-center justify-between text-slate-500 mb-1">
                       <span className="text-[10px] font-bold uppercase">Connected Campaigns</span>
-                      <Building className="w-3.5 h-3.5 text-indigo-400" />
+                      <Building className="w-3.5 h-3.5 text-slate-700" />
                     </div>
-                    <div className="text-lg font-bold text-white">{result.total_affected_campaigns}</div>
-                    <div className="text-[10px] text-slate-400">Active Campaign Initiatives</div>
+                    <div className="text-lg font-bold text-slate-900">{result.total_affected_campaigns}</div>
+                    <div className="text-[10px] text-slate-500">Active Campaign Initiatives</div>
                   </div>
 
-                  <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
-                    <div className="flex items-center justify-between text-slate-400 mb-1">
+                  <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <div className="flex items-center justify-between text-slate-500 mb-1">
                       <span className="text-[10px] font-bold uppercase">Departments Involved</span>
-                      <Users className="w-3.5 h-3.5 text-amber-400" />
+                      <Users className="w-3.5 h-3.5 text-slate-700" />
                     </div>
-                    <div className="text-lg font-bold text-white">{result.total_departments}</div>
-                    <div className="text-[10px] text-slate-400 truncate">
+                    <div className="text-lg font-bold text-slate-900">{result.total_departments}</div>
+                    <div className="text-[10px] text-slate-500 truncate">
                       {result.affected_departments.join(', ')}
                     </div>
                   </div>
@@ -397,9 +401,9 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
               </div>
 
               {/* ReactFlow Interactive Dependency Canvas */}
-              <div className="bg-slate-950 border border-slate-800 rounded-2xl h-[340px] overflow-hidden relative shadow-2xl">
-                <div className="absolute top-3 left-3 z-10 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-800 text-[11px] font-mono text-slate-300 flex items-center gap-2">
-                  <GitFork className="w-3.5 h-3.5 text-rose-400" />
+              <div className="bg-white border border-slate-200 rounded-xl h-[340px] overflow-hidden relative shadow-xs">
+                <div className="absolute top-3 left-3 z-10 bg-white/95 backdrop-blur-xs px-3 py-1.5 rounded-lg border border-slate-200 text-[11px] font-mono text-slate-800 flex items-center gap-2 shadow-xs">
+                  <GitFork className="w-3.5 h-3.5 text-slate-700" />
                   Live Dependency Tree: {result.fact_name}
                 </div>
                 <ReactFlow
@@ -411,9 +415,10 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
                   fitView
                   minZoom={0.3}
                   maxZoom={1.5}
+                  className="bg-white"
                 >
-                  <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#1e293b" />
-                  <Controls className="!bg-slate-900 !border-slate-800" />
+                  <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#E2E8F0" />
+                  <Controls className="!bg-white !border-slate-200 !fill-slate-700 !shadow-xs" />
                 </ReactFlow>
               </div>
             </div>
@@ -423,44 +428,44 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
 
       {/* Actionable Revision Tasks & Reviewer Routing Center */}
       {result && (
-        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4 animate-fadeIn">
-          <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-4 pb-3 border-b border-slate-100">
             <div>
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                <Users className="w-4 h-4 text-brand-400" />
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                <Users className="w-4 h-4 text-slate-800" />
                 Revision Tasks & Authorized Reviewer Routing ({result.revision_tasks.length})
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500 mt-0.5">
                 BrandTrace routes each affected asset to its designated department reviewer. No content is silently altered.
               </p>
             </div>
 
             {/* Status Filter */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg border border-slate-200">
               <button
                 onClick={() => setTaskFilter('ALL')}
-                className={`px-3 py-1 rounded-lg text-xs font-semibold ${
-                  taskFilter === 'ALL' ? 'bg-brand-600 text-white' : 'bg-slate-950 text-slate-400 hover:text-white'
+                className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${
+                  taskFilter === 'ALL' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 All Tasks
               </button>
               <button
                 onClick={() => setTaskFilter('PENDING_REVIEW')}
-                className={`px-3 py-1 rounded-lg text-xs font-semibold ${
+                className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${
                   taskFilter === 'PENDING_REVIEW'
-                    ? 'bg-amber-600 text-white'
-                    : 'bg-slate-950 text-slate-400 hover:text-white'
+                    ? 'bg-white text-amber-800 shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 Pending Review
               </button>
               <button
                 onClick={() => setTaskFilter('APPROVED_SEALED')}
-                className={`px-3 py-1 rounded-lg text-xs font-semibold ${
+                className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${
                   taskFilter === 'APPROVED_SEALED'
-                    ? 'bg-emerald-600 text-white'
-                    : 'bg-slate-950 text-slate-400 hover:text-white'
+                    ? 'bg-white text-emerald-800 shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 Approved & Sealed
@@ -469,9 +474,9 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
           </div>
 
           {/* Tasks Table */}
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto border border-slate-200 rounded-lg">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-950/80 border-b border-slate-800 text-slate-400 uppercase font-semibold text-[10px] tracking-wider">
+              <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase font-semibold text-[10px] tracking-wider">
                 <tr>
                   <th className="py-3 px-4">Task & Resource</th>
                   <th className="py-3 px-4">Department & Reviewer Role</th>
@@ -479,20 +484,20 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
                   <th className="py-3 px-4">Status & Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 font-sans">
+              <tbody className="divide-y divide-slate-100 font-sans">
                 {filteredTasks.map((task) => (
-                  <tr key={task.task_id} className="hover:bg-slate-800/30 transition-colors">
+                  <tr key={task.task_id} className="hover:bg-slate-50/70 transition-colors">
                     <td className="py-4 px-4 align-top">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-white text-xs">{task.asset_name}</span>
-                        <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-slate-800 text-brand-300">
+                        <span className="font-bold text-slate-900 text-xs">{task.asset_name}</span>
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-slate-100 text-slate-700 border border-slate-200">
                           {task.asset_type}
                         </span>
                       </div>
-                      <div className="text-[11px] font-mono text-slate-400 mb-1">{task.task_id}</div>
+                      <div className="text-[11px] font-mono text-slate-500 mb-1">{task.task_id}</div>
                       <button
                         onClick={() => handleViewVersionHistory(task.asset_id)}
-                        className="text-[11px] text-brand-400 hover:underline flex items-center gap-1 font-mono cursor-pointer"
+                        className="text-[11px] text-slate-600 hover:text-slate-900 flex items-center gap-1 font-mono cursor-pointer underline"
                       >
                         <History className="w-3 h-3" />
                         View Version Audit Trail
@@ -500,21 +505,21 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
                     </td>
 
                     <td className="py-4 px-4 align-top">
-                      <div className="font-semibold text-slate-200">{task.department}</div>
-                      <div className="text-[11px] text-amber-300/90 font-medium">
+                      <div className="font-semibold text-slate-900">{task.department}</div>
+                      <div className="text-[11px] text-slate-600 font-medium mt-0.5">
                         Assignee: {task.assigned_reviewer_role}
                       </div>
-                      <div className="text-[10px] font-bold uppercase tracking-wider text-rose-400 mt-1">
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-rose-700 mt-1">
                         Priority: {task.priority}
                       </div>
                     </td>
 
                     <td className="py-4 px-4 align-top max-w-md">
-                      <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800/80 font-mono text-[11px] leading-relaxed text-slate-300 space-y-1">
+                      <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 font-mono text-[11px] leading-relaxed text-slate-800 space-y-1">
                         <div className="text-slate-400 line-through text-[10px]">
                           Old: {task.current_content}
                         </div>
-                        <div className="text-emerald-300 font-semibold">
+                        <div className="text-emerald-700 font-semibold">
                           Proposed: {task.proposed_content}
                         </div>
                       </div>
@@ -523,12 +528,12 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
                     <td className="py-4 px-4 align-top">
                       {task.status === 'APPROVED_SEALED' ? (
                         <div className="space-y-1">
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                            <CheckCircle2 className="w-3 h-3" />
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                             Approved & Sealed
                           </span>
                           {task.audit_proof && (
-                            <div className="text-[10px] font-mono text-slate-400 truncate max-w-[120px]">
+                            <div className="text-[10px] font-mono text-slate-500 truncate max-w-[120px]">
                               {task.audit_proof}
                             </div>
                           )}
@@ -539,7 +544,7 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
                             setSelectedTask(task);
                             setReviewerName(task.assigned_reviewer_role);
                           }}
-                          className="px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-md shadow-brand-600/20 cursor-pointer"
+                          className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
                         >
                           <Lock className="w-3 h-3" />
                           Review & Authorize
@@ -556,29 +561,29 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
 
       {/* Human Review & Sign-Off Modal */}
       {selectedTask && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+          <div className="bg-white border border-slate-200 rounded-2xl max-w-xl w-full p-6 shadow-xl space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div>
-                <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                  <Lock className="w-4 h-4 text-brand-400" />
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-slate-800" />
                   Authorized Governance Sign-Off Gate
                 </h3>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-500 mt-0.5">
                   Task ID: {selectedTask.task_id} | Asset: {selectedTask.asset_name}
                 </p>
               </div>
               <button
                 onClick={() => setSelectedTask(null)}
-                className="text-xs text-slate-400 hover:text-white"
+                className="text-xs text-slate-400 hover:text-slate-700 p-1 rounded-md hover:bg-slate-100 cursor-pointer"
               >
                 ✕ Close
               </button>
             </div>
 
             {/* Zero Silent Overwrite Callout */}
-            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs flex items-start gap-2">
-              <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+            <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5">
+              <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <div>
                 <strong>Human-Controlled Decision Making:</strong> BrandTrace does not silently overwrite approved releases. This action explicitly promotes version v1.1 to v2.0 and generates an immutable audit hash.
               </div>
@@ -586,17 +591,17 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
 
             {/* Diff View */}
             <div className="space-y-2">
-              <label className="text-xs text-slate-400 font-medium block">Approved Content Diff</label>
-              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono space-y-2 leading-relaxed">
+              <label className="text-xs text-slate-600 font-semibold block">Approved Content Diff</label>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono space-y-2 leading-relaxed">
                 <div>
-                  <span className="text-red-400 font-bold block text-[10px] uppercase">Original Live Content:</span>
-                  <p className="text-slate-400 line-through">{selectedTask.current_content}</p>
+                  <span className="text-rose-700 font-bold block text-[10px] uppercase">Original Live Content:</span>
+                  <p className="text-slate-500 line-through">{selectedTask.current_content}</p>
                 </div>
-                <div className="pt-2 border-t border-slate-800">
-                  <span className="text-emerald-400 font-bold block text-[10px] uppercase">
+                <div className="pt-2 border-t border-slate-200">
+                  <span className="text-emerald-700 font-bold block text-[10px] uppercase">
                     Proposed Remediated Content:
                   </span>
-                  <p className="text-emerald-300 font-semibold">{selectedTask.proposed_content}</p>
+                  <p className="text-emerald-800 font-semibold">{selectedTask.proposed_content}</p>
                 </div>
               </div>
             </div>
@@ -604,40 +609,40 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
             {/* Reviewer Details */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs text-slate-400 font-medium block mb-1">Authorizing Reviewer</label>
+                <label className="text-xs text-slate-600 font-medium block mb-1">Authorizing Reviewer</label>
                 <input
                   type="text"
                   value={reviewerName}
                   onChange={(e) => setReviewerName(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500 font-medium"
+                  className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-slate-400 font-medium shadow-xs"
                 />
               </div>
               <div>
-                <label className="text-xs text-slate-400 font-medium block mb-1">Department</label>
+                <label className="text-xs text-slate-600 font-medium block mb-1">Department</label>
                 <input
                   type="text"
                   readOnly
                   value={selectedTask.department}
-                  className="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-400 font-medium"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-600 font-medium"
                 />
               </div>
             </div>
 
             {/* Resolution Notes */}
             <div>
-              <label className="text-xs text-slate-400 font-medium block mb-1">Compliance & Resolution Notes</label>
+              <label className="text-xs text-slate-600 font-medium block mb-1">Compliance & Resolution Notes</label>
               <textarea
                 rows={2}
                 value={resolutionNotes}
                 onChange={(e) => setResolutionNotes(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-500 resize-none font-mono"
+                className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs text-slate-900 focus:outline-none focus:border-slate-400 resize-none font-mono shadow-xs"
               />
             </div>
 
             {/* Success Message */}
             {resolutionSuccess && (
-              <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 {resolutionSuccess}
               </div>
             )}
@@ -646,14 +651,14 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 onClick={() => setSelectedTask(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white"
+                className="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900"
               >
                 Cancel
               </button>
               <button
                 onClick={handleResolveTask}
                 disabled={isResolving}
-                className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-slate-950 font-bold text-xs flex items-center gap-2 shadow-lg shadow-emerald-500/25 transition-all cursor-pointer"
+                className="px-5 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs flex items-center gap-2 shadow-xs transition-all cursor-pointer"
               >
                 {isResolving ? 'Sealing in Release Ledger...' : 'Approve & Seal Release v2.0'}
               </button>
@@ -664,19 +669,19 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
 
       {/* Version History Drawer Modal */}
       {versionHistoryAssetId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+          <div className="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-6 shadow-xl space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <History className="w-5 h-5 text-brand-400" />
+                <History className="w-5 h-5 text-slate-800" />
                 <div>
-                  <h3 className="text-sm font-bold text-white">Immutable Version History</h3>
-                  <p className="text-xs text-slate-400">Asset ID: {versionHistoryAssetId}</p>
+                  <h3 className="text-sm font-bold text-slate-900">Immutable Version History</h3>
+                  <p className="text-xs text-slate-500">Asset ID: {versionHistoryAssetId}</p>
                 </div>
               </div>
               <button
                 onClick={() => setVersionHistoryAssetId(null)}
-                className="text-xs text-slate-400 hover:text-white"
+                className="text-xs text-slate-400 hover:text-slate-700 p-1 rounded-md hover:bg-slate-100 cursor-pointer"
               >
                 ✕ Close
               </button>
@@ -684,36 +689,36 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
 
             <div className="space-y-3 max-h-96 overflow-y-auto">
               {isLoadingVersions ? (
-                <div className="p-8 text-center text-xs text-slate-400">Loading version records...</div>
+                <div className="p-8 text-center text-xs text-slate-500">Loading version records...</div>
               ) : versionRecords.length === 0 ? (
-                <div className="p-8 text-center text-xs text-slate-400">No version history recorded yet.</div>
+                <div className="p-8 text-center text-xs text-slate-500">No version history recorded yet.</div>
               ) : (
                 versionRecords.map((ver, i) => (
                   <div
                     key={i}
                     className={`p-3.5 rounded-xl border text-xs space-y-1.5 ${
                       ver.status === 'ACTIVE_APPROVED'
-                        ? 'bg-emerald-950/30 border-emerald-500/40'
+                        ? 'bg-emerald-50/70 border-emerald-200'
                         : ver.status === 'FLAGGED_NEEDS_REVISION'
-                        ? 'bg-amber-950/30 border-amber-500/40'
-                        : 'bg-slate-950 border-slate-800'
+                        ? 'bg-amber-50/70 border-amber-200'
+                        : 'bg-slate-50 border-slate-200'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-white">{ver.version_number}</span>
-                      <span className="text-[10px] font-mono text-slate-400">{ver.timestamp_iso}</span>
+                      <span className="font-bold text-slate-900">{ver.version_number}</span>
+                      <span className="text-[10px] font-mono text-slate-500">{ver.timestamp_iso}</span>
                     </div>
 
-                    <div className="p-2 rounded bg-slate-950/80 font-mono text-[11px] text-slate-200">
+                    <div className="p-2 rounded bg-white border border-slate-200 font-mono text-[11px] text-slate-800">
                       {ver.content}
                     </div>
 
-                    <div className="text-[10px] text-slate-400 italic">
+                    <div className="text-[10px] text-slate-500 italic">
                       Change notes: {ver.change_notes}
                     </div>
 
                     {ver.approval_record && (
-                      <div className="pt-1 border-t border-slate-800/80 text-[10px] text-emerald-400 font-mono flex items-center justify-between">
+                      <div className="pt-1 border-t border-slate-200 text-[10px] text-emerald-700 font-mono flex items-center justify-between">
                         <span>Reviewer: {ver.approval_record.reviewer}</span>
                         <span>Audit: {ver.approval_record.audit_hash.substring(0, 10)}...</span>
                       </div>

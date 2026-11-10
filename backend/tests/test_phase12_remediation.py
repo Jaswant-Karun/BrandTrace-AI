@@ -227,7 +227,7 @@ async def test_repo_add_brand_guideline_immutable_id_preserved():
     BrandGuidelineDoc update test:
     1. Insert new guideline.
     2. Retrieve and record _id.
-    3. Update severity and description.
+    3. Update severity and rule_statement.
     4. Confirm update succeeds.
     5. Confirm original _id preserved.
     """
@@ -242,7 +242,7 @@ async def test_repo_add_brand_guideline_immutable_id_preserved():
         workspace_id=ws_id,
         category="TYPOGRAPHY",
         title="Primary Headline Tracking",
-        description="Tracking must be tight (-0.02em)",
+        rule_statement="Tracking must be tight (-0.02em)",
         severity="MEDIUM",
         created_at=now_ts,
         updated_at=now_ts
@@ -260,7 +260,7 @@ async def test_repo_add_brand_guideline_immutable_id_preserved():
 
         # 3. Update
         gl_doc.severity = "CRITICAL"
-        gl_doc.description = "Updated strict tracking rule"
+        gl_doc.rule_statement = "Updated strict tracking rule"
         await repo.add_brand_guideline(gl_doc)
 
         # 5. Confirm _id preserved and fields updated
@@ -269,7 +269,7 @@ async def test_repo_add_brand_guideline_immutable_id_preserved():
         )
         assert updated_doc["_id"] == orig_id
         assert updated_doc["severity"] == "CRITICAL"
-        assert updated_doc["description"] == "Updated strict tracking rule"
+        assert updated_doc["rule_statement"] == "Updated strict tracking rule"
         assert updated_doc["title"] == "Primary Headline Tracking"
 
 
@@ -291,11 +291,11 @@ async def test_repo_save_content_asset_immutable_id_preserved():
         asset_id="AST-DEF02-01",
         organisation_id=org_id,
         workspace_id=ws_id,
-        name="Launch Keynote Teaser",
-        asset_type="SOCIAL_POST",
-        channel="TWITTER",
+        title="Launch Keynote Teaser",
+        channel="Social Media",
+        raw_content="Discover precision engineering at its finest.",
+        content_hash="hash_teaser_v1",
         status="DRAFT",
-        content_text="Discover precision engineering at its finest.",
         created_at=now_ts,
         updated_at=now_ts
     )
@@ -312,7 +312,7 @@ async def test_repo_save_content_asset_immutable_id_preserved():
 
         # 3. Update status to IN_REVIEW
         asset_doc.status = "IN_REVIEW"
-        asset_doc.content_text = "Updated: Discover titanium craftsmanship."
+        asset_doc.raw_content = "Updated: Discover titanium craftsmanship."
         await repo.save_content_asset(asset_doc)
 
         # 5. Confirm _id preserved
@@ -321,8 +321,8 @@ async def test_repo_save_content_asset_immutable_id_preserved():
         )
         assert updated_doc["_id"] == orig_id
         assert updated_doc["status"] == "IN_REVIEW"
-        assert updated_doc["content_text"] == "Updated: Discover titanium craftsmanship."
-        assert updated_doc["asset_type"] == "SOCIAL_POST"
+        assert updated_doc["raw_content"] == "Updated: Discover titanium craftsmanship."
+        assert updated_doc["title"] == "Launch Keynote Teaser"
 
 
 @pytest.mark.anyio
