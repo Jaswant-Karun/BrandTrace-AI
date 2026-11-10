@@ -87,7 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCurrentWorkspace(workspaceId);
     if (workspaceId === 'novus-health') {
       setCurrentOrg('ORG-NOVUS');
-    } else if (workspaceId === 'aurelle-maison') {
+    } else if (workspaceId === 'aurelle-maison' || workspaceId === 'aurelle-tech') {
       setCurrentOrg('ORG-AURELLE');
     } else {
       setCurrentOrg('ORG-APEX');
