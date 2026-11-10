@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AlertTriangle, ShieldCheck, Scale } from 'lucide-react';
+import { ShieldCheck, Scale } from 'lucide-react';
 import { PageHeader } from './ui/PageHeader';
 
 interface RiskIntelligenceViewProps {

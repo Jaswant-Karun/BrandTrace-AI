@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BarChart3, ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { PageHeader } from './ui/PageHeader';
 
 interface GovernanceAnalyticsViewProps {

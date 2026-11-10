@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   ShieldCheck, Lock, Mail, ArrowRight, Sparkles,
-  AlertCircle, Building2, CheckCircle2, UserCheck
+  AlertCircle, CheckCircle2, UserCheck
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 

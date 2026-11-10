@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import {
   ShieldCheck, ArrowRight, TrendingUp,
-  Lock, Sparkles, Building2, Activity, Layers,
+  Lock, Sparkles, Layers,
   BookOpen, GitFork, Flame, CheckSquare, CheckCircle2,
-  AlertTriangle, Clock, RefreshCw, FileText
+  Clock
 } from 'lucide-react';
 import { NavigationTab } from './Sidebar';
 import { useAuth } from '../context/AuthContext';

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FileText, DollarSign, Layers, CheckCircle2 } from 'lucide-react';
+import { DollarSign, Layers, CheckCircle2 } from 'lucide-react';
 import { PageHeader } from './ui/PageHeader';
 
 interface CampaignIntelligenceViewProps {
