@@ -7,7 +7,10 @@ router = APIRouter(prefix="/auth", tags=["Authentication & RBAC"])
 
 async def get_current_user(authorization: Optional[str] = Header(None)) -> UserProfile:
     """Dependency that validates JWT bearer token and injects tenant user profile."""
+    from brandtrace.core.config import settings
     if not authorization or not authorization.startswith("Bearer "):
+        if settings.environment == "production":
+            raise HTTPException(status_code=401, detail="Authentication credentials required")
         # Return default authorized persona in unauthenticated requests for easy hackathon testing
         return UserProfile(
             user_id="USR-CGO-01",

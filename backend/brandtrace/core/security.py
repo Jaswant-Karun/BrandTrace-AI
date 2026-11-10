@@ -36,8 +36,15 @@ def hash_password(password: str, salt: str = "brandtrace_salt_v1") -> str:
 
 def verify_password(plain_password: str, hashed_password: str, salt: str = "brandtrace_salt_v1") -> bool:
     """Verifies plain password against stored salted hash using constant-time comparison."""
-    computed = hash_password(plain_password, salt)
-    return hmac.compare_digest(computed, hashed_password)
+    if not plain_password or not hashed_password:
+        return False
+    if not isinstance(plain_password, str) or not isinstance(hashed_password, str):
+        return False
+    try:
+        computed = hash_password(plain_password, salt)
+        return hmac.compare_digest(computed, hashed_password)
+    except Exception:
+        return False
 
 def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
     """Creates signed JWT token with expiry and tenant claims."""

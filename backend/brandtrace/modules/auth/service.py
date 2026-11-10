@@ -106,13 +106,37 @@ PRESET_USERS: Dict[str, Dict] = {
 }
 
 class AuthService:
-    def authenticate_user(self, email: str, password: str) -> Optional[UserProfile]:
-        user_record = PRESET_USERS.get(email.lower().strip())
+    def authenticate_user(
+        self,
+        email: str,
+        password: str,
+        allow_mock_fallback: bool = False
+    ) -> Optional[UserProfile]:
+        from brandtrace.core.config import settings
+        if not email or not password or not isinstance(email, str) or not isinstance(password, str):
+            return None
+
+        clean_email = email.lower().strip()
+        user_record = PRESET_USERS.get(clean_email)
         if not user_record:
+            # Mock persona strictly forbidden in production mode; only allowed if explicitly opted in during development/testing
+            if allow_mock_fallback and settings.environment != "production":
+                return UserProfile(
+                    user_id="USR-DEMO-01",
+                    email=clean_email,
+                    name="Authorized Governance Officer",
+                    role=UserRole.COMPLIANCE_REVIEWER,
+                    org_id="ORG-APEX",
+                    workspace_id="apex-dynamics"
+                )
             return None
         
-        # Verify hashed password securely
-        if not verify_password(password, user_record.get("password_hash", "")):
+        # Verify stored password hash safely
+        stored_hash = user_record.get("password_hash")
+        if not stored_hash or not isinstance(stored_hash, str):
+            return None
+
+        if not verify_password(password, stored_hash):
             return None
         
         # Valid user found with verified credentials
