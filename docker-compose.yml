@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # 1. MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: brandtrace-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: brandtrace
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - brandtrace-network
+
+  # 2. FastAPI Governance Engine Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: brandtrace-backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - PORT=8000
+      - HOST=0.0.0.0
+      - MONGODB_URI=mongodb://mongodb:27017
+      - MONGODB_DB_NAME=brandtrace
+      - LLM_PROVIDER=mock
+    depends_on:
+      - mongodb
+    networks:
+      - brandtrace-network
+
+  # 3. Enterprise Frontend Control Plane
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: brandtrace-frontend
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - brandtrace-network
+
+volumes:
+  mongo_data:
+    driver: local
+
+networks:
+  brandtrace-network:
+    driver: bridge
