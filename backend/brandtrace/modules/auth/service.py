@@ -183,4 +183,71 @@ class AuthService:
             workspace_id=payload.get("workspace_id", "apex-dynamics")
         )
 
+    async def register_user(self, req: Any) -> UserProfile:
+        import uuid
+        clean_email = req.email.lower().strip()
+        if not clean_email or "@" not in clean_email:
+            raise ValueError("A valid email address is required.")
+        if not req.name or len(req.name.strip()) < 2:
+            raise ValueError("Full name must be at least 2 characters.")
+        if not req.password or len(req.password) < 6:
+            raise ValueError("Password must be at least 6 characters.")
+            
+        role = req.role if req.role else UserRole.BRAND_MANAGER
+        workspace_id = req.workspace_id or "aurelle-tech"
+        if "novus" in workspace_id:
+            org_id = "ORG-NOVUS"
+        elif "aurelle" in workspace_id:
+            org_id = "ORG-AURELLE"
+        else:
+            org_id = "ORG-APEX"
+            
+        user_id = f"USR-{uuid.uuid4().hex[:8].upper()}"
+        pwd_hash = hash_password(req.password)
+        
+        # Store in memory registry for immediate authentication
+        user_dict = {
+            "user_id": user_id,
+            "email": clean_email,
+            "name": req.name.strip(),
+            "role": role,
+            "org_id": org_id,
+            "workspace_id": workspace_id,
+            "password_hash": pwd_hash
+        }
+        PRESET_USERS[clean_email] = user_dict
+        
+        # Persist to MongoDB if connected
+        try:
+            from brandtrace.database.mongo import mongo_manager
+            from brandtrace.database.schemas import UserDoc, WorkspaceMembershipDoc
+            if mongo_manager.repo and mongo_manager.repo.mm.is_connected:
+                u_doc = UserDoc(
+                    user_id=user_id,
+                    organisation_id=org_id,
+                    workspace_id=workspace_id,
+                    email=clean_email,
+                    name=req.name.strip(),
+                    role=role.value
+                )
+                await mongo_manager.repo.create_user(u_doc)
+                m_doc = WorkspaceMembershipDoc(
+                    organisation_id=org_id,
+                    workspace_id=workspace_id,
+                    user_id=user_id,
+                    role_name=role.value
+                )
+                await mongo_manager.repo.add_workspace_membership(m_doc)
+        except Exception as e:
+            print(f"[Auth] MongoDB user persistence note: {e}")
+            
+        return UserProfile(
+            user_id=user_id,
+            email=clean_email,
+            name=req.name.strip(),
+            role=role,
+            org_id=org_id,
+            workspace_id=workspace_id
+        )
+
 auth_service = AuthService()

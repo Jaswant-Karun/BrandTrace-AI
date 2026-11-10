@@ -70,6 +70,18 @@ class ApiClient {
         method: 'POST',
         body: JSON.stringify({ email: credentials.email, password: credentials.password || 'brandtrace2026' })
       }),
+    register: (data: {
+      name: string;
+      email: string;
+      password: string;
+      organisation_name?: string;
+      role?: string;
+      workspace_id?: string;
+    }) =>
+      this.request<{ access_token: string; user: any }>('/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      }),
     me: () => this.request<any>('/api/auth/me'),
     personas: () => this.request<any[]>('/api/auth/personas'),
   };
