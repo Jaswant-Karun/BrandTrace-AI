@@ -16,6 +16,7 @@ import {
   Search, Filter, Shield, Layers, GitFork, Sparkles, 
   CheckCircle2, RefreshCw, X 
 } from 'lucide-react';
+import { PageHeader } from './ui/PageHeader';
 
 interface KnowledgeGraphViewProps {
   brandId: string;
@@ -191,6 +192,19 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
 
   return (
     <div className="space-y-4">
+      {/* Standardized Enterprise Page Header */}
+      <PageHeader
+        title="Brand Knowledge Graph & Dependency Intelligence"
+        description="Explore how your approved brand facts, guidelines, assets, campaigns, and content are structurally connected in a live MongoDB DAG."
+        category="Knowledge Graph Ontology"
+        workspaceName={activeBrandId}
+        secondaryAction={{
+          label: "Reload Graph",
+          onClick: loadGraph,
+          icon: <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+        }}
+      />
+
       {/* Top Control Bar */}
       <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-xs">
         <div className="flex items-center gap-4 flex-wrap">
