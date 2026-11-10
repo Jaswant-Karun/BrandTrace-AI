@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
-  Flame, ArrowRight, Network, Layers, GitCompare, ShieldAlert, 
-  CheckCircle2, XCircle, AlertTriangle, Lock, Sparkles, Clock, Users, Shield, Check
+  Flame, Network, GitCompare, 
+  CheckCircle2, XCircle, AlertTriangle, Lock, Sparkles, Clock, Check
 } from 'lucide-react';
 import { BlastRadiusResponse } from '../types';
 
