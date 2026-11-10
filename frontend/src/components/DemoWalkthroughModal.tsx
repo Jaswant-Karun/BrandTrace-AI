@@ -123,26 +123,26 @@ export const DemoWalkthroughModal: React.FC<DemoWalkthroughModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-      <div className="relative w-full max-w-6xl max-h-[92vh] flex flex-col bg-[#070B14] border border-[#1E293B] rounded-2xl shadow-2xl text-slate-100 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+      <div className="relative w-full max-w-6xl max-h-[92vh] flex flex-col bg-white border border-slate-200 rounded-2xl shadow-2xl text-slate-900 overflow-hidden">
         
         {/* Top Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#1E293B] bg-[#0A0F1D]/80">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white">
           <div className="flex items-center space-x-3">
-            <div className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
-              <Sparkles className="w-5 h-5 animate-pulse" />
+            <div className="p-2 rounded-xl bg-slate-100 border border-slate-200 text-slate-800">
+              <Sparkles className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h2 className="text-lg font-bold text-white tracking-tight">
+                <h2 className="text-base font-bold text-slate-900 tracking-tight">
                   AURELLE Interactive Governance Walkthrough
                 </h2>
-                <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300">
+                <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-slate-100 border border-slate-200 text-slate-700">
                   Phase 6 Master Scenario
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
-                Fictional consumer technology enterprise · 12-Step lifecycle & 9 statutory test cases · MongoDB Atlas live sync
+              <p className="text-xs text-slate-500">
+                Fictional consumer technology enterprise · 12-Step lifecycle &amp; 9 statutory test cases · MongoDB Atlas live sync
               </p>
             </div>
           </div>
@@ -151,7 +151,7 @@ export const DemoWalkthroughModal: React.FC<DemoWalkthroughModalProps> = ({
             <button
               onClick={handleResetScenario}
               disabled={loading}
-              className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"
+              className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 transition shadow-xs cursor-pointer"
               title="Reset scenario to ₹499 baseline"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -159,7 +159,7 @@ export const DemoWalkthroughModal: React.FC<DemoWalkthroughModalProps> = ({
             </button>
             <button
               onClick={onClose}
-              className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition"
+              className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -167,37 +167,37 @@ export const DemoWalkthroughModal: React.FC<DemoWalkthroughModalProps> = ({
         </div>
 
         {/* Workspace & Persona Quick-Bar */}
-        <div className="flex flex-wrap items-center justify-between px-6 py-2.5 bg-[#0D1527] border-b border-[#1E293B]/60 text-xs">
-          <div className="flex items-center space-x-2 text-slate-400">
+        <div className="flex flex-wrap items-center justify-between px-6 py-2.5 bg-slate-50 border-b border-slate-200 text-xs">
+          <div className="flex items-center space-x-2 text-slate-600">
             <span>Active Enterprise:</span>
-            <span className="font-semibold text-cyan-400 flex items-center space-x-1">
-              <Database className="w-3.5 h-3.5" />
+            <span className="font-semibold text-slate-900 flex items-center space-x-1">
+              <Database className="w-3.5 h-3.5 text-slate-700" />
               <span>ORG-AURELLE / aurelle-tech</span>
             </span>
-            <span className="text-slate-600">|</span>
+            <span className="text-slate-300">|</span>
             <span>Current Cloud Studio Price:</span>
             <span className={`font-mono font-bold px-2 py-0.5 rounded text-xs ${
-              scenarioState?.current_price === '₹599' ? 'bg-amber-950 text-amber-400 border border-amber-700' : 'bg-emerald-950 text-emerald-400 border border-emerald-700'
+              scenarioState?.current_price === '₹599' ? 'bg-amber-50 text-amber-800 border border-amber-300' : 'bg-emerald-50 text-emerald-800 border border-emerald-300'
             }`}>
               {scenarioState?.current_price || '₹499'} / mo
             </span>
           </div>
 
           <div className="flex items-center space-x-2">
-            <span className="text-slate-400">RBAC Persona:</span>
+            <span className="text-slate-600 font-semibold">RBAC Persona:</span>
             <div className="flex items-center space-x-1.5">
               {personas.filter(p => p.org_id === 'ORG-AURELLE' || p.workspace_id === 'aurelle-tech').map((p) => (
                 <button
                   key={p.email}
                   onClick={() => switchPersona(p)}
-                  className={`px-2 py-1 rounded text-xs font-medium transition ${
+                  className={`px-2.5 py-1 rounded text-xs font-medium transition cursor-pointer ${
                     user?.email === p.email
-                      ? 'bg-cyan-500 text-black font-semibold'
-                      : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                      ? 'bg-slate-900 text-white font-semibold shadow-xs'
+                      : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
                   }`}
                   title={`${p.name} (${p.role})`}
                 >
-                  {p.role.replace('_', ' ')}
+                  {p.role.replace(/_/g, ' ')}
                 </button>
               ))}
             </div>
@@ -205,32 +205,32 @@ export const DemoWalkthroughModal: React.FC<DemoWalkthroughModalProps> = ({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-[#1E293B] px-6 bg-[#070B14]">
+        <div className="flex border-b border-slate-200 px-6 bg-white">
           <button
             onClick={() => setActiveTab('lifecycle')}
-            className={`py-3 px-4 text-xs font-semibold border-b-2 flex items-center space-x-2 transition ${
+            className={`py-3 px-4 text-xs font-semibold border-b-2 flex items-center space-x-2 transition cursor-pointer ${
               activeTab === 'lifecycle'
-                ? 'border-cyan-500 text-cyan-400'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                ? 'border-slate-900 text-slate-900'
+                : 'border-transparent text-slate-500 hover:text-slate-900'
             }`}
           >
             <Layers className="w-4 h-4" />
             <span>12-Step Governance Lifecycle</span>
-            <span className="px-1.5 py-0.2 rounded-full bg-slate-800 text-[10px] text-slate-300">
+            <span className="px-1.5 py-0.5 rounded-full bg-slate-100 text-[10px] text-slate-600 font-bold border border-slate-200">
               Step {scenarioState?.current_step || 1}/12
             </span>
           </button>
           <button
             onClick={() => setActiveTab('cases')}
-            className={`py-3 px-4 text-xs font-semibold border-b-2 flex items-center space-x-2 transition ${
+            className={`py-3 px-4 text-xs font-semibold border-b-2 flex items-center space-x-2 transition cursor-pointer ${
               activeTab === 'cases'
-                ? 'border-cyan-500 text-cyan-400'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                ? 'border-slate-900 text-slate-900'
+                : 'border-transparent text-slate-500 hover:text-slate-900'
             }`}
           >
             <ShieldAlert className="w-4 h-4" />
             <span>9 Governance Demonstration Cases</span>
-            <span className="px-1.5 py-0.2 rounded-full bg-cyan-950 text-[10px] text-cyan-300 border border-cyan-800">
+            <span className="px-1.5 py-0.5 rounded-full bg-slate-100 text-[10px] text-slate-700 font-bold border border-slate-200">
               Live AI Inspection
             </span>
           </button>
@@ -242,12 +242,12 @@ export const DemoWalkthroughModal: React.FC<DemoWalkthroughModalProps> = ({
           {/* TAB 1: 12-STEP LIFECYCLE */}
           {activeTab === 'lifecycle' && (
             <div className="space-y-4">
-              <div className="p-4 rounded-xl bg-gradient-to-r from-blue-950/30 via-slate-900 to-cyan-950/30 border border-blue-900/40 flex items-center justify-between">
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-semibold text-white">
+                  <h3 className="text-sm font-semibold text-slate-900">
                     Scenario: Flagship Price Mutation ₹499 ➔ ₹599
                   </h3>
-                  <p className="text-xs text-slate-400 mt-1 max-w-2xl">
+                  <p className="text-xs text-slate-500 mt-1 max-w-2xl leading-relaxed">
                     Demonstrates autonomous dependency tracing, change simulation, human-in-the-loop revision routing, atomic review approvals, and cryptographic audit ledger sealing.
                   </p>
                 </div>
@@ -255,9 +255,9 @@ export const DemoWalkthroughModal: React.FC<DemoWalkthroughModalProps> = ({
                   <button
                     onClick={() => handleExecuteStep(scenarioState?.current_step || 1)}
                     disabled={executingStep !== null || scenarioState?.current_step >= 12}
-                    className="flex items-center space-x-2 px-4 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-black hover:opacity-95 transition disabled:opacity-50 shadow-lg shadow-cyan-500/20"
+                    className="flex items-center space-x-2 px-4 py-2 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition disabled:opacity-50 shadow-xs cursor-pointer"
                   >
-                    <Play className="w-4 h-4 fill-black" />
+                    <Play className="w-3.5 h-3.5 fill-white" />
                     <span>
                       {scenarioState?.current_step >= 12 ? 'Scenario Complete' : `Execute Step ${scenarioState?.current_step || 1}`}
                     </span>
@@ -276,28 +276,28 @@ export const DemoWalkthroughModal: React.FC<DemoWalkthroughModalProps> = ({
                       key={step.step_number}
                       className={`p-3.5 rounded-xl border transition-all ${
                         isCurrent
-                          ? 'bg-cyan-950/20 border-cyan-500/50 shadow-md shadow-cyan-900/20'
+                          ? 'bg-slate-50 border-slate-900 ring-1 ring-slate-900/10 shadow-xs'
                           : isCompleted
-                          ? 'bg-[#0A0F1D]/80 border-slate-800/80 hover:border-slate-700'
-                          : 'bg-[#070B14]/60 border-slate-900 opacity-60'
+                          ? 'bg-white border-slate-200 shadow-xs'
+                          : 'bg-slate-50/50 border-slate-200 opacity-60'
                       }`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-center space-x-2.5">
                           <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                             isCompleted
-                              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-300'
                               : isCurrent
-                              ? 'bg-cyan-500 text-black font-extrabold'
-                              : 'bg-slate-800 text-slate-400'
+                              ? 'bg-slate-900 text-white'
+                              : 'bg-slate-100 text-slate-500 border border-slate-200'
                           }`}>
                             {isCompleted ? <Check className="w-3.5 h-3.5" /> : step.step_number}
                           </span>
                           <div>
-                            <h4 className="text-xs font-bold text-white">
+                            <h4 className="text-xs font-bold text-slate-900">
                               {step.title}
                             </h4>
-                            <span className="text-[10px] text-cyan-400 font-medium">
+                            <span className="text-[10px] text-slate-500 font-medium">
                               Actor: {step.actor_name}
                             </span>
                           </div>
@@ -305,24 +305,24 @@ export const DemoWalkthroughModal: React.FC<DemoWalkthroughModalProps> = ({
 
                         <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full ${
                           isCompleted
-                            ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                             : isCurrent
-                            ? 'bg-cyan-950 text-cyan-300 border border-cyan-800 animate-pulse'
-                            : 'bg-slate-800 text-slate-400'
+                            ? 'bg-slate-100 text-slate-900 border border-slate-300 font-bold'
+                            : 'bg-slate-100 text-slate-500 border border-slate-200'
                         }`}>
                           {step.status}
                         </span>
                       </div>
 
-                      <p className="text-xs text-slate-300 mt-2">
+                      <p className="text-xs text-slate-600 mt-2 leading-relaxed">
                         {step.description}
                       </p>
 
                       {step.before_value && step.after_value && (
-                        <div className="mt-2.5 pt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px] font-mono">
+                        <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono">
                           <span className="text-slate-400 line-through">{step.before_value}</span>
-                          <ArrowRight className="w-3 h-3 text-cyan-400" />
-                          <span className="text-cyan-300 font-bold">{step.after_value}</span>
+                          <ArrowRight className="w-3 h-3 text-slate-700" />
+                          <span className="text-emerald-700 font-bold">{step.after_value}</span>
                         </div>
                       )}
 
@@ -333,7 +333,7 @@ export const DemoWalkthroughModal: React.FC<DemoWalkthroughModalProps> = ({
                               onNavigateToView(step.target_view!);
                               onClose();
                             }}
-                            className="text-[10px] text-cyan-400 hover:text-cyan-300 flex items-center space-x-1"
+                            className="text-[10px] text-slate-700 hover:text-slate-900 font-medium flex items-center space-x-1 underline cursor-pointer"
                           >
                             <span>Open {step.target_view}</span>
                             <ChevronRight className="w-3 h-3" />
@@ -342,7 +342,7 @@ export const DemoWalkthroughModal: React.FC<DemoWalkthroughModalProps> = ({
                         <button
                           onClick={() => handleExecuteStep(step.step_number)}
                           disabled={executingStep === step.step_number}
-                          className="ml-auto text-[10px] px-2.5 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
+                          className="ml-auto text-[10px] px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 transition font-semibold cursor-pointer"
                         >
                           {executingStep === step.step_number ? 'Running...' : 'Execute'}
                         </button>
@@ -358,10 +358,10 @@ export const DemoWalkthroughModal: React.FC<DemoWalkthroughModalProps> = ({
           {activeTab === 'cases' && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-sm font-semibold text-white">
-                  9 Comprehensive Governance & Statutory Compliance Tests
+                <h3 className="text-sm font-semibold text-slate-900">
+                  9 Comprehensive Governance &amp; Statutory Compliance Tests
                 </h3>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
                   Each case simulates real-world marketing and legal risks. Run live AI verification to inspect rule enforcement, risk scoring, and explainable rewrites.
                 </p>
               </div>
@@ -371,43 +371,43 @@ export const DemoWalkthroughModal: React.FC<DemoWalkthroughModalProps> = ({
                 {cases.map((c) => (
                   <div
                     key={c.case_id}
-                    className={`p-3.5 rounded-xl border flex flex-col justify-between transition-all ${
+                    className={`p-4 rounded-xl border flex flex-col justify-between transition-all shadow-xs ${
                       activeCaseResult?.case_id === c.case_id
-                        ? 'bg-blue-950/30 border-blue-500 shadow-md'
-                        : 'bg-[#0A0F1D] border-slate-800 hover:border-slate-700'
+                        ? 'bg-slate-50 border-slate-900 ring-1 ring-slate-900/10'
+                        : 'bg-white border-slate-200 hover:border-slate-300'
                     }`}
                   >
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-[10px] font-bold text-cyan-400 font-mono">
+                        <span className="text-[10px] font-bold text-slate-700 font-mono">
                           {c.case_id}
                         </span>
                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                          c.severity === 'CRITICAL' ? 'bg-red-950 text-red-400 border border-red-800' :
-                          c.severity === 'HIGH' ? 'bg-amber-950 text-amber-400 border border-amber-800' :
-                          'bg-blue-950 text-blue-400 border border-blue-800'
+                          c.severity === 'CRITICAL' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
+                          c.severity === 'HIGH' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
+                          'bg-slate-100 text-slate-700 border border-slate-200'
                         }`}>
                           {c.severity}
                         </span>
                       </div>
 
-                      <h4 className="text-xs font-bold text-white mb-1.5">
+                      <h4 className="text-xs font-bold text-slate-900 mb-1.5">
                         {c.title}
                       </h4>
-                      <p className="text-[11px] text-slate-300 italic mb-2 line-clamp-2">
+                      <p className="text-[11px] text-slate-600 italic mb-2 line-clamp-2">
                         "{c.sample_content}"
                       </p>
-                      <p className="text-[10px] text-slate-400 line-clamp-2">
-                        <strong className="text-slate-300">Policy:</strong> {c.governing_policy}
+                      <p className="text-[10px] text-slate-500 line-clamp-2">
+                        <strong className="text-slate-700">Policy:</strong> {c.governing_policy}
                       </p>
                     </div>
 
                     <button
                       onClick={() => handleRunCase(c.case_id)}
                       disabled={testingCaseId === c.case_id}
-                      className="mt-3 w-full py-1.5 text-xs font-semibold rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 flex items-center justify-center space-x-1.5 transition"
+                      className="mt-3 w-full py-1.5 text-xs font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-white flex items-center justify-center space-x-1.5 transition shadow-xs cursor-pointer"
                     >
-                      <Play className="w-3 h-3 fill-cyan-400" />
+                      <Play className="w-3 h-3 fill-white" />
                       <span>{testingCaseId === c.case_id ? 'Analyzing...' : 'Run Live Inspection'}</span>
                     </button>
                   </div>
@@ -416,42 +416,42 @@ export const DemoWalkthroughModal: React.FC<DemoWalkthroughModalProps> = ({
 
               {/* Case Inspection Result Display */}
               {activeCaseResult && (
-                <div className="p-4 rounded-xl bg-[#0A0F1D] border border-cyan-500/40 space-y-3">
-                  <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                  <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                     <div className="flex items-center space-x-2">
-                      <ShieldAlert className="w-4 h-4 text-cyan-400" />
-                      <h4 className="text-xs font-bold text-white">
+                      <ShieldAlert className="w-4 h-4 text-slate-800" />
+                      <h4 className="text-xs font-bold text-slate-900">
                         Inspection Results: {activeCaseResult.title}
                       </h4>
                     </div>
-                    <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-red-950 text-red-400 border border-red-800">
+                    <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-rose-50 text-rose-700 border border-rose-200">
                       {activeCaseResult.governance_decision} · Risk Score: {activeCaseResult.composite_risk_score}/100
                     </span>
                   </div>
 
                   {/* Tested Content */}
-                  <div className="text-xs font-mono p-2.5 rounded-lg bg-black/60 border border-slate-800 text-slate-200">
-                    <span className="text-slate-400 font-sans block text-[10px] mb-1">Tested Raw Content:</span>
+                  <div className="text-xs font-mono p-2.5 rounded-lg bg-white border border-slate-200 text-slate-800">
+                    <span className="text-slate-500 font-sans block text-[10px] mb-1">Tested Raw Content:</span>
                     {activeCaseResult.content_tested}
                   </div>
 
                   {/* Defects Detected */}
                   <div className="space-y-2">
-                    <h5 className="text-[11px] font-bold text-slate-300 uppercase tracking-wider">
+                    <h5 className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
                       Detected Governance Deviations ({activeCaseResult.defects_detected_count}):
                     </h5>
                     {activeCaseResult.risk_spans?.map((span: any, idx: number) => (
-                      <div key={idx} className="p-2.5 rounded-lg bg-red-950/20 border border-red-900/40 text-xs">
+                      <div key={idx} className="p-2.5 rounded-lg bg-white border border-rose-200 text-xs">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="font-semibold text-red-300 font-mono">
+                          <span className="font-semibold text-rose-800 font-mono">
                             "{span.matched_text}"
                           </span>
-                          <span className="text-[10px] text-red-400 font-mono">
+                          <span className="text-[10px] text-rose-700 font-mono">
                             {span.category} · {span.severity}
                           </span>
                         </div>
-                        <p className="text-[11px] text-slate-300">{span.explanation}</p>
-                        <p className="text-[10px] text-cyan-400 mt-1">
+                        <p className="text-[11px] text-slate-600">{span.explanation}</p>
+                        <p className="text-[10px] text-slate-700 mt-1 font-mono">
                           <strong>Governing Rule:</strong> {span.rule_citation}
                         </p>
                       </div>
@@ -460,15 +460,15 @@ export const DemoWalkthroughModal: React.FC<DemoWalkthroughModalProps> = ({
 
                   {/* Remediation Rewrite */}
                   {activeCaseResult.suggested_remediation && (
-                    <div className="p-3 rounded-lg bg-emerald-950/20 border border-emerald-900/40 text-xs">
-                      <span className="text-emerald-400 font-bold block mb-1">
+                    <div className="p-3 rounded-lg bg-emerald-50/70 border border-emerald-200 text-xs">
+                      <span className="text-emerald-800 font-bold block mb-1">
                         Explainable Graph-Preserving Remediation:
                       </span>
-                      <p className="text-emerald-200 font-medium">
+                      <p className="text-emerald-950 font-medium">
                         "{activeCaseResult.suggested_remediation}"
                       </p>
                       {activeCaseResult.remediation_rationale && (
-                        <p className="text-[10px] text-slate-400 mt-1">
+                        <p className="text-[10px] text-emerald-800/80 mt-1">
                           {activeCaseResult.remediation_rationale}
                         </p>
                       )}
@@ -482,10 +482,10 @@ export const DemoWalkthroughModal: React.FC<DemoWalkthroughModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 py-3 border-t border-[#1E293B] bg-[#0A0F1D] flex items-center justify-between text-xs text-slate-400">
+        <div className="px-6 py-3 border-t border-slate-200 bg-white flex items-center justify-between text-xs text-slate-500">
           <div className="flex items-center space-x-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <span>MongoDB Atlas Vector Search & GraphLookup Active</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span>MongoDB Atlas Vector Search &amp; GraphLookup Active</span>
           </div>
           <span>BRANDTRACE AI v2.0 Enterprise Control Plane</span>
         </div>
