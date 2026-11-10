@@ -1,5 +1,6 @@
 # BRANDTRACE AI 🛡️
-### *The Autonomous Brand Intelligence & Governance Control Plane*
+
+## *The Autonomous Brand Intelligence & Governance Control Plane*
 
 > **Tagline:** *Every brand decision connected. Every risk traceable. Every release accountable.*
 
@@ -12,7 +13,7 @@
 
 ## 🌟 Executive Summary & Problem Definition
 
-Modern enterprises release thousands of multi-channel marketing campaigns, advertisements, press statements, digital packaging, and partner collateral across dozens of distributed business units. 
+Modern enterprises release thousands of multi-channel marketing campaigns, advertisements, press statements, digital packaging, and partner collateral across dozens of distributed business units.
 
 When a brand guideline, product price, marketing claim, or regulatory policy changes, organizations struggle to identify which published or in-flight content is affected. Governance is fractured across static PDF style guides, disconnected email threads, and reactive PR firefighting.
 
@@ -41,7 +42,7 @@ Whenever an approved fact or policy changes (e.g., product price updates from �
 ## 🧭 The 14 Core Enterprise Modules
 
 | # | Module | Core Functionality |
-|---|---|---|
+| --- | --- | --- |
 | 1 | **Landing Page** | Public SaaS presentation, value proposition, and interactive live demo launcher |
 | 2 | **Authentication & RBAC** | JWT authentication (HS256) enforcing server-side RBAC across 5 organizational roles |
 | 3 | **Command Center** | Executive telemetry dashboard: active workspaces, asset counts, risk trends, and health |
@@ -61,7 +62,7 @@ Whenever an approved fact or policy changes (e.g., product price updates from �
 
 ## 🏗️ System Architecture & Technology Stack
 
-```
+```text
 BRANDTRACE AI/
 ├── frontend/                     # React 19 + TypeScript + Vite + Tailwind CSS + @xyflow/react
 │   ├── src/
@@ -103,11 +104,13 @@ BRANDTRACE AI/
 ## 🚀 Quickstart & Local Installation
 
 ### Prerequisites
+
 - Node.js 20+ and `pnpm` (or `npm`)
 - Python 3.11+ (Python 3.13 recommended)
 - MongoDB 7.0+ (Local or MongoDB Atlas cluster)
 
 ### Option 1: One-Click Docker Compose (Recommended)
+
 ```bash
 # 1. Clone repository
 git clone https://github.com/your-org/brandtrace-ai.git
@@ -119,6 +122,7 @@ cp .env.example .env
 # 3. Launch stack
 docker-compose up -d --build
 ```
+
 - **Frontend Control Plane:** `http://localhost:3000`
 - **Backend Swagger API Docs:** `http://localhost:8000/docs`
 - **Backend Health Check:** `http://localhost:8000/health`
@@ -129,6 +133,7 @@ docker-compose up -d --build
 ### Option 2: Local Development (Without Containers)
 
 #### 1. Backend Engine
+
 ```bash
 cd backend
 python -m venv .venv
@@ -138,9 +143,11 @@ pip install -r requirements.txt
 # Run server with live reload:
 uvicorn brandtrace.main:app --reload --port 8000
 ```
+
 > **Resilient Offline Fallback:** If MongoDB is running locally (`mongodb://localhost:27017`), BrandTrace connects automatically. If MongoDB is offline, BrandTrace engages its **in-memory fallback repository** so the entire platform runs smoothly without crashes!
 
 #### 2. Frontend Control Plane
+
 ```bash
 cd frontend
 pnpm install
@@ -153,16 +160,20 @@ pnpm dev
 ## 🌐 Cloud Deployment Guide
 
 ### Database: MongoDB Atlas
+
 1. Create a free cluster on [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
 2. Whitelist your application's IP ranges (`0.0.0.0/0` for initial cloud deployment).
 3. Obtain your connection URI:
+
    ```env
    MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.abcde.mongodb.net/?retryWrites=true&w=majority
    MONGODB_DB_NAME=brandtrace
    ```
 
 ### Backend: Render / Railway / Fly.io
+
 Deploy using the included `render.yaml`:
+
 - **Root Directory:** `backend`
 - **Build Command:** `uv venv && uv pip install -r requirements.txt`
 - **Start Command:** `.venv/bin/uvicorn brandtrace.main:app --host 0.0.0.0 --port $PORT`
@@ -175,7 +186,9 @@ Deploy using the included `render.yaml`:
   - `ALLOWED_ORIGINS=https://brandtrace-ai.vercel.app,http://localhost:5173,http://localhost:3000`
 
 ### Frontend: Vercel / Netlify
+
 Deploy using the included `vercel.json`:
+
 - **Root Directory:** `frontend`
 - **Build Command:** `pnpm build`
 - **Output Directory:** `dist`
@@ -188,7 +201,7 @@ Deploy using the included `vercel.json`:
 The platform includes 5 pre-configured demonstration personas across **AURELLE Global** (`ORG-AURELLE`, `aurelle-tech`):
 
 | Persona Name | Email | Role | Accessible Permissions |
-|:---|:---|:---|:---|
+| :--- | :--- | :--- | :--- |
 | **Sarah Chen** | `sarah.chen@aurelle.com` | `ADMIN` | Full tenant management, benchmark execution, settings |
 | **Julian Vance** | `julian.vance@aurelle.com` | `BRAND_MANAGER` | Brand truth-set, Digital Twin simulations, policy commits |
 | **Maya Lin** | `maya.lin@aurelle.com` | `CONTENT_CREATOR` | Submitting creative copy, executing remediations |
@@ -201,8 +214,8 @@ The platform includes 5 pre-configured demonstration personas across **AURELLE G
 
 ## 📊 Verification & Empirical Test Results
 
-```
-======================== 60 passed, 1 warning in 3.55s ========================
+```text
+======================== 77 passed in 5.66s ========================
 ```
 
 - **Backend Test Suite:** **60 / 60 Pytest tests passing (100%)** across 10 test suites.

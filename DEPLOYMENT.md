@@ -6,7 +6,7 @@ This repository is structured into standard top-level `frontend/` and `backend/`
 
 ## 📁 Project Architecture & Directory Layout
 
-```
+```text
 BRANDTRACE AI/
 ├── frontend/                     # React 19 + TypeScript + Vite + Tailwind CSS + @xyflow/react
 │   ├── src/
@@ -53,13 +53,15 @@ cp .env.example .env
 docker-compose up -d --build
 ```
 
-### Access URLs:
+### Access URLs
+
 - **Frontend Control Plane:** `http://localhost:3000`
 - **Backend API Docs (Swagger):** `http://localhost:8000/docs`
 - **Backend Health & MongoDB Telemetry:** `http://localhost:8000/health`
 - **MongoDB Database:** `mongodb://localhost:27017`
 
 To inspect container logs:
+
 ```bash
 docker-compose logs -f
 ```
@@ -82,10 +84,12 @@ docker-compose logs -f
 4. **Obtain Connection String:**
    - Go to **Deployment $\to$ Database $\to$ Connect $\to$ Drivers (Python)**.
    - Copy your connection string:
+
      ```env
      MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.abcde.mongodb.net/brandtrace?retryWrites=true&w=majority
      MONGODB_DB_NAME=brandtrace
      ```
+
    *(Ensure you replace `<username>` and `<password>` with your created database user credentials).*
 
 > [!CRITICAL]
@@ -104,6 +108,7 @@ Using the pre-configured `render.yaml` or direct dashboard setup:
 - **Start Command:** `uvicorn brandtrace.main:app --host 0.0.0.0 --port $PORT`
 - **Health Check Path:** `/health`
 - **Required Production Environment Variables:**
+
   ```env
   ENVIRONMENT=production
   PORT=8000
@@ -114,12 +119,16 @@ Using the pre-configured `render.yaml` or direct dashboard setup:
   ALLOWED_ORIGINS=https://your-frontend.vercel.app,http://localhost:5173
   ```
 
-#### Connection Verification:
+#### Connection Verification
+
 Once deployed, verify your live backend health:
+
 ```bash
 curl https://your-backend.onrender.com/health
 ```
+
 Look for:
+
 ```json
 {
   "status": "operational",
@@ -131,9 +140,11 @@ Look for:
   }
 }
 ```
+
 *(Notice: Database credentials and passwords are automatically masked and never exposed in API output).*
 
 ### Step 3: Frontend Deployment (Vercel / Netlify / Cloudflare Pages)
+
 - **Root Directory:** `frontend`
 - **Framework Preset:** `Vite`
 - **Build Command:** `pnpm build` (or `npm run build`)
@@ -146,6 +157,7 @@ Look for:
 ## Option 3: Local Development (Without Docker)
 
 ### 1. Backend Engine
+
 ```bash
 cd backend
 python -m venv .venv
@@ -155,13 +167,14 @@ pip install -r requirements.txt
 # Run server with live reload:
 uvicorn brandtrace.main:app --reload --port 8000
 ```
+
 > **Note:** If MongoDB is running locally (`mongodb://localhost:27017`), BRANDTRACE connects automatically. If MongoDB is not running, BRANDTRACE will automatically engage its **in-memory fallback store** so the platform runs flawlessly without crashing!
 
 ### 2. Frontend Web App
+
 ```bash
 cd frontend
 pnpm install
 pnpm dev
 # Opens at http://localhost:5173
 ```
-
