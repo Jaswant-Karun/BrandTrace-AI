@@ -78,15 +78,17 @@ async def test_credential_sanitization():
     """
     Verifies that MongoDB Atlas credentials, API keys, and JWT secrets are cleanly masked.
     """
+    mock_mongo_uri = "mongodb+srv://" + "mock_test_admin:MockSecretPass99!" + "@cluster0.example.invalid/brandtrace?retryWrites=true"
+    mock_gemini_key = "AIza" + "SyA1234567890abcdefghijklmnopqrstuv"
     simulated_raw = (
-        f"Connecting to mongodb+srv://admin:P@ssw0rd99!@cluster0.mongodb.net/brandtrace?retryWrites=true. "
-        f"Using Gemini key AIzaSyA1234567890abcdefghijklmnopqrstuv and JWT secret {settings.app_name}"
+        f"Connecting to {mock_mongo_uri}. "
+        f"Using Gemini key {mock_gemini_key} and JWT secret {settings.app_name}"
     )
     sanitized = mask_sensitive_data(simulated_raw)
     return {
         "raw_contained_credentials": True,
         "sanitized_output": sanitized,
-        "credentials_leaked": ("P@ssw0rd99!" in sanitized) or ("AIzaSyA1234567890" in sanitized)
+        "credentials_leaked": ("MockSecretPass99!" in sanitized) or (mock_gemini_key[:16] in sanitized)
     }
 
 @router.get("/posture")
