@@ -110,6 +110,42 @@ class BrandTraceRepository:
             None
         )
 
+    async def create_user(self, user: UserDoc) -> Dict[str, Any]:
+        doc = user.model_dump(by_alias=True)
+        if not doc.get("_id"):
+            doc["_id"] = str(ObjectId())
+
+        if self.mm.is_connected and self.mm.db is not None:
+            await self.mm.db.users.update_one(
+                {"organisation_id": user.organisation_id, "user_id": user.user_id},
+                {"$set": doc},
+                upsert=True
+            )
+        self._memory_collections["users"] = [
+            u for u in self._memory_collections["users"]
+            if not (u.get("organisation_id") == user.organisation_id and u.get("user_id") == user.user_id)
+        ]
+        self._memory_collections["users"].append(doc)
+        return doc
+
+    async def add_workspace_membership(self, mem: WorkspaceMembershipDoc) -> Dict[str, Any]:
+        doc = mem.model_dump(by_alias=True)
+        if not doc.get("_id"):
+            doc["_id"] = str(ObjectId())
+
+        if self.mm.is_connected and self.mm.db is not None:
+            await self.mm.db.workspace_memberships.update_one(
+                {"organisation_id": mem.organisation_id, "workspace_id": mem.workspace_id, "user_id": mem.user_id},
+                {"$set": doc},
+                upsert=True
+            )
+        self._memory_collections["workspace_memberships"] = [
+            m for m in self._memory_collections["workspace_memberships"]
+            if not (m.get("organisation_id") == mem.organisation_id and m.get("workspace_id") == mem.workspace_id and m.get("user_id") == mem.user_id)
+        ]
+        self._memory_collections["workspace_memberships"].append(doc)
+        return doc
+
     # ==============================================================================
     # 3. BRAND GUIDELINES & VERSIONS
     # ==============================================================================
