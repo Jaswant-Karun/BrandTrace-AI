@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
-  ShieldAlert, ShieldCheck, CheckCircle2, AlertTriangle, ArrowRight, 
-  Sparkles, FileText, Stamp, Layers, Lock, ExternalLink 
+  ShieldCheck, CheckCircle2, ArrowRight, AlertTriangle,
+  Sparkles, FileText, Stamp, Layers, Lock 
 } from 'lucide-react';
 import { VerificationResult, RiskSpan } from '../types';
 

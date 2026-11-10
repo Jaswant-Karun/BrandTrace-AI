@@ -12,7 +12,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { BrandNode } from './BrandNode';
-import { Search, Filter, Info, Shield, Layers } from 'lucide-react';
+import { Search, Filter, Shield, Layers } from 'lucide-react';
 
 interface KnowledgeGraphViewProps {
   brandId: string;

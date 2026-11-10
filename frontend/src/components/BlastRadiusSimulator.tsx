@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Flame, AlertTriangle, ArrowRight, ShieldAlert, CheckCircle, Network, Layers } from 'lucide-react';
+import { Flame, ArrowRight, Network, Layers } from 'lucide-react';
 import { BlastRadiusResponse } from '../types';
 
 interface BlastRadiusSimulatorProps {
