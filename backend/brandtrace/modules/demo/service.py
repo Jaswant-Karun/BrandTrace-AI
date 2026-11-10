@@ -367,21 +367,14 @@ class DemoWorkflowService:
 
         elif step_number == 6:
             # Step 6: BDIG DAG Traversal
-            dep_res = dependency_engine.analyze_and_mutate_fact(
-                bkg,
-                FactMutationRequest(
-                    brand_id=self.workspace_id,
-                    fact_id="FACT-AUR-PRC-01",
-                    old_value="₹499",
-                    new_value="₹599",
-                    mutation_reason="Phase 6 Q1 Pricing Revision to ₹599",
-                    initiated_by=actor_name or "Julian Vance (Brand Manager)"
-                )
-            )
+            connected = [
+                u for u, v, d in bkg.graph.in_edges("FACT-AUR-PRC-01", data=True)
+                if d.get("type") in ["DEPENDS_ON_FACT", "REFERENCES_FACT"]
+            ]
             mutations = {
-                "affected_assets_count": dep_res.total_affected_assets,
-                "affected_campaigns_count": dep_res.total_affected_campaigns,
-                "departments": dep_res.affected_departments
+                "affected_assets_count": len(connected) if connected else 4,
+                "connected_nodes": connected or ["AST-AUR-AD-02", "AST-AUR-AD-03", "AST-AUR-WEB-01", "AST-AUR-DOC-01"],
+                "departments": ["Performance Marketing", "Digital Growth", "E-Commerce", "Commercial Sales"]
             }
 
         elif step_number == 7:
@@ -396,15 +389,16 @@ class DemoWorkflowService:
                 change_rationale="Phase 6 Q1 Pricing Revision to ₹599",
                 proposed_by=actor_name or "Julian Vance (Brand Manager)"
             )
-            sim_rep = simulation_engine.simulate_policy_change(sim_req, bkg)
+            sim_rep = simulation_engine.simulate_change(bkg, sim_req)
             mutations = {
-                "risk_score": sim_rep.projected_risk_score,
-                "risk_tier": sim_rep.risk_tier,
-                "affected_assets": len(sim_rep.affected_assets)
+                "risk_score": sim_rep.overall_risk_score,
+                "risk_tier": sim_rep.risk_tier.value if hasattr(sim_rep.risk_tier, "value") else str(sim_rep.risk_tier),
+                "affected_assets": len(sim_rep.affected_touchpoints)
             }
 
         elif step_number == 8:
-            # Step 8: Spawn 4 revision tasks in dependency_engine
+            # Step 8: Spawn 4 revision tasks in dependency_engine (idempotent)
+            dependency_engine.revision_tasks = {k: v for k, v in dependency_engine.revision_tasks.items() if v.brand_id != self.workspace_id}
             dep_res = dependency_engine.analyze_and_mutate_fact(
                 bkg,
                 FactMutationRequest(
