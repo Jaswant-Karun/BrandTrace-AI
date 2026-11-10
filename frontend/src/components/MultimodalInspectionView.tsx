@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Eye, ShieldCheck, AlertTriangle, CheckCircle2, Sparkles, Sliders } from 'lucide-react';
+import { Eye, AlertTriangle, CheckCircle2, Sliders } from 'lucide-react';
 
 interface MultimodalInspectionViewProps {
   brandId: string;
@@ -7,13 +7,13 @@ interface MultimodalInspectionViewProps {
 
 export const MultimodalInspectionView: React.FC<MultimodalInspectionViewProps> = ({ brandId }) => {
   const [assetTitle, setAssetTitle] = useState<string>("Q1 Billboard & Digital Display Creative Lockup");
-  const [channel, setChannel] = useState<string>("Digital Display / Social");
+  const [channel] = useState<string>("Digital Display / Social");
   const [primaryColor, setPrimaryColor] = useState<string>("#0F172A");
   const [accentColor, setAccentColor] = useState<string>("#06B6D4");
   const [backgroundColor, setBackgroundColor] = useState<string>("#020617");
   const [textColor, setTextColor] = useState<string>("#F8FAFC");
   const [logoPadding, setLogoPadding] = useState<number>(24);
-  const [minLogoClearance, setMinLogoClearance] = useState<number>(20);
+  const [minLogoClearance] = useState<number>(20);
   const [disclaimerFontSize, setDisclaimerFontSize] = useState<number>(9.0);
   const [hasTrademarkSymbol, setHasTrademarkSymbol] = useState<boolean>(true);
 
