@@ -21,6 +21,9 @@ async def lifespan(app: FastAPI):
         brands = await mongo_manager.list_brands()
         if not brands:
             await seed_database()
+        # Seed Phase 5 Aurelle Enterprise Organisation
+        from brandtrace.database.seeding import seed_aurelle_organisation
+        await seed_aurelle_organisation(mongo_manager.repo)
     except Exception as e:
         print(f"[BrandTrace] Auto-seed note: {e}")
     yield
