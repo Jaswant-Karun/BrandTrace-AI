@@ -381,6 +381,60 @@ class RegulatoryComplianceAgent:
                 )
                 citations.append("GL-AUR-06: Global Master Typography Directive")
 
+        # 9. Novus Life Sciences: Unapproved Prescription Cure Claim
+        if "completely cures" in text.lower() or ("cures" in text.lower() and "hypertension" in text.lower()):
+            m = re.search(r"\b(?:completely\s+cures\s+hypertension|completely\s+cures)\b", text, re.IGNORECASE)
+            if m:
+                risk_spans.append(
+                    RiskSpan(
+                        start_char=m.start(),
+                        end_char=m.end(),
+                        matched_text=m.group(0),
+                        category="REGULATORY",
+                        severity=SeverityLevel.CRITICAL,
+                        explanation="Unsubstantiated cure claim. Prescription cardiovascular therapeutics cannot claim to cure disease under FDA 21 CFR §201.57 & §202.1.",
+                        rule_citation="FDA 21 CFR §201.57 / §202.1 (Non-Cure Prescription Efficacy Standard)",
+                        suggested_fix="clinically demonstrated to lower LDL-C and reduce cardiovascular event risk"
+                    )
+                )
+                citations.append("FDA 21 CFR §201.57: Non-Cure Prescription Efficacy Standard")
+
+        # 10. Novus Life Sciences: Omission of Risk Disclosures / Zero Side Effects
+        if "zero side effects" in text.lower() or "no side effects" in text.lower():
+            m = re.search(r"\b(?:zero|no)\s+side\s+effects\b", text, re.IGNORECASE)
+            if m:
+                risk_spans.append(
+                    RiskSpan(
+                        start_char=m.start(),
+                        end_char=m.end(),
+                        matched_text=m.group(0),
+                        category="REGULATORY",
+                        severity=SeverityLevel.CRITICAL,
+                        explanation="Claiming 'zero side effects' on a prescription small molecule violates FDA Fair Balance mandate and triggers mandatory warning letters.",
+                        rule_citation="FDA 21 CFR §202.1 (Prescription Drug Fair Balance & Risk Disclosure)",
+                        suggested_fix="Consult physician regarding potential contraindications and adverse reactions"
+                    )
+                )
+                citations.append("FDA 21 CFR §202.1: Fair Balance Mandate")
+
+        # 11. Novus Life Sciences: Expired Patient Assistance Program Tier
+        if "2024 zero-copay" in text.lower() or "novus care 2024" in text.lower():
+            m = re.search(r"\b(?:Novus\s+Care\s+2024\s+zero-copay(?:\s+program)?|2024\s+zero-copay)\b", text, re.IGNORECASE)
+            if m:
+                risk_spans.append(
+                    RiskSpan(
+                        start_char=m.start(),
+                        end_char=m.end(),
+                        matched_text=m.group(0),
+                        category="CLAIM",
+                        severity=SeverityLevel.HIGH,
+                        explanation="Content references expired 2024 patient assistance tier that lapsed on December 31, 2024.",
+                        rule_citation="Novus Market Access Directive 2024-EXP (Expired Patient Co-Pay Tier)",
+                        suggested_fix="NovusCare 2026 Patient Co-Pay Assistance Program"
+                    )
+                )
+                citations.append("Novus Market Access Directive 2024-EXP")
+
         score = max(0.0, 100.0 - (len(risk_spans) * 30.0))
         status = "PASSED" if score >= 80 else ("WARNING" if score >= 50 else "FAILED")
 
