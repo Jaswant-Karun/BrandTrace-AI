@@ -2,8 +2,7 @@ import React from 'react';
 import {
   ShieldCheck, LayoutDashboard, GitFork, Sparkles, Flame,
   Eye, FileText, AlertTriangle, CheckSquare, BookOpen,
-  BarChart3, Lock, Settings, ChevronLeft, ChevronRight,
-  Database
+  BarChart3, Lock, Settings, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { BrandProfile, DatabaseStatus } from '../types';
 
