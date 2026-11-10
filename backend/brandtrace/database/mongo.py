@@ -45,6 +45,15 @@ class MongoManager:
 
     async def connect(self):
         """Attempts connection to MongoDB Atlas with connection pooling and timeouts."""
+        is_production = settings.environment.lower() in ["production", "prod"]
+        
+        # In production, placeholder credentials must fail immediately with clear error
+        if is_production and "ENTER_SECURE_PASSWORD" in settings.mongodb_uri:
+            raise RuntimeError(
+                "Production startup failure: Placeholder credentials detected in MONGODB_URI. "
+                "Please configure an authenticated MongoDB Atlas connection string in your production environment variables."
+            )
+
         try:
             masked_uri = settings.mongodb_uri.split("@")[-1] if "@" in settings.mongodb_uri else settings.mongodb_uri
             logger.info(f"Connecting to MongoDB Atlas at {masked_uri} (db: {settings.mongodb_db_name})...")
@@ -73,7 +82,14 @@ class MongoManager:
             self.is_connected = False
             self.client = None
             self.db = None
-            logger.warning(f"MongoDB Atlas not reachable ({e}). Operating in resilient memory-fallback mode.")
+            if is_production:
+                logger.error("CRITICAL: MongoDB Atlas connection failed in production environment.")
+                raise RuntimeError(
+                    "Production startup failure: Unable to establish an authenticated connection to MongoDB Atlas. "
+                    "In-memory fallback is strictly disabled in production to guarantee data persistence. "
+                    "Verify your MONGODB_URI and Atlas Network Access whitelist."
+                ) from None
+            logger.warning(f"MongoDB Atlas not reachable ({e}). Operating in resilient memory-fallback mode (development/testing only).")
 
     async def close(self):
         """Closes MongoDB connection."""
