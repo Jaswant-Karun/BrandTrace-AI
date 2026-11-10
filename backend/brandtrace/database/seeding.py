@@ -129,8 +129,9 @@ async def seed_aurelle_organisation(repo: BrandTraceRepository) -> Dict[str, Any
         )
         await repo.create_workspace(ws_tech)
 
-        # 5 Demo Users & Memberships
+        # 6 Demo Users & Memberships
         demo_users = [
+            ("USR-DEMO-AURELLE", "demo@brandtrace.ai", "Alex Mercer", "BRAND_MANAGER"),
             ("USR-AUR-ADM", "admin@aurelle.com", "Sarah Chen", "ADMIN"),
             ("USR-AUR-BM", "brandmanager@aurelle.com", "Julian Vance", "BRAND_MANAGER"),
             ("USR-AUR-CRT", "creator@aurelle.com", "Maya Lin", "CREATOR"),
