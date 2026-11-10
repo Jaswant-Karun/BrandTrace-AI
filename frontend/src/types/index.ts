@@ -110,3 +110,4 @@ export interface DatabaseStatus {
   collections?: Record<string, number>;
   error?: string;
 }
+

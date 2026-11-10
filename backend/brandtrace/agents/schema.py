@@ -45,3 +45,4 @@ class VerificationResult(BaseModel):
     release_proof: Optional[Dict[str, Any]] = None
     timestamp: int
     timestamp_iso: str
+

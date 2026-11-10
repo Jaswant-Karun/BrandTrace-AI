@@ -23,3 +23,4 @@ ENV PORT=8000
 
 # Start Uvicorn server
 CMD ["uvicorn", "brandtrace.main:app", "--host", "0.0.0.0", "--port", "8000"]
+

@@ -89,3 +89,4 @@ def test_sign_release_ledger():
     data = response.json()
     assert data["status"] == "SEALED"
     assert "BT-SEAL-" in data["release"]["audit_stamp"]
+
