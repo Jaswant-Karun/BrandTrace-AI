@@ -25,10 +25,17 @@ export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<NavigationTab>('command-center');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
   const [brands, setBrands] = useState<BrandProfile[]>([]);
-  const [selectedBrandId, setSelectedBrandId] = useState<string>('apex-dynamics');
+  const { currentWorkspace, setWorkspace } = useAuth();
+  const [selectedBrandId, setSelectedBrandId] = useState<string>(currentWorkspace || 'apex-dynamics');
   const [dbStatus, setDbStatus] = useState<DatabaseStatus | null>(null);
   const [isDbModalOpen, setIsDbModalOpen] = useState<boolean>(false);
   const [isReseeding, setIsReseeding] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (currentWorkspace && currentWorkspace !== selectedBrandId) {
+      setSelectedBrandId(currentWorkspace);
+    }
+  }, [currentWorkspace]);
 
   // Load brands and DB telemetry
   const loadInitialData = async () => {
@@ -131,7 +138,10 @@ export const App: React.FC = () => {
         setCurrentTab={setCurrentTab}
         brands={brands}
         selectedBrandId={selectedBrandId}
-        setSelectedBrandId={setSelectedBrandId}
+        setSelectedBrandId={(id) => {
+          setSelectedBrandId(id);
+          setWorkspace(id);
+        }}
         dbStatus={dbStatus}
         isCollapsed={isSidebarCollapsed}
         setIsCollapsed={setIsSidebarCollapsed}
@@ -140,6 +150,9 @@ export const App: React.FC = () => {
 
       {/* Main App Workspace */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Enterprise Tenant & Auth Header */}
+        <AuthHeader onOpenDbStatus={() => setIsDbModalOpen(true)} />
+
         {/* Top Control Bar */}
         <header className="border-b border-slate-800/80 bg-[#0B0F19]/80 backdrop-blur-xl px-6 py-3 flex items-center justify-between sticky top-0 z-30">
           <div className="flex items-center gap-3">

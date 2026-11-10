@@ -1,0 +1,30 @@
+services:
+  # --------------------------------------------------------------------------
+  # BRANDTRACE AI — FastAPI Governance Engine on Render
+  # --------------------------------------------------------------------------
+  - type: web
+    name: brandtrace-backend
+    env: python
+    rootDir: backend
+    buildCommand: uv venv && uv pip install -r requirements.txt
+    startCommand: .venv/bin/uvicorn brandtrace.main:app --host 0.0.0.0 --port $PORT
+    plan: standard
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: MONGODB_URI
+        sync: false # Set in Render Dashboard: mongodb+srv://<user>:<password>@cluster0.mongodb.net/brandtrace?retryWrites=true&w=majority
+      - key: MONGODB_DB_NAME
+        value: brandtrace
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: GEMINI_API_KEY
+        sync: false # Set in Render Dashboard
+      - key: ALLOWED_ORIGINS
+        value: "https://brandtrace-ai.vercel.app,http://localhost:5173,http://localhost:3000"
