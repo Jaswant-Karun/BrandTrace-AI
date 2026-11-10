@@ -12,6 +12,8 @@ from brandtrace.modules.knowledge_base.router import router as kb_router
 from brandtrace.modules.graph_intelligence.router import router as graph_router
 from brandtrace.modules.content.router import router as content_router
 from brandtrace.modules.approvals.router import router as approvals_router
+# Phase 6 Demo Workflow Router
+from brandtrace.modules.demo.router import router as demo_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
