@@ -43,6 +43,7 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({ onOpenDbStatus }) => {
           >
             <option value="apex-dynamics" className="bg-slate-950 text-white">Apex Dynamics (EV Mobility)</option>
             <option value="novus-health" className="bg-slate-950 text-white">Novus Health (BioPharma)</option>
+            <option value="aurelle-maison" className="bg-slate-950 text-white">Aurelle Maison (Eco-Luxury)</option>
           </select>
         </div>
 
