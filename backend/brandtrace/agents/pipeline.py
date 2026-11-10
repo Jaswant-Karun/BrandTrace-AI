@@ -512,5 +512,8 @@ class AutonomousGovernancePipeline:
             timestamp_iso=t0_iso
         )
 
+    # Alias for API uniformity
+    analyze_asset = verify_asset
+
 governance_pipeline = AutonomousGovernancePipeline()
 

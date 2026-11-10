@@ -346,12 +346,16 @@ class DemoWorkflowService:
                 channel="Instagram / Meta Feed Ads",
                 content=ad_content
             )
-            v_res = governance_pipeline.analyze_asset(v_req, bkg)
+            v_res = governance_pipeline.verify_asset(v_req, bkg)
+            rel_hash = None
+            if v_res.release_proof:
+                rel_hash = v_res.release_proof.get("release_hash") if isinstance(v_res.release_proof, dict) else getattr(v_res.release_proof, "release_hash", None)
+
             mutations = {
                 "asset_id": "AST-AUR-AD-02",
                 "score": v_res.composite_risk_score,
                 "decision": v_res.governance_decision,
-                "release_hash": v_res.release_proof.release_hash if v_res.release_proof else None
+                "release_hash": rel_hash
             }
 
         elif step_number == 5:
@@ -384,9 +388,13 @@ class DemoWorkflowService:
             # Step 7: Blast radius simulation
             sim_req = SimulationProposedChange(
                 brand_id=self.workspace_id,
-                target_node_id="FACT-AUR-PRC-01",
-                new_value="₹599",
-                change_type="PRICE_MUTATION"
+                target_record_id="FACT-AUR-PRC-01",
+                target_record_type="PRICE",
+                record_label="Aurelle Cloud Studio Subscription Price",
+                old_value="₹499",
+                proposed_value="₹599",
+                change_rationale="Phase 6 Q1 Pricing Revision to ₹599",
+                proposed_by=actor_name or "Julian Vance (Brand Manager)"
             )
             sim_rep = simulation_engine.simulate_policy_change(sim_req, bkg)
             mutations = {
@@ -504,10 +512,14 @@ class DemoWorkflowService:
             channel="Multi-Channel Digital",
             content=text_to_test
         )
-        v_res = governance_pipeline.analyze_asset(v_req, bkg)
+        v_res = governance_pipeline.verify_asset(v_req, bkg)
 
         # Explainable claim assessment
         exp_report = explainable_engine.analyze_claims_explainable(text_to_test, bkg, self.workspace_id)
+
+        agent_scores = {}
+        for k, v in v_res.agent_reports.items():
+            agent_scores[k] = v.score if hasattr(v, "score") else v.get("score")
 
         return {
             "case_id": case.case_id,
@@ -519,11 +531,7 @@ class DemoWorkflowService:
             "governance_decision": v_res.governance_decision,
             "defects_detected_count": len(v_res.all_risk_spans),
             "risk_spans": [s.model_dump() for s in v_res.all_risk_spans],
-            "agent_scores": {
-                "voice": v_res.agent_reports.voice_persona.score,
-                "claims": v_res.agent_reports.claim_substantiation.score,
-                "regulatory": v_res.agent_reports.regulatory_compliance.score
-            },
+            "agent_scores": agent_scores,
             "explainable_assessments": [a.model_dump() for a in exp_report.assessments],
             "suggested_remediation": v_res.remediated_content,
             "remediation_rationale": v_res.remediation_rationale,
