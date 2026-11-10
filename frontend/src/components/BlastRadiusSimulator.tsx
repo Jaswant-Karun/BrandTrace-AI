@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Flame, ArrowRight, Network, Layers, GitCompare, ShieldAlert, 
-  CheckCircle2, XCircle, AlertTriangle, FileText, ChevronRight, Lock
+  CheckCircle2, XCircle, AlertTriangle, Lock
 } from 'lucide-react';
 import { BlastRadiusResponse } from '../types';
 
@@ -653,7 +653,7 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
 
                   <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl">
                     <div className="text-2xl font-black text-amber-400 font-mono">
-                      {blastResult.affected_campaigns.length}
+                      {blastResult.total_affected_campaigns}
                     </div>
                     <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-1">
                       Campaigns at Risk
@@ -688,33 +688,33 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
                   <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center justify-between">
                     <span>Downstream Content Dependencies</span>
                     <span className="text-slate-400 font-mono font-normal">
-                      {blastResult.impacted_assets.length} assets
+                      {blastResult.affected_targets.length} assets
                     </span>
                   </h4>
 
                   <div className="space-y-2">
-                    {blastResult.impacted_assets.map((asset, idx) => (
+                    {blastResult.affected_targets.map((target, idx) => (
                       <div
                         key={idx}
                         className="bg-slate-950 p-3 rounded-xl border border-slate-800/80 flex items-center justify-between gap-3 text-xs"
                       >
                         <div className="space-y-0.5">
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-white">{asset.asset_title}</span>
+                            <span className="font-bold text-white">{target.asset_name}</span>
                             <span className="text-[10px] font-mono text-slate-400 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">
-                              {asset.asset_id}
+                              {target.asset_id}
                             </span>
-                            <span className="text-[10px] font-mono text-cyan-400">{asset.channel}</span>
+                            <span className="text-[10px] font-mono text-cyan-400">{target.channel}</span>
                           </div>
-                          <p className="text-slate-400 text-[11px] truncate max-w-md">{asset.content_snippet}</p>
+                          <p className="text-slate-400 text-[11px] truncate max-w-md">{target.remediation_required}</p>
                         </div>
 
                         <div className="text-right flex-shrink-0">
                           <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30 font-bold block mb-1">
-                            {asset.exposure_level}
+                            {target.exposure_level}
                           </span>
                           <span className="text-[10px] text-slate-400 flex items-center gap-1 justify-end font-mono">
-                            Hops: {asset.dependency_path.length - 1}
+                            Hops: {target.traversal_path.length - 1}
                             <ArrowRight className="w-2.5 h-2.5" />
                           </span>
                         </div>

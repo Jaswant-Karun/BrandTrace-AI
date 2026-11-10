@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { 
   Lock, ShieldCheck, Download, Search, CheckCircle2, AlertTriangle, 
-  Key, AlertOctagon, RefreshCw, Sparkles, Check, XCircle, FileText
+  Key, AlertOctagon, RefreshCw, Sparkles, XCircle
 } from 'lucide-react';
 import { ReleaseLedgerEntry } from '../types';
 
