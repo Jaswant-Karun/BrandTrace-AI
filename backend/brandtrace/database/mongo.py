@@ -61,6 +61,10 @@ class MongoManager:
 
             # Initialize indexes
             await self.ensure_indexes()
+            
+            # Build Phase 5 Collections Indexes
+            from brandtrace.database.indexes import build_phase5_indexes
+            await build_phase5_indexes(self.db)
         except Exception as e:
             self.is_connected = False
             self.client = None
