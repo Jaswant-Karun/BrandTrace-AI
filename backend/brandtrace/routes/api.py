@@ -1,6 +1,6 @@
 import time
 from typing import Dict, Any, List, Optional
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, UploadFile, File, Form
 from pydantic import BaseModel
 
 from brandtrace.database.mongo import mongo_manager
@@ -539,6 +539,129 @@ async def get_governance_analytics(brand_id: Optional[str] = Query(None)):
             {"week": "W1 Feb", "scanned": 30, "approved": 29, "remediated": 1}
         ]
     }
+
+# ==============================================================================
+# PHASE 3: MULTIMODAL UPLOAD, EXPLAINABLE AI, SIMULATOR, COLLABORATION & AUDIT
+# ==============================================================================
+
+class ExplainableReviewRequest(BaseModel):
+    brand_id: str
+    content: str
+    asset_id: Optional[str] = None
+
+class SimulationCommitRequest(BaseModel):
+    brand_id: str
+    simulation_id: str
+    decision: str = "APPROVED" # "APPROVED" or "REJECTED"
+    authorized_reviewer: str = "Chief Governance Officer"
+
+class AddCommentRequest(BaseModel):
+    asset_id: str
+    author_id: str = "USR-REV-01"
+    message: str
+    highlighted_text: Optional[str] = None
+
+class VerifyRecordRequest(BaseModel):
+    identifier: str
+    content_to_test: Optional[str] = None
+
+@router.post("/multimodal/upload-and-inspect", response_model=MultimodalInspectionReport)
+async def upload_and_inspect_multimodal_file(
+    file: UploadFile = File(...),
+    brand_id: str = Form("apex-dynamics")
+):
+    """
+    Parses and inspects uploaded file:
+    Supports TXT, MD, PDF, DOCX, PNG, JPG, and MP4/MOV videos.
+    """
+    bkg = get_or_load_graph(brand_id)
+    content_bytes = await file.read()
+    filename = file.filename or "uploaded_asset"
+    
+    report = multimodal_engine.inspect_file(filename, content_bytes, bkg)
+    return report
+
+@router.post("/explainable/review", response_model=ExplainableReviewReport)
+async def explainable_claims_review(req: ExplainableReviewRequest):
+    """
+    Hybrid Explainable AI Review:
+    Classifies claims as SUPPORTED, CONTRADICTED, NEEDS_VERIFICATION, EXPIRED_SOURCE, or POTENTIALLY_MISLEADING.
+    """
+    bkg = get_or_load_graph(req.brand_id)
+    report = explainable_engine.analyze_claims_explainable(req.content, bkg, req.brand_id)
+    return report
+
+@router.post("/simulator/propose", response_model=SimulationReport)
+async def propose_change_simulation(req: SimulationProposedChange):
+    """
+    Simulates proposed change to price, spec, claim, terminology, or guideline.
+    Distinguishes direct dependencies from inferred lexical mentions.
+    """
+    bkg = get_or_load_graph(req.brand_id)
+    report = simulation_engine.simulate_change(bkg, req)
+    return report
+
+@router.post("/simulator/commit")
+async def commit_change_simulation(req: SimulationCommitRequest):
+    """
+    Activates new approved version in the graph only after authorized human manager approval.
+    """
+    bkg = get_or_load_graph(req.brand_id)
+    success, message, report = simulation_engine.commit_change(
+        bkg=bkg,
+        simulation_id=req.simulation_id,
+        decision=req.decision,
+        authorized_reviewer=req.authorized_reviewer
+    )
+    if not success:
+        raise HTTPException(status_code=400, detail=message)
+    return {"status": "success", "message": message, "report": report}
+
+@router.get("/collaboration/users")
+async def list_collaboration_users():
+    """List RBAC user profiles."""
+    return list(collaboration_engine.users.values())
+
+@router.get("/collaboration/events")
+async def list_governance_events(limit: int = Query(15)):
+    """List recent governance events."""
+    return collaboration_engine.get_recent_events(limit)
+
+@router.post("/collaboration/comments")
+async def add_content_comment(req: AddCommentRequest):
+    """Adds review comment to asset."""
+    comment = collaboration_engine.add_comment(
+        asset_id=req.asset_id,
+        author_id=req.author_id,
+        message=req.message,
+        highlighted_text=req.highlighted_text
+    )
+    return comment
+
+@router.get("/collaboration/comments/{asset_id}")
+async def get_content_comments(asset_id: str):
+    """Gets review comments for an asset."""
+    return collaboration_engine.get_comments(asset_id)
+
+@router.post("/ledger/verify-record")
+async def verify_ledger_record(req: VerifyRecordRequest):
+    """
+    Verifies content integrity against the immutable audit ledger.
+    Distinguishes VALID_UNCHANGED, MODIFIED_AFTER_APPROVAL, SUPERSEDED, REVOKED, UNKNOWN_RECORD.
+    """
+    # Seed a sample record in audit ledger if empty
+    if not audit_ledger_engine.records:
+        audit_ledger_engine.record_release(
+            user_identity="Chief Governance Officer",
+            user_role="COMPLIANCE_REVIEWER",
+            resource_id="AST-01",
+            resource_type="ASSET",
+            content="520 Miles of Zero Compromise. Powered by QuantumCell™ 800V Architecture. The Apex GT arrives."
+        )
+
+    result = audit_ledger_engine.verify_content(req.identifier, req.content_to_test)
+    return result
+
 
 
 
