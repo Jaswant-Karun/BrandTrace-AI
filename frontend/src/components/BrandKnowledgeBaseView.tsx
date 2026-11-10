@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BookOpen, Search, Plus, CheckCircle2, X } from 'lucide-react';
 import { apiClient } from '../services/apiClient';
+import { PageHeader } from './ui/PageHeader';
 
 interface BrandKnowledgeBaseViewProps {
   brandId: string;
@@ -102,30 +103,27 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
         </div>
       )}
 
-      {/* Header */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 flex flex-wrap items-center justify-between gap-4 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <BookOpen className="w-5 h-5 text-slate-800" />
-            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-              Brand Knowledge Base &amp; Truth-Set
-            </h2>
-          </div>
-          <p className="text-xs text-slate-500">
-            Source-of-truth registry: Approved commercial facts, verified laboratory claims, registered marks, and tone taxonomies.
-          </p>
+      {/* Standardized Enterprise Page Header */}
+      <PageHeader
+        title="Brand Knowledge Base & Certified Truth-Set"
+        description="The central system of record for approved commercial facts, brand guidelines, registered marks, and verified statutory citations."
+        category="Institutional Truth-Set"
+        workspaceName={brandId}
+        primaryAction={{
+          label: "Register Approved Fact",
+          onClick: () => setIsModalOpen(true),
+          icon: <Plus className="w-3.5 h-3.5" />
+        }}
+      />
+
+      {/* Filter and Search Bar */}
+      <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-xs">
+        <div className="flex items-center gap-2">
+          <BookOpen className="w-4 h-4 text-slate-700" />
+          <span className="text-xs font-semibold text-slate-800">Search Knowledge Truth-Set</span>
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Register Fact CTA */}
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-3.5 py-1.5 rounded-lg text-xs flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Register Approved Fact</span>
-          </button>
-
           {/* Search */}
           <div className="relative w-64">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />

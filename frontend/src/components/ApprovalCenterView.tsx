@@ -67,25 +67,18 @@ export const ApprovalCenterView: React.FC<ApprovalCenterViewProps> = ({ brandId 
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 flex flex-wrap items-center justify-between gap-4 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <CheckSquare className="w-5 h-5 text-slate-800" />
-            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-              Governance Approval Center
-            </h2>
-          </div>
-          <p className="text-xs text-slate-500">
-            Authorized sign-off routing: Review and approve staged content revisions triggered by Brand Dependency Intelligence.
-          </p>
-        </div>
-
+      {/* Standardized Enterprise Page Header */}
+      <PageHeader
+        title="Governance Approval Center"
+        description="Review findings and proposed changes, request revisions, and authorize approved releases with cryptographic tamper-evident seals."
+        category="Human-in-the-Loop Review"
+        workspaceName={brandId}
+      >
         <div className="flex items-center gap-2 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200 text-xs font-mono text-amber-900">
           <Lock className="w-4 h-4 text-amber-600" />
           Pending Approvals: <span className="font-bold">{pendingCount}</span>
         </div>
-      </div>
+      </PageHeader>
 
       {isLoading ? (
         <div className="p-12 text-center text-xs text-slate-500 bg-white border border-slate-200 rounded-xl shadow-xs">
