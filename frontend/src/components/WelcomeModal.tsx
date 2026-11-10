@@ -1,8 +1,5 @@
 import React from 'react';
-import {
-  ShieldCheck, ArrowRight, Sparkles, CheckCircle2,
-  X, BookOpen, Layers, Flame, CheckSquare, Lock
-} from 'lucide-react';
+import { ShieldCheck, ArrowRight, Sparkles, X } from 'lucide-react';
 
 interface WelcomeModalProps {
   isOpen: boolean;
