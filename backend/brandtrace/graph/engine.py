@@ -16,6 +16,8 @@ class BrandKnowledgeGraph:
     @classmethod
     def from_graph_data(cls, data: BrandGraphData) -> "BrandKnowledgeGraph":
         bkg = cls(brand_id=data.brand_id, brand_name=data.brand_name)
+        bkg.industry = data.industry
+        bkg.description = data.description
         for node in data.nodes:
             bkg.add_node(node)
         for edge in data.edges:
@@ -59,6 +61,8 @@ class BrandKnowledgeGraph:
         return BrandGraphData(
             brand_id=self.brand_id,
             brand_name=self.brand_name,
+            industry=getattr(self, "industry", "Enterprise Technology"),
+            description=getattr(self, "description", "Enterprise Brand Profile"),
             nodes=list(self.node_meta.values()),
             edges=self.edge_meta
         )
