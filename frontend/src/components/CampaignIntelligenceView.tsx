@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FileText, DollarSign, Layers, CheckCircle2 } from 'lucide-react';
+import { PageHeader } from './ui/PageHeader';
 
 interface CampaignIntelligenceViewProps {
   brandId: string;
@@ -25,20 +26,13 @@ export const CampaignIntelligenceView: React.FC<CampaignIntelligenceViewProps> =
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 flex flex-wrap items-center justify-between gap-4 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <FileText className="w-5 h-5 text-slate-800" />
-            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-              Campaign Intelligence Portfolio
-            </h2>
-          </div>
-          <p className="text-xs text-slate-500">
-            Real-time visibility into multi-channel marketing initiatives, budget distribution, and omnichannel compliance health.
-          </p>
-        </div>
-      </div>
+      {/* Standardized Enterprise Page Header */}
+      <PageHeader
+        title="Campaign Intelligence Portfolio"
+        description="Real-time visibility into multi-channel marketing initiatives, commercial budgets, flight dates, and associated brand touchpoints."
+        category="Campaign Governance"
+        workspaceName={brandId}
+      />
 
       {isLoading ? (
         <div className="p-12 text-center text-xs text-slate-500 bg-white border border-slate-200 rounded-xl shadow-xs">

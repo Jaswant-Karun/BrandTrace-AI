@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { AlertTriangle, ShieldCheck, Scale } from 'lucide-react';
+import { PageHeader } from './ui/PageHeader';
 
 interface RiskIntelligenceViewProps {
   brandId: string;
@@ -25,24 +26,18 @@ export const RiskIntelligenceView: React.FC<RiskIntelligenceViewProps> = ({ bran
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 flex flex-wrap items-center justify-between gap-4 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <AlertTriangle className="w-5 h-5 text-slate-800" />
-            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-              Enterprise Risk Intelligence &amp; Taxonomy
-            </h2>
-          </div>
-          <p className="text-xs text-slate-500">
-            Categorized statutory liabilities, prohibited marketing phrasing, and proactive legal guardrails.
-          </p>
-        </div>
-
+      {/* Standardized Enterprise Page Header */}
+      <PageHeader
+        title="Enterprise Risk Intelligence & Taxonomy"
+        description="Categorized statutory liabilities, FTC claim substantiation doctrine, FDA wellness standards, and institutional risk rankings."
+        category="Risk Taxonomy"
+        workspaceName={brandId}
+      >
         <div className="flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200 text-xs font-mono text-emerald-800">
           <ShieldCheck className="w-4 h-4 text-emerald-600" />
-          Rating: <span className="font-bold">Defended (Low Liability)</span>
+          Posture: <span className="font-bold">Defended (Low Liability)</span>
         </div>
+      </PageHeader>
       </div>
 
       {isLoading ? (

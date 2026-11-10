@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Settings, Database, Cpu, RefreshCw, CheckCircle2, Bell, Shield } from 'lucide-react';
 import { BrandProfile, DatabaseStatus } from '../types';
+import { PageHeader } from './ui/PageHeader';
 
 interface SettingsViewProps {
   brand: BrandProfile | undefined;
@@ -21,20 +22,18 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ brand, dbStatus, onR
 
   return (
     <div className="space-y-6 max-w-4xl">
-      {/* Header */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 flex flex-wrap items-center justify-between gap-4 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <Settings className="w-5 h-5 text-slate-800" />
-            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-              Control Plane Enterprise Settings
-            </h2>
-          </div>
-          <p className="text-xs text-slate-500">
-            Configure AI reasoning engines, database persistence, governance notification webhooks, and regulatory jurisdictions.
-          </p>
-        </div>
-      </div>
+      {/* Standardized Enterprise Page Header */}
+      <PageHeader
+        title="Control Plane Enterprise Settings"
+        description="Configure AI multi-agent reasoning models, MongoDB Atlas connection parameters, and governance notification dispatch rules."
+        category="Control Plane Administration"
+        workspaceName={brand?.brand_name || 'Aurelle Technologies'}
+        primaryAction={{
+          label: isReseeding ? "Re-seeding..." : "Re-seed Truth-Set",
+          onClick: onReseed,
+          icon: <RefreshCw className={`w-3.5 h-3.5 ${isReseeding ? 'animate-spin' : ''}`} />
+        }}
+      />
 
       {/* Brand Profile Details */}
       <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
