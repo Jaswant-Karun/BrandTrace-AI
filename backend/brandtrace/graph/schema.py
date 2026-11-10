@@ -5,6 +5,8 @@ from pydantic import BaseModel, Field
 class NodeType(str, Enum):
     BRAND = "BRAND"
     PILLAR = "PILLAR"
+    PRODUCT = "PRODUCT"
+    GUIDELINE = "GUIDELINE"
     TONE_ATTRIBUTE = "TONE_ATTRIBUTE"
     APPROVED_FACT = "APPROVED_FACT"     # Prices, Specs, Verified Claims, Legal Disclaimers
     APPROVED_CLAIM = "APPROVED_CLAIM"

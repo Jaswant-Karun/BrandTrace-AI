@@ -374,6 +374,7 @@ NOVUS_HEALTH_DATA = BrandGraphData(
 BRAND_SEEDS: Dict[str, BrandGraphData] = {
     "apex-dynamics": APEX_DYNAMICS_DATA,
     "novus-health": NOVUS_HEALTH_DATA,
+    "aurelle-tech": AURELLE_TECH_DATA,
 }
 
 # Approved Facts Catalog for easy query
@@ -413,5 +414,65 @@ APPROVED_FACTS_CATALOG: Dict[str, ApprovedFact] = {
         source_citation="Novus Commercial Access Policy 2026-B",
         department_owner="Market Access & Patient Commercial",
         last_verified="2026-01-20"
+    ),
+    "FACT-AUR-PRC-01": ApprovedFact(
+        id="FACT-AUR-PRC-01",
+        brand_id="aurelle-tech",
+        name="Aurelle Cloud Studio Subscription Price",
+        category="PRICE",
+        current_value="₹499",
+        unit="per creator / month",
+        description="Official entry subscription for Aurelle Cloud Studio audio and spatial mastering suite.",
+        source_citation="Aurelle Commercial Committee Resolution #2026-Q1-AUR",
+        department_owner="Pricing & Commercial Operations",
+        last_verified="2026-01-15"
+    ),
+    "FACT-AUR-BAT-01": ApprovedFact(
+        id="FACT-AUR-BAT-01",
+        brand_id="aurelle-tech",
+        name="Horizon Watch Continuous Battery Life",
+        category="SPECIFICATION",
+        current_value="72 hours",
+        unit="continuous runtime",
+        description="Official continuous battery runtime under IEC 62133 standardized lab protocol.",
+        source_citation="IEC 62133 Standard Lab Protocol #AUR-LAB-BAT-72H",
+        department_owner="Hardware Engineering",
+        last_verified="2026-02-01"
+    ),
+    "FACT-AUR-AUD-01": ApprovedFact(
+        id="FACT-AUR-AUD-01",
+        brand_id="aurelle-tech",
+        name="QuantumAcoustics™ Audio Resolution",
+        category="SPECIFICATION",
+        current_value="24-bit 192kHz",
+        unit="lossless spatial audio",
+        description="Mastering-grade lossless digital acoustic pipeline certified for studio reproduction.",
+        source_citation="Acoustics Certification Dossier #AUR-AC-994",
+        department_owner="Acoustics Engineering",
+        last_verified="2026-01-28"
+    ),
+    "FACT-AUR-TIT-01": ApprovedFact(
+        id="FACT-AUR-TIT-01",
+        brand_id="aurelle-tech",
+        name="Horizon Watch Metallurgy Specification",
+        category="SPECIFICATION",
+        current_value="Grade 5 Aerospace Titanium",
+        unit="metallurgy grade",
+        description="ASTM B265 Grade 5 Titanium enclosure engineered for extreme strength-to-weight ratio.",
+        source_citation="ASTM B265 Grade 5 Titanium Certification #TIT-2026-08",
+        department_owner="Industrial Design",
+        last_verified="2026-01-10"
+    ),
+    "FACT-AUR-EXP-01": ApprovedFact(
+        id="FACT-AUR-EXP-01",
+        brand_id="aurelle-tech",
+        name="Free 2025 Cloud Studio Founder Trial",
+        category="PROMOTION",
+        current_value="₹0 for 6 months",
+        unit="promotional tier",
+        description="Introductory trial tier that officially expired on December 31, 2025.",
+        source_citation="Aurelle Founder Growth Promotion #2025-FNDR",
+        department_owner="Growth Marketing",
+        last_verified="2025-12-31"
     )
 }
