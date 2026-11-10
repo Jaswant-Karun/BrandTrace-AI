@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import {
-  ShieldAlert, Play, RotateCcw, CheckCircle2, AlertTriangle, X,
-  Layers, ChevronRight, UserCheck, Eye, Terminal, Sparkles,
-  ArrowRight, Activity, Database, Check
+  ShieldAlert, Play, RotateCcw, X,
+  Layers, ChevronRight, Sparkles,
+  ArrowRight, Database, Check
 } from 'lucide-react';
 import { apiClient } from '../services/apiClient';
 import { useAuth } from '../context/AuthContext';
 
 interface ScenarioStep {
   step_number: number;
-  title: str;
+  title: string;
   actor_role: string;
   actor_name: string;
   status: 'COMPLETED' | 'IN_PROGRESS' | 'PENDING';
@@ -42,7 +42,7 @@ export const DemoWalkthroughModal: React.FC<DemoWalkthroughModalProps> = ({
   onClose,
   onNavigateToView
 }) => {
-  const { currentWorkspace, setWorkspace, user, personas, switchPersona } = useAuth();
+  const { user, personas, switchPersona } = useAuth();
   const [activeTab, setActiveTab] = useState<'lifecycle' | 'cases'>('lifecycle');
   
   // Scenario state
