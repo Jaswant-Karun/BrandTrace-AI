@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import {
-  ShieldCheck, GitFork, ArrowRight,
-  TrendingUp, CheckCircle2,
-  Lock, Sparkles, Building, Activity, Layers, Eye
+  ShieldCheck, ArrowRight,
+  TrendingUp,
+  Lock, Sparkles, Building, Activity, Layers
 } from 'lucide-react';
 import { NavigationTab } from './Sidebar';
 
