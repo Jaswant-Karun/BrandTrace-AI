@@ -1,0 +1,33 @@
+{
+  "name": "brandtrace-ai-monorepo",
+  "version": "1.0.0",
+  "description": "BRANDTRACE AI — The Autonomous Brand Intelligence & Governance Control Plane",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev:all",
+    "dev:all": "concurrently -n \"API,WEB\" -c \"blue,green\" \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:web": "npm run dev --workspace=apps/web",
+    "dev:api": "uv run uvicorn brandtrace.main:app --app-dir apps/api --reload --port 8000",
+    "build:web": "npm run build --workspace=apps/web",
+    "test:api": "uv run pytest apps/api/tests",
+    "test:web": "npm run test --workspace=apps/web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "keywords": [
+    "brand-governance",
+    "knowledge-graph",
+    "multi-agent",
+    "explainable-ai",
+    "ai-saas",
+    "compliance",
+    "brandtrace"
+  ],
+  "author": "BrandTrace AI Team",
+  "license": "Apache-2.0"
+}
