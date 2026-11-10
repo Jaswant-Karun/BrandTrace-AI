@@ -19,6 +19,7 @@ import { BrandNode } from './BrandNode';
 import {
   ApprovedFact, DependencyIntelligenceResult, RevisionTask, AssetVersionRecord
 } from '../types';
+import { PageHeader } from './ui/PageHeader';
 
 interface DependencyIntelligenceStudioProps {
   brandId: string;
@@ -197,31 +198,18 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-xs">
-              <GitFork className="w-5 h-5 stroke-[2.2]" />
-            </div>
-            <div>
-              <h2 className="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                Brand Dependency Intelligence Graph (BDIG)
-                <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200 px-2 py-0.5 rounded">
-                  Connected Control Plane
-                </span>
-              </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Connects distributed marketing copy, advertisements, websites, and sales documents to the foundational facts on which they depend.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 text-xs font-mono text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
-            <Lock className="w-3.5 h-3.5 text-slate-700" />
-            Zero-Silent-Overwrite Policy Active
-          </div>
+      {/* Standardized Enterprise Page Header */}
+      <PageHeader
+        title="Fact Mutation & Dependency Intelligence Studio"
+        description="Traverse cross-departmental dependencies, simulate asset blast radius, and safely dispatch revision tasks to authorized reviewers without silent overwrites."
+        category="Dependency Intelligence"
+        workspaceName={brandId}
+      >
+        <div className="flex items-center gap-2 text-xs font-mono text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
+          <Lock className="w-3.5 h-3.5 text-slate-700" />
+          Zero-Silent-Overwrite Policy Active
         </div>
-      </div>
+      </PageHeader>
 
       {/* Main Grid: Fact Mutation & Impact Analysis */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
