@@ -133,6 +133,87 @@ class BrandKnowledgeGraph:
             "edges": flow_edges
         }
 
+    def traverse_dependencies(
+        self,
+        start_node_id: str,
+        direction: str = "BOTH" # "DOWNSTREAM", "UPSTREAM", "BOTH"
+    ) -> Dict[str, Any]:
+        """
+        Intelligent graph traversal connecting guidelines, approved facts, marketing claims,
+        campaigns, documents, visual assets, and content versions with evidence-backed relationships.
+        """
+        if start_node_id not in self.graph:
+            return {
+                "start_node_id": start_node_id,
+                "found": False,
+                "upstream_nodes": [],
+                "downstream_nodes": [],
+                "evidence_citations": [],
+                "subgraph_node_ids": [],
+                "subgraph_edge_ids": []
+            }
+
+        start_meta = self.get_node(start_node_id)
+        upstream_nodes: List[Dict[str, Any]] = []
+        downstream_nodes: List[Dict[str, Any]] = []
+        evidence_citations: List[Dict[str, Any]] = []
+        subgraph_nodes: Set[str] = {start_node_id}
+        subgraph_edges: List[str] = []
+
+        rev_graph = self.graph.reverse()
+
+        # 1. Downstream Traversal (Assets, Campaigns, Documents that depend on or cite this node)
+        if direction in ["DOWNSTREAM", "BOTH"]:
+            for target in nx.descendants(rev_graph, start_node_id):
+                subgraph_nodes.add(target)
+                node_data = self.graph.nodes[target]
+                downstream_nodes.append({
+                    "id": target,
+                    "label": node_data.get("label", target),
+                    "type": node_data.get("type"),
+                    "properties": node_data.get("properties", {})
+                })
+
+            for u, v, data in self.graph.edges(data=True):
+                if u in subgraph_nodes and v in subgraph_nodes:
+                    edge_id = f"{u}->{v}"
+                    subgraph_edges.append(edge_id)
+                    evidence = data.get("properties", {}).get("citation") or data.get("label") or data.get("type")
+                    if evidence:
+                        evidence_citations.append({
+                            "source_node": u,
+                            "target_node": v,
+                            "relationship": data.get("type", "DEPENDS_ON"),
+                            "evidence": evidence
+                        })
+
+        # 2. Upstream Traversal (Ground truth, Regulations, Pillars, Facts that govern this node)
+        if direction in ["UPSTREAM", "BOTH"]:
+            for source in nx.descendants(self.graph, start_node_id):
+                subgraph_nodes.add(source)
+                node_data = self.graph.nodes[source]
+                upstream_nodes.append({
+                    "id": source,
+                    "label": node_data.get("label", source),
+                    "type": node_data.get("type"),
+                    "properties": node_data.get("properties", {})
+                })
+
+        return {
+            "start_node_id": start_node_id,
+            "start_node_label": start_meta.label if start_meta else start_node_id,
+            "start_node_type": start_meta.type if start_meta else "UNKNOWN",
+            "found": True,
+            "total_connected_nodes": len(subgraph_nodes),
+            "upstream_count": len(upstream_nodes),
+            "downstream_count": len(downstream_nodes),
+            "upstream_nodes": upstream_nodes,
+            "downstream_nodes": downstream_nodes,
+            "evidence_citations": evidence_citations,
+            "subgraph_node_ids": list(subgraph_nodes),
+            "subgraph_edge_ids": subgraph_edges
+        }
+
     def simulate_blast_radius(
         self,
         mutated_node_id: str,

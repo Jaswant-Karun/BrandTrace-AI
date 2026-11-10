@@ -32,6 +32,21 @@ export const BrandNode = memo(({ data }: NodeProps) => {
           icon: <Sparkles className="w-3.5 h-3.5 text-rose-400" />,
           title: 'Tone Attribute'
         };
+      case 'APPROVED_FACT':
+        return {
+          border: 'border-cyan-400/60 hover:border-cyan-300',
+          badge: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40',
+          icon: <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />,
+          title: 'Approved Fact'
+        };
+      case 'GUIDELINE':
+      case 'BRAND_GUIDELINE':
+        return {
+          border: 'border-amber-400/60 hover:border-amber-300',
+          badge: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+          icon: <Flag className="w-3.5 h-3.5 text-amber-400" />,
+          title: 'Brand Guideline'
+        };
       case 'APPROVED_CLAIM':
         return {
           border: 'border-emerald-500/50 hover:border-emerald-400',
