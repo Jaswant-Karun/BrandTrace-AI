@@ -16,3 +16,4 @@ def test_root():
     assert response.status_code == 200
     data = response.json()
     assert "BRANDTRACE AI" in data["name"]
+

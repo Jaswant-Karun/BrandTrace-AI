@@ -121,3 +121,4 @@ npm run dev
   - Backend: FastAPI, Pydantic v2, NetworkX, Uvicorn.
   - Zero proprietary or closed templates were copied.
 - **Dual-Mode Engine:** Includes a deterministic local reasoning engine with seeded brand graphs so judges can evaluate the platform instantly with zero API keys required.
+
