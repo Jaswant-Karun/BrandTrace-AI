@@ -47,6 +47,42 @@ class VoicePersonaAgent:
                 )
             )
 
+        # Dynamic Brand Voice Document Grounding (Phase 2)
+        try:
+            from brandtrace.database.mongo import mongo_manager
+            indexed_voice_docs = [
+                d for d in mongo_manager._memory_documents.values()
+                if (d.get("workspace_id") == getattr(bkg, "brand_id", "") or 
+                    d.get("organisation_id") == getattr(bkg, "org_id", ""))
+                and d.get("processing_status") == "INDEXED"
+                and d.get("category") == "BRAND_VOICE"
+            ]
+            for doc in indexed_voice_docs:
+                doc_id = doc.get("doc_id", "DOC-VOICE")
+                ver = doc.get("version_number", "1.0")
+                title = doc.get("title", "Brand Voice Mandate")
+                content = doc.get("raw_content", "")
+                for line in content.split("\n"):
+                    if "prohibited" in line.lower() or "banned" in line.lower() or "disallowed" in line.lower():
+                        terms = re.findall(r"['\"]([^'\"]+)['\"]", line)
+                        for term in terms:
+                            pat = re.compile(rf"\b{re.escape(term)}\b", re.IGNORECASE)
+                            for m in pat.finditer(text):
+                                risk_spans.append(
+                                    RiskSpan(
+                                        start_char=m.start(),
+                                        end_char=m.end(),
+                                        matched_text=m.group(),
+                                        category="VOICE",
+                                        severity=SeverityLevel.MODERATE,
+                                        explanation=f"Vocabulary '{m.group()}' violates brand voice mandate in {doc_id} (v{ver}).",
+                                        rule_citation=f"Document {doc_id} (v{ver}): {title}",
+                                        suggested_fix="Use approved brand vocabulary."
+                                    )
+                                )
+        except Exception:
+            pass
+
         score = max(0.0, 100.0 - (len(risk_spans) * 18.0))
         status = "PASSED" if score >= 80 else ("WARNING" if score >= 50 else "FAILED")
         
