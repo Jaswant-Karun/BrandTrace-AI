@@ -168,6 +168,10 @@ async def verify_asset(request: VerificationRequest):
     """
     if not request.content or not request.content.strip():
         raise HTTPException(status_code=400, detail="Content cannot be empty for governance inspection.")
+    if len(request.content) > 50000:
+        raise HTTPException(status_code=413, detail=f"Content length ({len(request.content)} chars) exceeds maximum permitted limit of 50,000 characters.")
+    if not request.brand_id or not request.brand_id.strip():
+        raise HTTPException(status_code=400, detail="Brand ID is required for governance inspection.")
     bkg = get_or_load_graph(request.brand_id)
     result = governance_pipeline.verify_asset(request, bkg)
     
@@ -896,6 +900,10 @@ async def explainable_claims_review(req: ExplainableReviewRequest):
     """
     if not req.content or not req.content.strip():
         raise HTTPException(status_code=400, detail="Content cannot be empty for explainable review.")
+    if len(req.content) > 50000:
+        raise HTTPException(status_code=413, detail=f"Content length ({len(req.content)} chars) exceeds maximum permitted limit of 50,000 characters.")
+    if not req.brand_id or not req.brand_id.strip():
+        raise HTTPException(status_code=400, detail="Brand ID is required for explainable review.")
     bkg = get_or_load_graph(req.brand_id)
     report = explainable_engine.analyze_claims_explainable(req.content, bkg, req.brand_id)
     return report
@@ -915,6 +923,11 @@ async def propose_change_simulation(
             status_code=400,
             detail="Invalid proposal parameters: brand_id, target_record_id, old_value, and proposed_value are required."
         )
+    if req.old_value.strip() == req.proposed_value.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Proposed value must differ from the current old value."
+        )
 
     bkg = get_or_load_graph(req.brand_id)
     report = simulation_engine.simulate_change(bkg, req)
@@ -922,9 +935,10 @@ async def propose_change_simulation(
     # Persist draft simulation in MongoDB if connected
     if mongo_manager.is_connected and mongo_manager.db is not None:
         try:
+            sim_dict = {k: v for k, v in report.model_dump().items() if k != "_id"}
             await mongo_manager.db.change_simulations.update_one(
                 {"simulation_id": report.simulation_id},
-                {"$set": report.model_dump()},
+                {"$set": sim_dict, "$setOnInsert": {"_id": f"sim_{report.simulation_id}"}},
                 upsert=True
             )
         except Exception:

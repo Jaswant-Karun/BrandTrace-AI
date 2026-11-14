@@ -28,7 +28,7 @@ async def get_current_user(authorization: Optional[str] = Header(None)) -> UserP
 
 @router.post("/login", response_model=LoginResponse)
 async def login(req: LoginRequest):
-    user = auth_service.authenticate_user(req.email, req.password)
+    user = await auth_service.authenticate_user_async(req.email, req.password)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
     token = auth_service.create_user_token(user)

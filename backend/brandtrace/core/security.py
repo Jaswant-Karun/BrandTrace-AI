@@ -197,6 +197,13 @@ def validate_file_upload(filename: str, file_size: int, content_type: Optional[s
             detail="Security violation: Illegal file path characters or traversal detected."
         )
 
+    # 1b. Empty file check
+    if file_size <= 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Security violation: Uploaded file is empty (0 bytes)."
+        )
+
     # 2. Size limit enforcement (max 25MB)
     if file_size > MAX_UPLOAD_SIZE:
         raise HTTPException(
