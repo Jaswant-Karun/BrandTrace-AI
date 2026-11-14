@@ -38,8 +38,9 @@ async def execute_vector_search(query: VectorSearchQuery):
     2. Runs $vectorSearch in MongoDB Atlas with tenant isolation (org_id, workspace_id).
     3. Returns top verified matching brand guidelines and approved facts.
     """
-    # 1. Ensure embeddings exist for the tenant
-    if len(mongo_manager._memory_embeddings) == 0:
+    # 1. Ensure approved facts embeddings exist for the tenant
+    has_facts_seeded = any(e.get("org_id") == query.org_id and e.get("node_type") == "APPROVED_FACT" for e in mongo_manager._memory_embeddings)
+    if not has_facts_seeded:
         await seed_brand_vector_embeddings(query.org_id, query.workspace_id)
 
     # 2. Generate embedding

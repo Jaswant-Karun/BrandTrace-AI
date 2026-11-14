@@ -592,6 +592,78 @@ async def create_brand_guideline_api(req: GuidelineCreatePayload):
         source_citation=req.source_citation
     ))
 
+# User Document Management Endpoints (Phase 2)
+@router.get("/documents")
+async def list_documents_api(
+    workspace_id: Optional[str] = Query(None),
+    org_id: Optional[str] = Query(None),
+    category: Optional[str] = Query(None),
+    is_demo: Optional[bool] = Query(None)
+):
+    from brandtrace.modules.knowledge_base.router import list_brand_documents
+    return await list_brand_documents(workspace_id=workspace_id, org_id=org_id, category=category, is_demo=is_demo)
+
+@router.post("/documents")
+async def create_document_api(req: Dict[str, Any]):
+    from brandtrace.modules.knowledge_base.router import create_brand_document
+    from brandtrace.modules.knowledge_base.models import CreateDocumentRequest
+    return await create_brand_document(CreateDocumentRequest(**req))
+
+@router.get("/documents/{doc_id}")
+async def get_document_api(doc_id: str, workspace_id: Optional[str] = Query(None), org_id: Optional[str] = Query(None)):
+    from brandtrace.modules.knowledge_base.router import get_brand_document
+    return await get_brand_document(doc_id=doc_id, workspace_id=workspace_id, org_id=org_id)
+
+@router.put("/documents/{doc_id}")
+async def update_document_api(doc_id: str, req: Dict[str, Any], workspace_id: str = Query("aurelle-tech"), org_id: Optional[str] = Query(None)):
+    from brandtrace.modules.knowledge_base.router import update_brand_document
+    from brandtrace.modules.knowledge_base.models import UpdateDocumentRequest
+    return await update_brand_document(doc_id=doc_id, req=UpdateDocumentRequest(**req), workspace_id=workspace_id, org_id=org_id)
+
+@router.delete("/documents/{doc_id}")
+async def delete_document_api(doc_id: str, workspace_id: str = Query("aurelle-tech"), org_id: Optional[str] = Query(None)):
+    from brandtrace.modules.knowledge_base.router import delete_brand_document
+    return await delete_brand_document(doc_id=doc_id, workspace_id=workspace_id, org_id=org_id)
+
+@router.get("/documents/{doc_id}/versions")
+async def get_document_versions_api(doc_id: str):
+    from brandtrace.modules.knowledge_base.router import get_document_version_history
+    return await get_document_version_history(doc_id=doc_id)
+
+@router.post("/documents/upload")
+async def upload_document_api(
+    file: UploadFile = File(...),
+    workspace_id: str = Form("aurelle-tech"),
+    org_id: Optional[str] = Form(None),
+    category: str = Form("BRAND_GUIDELINES"),
+    title: Optional[str] = Form(None)
+):
+    from brandtrace.modules.knowledge_base.router import upload_document_file
+    return await upload_document_file(file=file, workspace_id=workspace_id, org_id=org_id, category=category, title=title)
+
+@router.post("/documents/import-website/preview")
+async def preview_website_api(req: Dict[str, Any]):
+    from brandtrace.modules.knowledge_base.router import preview_website_import
+    from brandtrace.modules.knowledge_base.models import WebsiteImportRequest
+    return await preview_website_import(WebsiteImportRequest(**req))
+
+@router.post("/documents/import-website/commit")
+async def commit_website_api(
+    url: str = Form(...),
+    title: str = Form(...),
+    category: str = Form("BRAND_GUIDELINES"),
+    workspace_id: str = Form("aurelle-tech"),
+    org_id: Optional[str] = Form(None),
+    description: Optional[str] = Form(None),
+    raw_content: str = Form(...)
+):
+    from brandtrace.modules.knowledge_base.router import commit_website_import
+    return await commit_website_import(
+        url=url, title=title, category=category,
+        workspace_id=workspace_id, org_id=org_id,
+        description=description, raw_content=raw_content
+    )
+
 @router.post("/facts/mutate", response_model=DependencyIntelligenceResult)
 async def mutate_approved_fact(
     req: FactMutationRequest,
