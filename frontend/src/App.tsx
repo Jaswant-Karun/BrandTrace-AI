@@ -309,7 +309,7 @@ export const App: React.FC = () => {
                     </div>
 
                     {bdigSubTab === 'canvas' ? (
-                      <KnowledgeGraphView brandId={selectedBrandId} />
+                      <KnowledgeGraphView brandId={selectedBrandId} onNavigate={setCurrentTab} />
                     ) : (
                       <DependencyIntelligenceStudio brandId={selectedBrandId} />
                     )}
@@ -317,39 +317,39 @@ export const App: React.FC = () => {
                 )}
 
                 {currentTab === 'content-studio' && (
-                  <AssetInspector brandId={selectedBrandId} onSignRelease={handleSignRelease} />
+                  <AssetInspector brandId={selectedBrandId} onSignRelease={handleSignRelease} onNavigate={setCurrentTab} />
                 )}
 
                 {currentTab === 'impact-simulator' && (
-                  <BlastRadiusSimulator brandId={selectedBrandId} />
+                  <BlastRadiusSimulator brandId={selectedBrandId} onNavigate={setCurrentTab} />
                 )}
 
                 {currentTab === 'multimodal' && (
-                  <MultimodalInspectionView brandId={selectedBrandId} />
+                  <MultimodalInspectionView brandId={selectedBrandId} onNavigate={setCurrentTab} />
                 )}
 
                 {currentTab === 'campaigns' && (
-                  <CampaignIntelligenceView brandId={selectedBrandId} />
+                  <CampaignIntelligenceView brandId={selectedBrandId} onNavigate={setCurrentTab} />
                 )}
 
                 {currentTab === 'risks' && (
-                  <RiskIntelligenceView brandId={selectedBrandId} />
+                  <RiskIntelligenceView brandId={selectedBrandId} onNavigate={setCurrentTab} />
                 )}
 
                 {currentTab === 'approvals' && (
-                  <ApprovalCenterView brandId={selectedBrandId} />
+                  <ApprovalCenterView brandId={selectedBrandId} onNavigate={setCurrentTab} />
                 )}
 
                 {currentTab === 'knowledge-base' && (
-                  <BrandKnowledgeBaseView brandId={selectedBrandId} />
+                  <BrandKnowledgeBaseView brandId={selectedBrandId} onNavigate={setCurrentTab} />
                 )}
 
                 {currentTab === 'analytics' && (
-                  <GovernanceAnalyticsView brandId={selectedBrandId} />
+                  <GovernanceAnalyticsView brandId={selectedBrandId} onNavigate={setCurrentTab} />
                 )}
 
                 {currentTab === 'audit-trust' && (
-                  <AuditTrustCenterView brandId={selectedBrandId} />
+                  <AuditTrustCenterView brandId={selectedBrandId} onNavigate={setCurrentTab} />
                 )}
 
                 {currentTab === 'settings' && (
@@ -358,6 +358,7 @@ export const App: React.FC = () => {
                     dbStatus={dbStatus}
                     onReseed={handleReseed}
                     isReseeding={isReseeding}
+                    onNavigate={setCurrentTab}
                   />
                 )}
               </Suspense>

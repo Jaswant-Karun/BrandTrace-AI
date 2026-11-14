@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, HelpCircle, CheckCircle } from 'lucide-react';
+import { ArrowRight, HelpCircle } from 'lucide-react';
 
 export interface WorkflowBannerProps {
   currentStage: string;

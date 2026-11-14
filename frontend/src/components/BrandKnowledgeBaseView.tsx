@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BookOpen, Search, Plus, CheckCircle2, ShieldCheck, ExternalLink, Filter } from 'lucide-react';
+import { BookOpen, Search, Plus, ExternalLink } from 'lucide-react';
 import { apiClient } from '../services/apiClient';
 import { PageHeader } from './ui/PageHeader';
 import { WorkflowBanner } from './ui/WorkflowBanner';

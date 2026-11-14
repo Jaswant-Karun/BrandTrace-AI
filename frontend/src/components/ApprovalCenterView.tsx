@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Lock, CheckCircle2, ShieldCheck, ArrowRight, UserCheck, Check, AlertTriangle } from 'lucide-react';
+import { Lock, CheckCircle2, ShieldCheck, ArrowRight, Check } from 'lucide-react';
 import { RevisionTask } from '../types';
 import { PageHeader } from './ui/PageHeader';
 import { WorkflowBanner } from './ui/WorkflowBanner';
@@ -74,7 +74,7 @@ export const ApprovalCenterView: React.FC<ApprovalCenterViewProps> = ({ brandId,
     }
   };
 
-  const pendingCount = tasks.filter((t) => t.status === 'PENDING_REVIEW' || t.status === 'PENDING').length;
+  const pendingCount = tasks.filter((t) => t.status === 'PENDING_REVIEW' || t.status === 'IN_REVISION').length;
 
   return (
     <div className="space-y-6">
@@ -171,7 +171,7 @@ export const ApprovalCenterView: React.FC<ApprovalCenterViewProps> = ({ brandId,
                 </TableCell>
 
                 <TableCell className="align-top">
-                  {task.status === 'APPROVED_SEALED' || task.status === 'RESOLVED' ? (
+                  {task.status === 'APPROVED_SEALED' ? (
                     <div className="space-y-1">
                       <Badge variant="success" size="sm" dot>
                         Approved &amp; Sealed

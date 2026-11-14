@@ -2,21 +2,26 @@ import React, { useState } from 'react';
 import { Database, Cpu, RefreshCw, CheckCircle2, Bell, Shield } from 'lucide-react';
 import { BrandProfile, DatabaseStatus } from '../types';
 import { PageHeader } from './ui/PageHeader';
+import { WorkflowBanner } from './ui/WorkflowBanner';
+import { useToast } from './ui/ToastContext';
 
 interface SettingsViewProps {
   brand: BrandProfile | undefined;
   dbStatus: DatabaseStatus | null;
   onReseed: () => Promise<void>;
   isReseeding: boolean;
+  onNavigate?: (tab: any) => void;
 }
 
-export const SettingsView: React.FC<SettingsViewProps> = ({ brand, dbStatus, onReseed, isReseeding }) => {
+export const SettingsView: React.FC<SettingsViewProps> = ({ brand, dbStatus, onReseed, isReseeding, onNavigate }) => {
+  const toast = useToast();
   const [llmProvider, setLlmProvider] = useState<string>("mock");
   const [webhookUrl, setWebhookUrl] = useState<string>("https://hooks.slack.com/services/T00/B00/XXXX");
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
 
   const handleSave = () => {
     setSaveSuccess(true);
+    toast.success('Control plane settings successfully updated.');
     setTimeout(() => setSaveSuccess(false), 2500);
   };
 
@@ -24,10 +29,23 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ brand, dbStatus, onR
     <div className="space-y-6 max-w-4xl">
       {/* Standardized Enterprise Page Header */}
       <PageHeader
-        title="Control Plane Enterprise Settings"
-        description="Configure AI multi-agent reasoning models, MongoDB Atlas connection parameters, and governance notification dispatch rules."
-        category="Control Plane Administration"
+        title="Settings"
+        description="Configure tenant workspaces, user roles, database connectivity, and control plane policies."
+        category="Management"
         workspaceName={brand?.brand_name || 'Aurelle Technologies'}
+        breadcrumbs={[
+          { label: 'BrandTrace' },
+          { label: 'Management' },
+          { label: 'Settings', active: true }
+        ]}
+        helpContext={{
+          summary: "Control plane configuration manages the infrastructure supporting brand governance: database clusters, AI reasoning fallback engines, and external compliance dispatch webhooks.",
+          terms: [
+            { term: "AI Engine", definition: "Gemini 2.5 Flash / Pro with deterministic heuristic fallback when external APIs are disconnected." },
+            { term: "MongoDB Atlas", definition: "Persistent multi-tenant document store with tenant isolation for graph nodes, releases, and audit logs." },
+            { term: "Webhook Dispatch", definition: "Real-time Slack / HTTP notifications whenever a critical FTC or FDA regulatory defect is intercepted." }
+          ]
+        }}
         primaryAction={{
           label: isReseeding ? "Re-seeding..." : "Re-seed Truth-Set",
           onClick: onReseed,
@@ -169,6 +187,16 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ brand, dbStatus, onR
           </div>
         </div>
       </div>
+
+      {/* Workflow Banner: Next Step in Governance Journey */}
+      <WorkflowBanner
+        currentStage="Settings"
+        nextStageTitle="Overview & Command Center"
+        nextStageDescription="Return to the executive command center to view active postures, quick actions, and overall workspace status."
+        nextStageActionLabel="Return to Overview"
+        onNavigateNext={() => onNavigate && onNavigate('command-center')}
+        governanceHint="Configuration changes take effect immediately across all active workspaces."
+      />
     </div>
   );
 };

@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { PageHeader } from './ui/PageHeader';
+import { WorkflowBanner } from './ui/WorkflowBanner';
+import { Settings } from 'lucide-react';
 
 interface GovernanceAnalyticsViewProps {
   brandId: string;
+  onNavigate?: (tab: any) => void;
 }
 
-export const GovernanceAnalyticsView: React.FC<GovernanceAnalyticsViewProps> = ({ brandId }) => {
+export const GovernanceAnalyticsView: React.FC<GovernanceAnalyticsViewProps> = ({ brandId, onNavigate }) => {
   const [analytics, setAnalytics] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -28,10 +31,28 @@ export const GovernanceAnalyticsView: React.FC<GovernanceAnalyticsViewProps> = (
     <div className="space-y-6">
       {/* Standardized Enterprise Page Header */}
       <PageHeader
-        title="Governance Analytics & Velocity Telemetry"
-        description="Quantitative compliance indices, gate release velocity, violation distribution, and department-level adherence metrics."
-        category="Governance Telemetry"
-        workspaceName={brandId}
+        title="Analytics"
+        description="Analyze governance velocity, compliance trends over time, and departmental resolution rates."
+        category="Management"
+        workspaceName={brandId === 'aurelle-tech' ? 'Aurelle Technologies Inc.' : brandId}
+        breadcrumbs={[
+          { label: 'BrandTrace' },
+          { label: 'Management' },
+          { label: 'Analytics', active: true }
+        ]}
+        helpContext={{
+          summary: "Governance Analytics synthesizes inspection logs across departments to measure operational velocity, gate turnaround time, and common violation patterns.",
+          terms: [
+            { term: "Compliance Rate", definition: "Percentage of evaluated touchpoints that pass pre-release gates without requiring manual remediation." },
+            { term: "Release Turnaround", definition: "Average elapsed hours between content submission and authorized cryptographic sign-off." },
+            { term: "Department Breakdown", definition: "Tracks relative performance and active revisions across Performance Marketing, Sales, Brand, and Digital." }
+          ]
+        }}
+        primaryAction={{
+          label: "Enterprise Settings",
+          onClick: () => onNavigate && onNavigate('settings'),
+          icon: <Settings className="w-3.5 h-3.5" />
+        }}
       />
 
       {isLoading ? (
@@ -141,6 +162,16 @@ export const GovernanceAnalyticsView: React.FC<GovernanceAnalyticsViewProps> = (
           </div>
         </div>
       )}
+
+      {/* Workflow Banner: Next Step in Governance Journey */}
+      <WorkflowBanner
+        currentStage="Analytics"
+        nextStageTitle="Overview & Command Center"
+        nextStageDescription="Return to the executive command center to view active postures, quick actions, and overall workspace status."
+        nextStageActionLabel="Return to Overview"
+        onNavigateNext={() => onNavigate && onNavigate('command-center')}
+        governanceHint="High compliance velocity indicates healthy alignment between creative teams and certified brand knowledge."
+      />
     </div>
   );
 };

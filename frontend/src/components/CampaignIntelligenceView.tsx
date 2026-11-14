@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { DollarSign, Layers, CheckCircle2 } from 'lucide-react';
 import { PageHeader } from './ui/PageHeader';
+import { WorkflowBanner } from './ui/WorkflowBanner';
+import { ArrowRight } from 'lucide-react';
 
 interface CampaignIntelligenceViewProps {
   brandId: string;
+  onNavigate?: (tab: any) => void;
 }
 
-export const CampaignIntelligenceView: React.FC<CampaignIntelligenceViewProps> = ({ brandId }) => {
+export const CampaignIntelligenceView: React.FC<CampaignIntelligenceViewProps> = ({ brandId, onNavigate }) => {
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -28,10 +31,28 @@ export const CampaignIntelligenceView: React.FC<CampaignIntelligenceViewProps> =
     <div className="space-y-6">
       {/* Standardized Enterprise Page Header */}
       <PageHeader
-        title="Campaign Intelligence Portfolio"
-        description="Real-time visibility into multi-channel marketing initiatives, commercial budgets, flight dates, and associated brand touchpoints."
-        category="Campaign Governance"
-        workspaceName={brandId}
+        title="Campaign Intelligence"
+        description="Track and govern multi-channel marketing campaigns connected to your brand knowledge graph."
+        category="Intelligence"
+        workspaceName={brandId === 'aurelle-tech' ? 'Aurelle Technologies Inc.' : brandId}
+        breadcrumbs={[
+          { label: 'BrandTrace' },
+          { label: 'Intelligence' },
+          { label: 'Campaign Intelligence', active: true }
+        ]}
+        helpContext={{
+          summary: "Campaign Intelligence groups governed marketing assets into flighted commercial initiatives, tracking associated budget exposure and channel distributions.",
+          terms: [
+            { term: "Active Campaign Flight", definition: "A time-bounded commercial push spanning multiple channels (OOH, Social, Search, PR)." },
+            { term: "Connected Touchpoints", definition: "Individual marketing assets whose copy and design tokens reference brand truth nodes." },
+            { term: "Channel Guardrails", definition: "Specific regulatory requirements per channel (e.g., FTC disclosure size for social vs print)." }
+          ]
+        }}
+        primaryAction={{
+          label: "View Risk Intelligence",
+          onClick: () => onNavigate && onNavigate('risks'),
+          icon: <ArrowRight className="w-3.5 h-3.5" />
+        }}
       />
 
       {isLoading ? (
@@ -125,6 +146,16 @@ export const CampaignIntelligenceView: React.FC<CampaignIntelligenceViewProps> =
           ))}
         </div>
       )}
+
+      {/* Workflow Banner: Next Step in Governance Journey */}
+      <WorkflowBanner
+        currentStage="Campaign Intelligence"
+        nextStageTitle="Risk Intelligence & Taxonomy"
+        nextStageDescription="Examine enterprise brand risk categories, prohibited claims guardrails, and statutory exposure ratings."
+        nextStageActionLabel="Go to Risk Intelligence"
+        onNavigateNext={() => onNavigate && onNavigate('risks')}
+        governanceHint="Campaigns reference risk guardrails to ensure cross-channel advertising compliance before launch."
+      />
     </div>
   );
 };
