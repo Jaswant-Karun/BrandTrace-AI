@@ -56,10 +56,14 @@ export const AuditTrustCenterView: React.FC<AuditTrustCenterViewProps> = ({ bran
     setIsVerifying(true);
     setVerificationResult(null);
 
+    const token = localStorage.getItem('brandtrace_jwt_token');
     try {
       const res = await fetch('/api/ledger/verify-record', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({
           identifier: id,
           content_to_test: content.trim() ? content : null
@@ -121,10 +125,14 @@ export const AuditTrustCenterView: React.FC<AuditTrustCenterViewProps> = ({ bran
   };
 
   const handleRevokeSubmit = async () => {
+    const token = localStorage.getItem('brandtrace_jwt_token');
     try {
       const res = await fetch('/api/ledger/revoke-record', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({
           identifier: actionTargetId,
           revocation_reason: actionReason || 'Regulatory compliance recall',
@@ -142,10 +150,14 @@ export const AuditTrustCenterView: React.FC<AuditTrustCenterViewProps> = ({ bran
   };
 
   const handleSupersedeSubmit = async () => {
+    const token = localStorage.getItem('brandtrace_jwt_token');
     try {
       const res = await fetch('/api/ledger/supersede-record', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({
           identifier: actionTargetId,
           new_version: newVersionLabel,
