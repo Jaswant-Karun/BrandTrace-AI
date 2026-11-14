@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BookOpen, Search, Plus, ExternalLink } from 'lucide-react';
+import { BookOpen, Search, Plus, ExternalLink, Edit2, Flame, Calendar, Tag, ShieldCheck } from 'lucide-react';
 import { apiClient } from '../services/apiClient';
 import { PageHeader } from './ui/PageHeader';
 import { WorkflowBanner } from './ui/WorkflowBanner';
@@ -25,6 +25,7 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
   // Registration modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [registrationMode, setRegistrationMode] = useState<'FACT' | 'GUIDELINE'>('FACT');
   const [formData, setFormData] = useState({
     name: '',
     category: 'PRICE',
@@ -32,7 +33,31 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
     unit: '',
     description: '',
     source_citation: '',
-    department_owner: 'Brand Governance Committee'
+    department_owner: 'Brand Governance Committee',
+    source_date: '',
+    expiry_date: '',
+    evidence_reference: '',
+    restricted_terms: '',
+    required_phrases: '',
+    severity: 'HIGH'
+  });
+
+  // Edit modal state
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingNode, setEditingNode] = useState<any>(null);
+  const [editFormData, setEditFormData] = useState({
+    name: '',
+    category: 'PRICE',
+    current_value: '',
+    unit: '',
+    description: '',
+    source_citation: '',
+    department_owner: '',
+    source_date: '',
+    expiry_date: '',
+    evidence_reference: '',
+    restricted_terms: '',
+    required_phrases: ''
   });
 
   const loadGraphData = () => {
@@ -51,26 +76,69 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
 
   const handleCreateFact = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.current_value) {
-      toast.warning('Please enter both fact name and approved value.');
+    if (!formData.name || (registrationMode === 'FACT' && !formData.current_value)) {
+      toast.warning('Please enter fact/guideline name and required value/rule.');
       return;
     }
 
     try {
       setIsSubmitting(true);
-      await apiClient.knowledgeBase.createFact({
-        workspace_id: brandId,
-        org_id: brandId.includes('aurelle') ? 'ORG-AURELLE' : 'ORG-APEX',
-        name: formData.name,
-        category: formData.category,
-        current_value: formData.current_value,
-        unit: formData.unit,
-        description: formData.description || `${formData.name} officially approved at ${formData.current_value}`,
-        source_citation: formData.source_citation || 'Executive Governance Resolution #2026-AUT',
-        department_owner: formData.department_owner
-      });
+      if (registrationMode === 'FACT') {
+        await apiClient.knowledgeBase.createFact({
+          workspace_id: brandId,
+          org_id: brandId.includes('aurelle') ? 'ORG-AURELLE' : 'ORG-APEX',
+          name: formData.name,
+          category: formData.category,
+          current_value: formData.current_value,
+          unit: formData.unit,
+          description: formData.description || `${formData.name} officially approved at ${formData.current_value}`,
+          source_citation: formData.source_citation || 'Executive Governance Resolution #2026-AUT',
+          department_owner: formData.department_owner
+        });
+        
+        // Also persist to API endpoint with dates and restricted terminology
+        await fetch('/api/facts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            brand_id: brandId,
+            name: formData.name,
+            category: formData.category,
+            current_value: formData.current_value,
+            unit: formData.unit,
+            description: formData.description,
+            source_citation: formData.source_citation,
+            department_owner: formData.department_owner,
+            source_date: formData.source_date || '2026-01-15',
+            expiry_date: formData.expiry_date || undefined,
+            evidence_reference: formData.evidence_reference || undefined,
+            restricted_terms: formData.restricted_terms ? formData.restricted_terms.split(',').map((s) => s.trim()).filter(Boolean) : [],
+            required_phrases: formData.required_phrases ? formData.required_phrases.split(',').map((s) => s.trim()).filter(Boolean) : []
+          })
+        });
 
-      toast.success(`Approved Fact "${formData.name}" successfully registered in MongoDB Atlas & Brand Knowledge Graph!`);
+        toast.success(`Approved Fact "${formData.name}" successfully registered in MongoDB Atlas & Brand Graph!`);
+      } else {
+        await fetch('/api/guidelines', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            brand_id: brandId,
+            title: formData.name,
+            category: formData.category,
+            rule_statement: formData.description || formData.current_value,
+            severity: formData.severity,
+            source_citation: formData.source_citation,
+            effective_date: formData.source_date || '2026-01-15',
+            expiry_date: formData.expiry_date || undefined,
+            restricted_terms: formData.restricted_terms ? formData.restricted_terms.split(',').map((s) => s.trim()).filter(Boolean) : [],
+            required_phrases: formData.required_phrases ? formData.required_phrases.split(',').map((s) => s.trim()).filter(Boolean) : []
+          })
+        });
+
+        toast.success(`Brand Guideline "${formData.name}" registered in MongoDB Atlas & BKG Guardrails!`);
+      }
+
       setIsModalOpen(false);
       setFormData({
         name: '',
@@ -79,12 +147,79 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
         unit: '',
         description: '',
         source_citation: '',
-        department_owner: 'Brand Governance Committee'
+        department_owner: 'Brand Governance Committee',
+        source_date: '',
+        expiry_date: '',
+        evidence_reference: '',
+        restricted_terms: '',
+        required_phrases: '',
+        severity: 'HIGH'
       });
       loadGraphData();
     } catch (err: any) {
-      console.error('Failed to create fact:', err);
-      toast.error('Failed to register fact: ' + (err.message || 'Unknown error'));
+      console.error('Failed to create fact/guideline:', err);
+      toast.error('Failed to register: ' + (err.message || 'Unknown error'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleOpenEdit = (node: any) => {
+    setEditingNode(node);
+    const d = node.data || {};
+    const props = d.properties || {};
+    setEditFormData({
+      name: d.label ? d.label.split(':')[0] : '',
+      category: props.category || (d.nodeType === 'APPROVED_FACT' ? 'PRICE' : 'GUIDELINE'),
+      current_value: props.current_value || (d.label && d.label.includes(':') ? d.label.split(':')[1].trim() : ''),
+      unit: props.unit || '',
+      description: d.description || '',
+      source_citation: props.citation || props.source_citation || '',
+      department_owner: props.department_owner || 'Brand Governance Committee',
+      source_date: props.source_date || '2026-01-15',
+      expiry_date: props.expiry_date || '',
+      evidence_reference: props.evidence_reference || '',
+      restricted_terms: props.restricted_terms ? props.restricted_terms.join(', ') : '',
+      required_phrases: props.required_phrases ? props.required_phrases.join(', ') : ''
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateFact = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingNode || !editFormData.current_value) {
+      toast.warning('Please enter an approved value.');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      const res = await fetch(`/api/facts/${editingNode.id}?brand_id=${brandId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: editFormData.name,
+          category: editFormData.category,
+          current_value: editFormData.current_value,
+          unit: editFormData.unit,
+          description: editFormData.description,
+          source_citation: editFormData.source_citation,
+          department_owner: editFormData.department_owner,
+          source_date: editFormData.source_date || undefined,
+          expiry_date: editFormData.expiry_date || undefined,
+          evidence_reference: editFormData.evidence_reference || undefined,
+          restricted_terms: editFormData.restricted_terms ? editFormData.restricted_terms.split(',').map((s) => s.trim()).filter(Boolean) : [],
+          required_phrases: editFormData.required_phrases ? editFormData.required_phrases.split(',').map((s) => s.trim()).filter(Boolean) : []
+        })
+      });
+
+      if (!res.ok) throw new Error('Update failed');
+      toast.success(`Fact "${editFormData.name}" updated with authorized audit trail!`);
+      setIsEditModalOpen(false);
+      loadGraphData();
+    } catch (err: any) {
+      console.error('Update failed:', err);
+      toast.error('Failed to update: ' + (err.message || 'Server error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -93,6 +228,15 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
   const allNodes = graphData?.nodes || [];
 
   const filteredNodes = allNodes.filter((n: any) => {
+    const nodeType = n.data?.nodeType;
+    const matchesTab = activeTab === 'ALL' || nodeType === activeTab;
+    const matchesSearch =
+      search.trim() === '' ||
+      (n.data?.label || '').toLowerCase().includes(search.toLowerCase()) ||
+      (n.data?.id || '').toLowerCase().includes(search.toLowerCase()) ||
+      (n.data?.description || '').toLowerCase().includes(search.toLowerCase());
+    return matchesTab && matchesSearch;
+  });
     const nodeType = n.data?.nodeType;
     const matchesTab = activeTab === 'ALL' || nodeType === activeTab;
     const matchesSearch =
