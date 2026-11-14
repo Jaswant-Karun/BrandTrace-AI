@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   ShieldCheck, LayoutDashboard, GitFork, Sparkles, Flame,
   Eye, FileText, AlertTriangle, CheckSquare, BookOpen,
@@ -84,6 +84,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const currentBrand = brands.find((b) => b.brand_id === selectedBrandId);
 
+  useEffect(() => {
+    if (isMobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileOpen]);
+
   const handleItemClick = (id: NavigationTab) => {
     setCurrentTab(id);
     if (setIsMobileOpen) {
@@ -105,7 +116,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <aside
         className={`border-r border-slate-200 bg-white flex flex-col justify-between transition-all duration-200 z-50 select-none ${
           isMobileOpen
-            ? 'fixed inset-y-0 left-0 w-64 shadow-2xl translate-x-0'
+            ? 'fixed inset-y-0 left-0 w-64 max-w-[85vw] shadow-2xl translate-x-0'
             : 'hidden md:flex md:static'
         } ${isCollapsed ? 'md:w-18' : 'md:w-64'}`}
       >

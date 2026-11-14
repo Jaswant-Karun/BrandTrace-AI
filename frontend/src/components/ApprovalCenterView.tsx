@@ -126,12 +126,12 @@ export const ApprovalCenterView: React.FC<ApprovalCenterViewProps> = ({ brandId,
       </PageHeader>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs w-fit">
+      <div className="flex flex-wrap items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs w-full sm:w-fit">
         {['ALL', 'PENDING', 'APPROVED_SEALED', 'REJECTED'].map((st) => (
           <button
             key={st}
             onClick={() => setStatusFilter(st)}
-            className={`px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer text-xs ${
+            className={`px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer text-xs flex-1 sm:flex-none text-center min-h-[32px] sm:min-h-0 ${
               statusFilter === st
                 ? 'bg-white text-slate-900 border border-slate-200 shadow-2xs font-semibold'
                 : 'text-slate-600 hover:text-slate-900'
@@ -236,16 +236,22 @@ export const ApprovalCenterView: React.FC<ApprovalCenterViewProps> = ({ brandId,
         subtitle={`Reviewing ${selectedTask?.asset_name || selectedTask?.task_id}`}
         maxWidth="lg"
         footer={
-          <div className="flex items-center justify-between w-full">
-            <Button variant="secondary" onClick={() => setSelectedTask(null)} disabled={isResolving}>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between w-full gap-2">
+            <Button
+              variant="secondary"
+              onClick={() => setSelectedTask(null)}
+              disabled={isResolving}
+              className="w-full sm:w-auto justify-center"
+            >
               Cancel
             </Button>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2 w-full sm:w-auto">
               <Button
                 variant="danger"
                 size="sm"
                 onClick={() => handleResolve('REJECTED')}
                 disabled={isResolving}
+                className="flex-1 sm:flex-none justify-center"
               >
                 Reject Revision
               </Button>
@@ -255,6 +261,7 @@ export const ApprovalCenterView: React.FC<ApprovalCenterViewProps> = ({ brandId,
                 onClick={() => handleResolve('APPROVED')}
                 isLoading={isResolving}
                 icon={<Check className="w-3.5 h-3.5" />}
+                className="flex-1 sm:flex-none justify-center"
               >
                 Authorize &amp; Seal into Ledger
               </Button>

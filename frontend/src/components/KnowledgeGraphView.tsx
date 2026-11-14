@@ -226,10 +226,10 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
       />
 
       {/* Top Control Bar */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-xs">
-        <div className="flex items-center gap-4 flex-wrap">
+      <div className="bg-white border border-slate-200 rounded-xl p-3.5 sm:p-4 flex flex-wrap items-center justify-between gap-3 sm:gap-4 shadow-xs">
+        <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center border border-slate-200">
+            <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center border border-slate-200 shrink-0">
               <Layers className="w-4 h-4 text-slate-800" />
             </div>
             <div>
@@ -243,17 +243,17 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
           </div>
 
           {/* Brand Workspace Switcher */}
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs">
-            <span className="text-[10px] uppercase font-bold text-slate-500 px-2">Brand:</span>
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs flex-wrap">
+            <span className="text-[10px] uppercase font-bold text-slate-500 px-1.5 sm:px-2">Brand:</span>
             {[
-              { id: 'aurelle-tech', label: 'AURELLE (Consumer Tech)' },
-              { id: 'apex-dynamics', label: 'APEX (EV Mobility)' },
-              { id: 'novus-health', label: 'NOVUS (Life Sciences)' }
+              { id: 'aurelle-tech', label: 'AURELLE' },
+              { id: 'apex-dynamics', label: 'APEX' },
+              { id: 'novus-health', label: 'NOVUS' }
             ].map((b) => (
               <button
                 key={b.id}
                 onClick={() => setActiveBrandId(b.id)}
-                className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+                className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                   activeBrandId === b.id
                     ? 'bg-white text-slate-900 border border-slate-200 shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
@@ -270,36 +270,36 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
         </div>
 
         {/* Filters, Search & Trace Reset */}
-        <div className="flex items-center gap-2.5 flex-wrap">
+        <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap w-full sm:w-auto">
           {traversedSubgraph && (
             <button
               onClick={handleClearTrace}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-300 text-xs font-semibold hover:bg-amber-100 transition-all"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-300 text-xs font-semibold hover:bg-amber-100 transition-all cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
-              Clear Trace ({traversedSubgraph.subgraphNodeIds.length} nodes)
+              Clear Trace ({traversedSubgraph.subgraphNodeIds.length})
             </button>
           )}
 
           {/* Search */}
-          <div className="relative">
+          <div className="relative flex-1 sm:flex-initial">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search node name, ID..."
+              placeholder="Search nodes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-400 w-48 shadow-xs"
+              className="bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-400 w-full sm:w-44 shadow-xs"
             />
           </div>
 
           {/* Node Category Filter */}
           <div className="flex items-center gap-1.5">
-            <Filter className="w-3.5 h-3.5 text-slate-500" />
+            <Filter className="w-3.5 h-3.5 text-slate-500 shrink-0" />
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-slate-400 shadow-xs"
+              className="bg-white border border-slate-200 rounded-lg px-2 sm:px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-slate-400 shadow-xs cursor-pointer max-w-[130px] sm:max-w-none"
             >
               <option value="ALL">All Categories</option>
               <option value="APPROVED_FACT">Approved Facts</option>
@@ -316,11 +316,11 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
 
           {/* Relationship Filter */}
           <div className="flex items-center gap-1.5">
-            <GitFork className="w-3.5 h-3.5 text-slate-500" />
+            <GitFork className="w-3.5 h-3.5 text-slate-500 shrink-0" />
             <select
               value={relationshipFilter}
               onChange={(e) => setRelationshipFilter(e.target.value)}
-              className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-slate-400 shadow-xs"
+              className="bg-white border border-slate-200 rounded-lg px-2 sm:px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-slate-400 shadow-xs cursor-pointer max-w-[130px] sm:max-w-none"
             >
               <option value="ALL">All Relationships</option>
               <option value="DEPENDS_ON_FACT">DEPENDS_ON_FACT</option>
@@ -343,7 +343,7 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
       </div>
 
       {/* Main Canvas + Detail Drawer */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 min-h-[480px] h-[65vh] lg:h-[720px]">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 min-h-[420px] sm:min-h-[480px] h-[55vh] sm:h-[65vh] lg:h-[720px]">
         {/* Canvas */}
         <div className={`${selectedNode ? 'lg:col-span-8' : 'lg:col-span-12'} h-full bg-white border border-slate-200 rounded-xl overflow-hidden relative shadow-xs transition-all`}>
           {isLoading ? (
@@ -394,7 +394,7 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
 
         {/* Selected Node Inspector Drawer (4 cols) */}
         {selectedNode && (
-          <div className="lg:col-span-4 bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col justify-between overflow-y-auto max-h-[700px]">
+          <div className="lg:col-span-4 bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-sm flex flex-col justify-between overflow-y-auto max-h-[500px] lg:max-h-[700px]">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-800 border border-slate-200 px-2.5 py-1 rounded">

@@ -220,28 +220,30 @@ export const MultimodalInspectionView: React.FC<MultimodalInspectionViewProps> =
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 w-full sm:w-auto">
           <button
             onClick={() => setActiveTab('file_inspect')}
-            className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-2 ${
+            className={`px-3 py-2 sm:py-1.5 rounded-md text-xs font-semibold transition-all flex items-center justify-center gap-2 min-h-[36px] ${
               activeTab === 'file_inspect'
                 ? 'bg-white text-slate-900 border border-slate-200 shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <UploadCloud className="w-3.5 h-3.5" />
-            Multimodal File Inspector
+            <UploadCloud className="w-3.5 h-3.5 shrink-0" />
+            <span className="hidden sm:inline">Multimodal File Inspector</span>
+            <span className="sm:hidden">File Inspector</span>
           </button>
           <button
             onClick={() => setActiveTab('token_studio')}
-            className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-2 ${
+            className={`px-3 py-2 sm:py-1.5 rounded-md text-xs font-semibold transition-all flex items-center justify-center gap-2 min-h-[36px] ${
               activeTab === 'token_studio'
                 ? 'bg-white text-slate-900 border border-slate-200 shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Sliders className="w-3.5 h-3.5" />
-            Visual Design Tokens
+            <Sliders className="w-3.5 h-3.5 shrink-0" />
+            <span className="hidden sm:inline">Visual Design Tokens</span>
+            <span className="sm:hidden">Design Tokens</span>
           </button>
         </div>
       </div>
@@ -279,7 +281,7 @@ export const MultimodalInspectionView: React.FC<MultimodalInspectionViewProps> =
           </div>
 
           {/* Upload Dropzone */}
-          <div className="bg-white border border-slate-200 rounded-xl p-6 text-center shadow-xs">
+          <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 text-center shadow-xs">
             <input
               type="file"
               ref={fileInputRef}
@@ -289,7 +291,7 @@ export const MultimodalInspectionView: React.FC<MultimodalInspectionViewProps> =
             />
             <div 
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-slate-300 hover:border-slate-400 rounded-xl p-8 cursor-pointer transition-all bg-slate-50/50 hover:bg-slate-50"
+              className="border-2 border-dashed border-slate-300 hover:border-slate-400 rounded-xl p-4 sm:p-8 cursor-pointer transition-all bg-slate-50/50 hover:bg-slate-50"
             >
               <UploadCloud className="w-10 h-10 text-slate-500 mx-auto mb-3" />
               <div className="text-sm font-bold text-slate-900 mb-1">
@@ -435,7 +437,7 @@ export const MultimodalInspectionView: React.FC<MultimodalInspectionViewProps> =
               </div>
 
               {/* Colors */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs text-slate-600 font-medium block mb-1">Background Hex</label>
                   <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-2 py-1.5 shadow-xs">

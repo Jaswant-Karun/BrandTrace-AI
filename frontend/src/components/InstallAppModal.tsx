@@ -39,12 +39,12 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
       title="Install BrandTrace AI Desktop Application"
       maxWidth="md"
       footer={
-        <div className="flex items-center justify-between w-full">
-          <span className="text-[11px] text-slate-500 font-mono">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between w-full gap-2">
+          <span className="text-[11px] text-slate-500 font-mono text-center sm:text-left">
             {isInstalled ? 'Status: Installed' : isInstallable ? 'Ready to Install' : 'Browser Mode Active'}
           </span>
-          <div className="flex items-center gap-2">
-            <Button variant="secondary" size="sm" onClick={onClose}>
+          <div className="flex flex-wrap items-center justify-end gap-2 w-full sm:w-auto">
+            <Button variant="secondary" size="sm" onClick={onClose} className="flex-1 sm:flex-none justify-center">
               Dismiss
             </Button>
             {isInstallable && !isInstalled && (
@@ -54,6 +54,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
                 onClick={handleInstallClick}
                 disabled={installing}
                 icon={<Download className={`w-3.5 h-3.5 ${installing ? 'animate-bounce' : ''}`} />}
+                className="flex-1 sm:flex-none justify-center"
               >
                 {installing ? 'Installing...' : 'Install Now'}
               </Button>
