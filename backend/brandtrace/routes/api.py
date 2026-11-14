@@ -593,7 +593,10 @@ async def create_brand_guideline_api(req: GuidelineCreatePayload):
     ))
 
 @router.post("/facts/mutate", response_model=DependencyIntelligenceResult)
-async def mutate_approved_fact(req: FactMutationRequest):
+async def mutate_approved_fact(
+    req: FactMutationRequest,
+    current_user: UserProfile = Depends(get_current_user)
+):
     """
     Core BDIG Workflow:
     1. Identifies the modified approved fact (e.g. Price from ₹499 to ₹599).
@@ -605,6 +608,11 @@ async def mutate_approved_fact(req: FactMutationRequest):
     7. Preserves old versions and historical approval records.
     8. Never silently modifies or republishes approved content.
     """
+    if current_user.role in [UserRole.CREATOR, UserRole.REVIEWER]:
+        raise HTTPException(
+            status_code=403,
+            detail=f"Role '{current_user.role}' is not authorized to mutate brand facts. Requires BRAND_MANAGER or ADMIN."
+        )
     bkg = get_or_load_graph(req.brand_id)
     result = dependency_engine.analyze_and_mutate_fact(bkg, req)
     
