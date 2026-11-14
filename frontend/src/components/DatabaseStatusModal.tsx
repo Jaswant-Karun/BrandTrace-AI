@@ -26,7 +26,8 @@ export const DatabaseStatusModal: React.FC<DatabaseStatusModalProps> = ({ isOpen
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="p-2 sm:p-1.5 min-w-[40px] min-h-[40px] sm:min-w-0 sm:min-h-0 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            aria-label="Close database telemetry"
           >
             <X className="w-4 h-4" />
           </button>

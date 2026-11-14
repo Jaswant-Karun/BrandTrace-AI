@@ -307,7 +307,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
           Launch BrandTrace Control Plane
         </button>
         <div className="text-[11px] text-slate-400 font-mono pt-4">
-          BrandTrace AI — International AI Hackathon Submission &bull; Apache-2.0
+          BrandTrace AI — Enterprise Brand Intelligence & Governance Platform &bull; Apache-2.0
         </div>
       </footer>
     </div>

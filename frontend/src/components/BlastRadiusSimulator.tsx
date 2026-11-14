@@ -283,7 +283,7 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
             {/* Quick Scenario Picker */}
             <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
               <label className="text-xs font-bold text-slate-900 uppercase tracking-wider block mb-2 pb-1 border-b border-slate-100">
-                5 Differentiating Hackathon Simulation Scenarios
+                Pre-Configured Enterprise Simulation Scenarios
               </label>
               <div className="space-y-1.5">
                 {SIMULATION_PRESETS.map((p) => (
