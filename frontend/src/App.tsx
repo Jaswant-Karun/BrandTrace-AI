@@ -9,6 +9,9 @@ import { DemoWalkthroughModal } from './components/DemoWalkthroughModal';
 import { WelcomeModal } from './components/WelcomeModal';
 import { GuidedTourOverlay } from './components/GuidedTourOverlay';
 import { AuthHeader } from './components/AuthHeader';
+import { OfflineBanner } from './components/OfflineBanner';
+import { InstallAppModal } from './components/InstallAppModal';
+import { usePWA } from './hooks/usePWA';
 import { useAuth } from './context/AuthContext';
 import { BrandProfile, DatabaseStatus, VerificationResult } from './types';
 import { ExternalLink, RefreshCw, Search } from 'lucide-react';
@@ -47,6 +50,13 @@ export const App: React.FC = () => {
   const [brands, setBrands] = useState<BrandProfile[]>([]);
   const [selectedBrandId, setSelectedBrandId] = useState<string>(currentWorkspace || 'aurelle-tech');
   const [dbStatus, setDbStatus] = useState<DatabaseStatus | null>(null);
+
+  // Progressive Web App (PWA) & Offline Hook
+  const { isOnline, isInstallable, isInstalled, promptInstall } = usePWA();
+  
+  // Mobile Navigation Drawer & Install Modal State
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState<boolean>(false);
   
   // Modals & Interactive Tour State
   const [isDbModalOpen, setIsDbModalOpen] = useState<boolean>(false);
