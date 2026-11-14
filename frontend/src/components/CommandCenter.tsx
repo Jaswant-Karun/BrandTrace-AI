@@ -3,10 +3,14 @@ import {
   ShieldCheck, ArrowRight, TrendingUp,
   Lock, Sparkles, Layers,
   BookOpen, GitFork, Flame, CheckSquare, CheckCircle2,
-  Clock
+  Clock, AlertTriangle, RefreshCw
 } from 'lucide-react';
 import { NavigationTab } from './Sidebar';
 import { useAuth } from '../context/AuthContext';
+import { PageHeader } from './ui/PageHeader';
+import { WorkflowBanner } from './ui/WorkflowBanner';
+import { Badge } from './ui/Badge';
+import { Button } from './ui/Button';
 
 interface CommandCenterProps {
   brandId: string;
@@ -22,40 +26,54 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   const { user } = useAuth();
   const [analytics, setAnalytics] = useState<any>(null);
   const [releases, setReleases] = useState<any[]>([]);
-  const [pendingTasksCount, setPendingTasksCount] = useState<number>(4);
+  const [tasks, setTasks] = useState<any[]>([]);
+  const [facts, setFacts] = useState<any[]>([]);
+  const [events, setEvents] = useState<any[]>([]);
+  const [risks, setRisks] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const loadDashboardData = async () => {
+    setIsLoading(true);
+    try {
+      const [analyticsRes, releasesRes, tasksRes, factsRes, eventsRes, risksRes] = await Promise.all([
+        fetch(`/api/analytics/governance?brand_id=${brandId}`).then((r) => r.ok ? r.json() : null),
+        fetch(`/api/releases?brand_id=${brandId}`).then((r) => r.ok ? r.json() : []),
+        fetch(`/api/tasks`).then((r) => r.ok ? r.json() : []),
+        fetch(`/api/facts?brand_id=${brandId}`).then((r) => r.ok ? r.json() : []),
+        fetch(`/api/collaboration/events?limit=5`).then((r) => r.ok ? r.json() : []),
+        fetch(`/api/risks/taxonomy?brand_id=${brandId}`).then((r) => r.ok ? r.json() : null),
+      ]);
+
+      setAnalytics(analyticsRes);
+      setReleases(releasesRes || []);
+      setTasks(tasksRes || []);
+      setFacts(factsRes || []);
+      setEvents(eventsRes || []);
+      setRisks(risksRes);
+    } catch (err) {
+      console.error('Failed to load dashboard data:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    fetch(`/api/analytics/governance?brand_id=${brandId}`)
-      .then((res) => res.json())
-      .then((data) => setAnalytics(data))
-      .catch((err) => console.error(err));
-
-    fetch(`/api/releases?brand_id=${brandId}`)
-      .then((res) => res.json())
-      .then((data) => setReleases(data || []))
-      .catch((err) => console.error(err));
-
-    fetch(`/api/demo/scenario-status`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && typeof data.pending_revisions_count === 'number') {
-          setPendingTasksCount(data.pending_revisions_count);
-        }
-      })
-      .catch(() => {});
+    loadDashboardData();
   }, [brandId]);
+
+  const pendingTasks = tasks.filter((t) => t.status === 'PENDING_REVIEW' || t.status === 'PENDING');
 
   const LIFECYCLE_STEPS = [
     {
       tab: 'knowledge-base' as NavigationTab,
       label: '1. Brand Knowledge',
-      sub: 'Approved Facts (₹499) & Rules',
+      sub: `${facts.length} Certified Truth Nodes`,
       icon: <BookOpen className="w-3.5 h-3.5" />
     },
     {
       tab: 'content-studio' as NavigationTab,
-      label: '2. Content Studio',
-      sub: 'Multi-Agent Inspection',
+      label: '2. Content Intelligence',
+      sub: 'Multi-Agent Inspection (<800ms)',
       icon: <Sparkles className="w-3.5 h-3.5" />
     },
     {
@@ -67,140 +85,123 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
     {
       tab: 'impact-simulator' as NavigationTab,
       label: '4. Impact Simulator',
-      sub: 'Simulate ₹499 ➔ ₹599 Change',
+      sub: 'Simulate ₹499 ➔ ₹599 Ripple',
       icon: <Flame className="w-3.5 h-3.5 text-amber-600" />
     },
     {
       tab: 'approvals' as NavigationTab,
       label: '5. Approval Center',
-      sub: 'Human Sign-off & Sealing',
+      sub: `${pendingTasks.length} Awaiting Sign-off`,
       icon: <CheckSquare className="w-3.5 h-3.5" />
     },
     {
       tab: 'audit-trust' as NavigationTab,
       label: '6. Trust Ledger',
-      sub: 'SHA-256 Verifiable Proofs',
+      sub: `${releases.length} Sealed SHA-256 Blocks`,
       icon: <Lock className="w-3.5 h-3.5" />
-    }
-  ];
-
-  const GETTING_STARTED = [
-    {
-      step: 1,
-      title: 'Inspect Approved Brand Facts',
-      desc: 'Verify the active baseline pricing for Aurelle Cloud Studio (FACT-AUR-PRC-01 at ₹499/mo).',
-      action: 'Open Knowledge Base',
-      tab: 'knowledge-base' as NavigationTab,
-      completed: true
-    },
-    {
-      step: 2,
-      title: 'Scan Marketing Copy in Content Studio',
-      desc: 'Test 1-click sample ad copy to see 4 autonomous agents identify unapproved claims and missing trademarks.',
-      action: 'Run Scan',
-      tab: 'content-studio' as NavigationTab,
-      completed: true
-    },
-    {
-      step: 3,
-      title: 'Simulate Proposed Price Mutation (₹499 ➔ ₹599)',
-      desc: 'Preview how changing the Cloud Studio price affects 4 dependent live assets and campaigns in the Digital Twin.',
-      action: 'Simulate Blast Radius',
-      tab: 'impact-simulator' as NavigationTab,
-      completed: false
-    },
-    {
-      step: 4,
-      title: 'Authorize Revisions in Approval Center',
-      desc: 'Conduct authorized human-in-the-loop review on staged copy revisions generated by the price mutation.',
-      action: 'Review Pending Tasks',
-      tab: 'approvals' as NavigationTab,
-      completed: false
-    },
-    {
-      step: 5,
-      title: 'Verify Cryptographic Release Signatures',
-      desc: 'Inspect immutable SHA-256 digests in the Trust Ledger using the interactive 5-state verifier.',
-      action: 'Verify Releases',
-      tab: 'audit-trust' as NavigationTab,
-      completed: false
     }
   ];
 
   return (
     <div className="space-y-6">
-      {/* 1. Executive Welcome & Posture Banner */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs flex flex-wrap items-center justify-between gap-6">
-        <div className="space-y-1.5 max-w-2xl">
-          <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <span className="text-[10px] font-semibold uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-md flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Active Governance Posture
-            </span>
-            <span className="text-xs font-mono text-slate-500 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded">
-              Workspace: <strong className="text-slate-800 font-semibold">{brandId}</strong>
-            </span>
-            {user && (
-              <span className="text-xs font-medium text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded">
-                Logged in as: <strong className="text-slate-900">{user.name}</strong> ({user.role})
-              </span>
-            )}
-          </div>
+      {/* Page Header with One-Sentence Purpose & Contextual Help */}
+      <PageHeader
+        title="Overview"
+        description="Your brand governance workspace at a glance. Monitor certified truth nodes, pending approvals, recent inspections, and active compliance guardrails."
+        icon={<ShieldCheck className="w-4 h-4 text-white" />}
+        category="Workspace"
+        workspaceName={brandId === 'aurelle-tech' ? 'Aurelle Technologies Inc.' : brandId}
+        breadcrumbs={[
+          { label: 'BrandTrace' },
+          { label: 'Workspace' },
+          { label: 'Overview', active: true }
+        ]}
+        helpContext={{
+          summary: "BrandTrace AI acts as the single source of brand truth. Approved facts govern all marketing copy, simulations sandbox prospective mutations before commit, and all releases are sealed with cryptographic SHA-256 proofs.",
+          terms: [
+            { term: "Brand Truth Node", definition: "An officially certified fact, pricing tier, claim, or guideline stored in the brand graph." },
+            { term: "Blast Radius", definition: "The complete set of downstream marketing assets, web pages, and documents affected when a brand fact mutates." },
+            { term: "Cryptographic Seal", definition: "A deterministic SHA-256 Merkle block digest binding content, reviewer identity, and timestamp into an immutable audit record." },
+            { term: "Reverse-Offset Remediation", definition: "Right-to-left string replacement repairing policy defects without corrupting character indices." }
+          ]
+        }}
+        primaryAction={{
+          label: "Simulate Price Mutation",
+          onClick: () => onNavigate('impact-simulator'),
+          icon: <Flame className="w-3.5 h-3.5 text-amber-400" />
+        }}
+        secondaryAction={{
+          label: "Inspect New Copy",
+          onClick: () => onNavigate('content-studio'),
+          icon: <Sparkles className="w-3.5 h-3.5 text-sky-600" />
+        }}
+      >
+        {onStartTour && (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={onStartTour}
+            icon={<Sparkles className="w-3.5 h-3.5 text-amber-500" />}
+          >
+            Guided Tour
+          </Button>
+        )}
+      </PageHeader>
 
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-            Brand Intelligence &amp; Governance Control Plane
-          </h1>
-          <p className="text-xs text-slate-600 leading-relaxed">
-            Every brand decision connected. Every risk traceable. Every release accountable. Autonomous multi-agent verification grounded in certified brand truth.
-          </p>
+      {/* 1. Governance Posture & Quantitative Telemetry Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-2">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[10px] font-semibold uppercase tracking-wider">Certified Truth Nodes</span>
+            <BookOpen className="w-4 h-4 text-slate-700" />
+          </div>
+          <div className="text-2xl font-bold text-slate-900 font-mono">
+            {facts.length} Facts
+          </div>
+          <p className="text-[11px] text-slate-500">Approved pricing, specs &amp; claims</p>
         </div>
 
-        {/* Global Compliance Health Score & Quick Actions */}
-        <div className="flex items-center gap-3 shrink-0 flex-wrap">
-          <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-2xs">
-            <div>
-              <div className="text-3xl font-extrabold text-slate-900 font-mono tracking-tight">
-                {analytics?.compliance_rate_percent || 94.2}%
-              </div>
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                Compliance Index
-              </div>
-            </div>
-            <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 stroke-[2.2]" />
-            </div>
+        <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-2">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[10px] font-semibold uppercase tracking-wider">Sealed Releases</span>
+            <Lock className="w-4 h-4 text-slate-700" />
           </div>
+          <div className="text-2xl font-bold text-slate-900 font-mono">
+            {releases.length} Sealed
+          </div>
+          <p className="text-[11px] text-slate-500">Immutable SHA-256 ledger blocks</p>
+        </div>
 
-          {onStartTour && (
-            <button
-              onClick={onStartTour}
-              className="px-3.5 py-3 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition-colors flex items-center gap-2 cursor-pointer shadow-2xs"
-              title="Launch interactive tour of all modules"
-            >
-              <Sparkles className="w-4 h-4 text-amber-500" />
-              <span>Guided Tour</span>
-            </button>
-          )}
+        <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-2">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[10px] font-semibold uppercase tracking-wider">Compliance Index</span>
+            <TrendingUp className="w-4 h-4 text-emerald-600" />
+          </div>
+          <div className="text-2xl font-bold text-slate-900 font-mono">
+            {analytics?.compliance_rate_percent || 94.2}%
+          </div>
+          <p className="text-[11px] text-slate-500">{analytics?.prevented_violations_count || 56} prevented violations</p>
+        </div>
 
-          <button
-            onClick={() => onNavigate('impact-simulator')}
-            className="px-4 py-3 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-colors flex items-center gap-2 cursor-pointer shadow-xs"
-          >
-            <Flame className="w-4 h-4 text-amber-400" />
-            <span>Run ₹499 ➔ ₹599 Demo</span>
-          </button>
+        <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-2">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[10px] font-semibold uppercase tracking-wider">Pending Approvals</span>
+            <Clock className="w-4 h-4 text-amber-600" />
+          </div>
+          <div className="text-2xl font-bold text-slate-900 font-mono text-amber-700">
+            {pendingTasks.length} Tasks
+          </div>
+          <p className="text-[11px] text-slate-500">Awaiting authorized sign-off</p>
         </div>
       </div>
 
-      {/* 2. Visual "How BrandTrace Works" Journey Stepper */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-3">
+      {/* 2. Visual "How BrandTrace Operates" Journey Stepper */}
+      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-3">
         <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-semibold uppercase tracking-wider bg-slate-900 text-white px-2 py-0.5 rounded">
-              Product Journey
-            </span>
+            <Badge variant="brand" size="sm">Product Journey</Badge>
             <h2 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-              How BrandTrace Operates
+              Connected Brand Governance Loop
             </h2>
           </div>
           <span className="text-[11px] font-mono text-slate-500 hidden sm:inline">
@@ -230,196 +231,160 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         </div>
       </div>
 
-      {/* 3. 4 Quantitative Telemetry Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-xs space-y-2">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[10px] font-semibold uppercase tracking-wider">Governed Touchpoints</span>
-            <Layers className="w-4 h-4 text-slate-700" />
-          </div>
-          <div className="text-2xl font-bold text-slate-900 font-mono">
-            {analytics?.total_assets_governed || 142}
-          </div>
-          <p className="text-[11px] text-slate-500">Ads, Websites, PDFs, Decks, Packaging</p>
-        </div>
-
-        <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-xs space-y-2">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[10px] font-semibold uppercase tracking-wider">Sealed Releases</span>
-            <Lock className="w-4 h-4 text-slate-700" />
-          </div>
-          <div className="text-2xl font-bold text-slate-900 font-mono">
-            {releases.length > 0 ? releases.length : analytics?.releases_sealed_count || 86}
-          </div>
-          <p className="text-[11px] text-slate-500">Tamper-evident audit signatures</p>
-        </div>
-
-        <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-xs space-y-2">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[10px] font-semibold uppercase tracking-wider">Prevented Violations</span>
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
-          </div>
-          <div className="text-2xl font-bold text-slate-900 font-mono">
-            {analytics?.prevented_violations_count || 56}
-          </div>
-          <p className="text-[11px] text-slate-500">Intercepted pre-release risks</p>
-        </div>
-
-        <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-xs space-y-2">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[10px] font-semibold uppercase tracking-wider">Pending Approvals</span>
-            <Clock className="w-4 h-4 text-amber-600" />
-          </div>
-          <div className="text-2xl font-bold text-slate-900 font-mono text-amber-800">
-            {pendingTasksCount} Tasks
-          </div>
-          <p className="text-[11px] text-slate-500">Awaiting authorized sign-off</p>
-        </div>
-      </div>
-
-      {/* 4. Getting Started Guide & Operational Actions Grid */}
+      {/* 3. Operational Split Grid: Pending Approvals & Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left: 5-Step Getting Started Progression (7 Cols) */}
-        <div className="lg:col-span-7 bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
+        {/* Left: Pending Approvals & Tasks (7 Cols) */}
+        <div className="lg:col-span-7 bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <CheckSquare className="w-4 h-4 text-slate-700" />
               <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                Getting Started Walkthrough
+                Pending Governance Tasks
               </h3>
+              <Badge variant={pendingTasks.length > 0 ? "warning" : "success"} size="sm" dot>
+                {pendingTasks.length} Active
+              </Badge>
             </div>
-            <span className="text-[11px] font-mono text-slate-500">
-              Interactive Evaluation Path
-            </span>
-          </div>
-
-          <div className="space-y-3">
-            {GETTING_STARTED.map((item) => (
-              <div
-                key={item.step}
-                className="p-3.5 rounded-lg bg-slate-50 border border-slate-200 flex items-start justify-between gap-4"
-              >
-                <div className="flex items-start gap-3">
-                  <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold font-mono shrink-0 mt-0.5 ${
-                    item.completed
-                      ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                      : 'bg-slate-200 text-slate-700'
-                  }`}>
-                    {item.completed ? '✓' : item.step}
-                  </span>
-                  <div className="space-y-0.5">
-                    <div className="text-xs font-semibold text-slate-900">
-                      {item.title}
-                    </div>
-                    <div className="text-[11px] text-slate-500 leading-tight">
-                      {item.desc}
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => onNavigate(item.tab)}
-                  className="px-3 py-1.5 rounded-md bg-white hover:bg-slate-100 text-slate-900 text-xs font-medium border border-slate-200 transition-colors shrink-0 flex items-center gap-1 cursor-pointer shadow-2xs whitespace-nowrap"
-                >
-                  <span>{item.action}</span>
-                  <ArrowRight className="w-3 h-3 text-slate-400" />
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Right: Direct Control Plane Shortcuts (5 Cols) */}
-        <div className="lg:col-span-5 bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-slate-700" />
-              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                Direct Module Shortcuts
-              </h3>
-            </div>
-            <span className="text-[11px] font-mono text-slate-500">Quick Access</span>
-          </div>
-
-          <div className="space-y-2">
-            <button
-              onClick={() => onNavigate('impact-simulator')}
-              className="w-full p-3 rounded-lg bg-amber-50/60 hover:bg-amber-100/60 border border-amber-200 text-left flex items-center justify-between transition-colors group cursor-pointer shadow-2xs"
-            >
-              <div>
-                <div className="text-xs font-semibold text-amber-950 flex items-center gap-1.5">
-                  <Flame className="w-3.5 h-3.5 text-amber-700" />
-                  <span>AURELLE Price Mutation Simulator</span>
-                </div>
-                <div className="text-[11px] text-amber-800">
-                  Simulate ₹499 ➔ ₹599 blast radius on 4 assets
-                </div>
-              </div>
-              <ArrowRight className="w-4 h-4 text-amber-700 group-hover:translate-x-0.5 transition-all" />
-            </button>
-
-            <button
-              onClick={() => onNavigate('content-studio')}
-              className="w-full p-3 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-left flex items-center justify-between transition-colors group cursor-pointer shadow-2xs"
-            >
-              <div>
-                <div className="text-xs font-semibold text-slate-900">
-                  Content Studio &amp; Multi-Agent Inspection
-                </div>
-                <div className="text-[11px] text-slate-500">
-                  Scan copy against certified truth in under 800ms
-                </div>
-              </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-900 group-hover:translate-x-0.5 transition-all" />
-            </button>
-
-            <button
-              onClick={() => onNavigate('bdig')}
-              className="w-full p-3 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-left flex items-center justify-between transition-colors group cursor-pointer shadow-2xs"
-            >
-              <div>
-                <div className="text-xs font-semibold text-slate-900">
-                  Brand Knowledge Graph (BDIG)
-                </div>
-                <div className="text-[11px] text-slate-500">
-                  Explore live DAG connecting facts, assets &amp; rules
-                </div>
-              </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-900 group-hover:translate-x-0.5 transition-all" />
-            </button>
-
             <button
               onClick={() => onNavigate('approvals')}
-              className="w-full p-3 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-left flex items-center justify-between transition-colors group cursor-pointer shadow-2xs"
+              className="text-xs text-slate-600 hover:text-slate-900 font-medium flex items-center gap-1 cursor-pointer"
             >
-              <div>
-                <div className="text-xs font-semibold text-slate-900">
-                  Governance Approval Center
-                </div>
-                <div className="text-[11px] text-slate-500">
-                  Authorize staged tasks &amp; seal releases with SHA-256
-                </div>
-              </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-900 group-hover:translate-x-0.5 transition-all" />
+              <span>View All</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
+          </div>
 
+          {pendingTasks.length > 0 ? (
+            <div className="space-y-2.5">
+              {pendingTasks.slice(0, 4).map((task: any, idx: number) => (
+                <div
+                  key={task.task_id || idx}
+                  className="p-3.5 rounded-lg bg-slate-50/70 border border-slate-200 flex items-start justify-between gap-3"
+                >
+                  <div className="space-y-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs font-semibold text-slate-900 truncate">
+                        {task.asset_name || task.asset_id || `Task #${idx + 1}`}
+                      </span>
+                      <Badge variant="warning" size="sm">
+                        {task.change_type || 'PRICE_MUTATION'}
+                      </Badge>
+                    </div>
+                    <p className="text-[11px] text-slate-500 line-clamp-1">
+                      {task.current_content || task.proposed_content || 'Revision required due to brand truth update.'}
+                    </p>
+                  </div>
+
+                  <Button
+                    variant="secondary"
+                    size="xs"
+                    onClick={() => onNavigate('approvals')}
+                    icon={<ArrowRight className="w-3 h-3" />}
+                    iconPosition="right"
+                  >
+                    Review
+                  </Button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="p-8 text-center rounded-xl bg-slate-50/50 border border-slate-200 space-y-2">
+              <CheckCircle2 className="w-6 h-6 text-emerald-600 mx-auto" />
+              <div className="text-xs font-semibold text-slate-900">
+                All Touchpoints Aligned
+              </div>
+              <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
+                No active revision tasks are pending. Run the Change Impact Simulator to model prospective mutations and generate review tasks.
+              </p>
+              <Button
+                variant="primary"
+                size="xs"
+                onClick={() => onNavigate('impact-simulator')}
+                icon={<Flame className="w-3.5 h-3.5 text-amber-400" />}
+              >
+                Launch Price Simulation (₹499 ➔ ₹599)
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {/* Right: Recent Governance Activity (5 Cols) */}
+        <div className="lg:col-span-5 bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-slate-700" />
+              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                Recent Activity &amp; Audit Trail
+              </h3>
+            </div>
             <button
               onClick={() => onNavigate('audit-trust')}
-              className="w-full p-3 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-left flex items-center justify-between transition-colors group cursor-pointer shadow-2xs"
+              className="text-xs text-slate-600 hover:text-slate-900 font-medium flex items-center gap-1 cursor-pointer"
             >
-              <div>
-                <div className="text-xs font-semibold text-slate-900">
-                  Audit &amp; Trust Ledger
-                </div>
-                <div className="text-[11px] text-slate-500">
-                  5-state cryptographic verifier for release integrity
-                </div>
-              </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-900 group-hover:translate-x-0.5 transition-all" />
+              <span>Ledger</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
+          </div>
+
+          <div className="space-y-2.5">
+            {events.length > 0 ? (
+              events.map((evt: any, idx: number) => (
+                <div
+                  key={evt.id || idx}
+                  className="p-3 rounded-lg border border-slate-200 bg-white shadow-2xs space-y-1"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold text-slate-900 font-mono">
+                      {evt.action || evt.action_type || 'GOVERNANCE_CHECK'}
+                    </span>
+                    <span className="text-[10px] text-slate-400">
+                      {evt.time_ago || 'Recent'}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 line-clamp-1">
+                    {evt.description || evt.summary || `Resource ${evt.resource_id || 'AST-01'} audited.`}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <div className="p-6 text-center rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-500">
+                No recent governance events recorded.
+              </div>
+            )}
+
+            {/* Quick Action Card */}
+            <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
+              <div className="text-xs font-semibold text-slate-900 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-sky-600" />
+                <span>Next Recommended Action</span>
+              </div>
+              <p className="text-[11px] text-slate-600 leading-snug">
+                Inspect a marketing copy sample in Content Intelligence to see autonomous agents detect compliance risks in &lt;800ms.
+              </p>
+              <Button
+                variant="secondary"
+                size="xs"
+                fullWidth
+                onClick={() => onNavigate('content-studio')}
+                icon={<ArrowRight className="w-3 h-3" />}
+                iconPosition="right"
+              >
+                Open Content Intelligence
+              </Button>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Workflow Banner: Next Step in Governance Journey */}
+      <WorkflowBanner
+        currentStage="Overview"
+        nextStageTitle="Brand Knowledge (Certified Truth Set)"
+        nextStageDescription="Examine the certified truth nodes, approved pricing facts (₹499), and brand voice rules that govern all marketing copy."
+        nextStageActionLabel="Go to Brand Knowledge"
+        onNavigateNext={() => onNavigate('knowledge-base')}
+        governanceHint="Every asset evaluated by BrandTrace AI is cross-checked against certified facts in the knowledge graph."
+      />
     </div>
   );
 };
