@@ -17,7 +17,7 @@ from starlette.testclient import TestClient
 from brandtrace.main import app
 from brandtrace.core.security import create_access_token
 from brandtrace.engine.simulation import simulation_engine, ConflictType
-from brandtrace.engine.dependency import dependency_engine
+from brandtrace.graph.dependency_engine import dependency_engine
 
 client = TestClient(app)
 
