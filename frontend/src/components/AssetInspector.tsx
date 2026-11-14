@@ -6,10 +6,12 @@ import {
 } from 'lucide-react';
 import { VerificationResult, RiskSpan } from '../types';
 import { PageHeader } from './ui/PageHeader';
+import { WorkflowBanner } from './ui/WorkflowBanner';
 
 interface AssetInspectorProps {
   brandId: string;
   onSignRelease: (result: VerificationResult, reviewerName: string) => Promise<void>;
+  onNavigate?: (tab: any) => void;
 }
 
 export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignRelease }) => {
