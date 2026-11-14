@@ -453,6 +453,30 @@ async def update_approved_fact(fact_id: str, req: FactUpdatePayload, brand_id: O
     existing = APPROVED_FACTS_CATALOG.get(fact_id)
     if not existing:
         raise HTTPException(status_code=404, detail=f"Fact '{fact_id}' not found.")
+
+    if req.current_value is not None and not req.current_value.strip():
+        raise HTTPException(status_code=400, detail="Fact value cannot be empty or whitespace.")
+    if req.name is not None and not req.name.strip():
+        raise HTTPException(status_code=400, detail="Fact name cannot be empty or whitespace.")
+
+    def _validate_date(d_str: Optional[str], label: str):
+        if not d_str:
+            return
+        try:
+            cleaned = d_str.strip()
+            if len(cleaned) == 10:
+                datetime.date.fromisoformat(cleaned)
+            else:
+                datetime.datetime.fromisoformat(cleaned)
+        except Exception:
+            raise HTTPException(status_code=400, detail=f"Invalid format for '{label}': '{d_str}'. Expected YYYY-MM-DD format.")
+
+    if req.source_date:
+        _validate_date(req.source_date, "source_date")
+    if req.expiry_date:
+        _validate_date(req.expiry_date, "expiry_date")
+    if req.source_date and req.expiry_date and req.expiry_date < req.source_date:
+        raise HTTPException(status_code=400, detail="Expiry date cannot be prior to source date.")
         
     updated_name = req.name if req.name is not None else existing.name
     updated_val = req.current_value if req.current_value is not None else existing.current_value
