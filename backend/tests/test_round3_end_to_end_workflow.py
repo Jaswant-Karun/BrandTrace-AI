@@ -36,6 +36,16 @@ async def test_round3_end_to_end_aurelle_workflow():
     brand_id = "aurelle-tech"
     admin_headers = get_auth_header(UserRole.ADMIN)
 
+    # Pristine state isolation: reset demo price node if modified by prior test runs
+    from brandtrace.data.seed_data import APPROVED_FACTS_CATALOG, BRAND_SEEDS
+    if "FACT-AUR-PRC-01" in APPROVED_FACTS_CATALOG:
+        APPROVED_FACTS_CATALOG["FACT-AUR-PRC-01"].current_value = "₹499"
+    if brand_id in BRAND_SEEDS:
+        for node in BRAND_SEEDS[brand_id].nodes:
+            if node.id == "FACT-AUR-PRC-01":
+                node.properties["value"] = "₹499"
+                node.properties["current_value"] = "₹499"
+
     # --------------------------------------------------------------------------
     # STEP 1: BRAND KNOWLEDGE
     # --------------------------------------------------------------------------
