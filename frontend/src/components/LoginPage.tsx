@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   ShieldCheck, Lock, Mail, ArrowRight, Sparkles,
   AlertCircle, CheckCircle2, UserCheck, User,
-  Eye, EyeOff, Database, KeyRound, Check
+  Eye, EyeOff, Database, KeyRound, Check, Copy
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -16,6 +16,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onOpenLanding }
   
   // Tab state: 'login' | 'register'
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+
+  // Copy feedback state
+  const [copiedField, setCopiedField] = useState<'email' | 'password' | null>(null);
+
+  const copyCredential = (text: string, field: 'email' | 'password') => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField(null), 2000);
+  };
 
   // Sign In Form State
   const [loginEmail, setLoginEmail] = useState<string>('demo@brandtrace.ai');
@@ -543,12 +552,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onOpenLanding }
           {/* Right Column: Recommended Evaluation Showcase & Personas (5 Cols) */}
           <div className="lg:col-span-5 space-y-4">
             
-            {/* Primary Demo Card */}
+            {/* Primary Demo Card: Dedicated Judge Evaluation Experience */}
             <div className="bg-white border-2 border-slate-900 rounded-2xl p-6 shadow-xs space-y-4 relative overflow-hidden">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-900 text-white px-2 py-0.5 rounded flex items-center gap-1.5">
                   <Sparkles className="w-3 h-3 text-amber-300" />
-                  Recommended for Evaluation
+                  Public Demonstration
                 </span>
                 <span className="flex items-center gap-1 text-[11px] font-mono text-emerald-800 font-semibold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -558,36 +567,111 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onOpenLanding }
 
               <div className="space-y-1.5">
                 <h3 className="text-base font-bold text-slate-900 tracking-tight">
-                  Aurelle Technologies Showcase
+                  Explore the BrandTrace AI Demo
                 </h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Log in directly to explore the signature <strong className="text-slate-900">₹499 → ₹599 price mutation scenario</strong>, 4-agent pre-release checks, and tamper-evident trust verification.
+                  Log in with the dedicated restricted demonstration account to test the autonomous multi-agent gate, digital twin simulations, and cryptographic audit proofs.
                 </p>
               </div>
 
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-1.5 text-xs">
-                <div className="flex justify-between text-slate-600">
-                  <span className="text-slate-500">Evaluation Email:</span>
-                  <strong className="text-slate-900 font-mono">demo@brandtrace.ai</strong>
+              {/* Synthetic Data Note */}
+              <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2 text-[11px] text-amber-900">
+                <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                <span>
+                  <strong>Synthetic Demonstration Data:</strong> Isolated <code className="font-mono text-amber-950 font-bold">aurelle-tech</code> workspace. No production data modified.
+                </span>
+              </div>
+
+              {/* Credential Box with Safe Copy-to-Clipboard Controls */}
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500">Demo Email:</span>
+                  <div className="flex items-center gap-1.5">
+                    <strong className="text-slate-900 font-mono">demo@brandtrace.ai</strong>
+                    <button
+                      type="button"
+                      onClick={() => copyCredential('demo@brandtrace.ai', 'email')}
+                      className="p-1 rounded hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
+                      title="Copy email to clipboard"
+                    >
+                      {copiedField === 'email' ? (
+                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      ) : (
+                        <Copy className="w-3.5 h-3.5" />
+                      )}
+                    </button>
+                  </div>
                 </div>
-                <div className="flex justify-between text-slate-600">
-                  <span className="text-slate-500">Assigned Persona:</span>
-                  <span className="text-slate-900 font-medium">Alex Mercer (VP Governance)</span>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500">Demo Password:</span>
+                  <div className="flex items-center gap-1.5">
+                    <strong className="text-slate-900 font-mono">DemoAurelle2026!</strong>
+                    <button
+                      type="button"
+                      onClick={() => copyCredential('DemoAurelle2026!', 'password')}
+                      className="p-1 rounded hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
+                      title="Copy password to clipboard"
+                    >
+                      {copiedField === 'password' ? (
+                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      ) : (
+                        <Copy className="w-3.5 h-3.5" />
+                      )}
+                    </button>
+                  </div>
                 </div>
-                <div className="flex justify-between text-slate-600">
-                  <span className="text-slate-500">Enterprise Workspace:</span>
-                  <span className="text-slate-900 font-semibold font-mono">aurelle-tech</span>
+
+                <div className="flex items-center justify-between pt-1 border-t border-slate-200/80">
+                  <span className="text-slate-500">Demo Role:</span>
+                  <span className="text-slate-900 font-medium">Alex Mercer (Brand Manager · aurelle-tech)</span>
                 </div>
               </div>
 
+              {/* What the Judge Can Test */}
+              <div className="space-y-1.5">
+                <span className="text-[11px] font-semibold text-slate-800 uppercase tracking-wider block">
+                  What You Can Test:
+                </span>
+                <ul className="space-y-1 text-slate-600 text-[11px]">
+                  <li className="flex items-start gap-1.5">
+                    <Check className="w-3 h-3 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>Autonomous 4-agent pre-release compliance gate (&lt;800ms)</span>
+                  </li>
+                  <li className="flex items-start gap-1.5">
+                    <Check className="w-3 h-3 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>Explainable claim substantiation with direct policy citations</span>
+                  </li>
+                  <li className="flex items-start gap-1.5">
+                    <Check className="w-3 h-3 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>Predictive digital twin (₹499 ➔ ₹599 price mutation &amp; $320k exposure)</span>
+                  </li>
+                  <li className="flex items-start gap-1.5">
+                    <Check className="w-3 h-3 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>Cryptographic SHA-256 release proofs with Merkle block audit ledger</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Clearly Labelled Action: Executes Normal Authentication */}
               <button
                 onClick={handleQuickDemoLogin}
                 disabled={isLoading}
-                className="w-full py-2.5 px-4 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs disabled:opacity-50"
+                className="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs disabled:opacity-50"
               >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>1-Click Launch AURELLE Demo</span>
+                {isLoading ? (
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                    <span>Use Demo Account (Authenticate via JWT)</span>
+                  </>
+                )}
               </button>
+
+              <p className="text-[10px] text-slate-400 text-center font-mono">
+                Executes standard POST /api/auth/login · Zero route bypass
+              </p>
             </div>
 
             {/* Other Pre-seeded Enterprise Personas */}

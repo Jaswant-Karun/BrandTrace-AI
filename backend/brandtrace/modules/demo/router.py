@@ -5,6 +5,8 @@ from brandtrace.modules.demo.models import (
     DemoCase, RunCaseRequest
 )
 from brandtrace.modules.demo.service import demo_service
+from brandtrace.modules.auth.router import get_current_user
+from brandtrace.core.security import UserProfile
 
 router = APIRouter(prefix="/demo", tags=["Demo Workflow & Scenarios"])
 
@@ -27,11 +29,19 @@ async def execute_scenario_step(req: ExecuteStepRequest):
     return await demo_service.execute_step(req.step_number, req.actor_role, req.actor_name)
 
 @router.post("/reset", response_model=DemoScenarioStatusResponse)
-async def reset_demo_scenario():
+async def reset_demo_scenario(user: UserProfile = Depends(get_current_user)):
     """
     Resets the AURELLE scenario to the initial baseline (₹499 price, 0 pending revision tasks).
     Allows judges and evaluators to re-run the 12-step lifecycle cleanly.
+    Enforces RBAC: BRAND_MANAGER, COMPLIANCE_REVIEWER, and ADMIN roles can execute reset.
+    CREATOR role is restricted from resetting workspace state.
     """
+    role_str = str(user.role.value if hasattr(user.role, 'value') else user.role).upper()
+    if role_str == "CREATOR":
+        raise HTTPException(
+            status_code=403,
+            detail="Forbidden: Creator role is not authorized to reset the brand workspace. Contact Brand Manager."
+        )
     return await demo_service.reset_scenario()
 
 @router.get("/cases", response_model=List[DemoCase])
