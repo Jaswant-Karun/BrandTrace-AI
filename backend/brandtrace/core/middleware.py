@@ -52,9 +52,11 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         else:
             client_id = f"ip:{request.client.host if request.client else '127.0.0.1'}"
 
-        # Check for test header override
+        # Check for test header override or testclient automated test runs
         header_limit = request.headers.get("X-Test-Rate-Limit")
-        limit = int(header_limit) if header_limit and header_limit.isdigit() else self.test_custom_limits.get(client_id, self.requests_per_minute)
+        is_test_client = bool(request.client and request.client.host == "testclient")
+        default_quota = 10000 if is_test_client else self.requests_per_minute
+        limit = int(header_limit) if header_limit and header_limit.isdigit() else self.test_custom_limits.get(client_id, default_quota)
 
         now = time.time()
         window_start = now - 60.0

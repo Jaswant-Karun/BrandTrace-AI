@@ -438,6 +438,14 @@ async def create_approved_fact(req: FactCreatePayload):
         
     return fact_obj.model_dump()
 
+@router.get("/facts/{fact_id}")
+async def get_approved_fact(fact_id: str):
+    """Retrieves an approved fact by ID."""
+    existing = APPROVED_FACTS_CATALOG.get(fact_id)
+    if not existing:
+        raise HTTPException(status_code=404, detail=f"Fact '{fact_id}' not found.")
+    return existing.model_dump()
+
 @router.put("/facts/{fact_id}")
 async def update_approved_fact(fact_id: str, req: FactUpdatePayload, brand_id: Optional[str] = Query(None)):
     """Edits an approved fact with server-side validation and persistence."""
