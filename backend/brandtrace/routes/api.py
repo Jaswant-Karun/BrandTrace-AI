@@ -333,14 +333,27 @@ async def list_revision_tasks(brand_id: Optional[str] = Query(None)):
     return await mongo_manager.list_tasks(brand_id)
 
 @router.post("/tasks/{task_id}/resolve")
-async def resolve_revision_task(task_id: str, req: TaskResolutionRequest):
+async def resolve_revision_task(
+    task_id: str,
+    req: TaskResolutionRequest,
+    current_user: UserProfile = Depends(get_current_user)
+):
     """
     Human-controlled sign-off on a revision task.
     Authorizes update, promotes version, and stamps with cryptographic proof.
+    Enforces server-side RBAC and persists resolution state into MongoDB.
     """
+    allowed_roles = [UserRole.ADMIN, UserRole.BRAND_MANAGER, UserRole.COMPLIANCE_REVIEWER, UserRole.REVIEWER]
+    if current_user.role not in allowed_roles:
+        raise HTTPException(
+            status_code=403,
+            detail=f"Role '{current_user.role}' is not authorized to resolve governance revision tasks."
+        )
+
+    reviewer_name = req.reviewer_name or current_user.name
     success, message, task = dependency_engine.resolve_revision_task(
         task_id=task_id,
-        reviewer_name=req.reviewer_name,
+        reviewer_name=reviewer_name,
         decision=req.decision,
         final_content=req.final_content or "",
         resolution_notes=req.resolution_notes or ""
@@ -663,29 +676,115 @@ async def explainable_claims_review(req: ExplainableReviewRequest):
     return report
 
 @router.post("/simulator/propose", response_model=SimulationReport)
-async def propose_change_simulation(req: SimulationProposedChange):
+async def propose_change_simulation(
+    req: SimulationProposedChange,
+    current_user: UserProfile = Depends(get_current_user)
+):
     """
     Simulates proposed change to price, spec, claim, terminology, or guideline.
     Distinguishes direct dependencies from inferred lexical mentions.
+    Validates input and persists proposed simulation state in MongoDB.
     """
+    if not req.brand_id or not req.target_record_id or not req.proposed_value or not req.old_value:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid proposal parameters: brand_id, target_record_id, old_value, and proposed_value are required."
+        )
+
     bkg = get_or_load_graph(req.brand_id)
     report = simulation_engine.simulate_change(bkg, req)
+
+    # Persist draft simulation in MongoDB if connected
+    if mongo_manager.is_connected and mongo_manager.db is not None:
+        try:
+            await mongo_manager.db.change_simulations.update_one(
+                {"simulation_id": report.simulation_id},
+                {"$set": report.model_dump()},
+                upsert=True
+            )
+        except Exception:
+            pass
+
     return report
 
 @router.post("/simulator/commit")
-async def commit_change_simulation(req: SimulationCommitRequest):
+async def commit_change_simulation(
+    req: SimulationCommitRequest,
+    current_user: UserProfile = Depends(get_current_user)
+):
     """
     Activates new approved version in the graph only after authorized human manager approval.
+    Enforces server-side RBAC, prevents duplicate commits, and persists generated revision tasks into MongoDB Atlas.
     """
+    allowed_roles = [UserRole.ADMIN, UserRole.BRAND_MANAGER, UserRole.COMPLIANCE_REVIEWER]
+    if current_user.role not in allowed_roles:
+        raise HTTPException(
+            status_code=403,
+            detail=f"Role '{current_user.role}' is not authorized to commit governance changes. Requires BRAND_MANAGER or ADMIN."
+        )
+
+    # Check for duplicate commit on already approved simulation
+    if req.simulation_id in simulation_engine.active_simulations:
+        existing_sim = simulation_engine.active_simulations[req.simulation_id]
+        if existing_sim.status == "APPROVED_ACTIVE":
+            raise HTTPException(
+                status_code=409,
+                detail=f"Simulation '{req.simulation_id}' is already committed and active in production."
+            )
+
     bkg = get_or_load_graph(req.brand_id)
+    authorized_reviewer = req.authorized_reviewer or current_user.name
     success, message, report = simulation_engine.commit_change(
         bkg=bkg,
         simulation_id=req.simulation_id,
         decision=req.decision,
-        authorized_reviewer=req.authorized_reviewer
+        authorized_reviewer=authorized_reviewer
     )
-    if not success:
+    if not success or not report:
         raise HTTPException(status_code=400, detail=message)
+
+    # DEF-05 REMEDIATION: Persist all generated revision tasks to MongoDB Atlas & register in dependency_engine
+    if req.decision == "APPROVED":
+        for task in report.generated_tasks:
+            dependency_engine.revision_tasks[task.task_id] = task
+            await mongo_manager.save_task(task.model_dump())
+
+        # Persist change simulation report and impact metrics into MongoDB Atlas
+        if mongo_manager.is_connected and mongo_manager.db is not None:
+            try:
+                await mongo_manager.db.change_simulations.update_one(
+                    {"simulation_id": report.simulation_id},
+                    {"$set": report.model_dump()},
+                    upsert=True
+                )
+                await mongo_manager.db.impact_reports.update_one(
+                    {"simulation_id": report.simulation_id},
+                    {"$set": {
+                        "simulation_id": report.simulation_id,
+                        "target_record_id": report.target_record_id,
+                        "direct_dependencies_count": report.direct_dependencies_count,
+                        "indirect_dependencies_count": report.indirect_dependencies_count,
+                        "outdated_campaigns_count": report.outdated_campaigns_count,
+                        "overall_risk_score": report.overall_risk_score,
+                        "risk_tier": str(report.risk_tier.value if hasattr(report.risk_tier, 'value') else report.risk_tier),
+                        "timestamp": int(time.time())
+                    }},
+                    upsert=True
+                )
+                # Synchronize updated fact into approved_facts and knowledge_nodes in MongoDB Atlas
+                await mongo_manager.db.approved_facts.update_one(
+                    {"fact_id": report.target_record_id},
+                    {"$set": {"current_value": report.proposed_value, "last_verified": time.strftime("%Y-%m-%d")}},
+                    upsert=True
+                )
+                await mongo_manager.db.knowledge_nodes.update_one(
+                    {"node_id": report.target_record_id},
+                    {"$set": {"properties.current_value": report.proposed_value}},
+                    upsert=True
+                )
+            except Exception as e:
+                print(f"[BrandTrace] Simulation MongoDB commit sync note: {e}")
+
     return {"status": "success", "message": message, "report": report}
 
 @router.get("/collaboration/users")
@@ -743,6 +842,7 @@ async def verify_ledger_record(req: VerifyRecordRequest):
     """
     Verifies content integrity against the immutable audit ledger.
     Distinguishes VALID_UNCHANGED, MODIFIED_AFTER_APPROVAL, SUPERSEDED, REVOKED, UNKNOWN_RECORD.
+    Cross-checks in-memory ledger engine and MongoDB Atlas release_ledger.
     """
     # Ensure sample baseline records exist in audit ledger
     resource_ids = {r.resource_id for r in audit_ledger_engine.records.values()}
@@ -797,30 +897,197 @@ async def verify_ledger_record(req: VerifyRecordRequest):
         audit_ledger_engine.revoke_release(r_rev.record_id, "Violates FDA 21 CFR §870 Wellness Device Classification")
 
     result = audit_ledger_engine.verify_content(req.identifier, req.content_to_test)
+    
+    # If unknown in memory, check MongoDB Atlas release_ledger
+    if result.state == ReleaseVerificationState.UNKNOWN_RECORD and mongo_manager.is_connected and mongo_manager.db is not None:
+        try:
+            db_rec = await mongo_manager.db.release_ledger.find_one({
+                "$or": [
+                    {"release_id": req.identifier},
+                    {"asset_id": req.identifier},
+                    {"audit_stamp": req.identifier},
+                    {"tamper_evident_seal": req.identifier}
+                ]
+            })
+            if db_rec:
+                computed_hash = audit_ledger_engine.compute_sha256(req.content_to_test) if req.content_to_test else db_rec.get("content_hash", "")
+                if db_rec.get("is_revoked") or db_rec.get("approval_decision") == "REVOKED":
+                    return {
+                        "state": "REVOKED",
+                        "is_authentic": False,
+                        "record_id": db_rec.get("release_id"),
+                        "content_id": db_rec.get("asset_id"),
+                        "approved_version": db_rec.get("approved_version", "v1.0"),
+                        "sealed_by": db_rec.get("reviewer"),
+                        "sealed_timestamp": db_rec.get("timestamp_iso"),
+                        "computed_content_hash": computed_hash,
+                        "recorded_content_hash": db_rec.get("content_hash"),
+                        "relevant_sources": db_rec.get("relevant_sources", []),
+                        "tamper_evident_seal": db_rec.get("audit_stamp") or db_rec.get("tamper_evident_seal"),
+                        "explanation": f"Revoked: Release revoked by compliance ({db_rec.get('revocation_reason', 'Policy violation')}).",
+                        "cryptographic_scheme": "SHA-256 Tamper-Evident Ledger Digest (Internal Merkle-Style Chaining)"
+                    }
+                elif db_rec.get("is_superseded") or db_rec.get("approval_decision") == "SUPERSEDED":
+                    return {
+                        "state": "SUPERSEDED",
+                        "is_authentic": False,
+                        "record_id": db_rec.get("release_id"),
+                        "content_id": db_rec.get("asset_id"),
+                        "approved_version": db_rec.get("approved_version", "v1.0"),
+                        "sealed_by": db_rec.get("reviewer"),
+                        "sealed_timestamp": db_rec.get("timestamp_iso"),
+                        "computed_content_hash": computed_hash,
+                        "recorded_content_hash": db_rec.get("content_hash"),
+                        "relevant_sources": db_rec.get("relevant_sources", []),
+                        "tamper_evident_seal": db_rec.get("audit_stamp") or db_rec.get("tamper_evident_seal"),
+                        "explanation": f"Superseded: Version {db_rec.get('approved_version', 'v1.0')} has been superseded by newer approved release {db_rec.get('superseded_by_version', 'v2.0')}.",
+                        "cryptographic_scheme": "SHA-256 Tamper-Evident Ledger Digest (Internal Merkle-Style Chaining)"
+                    }
+                elif req.content_to_test and computed_hash != db_rec.get("content_hash"):
+                    return {
+                        "state": "MODIFIED_AFTER_APPROVAL",
+                        "is_authentic": False,
+                        "record_id": db_rec.get("release_id"),
+                        "content_id": db_rec.get("asset_id"),
+                        "approved_version": db_rec.get("approved_version", "v1.0"),
+                        "sealed_by": db_rec.get("reviewer"),
+                        "sealed_timestamp": db_rec.get("timestamp_iso"),
+                        "computed_content_hash": computed_hash,
+                        "recorded_content_hash": db_rec.get("content_hash"),
+                        "relevant_sources": db_rec.get("relevant_sources", []),
+                        "tamper_evident_seal": db_rec.get("audit_stamp") or db_rec.get("tamper_evident_seal"),
+                        "explanation": "Modified After Approval: Cryptographic hash mismatch! Content has been altered since formal approval.",
+                        "cryptographic_scheme": "SHA-256 Tamper-Evident Ledger Digest (Internal Merkle-Style Chaining)"
+                    }
+                else:
+                    return {
+                        "state": "VALID_UNCHANGED",
+                        "is_authentic": True,
+                        "record_id": db_rec.get("release_id"),
+                        "content_id": db_rec.get("asset_id"),
+                        "approved_version": db_rec.get("approved_version", "v1.0"),
+                        "sealed_by": db_rec.get("reviewer"),
+                        "sealed_timestamp": db_rec.get("timestamp_iso"),
+                        "computed_content_hash": computed_hash,
+                        "recorded_content_hash": db_rec.get("content_hash"),
+                        "relevant_sources": db_rec.get("relevant_sources", []),
+                        "tamper_evident_seal": db_rec.get("audit_stamp") or db_rec.get("tamper_evident_seal"),
+                        "explanation": "Valid & Unchanged: Cryptographic seal verified in MongoDB Atlas. Content matches immutable SHA-256 ledger record.",
+                        "cryptographic_scheme": "SHA-256 Tamper-Evident Ledger Digest (Internal Merkle-Style Chaining)"
+                    }
+        except Exception as e:
+            print(f"[BrandTrace] MongoDB ledger lookup note: {e}")
+
     return result
 
 @router.post("/ledger/revoke-record")
-async def revoke_ledger_record(req: RevokeRecordRequest):
-    """Officially revokes a release record in the audit ledger with explanation."""
+async def revoke_ledger_record(
+    req: RevokeRecordRequest,
+    current_user: UserProfile = Depends(get_current_user)
+):
+    """Officially revokes a release record in the audit ledger with explanation and server-side RBAC."""
+    allowed_roles = [UserRole.ADMIN, UserRole.COMPLIANCE_REVIEWER]
+    if current_user.role not in allowed_roles:
+        raise HTTPException(
+            status_code=403,
+            detail=f"Role '{current_user.role}' is not authorized to revoke release records. Requires COMPLIANCE_REVIEWER or ADMIN."
+        )
+
+    revoked_by = req.revoked_by or current_user.name
     success, msg, rec = audit_ledger_engine.revoke_release(
         target_record_or_resource_id=req.identifier,
         revocation_reason=req.revocation_reason,
-        revoked_by_user=req.revoked_by
+        revoked_by_user=revoked_by
     )
     if not success:
         raise HTTPException(status_code=404, detail=msg)
+
+    # Persist revocation in MongoDB Atlas release_ledger
+    if mongo_manager.is_connected and mongo_manager.db is not None:
+        try:
+            await mongo_manager.db.release_ledger.update_many(
+                {
+                    "$or": [
+                        {"release_id": req.identifier},
+                        {"asset_id": req.identifier},
+                        {"audit_stamp": req.identifier},
+                        {"tamper_evident_seal": req.identifier}
+                    ]
+                },
+                {
+                    "$set": {
+                        "is_revoked": True,
+                        "approval_decision": "REVOKED",
+                        "revocation_reason": req.revocation_reason
+                    }
+                }
+            )
+            await mongo_manager.db.audit_events.insert_one({
+                "event_id": f"REV-{req.identifier}-{int(time.time())}",
+                "action_type": "RELEASE_REVOKED",
+                "resource_id": req.identifier,
+                "user_identity": revoked_by,
+                "reason": req.revocation_reason,
+                "timestamp": int(time.time())
+            })
+        except Exception:
+            pass
+
     return {"status": "REVOKED", "message": msg, "record": rec}
 
 @router.post("/ledger/supersede-record")
-async def supersede_ledger_record(req: SupersedeRecordRequest):
-    """Marks an existing release record as SUPERSEDED by a newer approved version."""
+async def supersede_ledger_record(
+    req: SupersedeRecordRequest,
+    current_user: UserProfile = Depends(get_current_user)
+):
+    """Marks an existing release record as SUPERSEDED by a newer approved version with server-side RBAC."""
+    allowed_roles = [UserRole.ADMIN, UserRole.BRAND_MANAGER, UserRole.COMPLIANCE_REVIEWER]
+    if current_user.role not in allowed_roles:
+        raise HTTPException(
+            status_code=403,
+            detail=f"Role '{current_user.role}' is not authorized to supersede release records. Requires BRAND_MANAGER or ADMIN."
+        )
+
+    superseded_by = req.superseded_by or current_user.name
     success, msg, rec = audit_ledger_engine.supersede_release(
         target_record_or_resource_id=req.identifier,
         new_version=req.new_version,
-        superseded_by_user=req.superseded_by
+        superseded_by_user=superseded_by
     )
     if not success:
         raise HTTPException(status_code=404, detail=msg)
+
+    # Persist superseded status in MongoDB Atlas release_ledger
+    if mongo_manager.is_connected and mongo_manager.db is not None:
+        try:
+            await mongo_manager.db.release_ledger.update_many(
+                {
+                    "$or": [
+                        {"release_id": req.identifier},
+                        {"asset_id": req.identifier},
+                        {"audit_stamp": req.identifier},
+                        {"tamper_evident_seal": req.identifier}
+                    ]
+                },
+                {
+                    "$set": {
+                        "is_superseded": True,
+                        "approval_decision": "SUPERSEDED",
+                        "superseded_by_version": req.new_version
+                    }
+                }
+            )
+            await mongo_manager.db.audit_events.insert_one({
+                "event_id": f"SUP-{req.identifier}-{int(time.time())}",
+                "action_type": "RELEASE_SUPERSEDED",
+                "resource_id": req.identifier,
+                "user_identity": superseded_by,
+                "new_version": req.new_version,
+                "timestamp": int(time.time())
+            })
+        except Exception:
+            pass
+
     return {"status": "SUPERSEDED", "message": msg, "record": rec}
 
 
