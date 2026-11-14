@@ -47,3 +47,4 @@
   - The application shell, navigation chrome, and offline fallback interface remain fully functional.
   - Active inspection jobs, change simulations, and release signing cannot be executed offline.
 - **Rationale:** Allowing offline approvals would risk publishing content based on stale brand rules, directly violating the core governance promise of BRANDTRACE AI.
+

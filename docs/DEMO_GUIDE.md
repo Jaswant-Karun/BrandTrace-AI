@@ -99,3 +99,4 @@ Evaluators can reset the demonstration workspace at any time to return all recor
 2. Confirm the prompt.
 3. All simulated price changes, draft tasks, and test facts are purged, and the factory state is restored.
 4. Production settings and other tenants remain strictly isolated and unaffected.
+

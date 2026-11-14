@@ -232,3 +232,4 @@ Executes a discrete step in the demonstration sequence (1 to 12).
 
 ### `POST /api/demo/reset`
 Restores the AURELLE demonstration workspace to pristine factory state without affecting production settings. Requires `BRAND_MANAGER` or `ADMIN` role.
+

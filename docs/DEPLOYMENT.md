@@ -123,3 +123,4 @@ flowchart LR
 |---|---|---|
 | `VITE_API_BASE_URL` | Backend REST API base URL | `https://brandtrace-backend.onrender.com` |
 | `VITE_APP_NAME` | Application title | `BRANDTRACE AI` |
+
