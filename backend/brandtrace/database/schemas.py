@@ -63,12 +63,15 @@ class RolePermissionDoc(BaseMongoRecord):
 class BrandGuidelineDoc(BaseMongoRecord):
     guideline_id: str
     title: str
-    category: str # "VOICE", "PACKAGING", "REGULATORY", "SUSTAINABILITY", "VISUAL"
+    category: str # "VOICE", "PACKAGING", "REGULATORY", "SUSTAINABILITY", "VISUAL", "TRADEMARK"
     rule_statement: str
     severity: str = "HIGH"
     effective_date: int = Field(default_factory=current_epoch_ms)
     expiry_date: Optional[int] = None
     version_number: str = "1.0"
+    restricted_terms: Optional[List[str]] = None
+    required_phrases: Optional[List[str]] = None
+    source_citation: Optional[str] = None
 
 # 7. guideline_versions
 class GuidelineVersionDoc(BaseMongoRecord):
@@ -90,6 +93,11 @@ class ApprovedFactDoc(BaseMongoRecord):
     source_citation: str
     department_owner: str
     last_verified: str
+    source_date: Optional[str] = None
+    expiry_date: Optional[str] = None
+    evidence_reference: Optional[str] = None
+    restricted_terms: Optional[List[str]] = None
+    required_phrases: Optional[List[str]] = None
     embedding: Optional[List[float]] = None
 
 # 9. fact_sources

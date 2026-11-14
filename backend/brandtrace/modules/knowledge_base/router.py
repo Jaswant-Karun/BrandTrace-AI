@@ -5,7 +5,8 @@ from fastapi import APIRouter, HTTPException, Depends
 from typing import List, Dict, Any, Optional
 from brandtrace.modules.knowledge_base.models import (
     VectorSearchQuery, VectorSearchResult, AtlasIndexConfigResponse,
-    CreateFactRequest, ApprovedFactResponse
+    CreateFactRequest, ApprovedFactResponse, UpdateFactRequest,
+    CreateGuidelineRequest, GuidelineResponse
 )
 from brandtrace.database.mongo import mongo_manager
 from brandtrace.database.schemas import ApprovedFactDoc
