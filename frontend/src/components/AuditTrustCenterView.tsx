@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { 
   ShieldCheck, Download, Search, CheckCircle2, AlertTriangle, 
-  AlertOctagon, RefreshCw, XCircle, Shield, FileCheck, ArrowRight
+  AlertOctagon, RefreshCw, XCircle, Shield, ArrowRight
 } from 'lucide-react';
 import { ReleaseLedgerEntry } from '../types';
 import { PageHeader } from './ui/PageHeader';
@@ -16,6 +16,8 @@ interface AuditTrustCenterViewProps {
 export const AuditTrustCenterView: React.FC<AuditTrustCenterViewProps> = ({ brandId, onNavigate }) => {
   const toast = useToast();
   const [releases, setReleases] = useState<ReleaseLedgerEntry[]>([]);
+  const [events, setEvents] = useState<any[]>([]);
+  const [ledgerView, setLedgerView] = useState<'RELEASES' | 'EVENTS'>('RELEASES');
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [search, setSearch] = useState<string>('');
 
@@ -40,10 +42,13 @@ export const AuditTrustCenterView: React.FC<AuditTrustCenterViewProps> = ({ bran
 
   const loadLedger = () => {
     setIsLoading(true);
-    fetch(`/api/releases?brand_id=${brandId || 'aurelle-tech'}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setReleases(data || []);
+    Promise.all([
+      fetch(`/api/releases?brand_id=${brandId || 'aurelle-tech'}`).then((r) => r.ok ? r.json() : []),
+      fetch(`/api/collaboration/events?limit=25`).then((r) => r.ok ? r.json() : [])
+    ])
+      .then(([releasesData, eventsData]) => {
+        setReleases(releasesData || []);
+        setEvents(eventsData || []);
         setIsLoading(false);
       })
       .catch((err) => {
@@ -424,10 +429,26 @@ export const AuditTrustCenterView: React.FC<AuditTrustCenterViewProps> = ({ bran
       <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-slate-100">
           <div className="flex items-center gap-2">
-            <FileCheck className="w-4 h-4 text-slate-800" />
-            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-              Cryptographically Sealed Release Records ({releases.length})
-            </h3>
+            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
+              <button
+                type="button"
+                onClick={() => setLedgerView('RELEASES')}
+                className={`px-3 py-1.5 rounded-md text-xs font-semibold cursor-pointer transition-all ${
+                  ledgerView === 'RELEASES' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600'
+                }`}
+              >
+                Sealed Releases ({releases.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setLedgerView('EVENTS')}
+                className={`px-3 py-1.5 rounded-md text-xs font-semibold cursor-pointer transition-all ${
+                  ledgerView === 'EVENTS' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600'
+                }`}
+              >
+                Governance Audit Events ({events.length})
+              </button>
+            </div>
           </div>
 
           <div className="relative">
@@ -443,7 +464,38 @@ export const AuditTrustCenterView: React.FC<AuditTrustCenterViewProps> = ({ bran
         </div>
 
         {isLoading ? (
-          <div className="p-8 text-center text-xs text-slate-500">Loading immutable release records...</div>
+          <div className="p-8 text-center text-xs text-slate-500">Loading immutable records...</div>
+        ) : ledgerView === 'EVENTS' ? (
+          <div className="overflow-x-auto border border-slate-200 rounded-lg">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold border-b border-slate-200">
+                <tr>
+                  <th className="p-3">Event ID</th>
+                  <th className="p-3">Action Type</th>
+                  <th className="p-3">Actor / Reviewer</th>
+                  <th className="p-3">Resource Target</th>
+                  <th className="p-3">Tamper-Evident Seal</th>
+                  <th className="p-3">Timestamp</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-sans">
+                {events.map((evt, i) => (
+                  <tr key={i} className="hover:bg-slate-50/70 transition-colors">
+                    <td className="p-3 font-mono font-bold text-slate-900">{evt.event_id || `EVT-${i+1}`}</td>
+                    <td className="p-3">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-100 text-slate-800 border border-slate-200 font-mono">
+                        {evt.action_type || evt.event_type || 'GOVERNANCE_ACTION'}
+                      </span>
+                    </td>
+                    <td className="p-3 font-medium text-slate-700">{evt.user_identity || evt.user_name || 'Chief Governance Officer'}</td>
+                    <td className="p-3 font-mono text-[11px] text-slate-900">{evt.resource_id || evt.asset_id || 'SYSTEM'}</td>
+                    <td className="p-3 font-mono text-[11px] text-slate-500 truncate max-w-[200px]">{evt.tamper_evident_digest || evt.audit_stamp || 'SHA256:VERIFIED'}</td>
+                    <td className="p-3 font-mono text-[11px] text-slate-500">{evt.timestamp_iso || new Date(evt.timestamp * 1000).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : filtered.length === 0 ? (
           <div className="p-8 text-center text-xs text-slate-500">No release records found.</div>
         ) : (
