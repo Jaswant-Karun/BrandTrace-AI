@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BrandTrace AI — Round 3 Final Submission — Storm Crackers</title>
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 11mm 13mm 11mm 13mm;
+  }
+  * {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    background-color: #ffffff;
+    line-height: 1.4;
+    font-size: 8pt;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Page Break Utilities */
+  .page-break {
+    page-break-before: always;
+    break-before: page;
+  }
+  .avoid-break {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  
+  /* Typography */
+  h1, h2, h3, h4 {
+    color: #0f172a;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 3px;
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+  h1 {
+    font-size: 15pt;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+  }
+  h2 {
+    font-size: 9.8pt;
+    border-bottom: 1.5px solid #cbd5e1;
+    padding-bottom: 3px;
+    margin-top: 8px;
+    margin-bottom: 4px;
+    color: #1e3a8a;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  h3 {
+    font-size: 8.5pt;
+    margin-top: 4px;
+    margin-bottom: 2px;
+    color: #0f172a;
+  }
+  p {
+    margin: 0 0 4px 0;
+    font-size: 8pt;
+    text-align: justify;
+  }
+  
+  /* Running Header Card (Cover Page) */
+  .cover-header {
+    background: linear-gradient(135deg, #091326 0%, #1e3a8a 55%, #1d4ed8 100%);
+    color: #ffffff;
+    padding: 10px 14px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+  .cover-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3px;
+  }
+  .header-badge {
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    color: #ffffff;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 7.2pt;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .cover-subtitle {
+    font-size: 9.5pt;
+    color: #93c5fd;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  
+  /* Section Header Banners (Pages 2-10) */
+  .chapter-banner {
+    background: #0f172a;
+    color: #ffffff;
+    padding: 6px 10px;
+    border-radius: 3px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+  .chapter-title {
+    font-size: 9pt;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .chapter-meta {
+    font-size: 7.2pt;
+    color: #94a3b8;
+  }
+  .chapter-meta strong {
+    color: #38bdf8;
+  }
+
+  /* Metadata Grids */
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.12);
+    padding: 6px 10px;
+    border-radius: 3px;
+    font-size: 7.5pt;
+  }
+  .meta-item strong {
+    display: block;
+    color: #cbd5e1;
+    font-size: 6.8pt;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .meta-item span {
+    color: #ffffff;
+    font-weight: 600;
+  }
+  .meta-item a {
+    color: #93c5fd;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 5px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 5px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 5px; margin-bottom: 5px; }
+  
+  /* Cards & Callouts */
+  .card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 6px 8px;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin-bottom: 5px;
+  }
+  .card-title {
+    font-weight: 700;
+    font-size: 8pt;
+    color: #1e3a8a;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card-stat {
+    font-size: 13pt;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.1;
+  }
+  .card-desc {
+    font-size: 7.2pt;
+    color: #475569;
+    margin-top: 1px;
+    line-height: 1.3;
+  }
+  
+  .callout {
+    background-color: #eff6ff;
+    border-left: 3px solid #2563eb;
+    border-radius: 3px;
+    padding: 6px 8px;
+    margin: 5px 0;
+    font-size: 7.8pt;
+    line-height: 1.35;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .callout-title {
+    font-weight: 700;
+    color: #1e40af;
+    font-size: 8.2pt;
+    margin-bottom: 2px;
+  }
+  .callout-success {
+    background-color: #f0fdf4;
+    border-left: 3px solid #16a34a;
+  }
+  .callout-success .callout-title { color: #15803d; }
+  .callout-amber {
+    background-color: #fffbeb;
+    border-left: 3px solid #d97706;
+  }
+  .callout-amber .callout-title { color: #b45309; }
+  
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 7.4pt;
+    margin: 5px 0;
+    page-break-inside: auto;
+  }
+  th, td {
+    padding: 4px 6px;
+    text-align: left;
+    border: 1px solid #cbd5e1;
+    vertical-align: top;
+    line-height: 1.3;
+  }
+  tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  th {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    font-weight: 700;
+  }
+  tr:nth-child(even) td { background-color: #f8fafc; }
+  
+  /* Code Blocks */
+  .code-block {
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 5px 7px;
+    border-radius: 3px;
+    font-family: Consolas, Monaco, "Courier New", monospace;
+    font-size: 7pt;
+    white-space: pre-wrap;
+    line-height: 1.3;
+    margin: 4px 0;
+    border-left: 2px solid #38bdf8;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  
+  /* Badges */
+  .badge {
+    display: inline-block;
+    padding: 1px 4px;
+    border-radius: 2px;
+    font-size: 6.6pt;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .badge-green { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+  .badge-blue { background-color: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe; }
+  .badge-amber { background-color: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+  .badge-red { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+  .badge-purple { background-color: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+
+  /* Flow Diagram */
+  .flow-diagram {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 5px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 4px 0;
+    font-size: 7pt;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .flow-step {
+    background: #ffffff;
+    border: 1.2px solid #94a3b8;
+    border-radius: 3px;
+    padding: 4px 6px;
+    text-align: center;
+    flex: 1;
+    margin: 0 2px;
+    font-weight: 600;
+  }
+  .flow-arrow {
+    color: #0284c7;
+    font-weight: 800;
+    font-size: 9pt;
+  }
+
+  /* Running Footer */
+  .doc-footer {
+    border-top: 1px solid #cbd5e1;
+    padding-top: 3px;
+    margin-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 7pt;
+    color: #64748b;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .doc-footer strong { color: #0f172a; }
+  a { color: #2563eb; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<!-- ================= CHAPTER 1: COVER & EXECUTIVE OVERVIEW ================= -->
+<div>
+  <div class="cover-header">
+    <div class="cover-header-top">
+      <h1>BRANDTRACE AI 🛡️</h1>
+      <span class="header-badge">HACKATHON ROUND 3 &bull; FINAL MASTER SUBMISSION</span>
+    </div>
+    <div class="cover-subtitle">The Autonomous Brand Intelligence &amp; Governance Control Plane</div>
+    <p style="font-size: 7.8pt; margin-bottom: 5px; color: #e2e8f0; line-height: 1.35;">
+      A connected enterprise brand-governance system: Know what your brand allows. Detect what your content risks. Understand the impact of changes. Approve with evidence. Preserve an auditable record.
+    </p>
+    <div class="meta-grid">
+      <div class="meta-item">
+        <strong>Team Name</strong>
+        <span>Storm Crackers</span>
+      </div>
+      <div class="meta-item">
+        <strong>Leadership &amp; Architecture</strong>
+        <span>Jaswant Karun S A (Lead) &bull; Jaiwant Karrun S A</span>
+      </div>
+      <div class="meta-item">
+        <strong>Institution</strong>
+        <span>KPR Institute of Eng. &amp; Tech.</span>
+      </div>
+      <div class="meta-item">
+        <strong>Hackathon Stage</strong>
+        <span style="color: #93c5fd;">Round 3 Final Evaluation</span>
+      </div>
+    </div>
+  </div>
+
+  <h2>1. Authoritative Production Links &amp; System Access</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">Service Component</th>
+        <th style="width: 45%;">Authoritative Production URL</th>
+        <th style="width: 15%;">Host Platform</th>
+        <th style="width: 15%;">Live Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Frontend Application</strong></td>
+        <td><a href="https://brand-trace-ai-dun.vercel.app/" target="_blank">https://brand-trace-ai-dun.vercel.app/</a></td>
+        <td>Vercel Global Edge CDN</td>
+        <td><span class="badge badge-green">HTTP 200 OK</span></td>
+      </tr>
+      <tr>
+        <td><strong>Backend API Service</strong></td>
+        <td><a href="https://brandtrace-backend.onrender.com" target="_blank">https://brandtrace-backend.onrender.com</a></td>
+        <td>Render Cloud PaaS (Oregon)</td>
+        <td><span class="badge badge-green">HTTP 200 OK</span></td>
+      </tr>
+      <tr>
+        <td><strong>Edge Proxied Health</strong></td>
+        <td><a href="https://brand-trace-ai-dun.vercel.app/health" target="_blank">https://brand-trace-ai-dun.vercel.app/health</a></td>
+        <td>Vercel Edge Rewrite Proxy</td>
+        <td><span class="badge badge-blue">4 AGENTS ACTIVE</span></td>
+      </tr>
+      <tr>
+        <td><strong>Official GitHub Repository</strong></td>
+        <td><a href="https://github.com/Jaswant-Karun/BrandTrace-AI" target="_blank">https://github.com/Jaswant-Karun/BrandTrace-AI</a></td>
+        <td>Git Branch: <code>main</code> (Clean)</td>
+        <td><span class="badge badge-green">SYNCHRONIZED</span></td>
+      </tr>
+      <tr>
+        <td><strong>Public Demo Portal</strong></td>
+        <td><a href="https://brand-trace-ai-dun.vercel.app/login" target="_blank">https://brand-trace-ai-dun.vercel.app/login</a> (One-Click Demo Pill)</td>
+        <td>Role: <code>BRAND_MANAGER</code></td>
+        <td><span class="badge badge-green">1-CLICK LOGIN</span></td>
+      </tr>
+      <tr>
+        <td><strong>MongoDB Atlas Cloud</strong></td>
+        <td><code>cluster0.wikhvvy.mongodb.net/brandtrace_admin</code></td>
+        <td>Atlas 7.0+ Replica Set</td>
+        <td><span class="badge badge-green">35 COLLECTIONS</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>2. Executive Summary</h2>
+  <p>
+    <strong>BrandTrace AI</strong> is an enterprise-grade autonomous brand intelligence and governance control plane. Modern consumer and technology enterprises operate across dozens of distributed marketing channels, generating thousands of ad variants, press announcements, retail rate cards, and packaging designs monthly. When commercial terms, product specifications, or regulatory guidelines evolve, organizations suffer from severe <em>cascading brand blindspots</em>. Approved commercial facts are trapped in static PDF guidelines, leading to inadvertent false advertising, Lanham Act civil litigation, FTC Green Guide investigations, and severe regulatory penalties.
+  </p>
+  <p>
+    BrandTrace AI solves this challenge by unifying brand knowledge, multi-agent automated inspection, proactive change impact simulation (Digital Twin), human-in-the-loop review queues, and cryptographic release verification into a single decoupled cloud platform. Rather than reviewing marketing text in isolation, BrandTrace AI connects every piece of copy to an active <strong>Brand Dependency Intelligence Graph (BDIG)</strong>, validating claims, calculating blast radius risk, and enforcing tamper-evident provenance.
+  </p>
+
+  <div class="grid-3" style="margin-top: 4px;">
+    <div class="card">
+      <div class="card-title">Connected Truth-Sets</div>
+      <p class="card-desc">Ground-truth brand facts, specifications, and regulatory guidelines persist in MongoDB Atlas with formal evidentiary citations and vector embeddings.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Digital Twin Simulation</div>
+      <p class="card-desc">A proactive graph engine traverses downstream touchpoints before fact changes are committed, quantifying organizational blast radius.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Cryptographic Trust Ledger</div>
+      <p class="card-desc">Every approved release receives an immutable SHA-256 Merkle-style seal, verified in real-time across 5 statutory lifecycle states.</p>
+    </div>
+  </div>
+
+  <h2>3. Key Milestones Delivered in Round 3</h2>
+  <div class="callout callout-success">
+    <div class="callout-title">Core Technical Deliverables in This Final Release</div>
+    - <strong>Full Cloud Persistence:</strong> All 13 modules wired to MongoDB Atlas with zero volatile in-memory loss across server restarts.<br>
+    - <strong>Sub-Second Multi-Agent Inspection:</strong> Concurrent inspection verified at <strong>619ms–887ms</strong> with concrete statutory legal citations (FDA 21 CFR §870, FTC 16 CFR §260.4).<br>
+    - <strong>Deterministic Cryptographic Sealing:</strong> Software-based SHA-256 Merkle block stamps (<code>BT-SEAL-...</code>) verified across 5 statutory lifecycle states.<br>
+    - <strong>Automated Test Coverage:</strong> Exactly <strong>136 / 136 tests passing</strong> in 6.39 seconds with 0 TypeScript compilation errors.<br>
+    - <strong>Progressive Web App (PWA):</strong> Valid W3C web app manifest, zero-trust caching service worker (<code>sw.js</code>), and branded offline resilience.
+  </div>
+
+  <div class="doc-footer">
+    <span><strong>BRANDTRACE AI</strong> &bull; Round 3 Final Master Submission &bull; Team: <strong>Storm Crackers</strong></span>
+    <span>Live App: <a href="https://brand-trace-ai-dun.vercel.app/">https://brand-trace-ai-dun.vercel.app/</a> &bull; Chapter 1: Overview</span>
+  </div>
+</div>
+
+<!-- ================= CHAPTER 2: PROBLEM & PROPOSED SOLUTION ================= -->
+<div class="page-break">
+  <div class="chapter-banner">
+    <div class="chapter-title">🔍 CHAPTER 2: PROBLEM STATEMENT &amp; THE PROPOSED SOLUTION</div>
+    <div class="chapter-meta">Enterprise Market Reality &bull; <strong>Governance Control Plane</strong></div>
+  </div>
+
+  <h2>1. The Real-World Enterprise Governance Crisis</h2>
+  <p>
+    Modern consumer enterprises operate across fragmented digital ecosystems: Meta Ads, Google PPC, retail partner portals, packaging copy, and press statements. When commercial parameters change (e.g. price increases, wellness device classifications, or sustainability claims), organizations experience severe operational breakdowns:
+  </p>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">1. Scattered Guidelines &amp; Trapped Truth</div>
+      <p class="card-desc">Approved commercial facts, pricing sheets, and legal disclaimers live trapped inside static PDFs, Slack threads, and Confluence pages, entirely disconnected from the authoring tools used by content creators.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">2. Inconsistent Messaging at Scale</div>
+      <p class="card-desc">Marketing teams generate hundreds of localized copy variants monthly. Without continuous automated checks, conflicting claims and outdated pricing slip into active consumer acquisition channels.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">3. Severe Statutory &amp; Regulatory Risk</div>
+      <p class="card-desc">Consumer healthcare, dietary supplements, and tech hardware face strict statutory liabilities under <strong>FDA 21 CFR §870</strong>, <strong>FTC 16 CFR §260.4 (Green Guides)</strong>, and the <strong>Lanham Act §43(a)</strong> for false advertising.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">4. Silent Downstream Asset Invalidation</div>
+      <p class="card-desc">Mutating a single brand fact (e.g. changing subscription fees from ₹499 to ₹599) silently invalidates active ad creative and distributor rate cards without notifying content owners.</p>
+    </div>
+  </div>
+
+  <h2>2. The Proposed Solution: An Integrated Governance Control Plane</h2>
+  <p>
+    BrandTrace AI solves this by introducing a centralized, autonomous intelligence and governance control plane. Rather than inspecting content in isolation, BrandTrace AI connects every piece of copy to an active <strong>Brand Dependency Intelligence Graph (BDIG)</strong>, validating claims, calculating blast radius risk, and enforcing cryptographic audit trails.
+  </p>
+  
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">Capability Dimension</th>
+        <th style="width: 35%;">Traditional Content / Grammar Checkers</th>
+        <th style="width: 40%;">BrandTrace AI Governance Control Plane</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Truth Reference</strong></td>
+        <td>Generic dictionary / statistical grammar models.</td>
+        <td><span class="badge badge-green">CONNECTED</span> Ground-truth brand facts &amp; statutory rules in MongoDB.</td>
+      </tr>
+      <tr>
+        <td><strong>Regulatory Citations</strong></td>
+        <td>None. Flags stylistic or spelling errors only.</td>
+        <td><span class="badge badge-green">STATUTORY</span> Cites exact legal statutes (FDA 21 CFR §870, FTC §260.4).</td>
+      </tr>
+      <tr>
+        <td><strong>Change Impact Awareness</strong></td>
+        <td>Zero. Operates on isolated single documents.</td>
+        <td><span class="badge badge-blue">DIGITAL TWIN</span> Traverses DAG to identify all downstream touchpoints at risk.</td>
+      </tr>
+      <tr>
+        <td><strong>Remediation Engine</strong></td>
+        <td>Generic synonym substitution.</td>
+        <td><span class="badge badge-green">UNICODE-SAFE</span> Reverse-offset token replacement preserving brand voice &amp; emojis.</td>
+      </tr>
+      <tr>
+        <td><strong>Release Provenance</strong></td>
+        <td>Unsigned text export or PDF download.</td>
+        <td><span class="badge badge-purple">CRYPTOGRAPHIC</span> Deterministic SHA-256 Merkle seals verified across 5 states.</td>
+      </tr>
+      <tr>
+        <td><strong>Approval Gate</strong></td>
+        <td>Ungated client-side publishing.</td>
+        <td><span class="badge badge-amber">RBAC GATE</span> Strict human-in-the-loop sign-off with tamper detection.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>3. The Connected 10-Step Brand Governance Lifecycle</h2>
+  <div class="flow-diagram">
+    <div class="flow-step">1. Knowledge Ground Truth</div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step">2. Content Submission</div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step">3. Multi-Agent Scan</div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step">4. Evidence Citations</div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step">5. Safe Remediation</div>
+  </div>
+  <div class="flow-diagram" style="margin-top: 3px;">
+    <div class="flow-step">6. Digital Twin Simulation</div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step">7. Revision Tasks Dispatch</div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step">8. Human Review Sign-Off</div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step">9. SHA-256 Release Seal</div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step">10. 5-State Trust Ledger</div>
+  </div>
+
+  <div class="callout callout-success" style="margin-top: 5px;">
+    <div class="callout-title">The Strategic Shift</div>
+    BrandTrace AI transitions brand governance from an archaic, punitive manual audit process into a <strong>real-time, proactive autonomous control plane</strong>. Content creators receive instant guidance, brand managers simulate changes before committing them, and compliance executives possess mathematically verifiable proof of release authenticity.
+  </div>
+
+  <div class="doc-footer">
+    <span><strong>BRANDTRACE AI</strong> &bull; Round 3 Final Master Submission &bull; Team: <strong>Storm Crackers</strong></span>
+    <span>GitHub: <a href="https://github.com/Jaswant-Karun/BrandTrace-AI">Jaswant-Karun/BrandTrace-AI</a> &bull; Chapter 2: Problem &amp; Solution</span>
+  </div>
+</div>
+
+<!-- ================= CHAPTER 3: SYSTEM ARCHITECTURE & TECH STACK ================= -->
+<div class="page-break">
+  <div class="chapter-banner">
+    <div class="chapter-title">🏗️ CHAPTER 3: SYSTEM ARCHITECTURE &amp; TECHNOLOGY STACK</div>
+    <div class="chapter-meta">Decoupled Cloud Architecture &bull; <strong>Verified Technology Stack</strong></div>
+  </div>
+
+  <h2>1. Full-Stack Technology Implementation</h2>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title">Frontend Tier (React 19 + Vite 6)</div>
+      <ul style="font-size: 7.2pt; padding-left: 11px; margin: 1px 0;">
+        <li><strong>Core Framework:</strong> React 19.0.0 SPA + TypeScript 5.8</li>
+        <li><strong>Build Engine:</strong> Vite 6.2 with optimized tree-shaking</li>
+        <li><strong>Design System:</strong> Tailwind CSS enterprise palette</li>
+        <li><strong>Graph Visualization:</strong> @xyflow/react DAG renderer</li>
+        <li><strong>Motion &amp; Icons:</strong> Framer Motion 12 + Lucide React</li>
+        <li><strong>PWA Layer:</strong> Service worker (<code>sw.js</code>) + Web Manifest</li>
+        <li><strong>Hosting:</strong> Vercel Global Edge Network CDN</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">Backend API Tier (Python 3.13 FastAPI)</div>
+      <ul style="font-size: 7.2pt; padding-left: 11px; margin: 1px 0;">
+        <li><strong>Application Core:</strong> Python 3.13 + FastAPI async engine</li>
+        <li><strong>Graph Engine:</strong> NetworkX 3.4.2 directed graphs</li>
+        <li><strong>Validation:</strong> Pydantic v2 strict schemas</li>
+        <li><strong>Security:</strong> PBKDF2-SHA256 salted password hashing</li>
+        <li><strong>Rate Limiting:</strong> Sliding-window limiter (120 req/min)</li>
+        <li><strong>Sanitization:</strong> ErrorSanitizationMiddleware filters logs</li>
+        <li><strong>Hosting:</strong> Render Cloud PaaS (Oregon US-West)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">Persistence &amp; Ledger (MongoDB Atlas)</div>
+      <ul style="font-size: 7.2pt; padding-left: 11px; margin: 1px 0;">
+        <li><strong>Database:</strong> MongoDB Atlas 7.0+ Replica Set</li>
+        <li><strong>Async Driver:</strong> Motor 3.7+ async I/O</li>
+        <li><strong>Data Volume:</strong> 35 BSON collections active</li>
+        <li><strong>Search:</strong> Atlas Vector Search (768-dim cosine)</li>
+        <li><strong>Ledger Engine:</strong> Deterministic SHA-256 Merkle blocks</li>
+        <li><strong>State Machine:</strong> 5-State statutory verification verifier</li>
+        <li><strong>Integrity:</strong> Idempotent compound unique indexes</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>2. End-to-End Request, Inspection &amp; Ledger Data Flow Diagram</h2>
+  <div class="code-block" style="font-size: 6.8pt; line-height: 1.25;">
+[ Client Browser / Desktop / Mobile PWA ]
+       |
+       |  HTTPS GET/POST + JWT Bearer Token
+       v
+[ Vercel Global Edge CDN ]  --> Serves static assets, /sw.js, manifest.webmanifest, offline.html
+       |
+       |  Rewrites /api/* and /health proxy
+       v
+[ FastAPI Asynchronous Backend Core (Render Cloud PaaS) ]
+  ├── 1. Security Gate: RateLimiter (120/min) + ErrorSanitizer + PBKDF2 Token Validator
+  ├── 2. Route Dispatcher:
+  │      ├── POST /api/verify ------------> Multi-Agent Content Inspection Pipeline
+  │      │                                  ├── VoicePersonaAgent (Tone Fidelity Scorer)
+  │      │                                  ├── ClaimSubstantiationAgent (Truth Node Matcher)
+  │      │                                  └── RegulatoryComplianceAgent (Statutory Law Checker)
+  │      ├── POST /api/simulator/propose -> NetworkX Virtual DAG Blast Radius Engine
+  │      ├── POST /api/releases/sign ------> Deterministic SHA-256 Merkle Sealer
+  │      └── POST /api/ledger/verify ------> 5-State Cryptographic Ledger Verifier
+  │
+  └── 3. Async Database Driver (Motor)
+         v
+[ MongoDB Atlas 7.0+ Cloud Cluster ]
+  ├── approved_facts (Truth-set ground nodes)       ├── revision_tasks (Human approval queue)
+  ├── graph_nodes & graph_relationships (BDIG)     ├── release_ledger (Immutable SHA-256 blocks)
+  └── brand_guidelines (Vector search indexed)      └── audit_events (Governance event stream)</div>
+
+  <h2>3. Architectural Truthfulness &amp; Zero-Fabrication Standards</h2>
+  <div class="callout callout-success">
+    <div class="callout-title">Engineering Transparency Principles</div>
+    - <strong>Strictly Disclosed Microservices:</strong> BrandTrace AI operates as a clean decoupled frontend/backend architecture. We do NOT falsely claim microservice fabrics or unverified distributed queues.<br>
+    - <strong>Software-Based Ledger:</strong> The release ledger uses cryptographic SHA-256 hashing in MongoDB Atlas. We do NOT falsely claim blockchain networks or Hardware Security Modules (HSMs).<br>
+    - <strong>Verified Persistence:</strong> All database operations persist in live MongoDB Atlas collections. Zero temporary mock arrays are used for core workflow operations.
+  </div>
+
+  <div class="doc-footer">
+    <span><strong>BRANDTRACE AI</strong> &bull; Round 3 Final Master Submission &bull; Team: <strong>Storm Crackers</strong></span>
+    <span>API: <a href="https://brandtrace-backend.onrender.com">https://brandtrace-backend.onrender.com</a> &bull; Chapter 3: Architecture</span>
+  </div>
+</div>
+
+<!-- ================= CHAPTER 4: CORE MODULES & FEATURES ================= -->
+<div class="page-break">
+  <div class="chapter-banner">
+    <div class="chapter-title">📦 CHAPTER 4: CORE MODULES &amp; IMPLEMENTED FUNCTIONALITIES</div>
+    <div class="chapter-meta">All 13 Modules Audited &bull; <strong>Granular Feature Specifications</strong></div>
+  </div>
+
+  <h2>Comprehensive Audit of All 13 Control Plane Modules</h2>
+  <p>
+    Every user navigation module was inspected against live production code and backend routes. Features are categorized strictly by their actual implementation state:
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 18%;">Module Name</th>
+        <th style="width: 32%;">User Problem Addressed</th>
+        <th style="width: 34%;">Actual Implemented Functionality</th>
+        <th style="width: 16%;">Current Boundary</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>1. Overview Dashboard</strong></td>
+        <td>Lack of centralized visibility into enterprise brand compliance health.</td>
+        <td>Executive telemetry: 94.2% compliance rate, active assets, verified releases count, and live health status modal.</td>
+        <td><span class="badge badge-green">FULLY DELIVERED</span> Real-time aggregation.</td>
+      </tr>
+      <tr>
+        <td><strong>2. Knowledge Graph</strong></td>
+        <td>Cannot see how claims connect to products, campaigns, and regulations.</td>
+        <td>Interactive DAG graph rendered with @xyflow/react. Visualizes nodes (facts, claims, touchpoints) and dependency edges.</td>
+        <td><span class="badge badge-green">FULLY DELIVERED</span> Visual zoom &amp; filter.</td>
+      </tr>
+      <tr>
+        <td><strong>3. Content Intelligence</strong></td>
+        <td>Ad-hoc marketing copy published without statutory policy validation.</td>
+        <td>Multi-agent content verification via <code>POST /api/verify</code>. Returns risk scores, span character offsets, and legal citations.</td>
+        <td><span class="badge badge-green">FULLY DELIVERED</span> Sub-second response.</td>
+      </tr>
+      <tr>
+        <td><strong>4. Content Studio</strong></td>
+        <td>Copywriters lack real-time feedback while drafting ad variations.</td>
+        <td>Interactive copy authoring studio with channel selection (Meta, PPC, Display), instant tone scoring, and live claim checking.</td>
+        <td><span class="badge badge-green">FULLY DELIVERED</span> Direct 1-click test copy.</td>
+      </tr>
+      <tr>
+        <td><strong>5. Digital Twin Simulator</strong></td>
+        <td>Changing a price or claim silently breaks in-market creative collateral.</td>
+        <td>Proactive graph blast radius simulation (<code>/api/simulator/propose</code>). Traces downstream assets and flags policy conflicts.</td>
+        <td><span class="badge badge-green">SIGNATURE FEATURE</span> Non-destructive sandbox.</td>
+      </tr>
+      <tr>
+        <td><strong>6. Multimodal Inspection</strong></td>
+        <td>Image banners, product packaging, and rate card PDFs lack text inspection.</td>
+        <td>Uploads image files (.png, .jpeg), extracts text via OCR engine, and verifies extracted copy against brand guidelines.</td>
+        <td><span class="badge badge-amber">PARTIAL</span> OCR active; cloud vision in progress.</td>
+      </tr>
+      <tr>
+        <td><strong>7. Campaign Intelligence</strong></td>
+        <td>Campaign assets scattered across silos without unified compliance tracking.</td>
+        <td>Multi-channel campaign grouping (e.g. Aurelle Q1 Launch) showing aggregate compliance scores and linked collateral assets.</td>
+        <td><span class="badge badge-green">FULLY DELIVERED</span> 2 active campaigns.</td>
+      </tr>
+      <tr>
+        <td><strong>8. Risk Intelligence</strong></td>
+        <td>Teams unaware of high-exposure statutory legal liability frameworks.</td>
+        <td>Taxonomy aggregator for FTC Green Guides, FDA Wellness Devices, and Lanham Act §43(a) violation classifications.</td>
+        <td><span class="badge badge-green">FULLY DELIVERED</span> Statutory legal map.</td>
+      </tr>
+      <tr>
+        <td><strong>9. Approval Center</strong></td>
+        <td>Unstructured email approvals lack audit trails and evidentiary diffs.</td>
+        <td>Human-in-the-loop task queue in MongoDB (<code>revision_tasks</code>). Reviewers inspect diffs, add notes, and approve/reject.</td>
+        <td><span class="badge badge-green">FULLY DELIVERED</span> Server-side RBAC gated.</td>
+      </tr>
+      <tr>
+        <td><strong>10. Knowledge Base</strong></td>
+        <td>Approved facts and warranty terms locked in PDFs and forgotten spreadsheets.</td>
+        <td>Ground truth repository for approved facts and guidelines with citations, source dates, expiry dates, and vector search.</td>
+        <td><span class="badge badge-green">FULLY DELIVERED</span> Search &amp; category filters.</td>
+      </tr>
+      <tr>
+        <td><strong>11. Analytics</strong></td>
+        <td>Executives cannot measure governance efficiency or review cycle latency.</td>
+        <td>Historical telemetry charts, compliance pass/fail trends, and agent latency distribution metrics.</td>
+        <td><span class="badge badge-green">FULLY DELIVERED</span> Synthetic demo history.</td>
+      </tr>
+      <tr>
+        <td><strong>12. Trust &amp; Audit Ledger</strong></td>
+        <td>No mathematical proof that published content was not altered post-sign-off.</td>
+        <td>Deterministic SHA-256 release sealing engine with a 5-state cryptographic verifier (<code>/api/ledger/verify-record</code>).</td>
+        <td><span class="badge badge-green">SIGNATURE FEATURE</span> Mathematical proof.</td>
+      </tr>
+      <tr>
+        <td><strong>13. Settings &amp; Admin</strong></td>
+        <td>Admins cannot configure tenants or safely reset demonstration sandboxes.</td>
+        <td>Role management, API keys health status, and tenant factory reset (<code>POST /api/demo/reset</code>) for evaluators.</td>
+        <td><span class="badge badge-green">FULLY DELIVERED</span> Isolated tenant reset.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Module Verification Disclosure</h2>
+  <div class="callout callout-amber">
+    <div class="callout-title">Implementation Status Clarification</div>
+    All 13 modules are accessible via the primary navigation sidebar. Modules 1 through 5, and 7 through 13 are <strong>100% operational on live persisted MongoDB data</strong>. Module 6 (Multimodal Inspection) performs live image OCR extraction and text evaluation; deep visual layout segmentation remains an active roadmap enhancement.
+  </div>
+
+  <div class="doc-footer">
+    <span><strong>BRANDTRACE AI</strong> &bull; Round 3 Final Master Submission &bull; Team: <strong>Storm Crackers</strong></span>
+    <span>Live App: <a href="https://brand-trace-ai-dun.vercel.app/">https://brand-trace-ai-dun.vercel.app/</a> &bull; Chapter 4: Modules</span>
+  </div>
+</div>
+
+<!-- ================= CHAPTER 5: SIGNATURE INNOVATION: DIGITAL TWIN ================= -->
+<div class="page-break">
+  <div class="chapter-banner">
+    <div class="chapter-title">⚡ CHAPTER 5: SIGNATURE INNOVATION — BRAND GOVERNANCE DIGITAL TWIN</div>
+    <div class="chapter-meta">Proactive DAG Ripple Simulation &bull; <strong>Non-Destructive Sandbox</strong></div>
+  </div>
+
+  <h2>1. Why the Digital Twin Differentiates BrandTrace AI</h2>
+  <p>
+    Traditional brand governance is completely <em>reactive</em>: marketing teams publish copy, and months later legal teams discover conflicts. When a product specification or price changes, there is no mechanism to answer: <strong>"If we change this brand fact today, what active collateral in the market becomes deceptive or illegal?"</strong>
+  </p>
+  <div class="callout callout-success">
+    <div class="callout-title">The Brand Governance Digital Twin Concept</div>
+    BrandTrace AI models all brand facts, claims, guidelines, and published marketing touchpoints as an interconnected <strong>Brand Dependency Intelligence Graph (BDIG)</strong>. The Digital Twin creates an isolated in-memory simulation sandbox that ripples proposed mutations through the dependency graph before any change is permanently committed to production.
+  </div>
+
+  <h2>2. The 7-Step Change Impact Simulation Workflow</h2>
+  <div class="grid-4">
+    <div class="card">
+      <div class="card-title">1. Select Target Fact</div>
+      <p class="card-desc">Brand manager selects an active truth node (e.g. <code>FACT-AUR-PRC-01</code> Subscription Price).</p>
+    </div>
+    <div class="card">
+      <div class="card-title">2. Propose Mutation</div>
+      <p class="card-desc">Input proposed value (₹499 &rarr; ₹599) and business rationale (Commercial Tier Revision).</p>
+    </div>
+    <div class="card">
+      <div class="card-title">3. Graph Traversal</div>
+      <p class="card-desc">NetworkX DAG engine executes breadth-first traversal across all connected touchpoint nodes.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">4. Blast Radius Score</div>
+      <p class="card-desc">Calculates downstream exposure risk (87.5% Critical) and unbudgeted commercial risk.</p>
+    </div>
+  </div>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title">5. Policy Conflict Engine</div>
+      <p class="card-desc">Detects <code>DIRECT_CONTRADICTION</code> with live ad creative, rate cards, and e-commerce checkout prices.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">6. Auto-Task Generation</div>
+      <p class="card-desc">Generates revision tasks with diffs, dispatched to Approval Center for review across Marketing and Legal.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">7. RBAC Commit Gate</div>
+      <p class="card-desc">Only an authorized <code>BRAND_MANAGER</code> or <code>ADMIN</code> can commit the simulated mutation to live MongoDB facts.</p>
+    </div>
+  </div>
+
+  <h2>3. Live Benchmark Demonstration: The Aurelle ₹499 &rarr; ₹599 Mutation</h2>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Simulation Execution Telemetry (Sim ID: SIM-B04F559C)</div>
+      <table style="font-size: 7.2pt; margin: 1px 0;">
+        <tr><td><strong>Target Record:</strong></td><td>FACT-AUR-PRC-01 (Aurelle Cloud Studio Subscription)</td></tr>
+        <tr><td><strong>Baseline Value:</strong></td><td>₹499 per creator / month</td></tr>
+        <tr><td><strong>Proposed Value:</strong></td><td>₹599 per creator / month</td></tr>
+        <tr><td><strong>API Response Latency:</strong></td><td><strong>686ms</strong> via <code>POST /api/simulator/propose</code></td></tr>
+        <tr><td><strong>Affected Touchpoints:</strong></td><td><strong>4 omnichannel assets identified</strong></td></tr>
+        <tr><td><strong>Policy Conflict:</strong></td><td><code>DIRECT_CONTRADICTION</code> (Published creative conflict)</td></tr>
+        <tr><td><strong>Projected Workload:</strong></td><td>14.5 hours cross-functional revision effort</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">The 4 Affected Downstream Touchpoints Identified</div>
+      <ul style="font-size: 7.2pt; padding-left: 11px; margin: 1px 0;">
+        <li><strong>Touchpoint 1:</strong> <em>Meta Feed Ad: Cloud Studio at ₹499/mo</em> (Paid Social Ad)</li>
+        <li><strong>Touchpoint 2:</strong> <em>B2B Enterprise Rate Card &amp; Licensing PDF</em> (Sales Deck)</li>
+        <li><strong>Touchpoint 3:</strong> <em>Google PPC Ad: Cloud Studio from ₹499</em> (Search Ad)</li>
+        <li><strong>Touchpoint 4:</strong> <em>Aurelle Cloud Studio Pricing &amp; Checkout Page</em> (Web Checkout)</li>
+      </ul>
+      <div class="callout callout-amber" style="margin-top: 3px; font-size: 6.8pt;">
+        <strong>Non-Destructive Guarantee:</strong> Live database checks confirmed that running simulations leaves the active database value strictly at <strong>₹499</strong> until an authorized commit is executed.
+      </div>
+    </div>
+  </div>
+
+  <h2>4. Mathematical Simulation Boundary Disclosure</h2>
+  <div class="callout">
+    <div class="callout-title">Simulation vs Real-World Prediction Distinction</div>
+    The Digital Twin provides a deterministic graph dependency analysis based on registered assets in the enterprise BDIG. The downstream risk score (e.g. 87.5%) and review workload (14.5 hours) represent <strong>algorithmic estimations derived from graph centrality and asset weights</strong>. They do not constitute guaranteed commercial forecasts or empirical real-world financial loss predictions.
+  </div>
+
+  <div class="doc-footer">
+    <span><strong>BRANDTRACE AI</strong> &bull; Round 3 Final Master Submission &bull; Team: <strong>Storm Crackers</strong></span>
+    <span>Live App: <a href="https://brand-trace-ai-dun.vercel.app/">https://brand-trace-ai-dun.vercel.app/</a> &bull; Chapter 5: Digital Twin</span>
+  </div>
+</div>
+
+<!-- ================= CHAPTER 6: AI AGENTS, RISK INTEL & HUMAN APPROVAL ================= -->
+<div class="page-break">
+  <div class="chapter-banner">
+    <div class="chapter-title">🤖 CHAPTER 6: AI AGENTS, RISK INTELLIGENCE &amp; HUMAN APPROVAL</div>
+    <div class="chapter-meta">4 Specialized Agents &bull; <strong>Strict Human-in-the-Loop Governance</strong></div>
+  </div>
+
+  <h2>1. The Four Active Platform Agents &amp; Their Exact Scopes</h2>
+  <p>
+    BrandTrace AI deploys exactly <strong>four specialized platform agents</strong> across content inspection and knowledge graph intelligence. To maintain architectural precision: three agents participate in content inspection (<code>/api/verify</code>), while the fourth agent powers dependency graph impact simulation:
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 22%;">Agent Identifier</th>
+        <th style="width: 20%;">Operational Pipeline</th>
+        <th style="width: 43%;">Responsibilities &amp; Detection Mechanism</th>
+        <th style="width: 15%;">Live Latency</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>1. VoicePersonaAgent</strong></td>
+        <td>Content Inspection (<code>/api/verify</code>)</td>
+        <td>Evaluates vocabulary sophistication, stylistic deviations, unauthorized slang, and channel tone match. Assigns tone consistency score (0–100).</td>
+        <td>Concurrent (&lt;800ms)</td>
+      </tr>
+      <tr>
+        <td><strong>2. ClaimSubstantiationAgent</strong></td>
+        <td>Content Inspection (<code>/api/verify</code>)</td>
+        <td>Extracts numerical, pricing, and performance claims from copy. Cross-references against approved facts in MongoDB Atlas.</td>
+        <td>Concurrent (&lt;800ms)</td>
+      </tr>
+      <tr>
+        <td><strong>3. RegulatoryComplianceAgent</strong></td>
+        <td>Content Inspection (<code>/api/verify</code>)</td>
+        <td>Scans for statutory legal liability: <strong>FDA 21 CFR §870</strong> (medical wellness claims), <strong>FTC 16 CFR §260.4</strong> (green claims), <strong>Lanham Act §43(a)</strong>.</td>
+        <td>Concurrent (&lt;800ms)</td>
+      </tr>
+      <tr>
+        <td><strong>4. Cascading Blast Radius Agent</strong></td>
+        <td>Graph Simulation (<code>/api/simulator</code>)</td>
+        <td>Traverses the NetworkX directed acyclic graph to identify downstream marketing touchpoints and active campaigns at risk during fact changes.</td>
+        <td>686ms live</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>2. Statutory Regulatory Frameworks &amp; Evidence-Linked Findings</h2>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title">FDA 21 CFR §870 (Medical Devices)</div>
+      <p class="card-desc">Consumer wellness devices (e.g. smart rings) claiming to "diagnose, treat, or cure" cardiovascular disease trigger immediate Class II/III statutory gating (<code>REJECTED_GATED</code>).</p>
+    </div>
+    <div class="card">
+      <div class="card-title">FTC 16 CFR §260.4 (Green Guides)</div>
+      <p class="card-desc">Unsubstantiated environmental claims (e.g. "100% eco-friendly zero carbon") lacking third-party life-cycle evidence trigger deceptive marketing violations.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Lanham Act §43(a) (Deception)</div>
+      <p class="card-desc">False commercial descriptions or pricing discrepancies (e.g. advertising ₹499 when checkout charges ₹599) trigger civil liability for commercial deception.</p>
+    </div>
+  </div>
+
+  <h2>3. Reverse-Offset Unicode-Preserving Remediation Engine</h2>
+  <p>
+    When violations are detected, BrandTrace AI provides 1-click suggested fixes. Traditional token replacement causes character-offset drift when copy contains multi-byte Unicode (₹, —, ™, emojis). BrandTrace AI replaces tokens in <strong>reverse-offset order (from end of string to beginning)</strong>, guaranteeing zero alignment corruption:
+  </p>
+  <div class="code-block">// Live Production Verification Result:
+Original Copy: "Aurelle Pulse Smart Ring is a medical-grade diagnostic cure... ✨ 100% Guaranteed! 🎵"
+Matched Span: Chars 30–59 ("medical-grade diagnostic cure") &bull; Severity: CRITICAL
+Statutory Evidence: FDA 21 CFR §870 Wellness Device Classification / Brand Guideline GL-AUR-03
+Remediated Copy: "Aurelle Pulse Smart Ring is a consumer biometric wellness monitor... ✨ 100% Guaranteed! 🎵"
+Unicode Verification: Emojis ✨ and 🎵 100% Preserved with Zero Character Offset Drift</div>
+
+  <h2>4. Mandatory Human-in-the-Loop Governance: Advisory AI vs Human Authority</h2>
+  <div class="callout callout-amber">
+    <div class="callout-title">The Non-Negotiable Human Gate</div>
+    In BrandTrace AI, <strong>AI-generated risk scores and remediation suggestions are strictly advisory</strong>. The platform is architecturally forbidden from automatically approving releases or mutating production facts without explicit human authorization. Only an authenticated reviewer with appropriate RBAC credentials (e.g. <code>BRAND_MANAGER</code> or <code>COMPLIANCE_REVIEWER</code>) holds the authority to sign a release or commit a simulation.
+  </div>
+
+  <div class="doc-footer">
+    <span><strong>BRANDTRACE AI</strong> &bull; Round 3 Final Master Submission &bull; Team: <strong>Storm Crackers</strong></span>
+    <span>GitHub: <a href="https://github.com/Jaswant-Karun/BrandTrace-AI">Jaswant-Karun/BrandTrace-AI</a> &bull; Chapter 6: AI Agents</span>
+  </div>
+</div>
+
+<!-- ================= CHAPTER 7: CRYPTOGRAPHIC LEDGER & TRUST ================= -->
+<div class="page-break">
+  <div class="chapter-banner">
+    <div class="chapter-title">🔐 CHAPTER 7: CRYPTOGRAPHIC RELEASE LEDGER &amp; TRUST ASSURANCE</div>
+    <div class="chapter-meta">Deterministic SHA-256 Merkle Sealing &bull; <strong>5 Statutory States</strong></div>
+  </div>
+
+  <h2>1. The Need for a Cryptographic Assurance Plane</h2>
+  <p>
+    In enterprise governance, the moment of human approval must be tamper-evident. If a rogue actor or disgruntled agency modifies marketing copy after formal brand compliance sign-off, traditional systems have no mathematical way to prove whether the published asset matches what was approved.
+  </p>
+  <div class="callout callout-success">
+    <div class="callout-title">Deterministic Software-Based Release Sealing</div>
+    BrandTrace AI implements a software-based SHA-256 Merkle release-sealing mechanism. Upon authorized human sign-off, the engine computes a deterministic 64-character hash:
+    <br><code>Seal_Digest = SHA-256(Raw_Content || Asset_ID || Reviewer_Email || Brand_ID || Timestamp)</code>
+    <br>This seal (stamped <code>BT-SEAL-...</code>) is immutably recorded in the MongoDB Atlas <code>release_ledger</code> collection.
+  </div>
+
+  <h2>2. The Five Statutory Verification States</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">Statutory State</th>
+        <th style="width: 45%;">Cryptographic Evaluation Condition</th>
+        <th style="width: 15%;">Authenticity</th>
+        <th style="width: 15%;">Verification Method</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>1. VALID_UNCHANGED</strong></td>
+        <td>Presented content SHA-256 exactly matches the immutable hash recorded in the MongoDB release block. Content is untouched.</td>
+        <td><span class="badge badge-green">AUTHENTIC</span></td>
+        <td>Live API (770ms)</td>
+      </tr>
+      <tr>
+        <td><strong>2. MODIFIED_AFTER_APPROVAL</strong></td>
+        <td>Presented content hash diverges from the sealed release block. Mathematically proves post-approval unauthorized tampering.</td>
+        <td><span class="badge badge-red">TAMPERED</span></td>
+        <td>Live API (772ms)</td>
+      </tr>
+      <tr>
+        <td><strong>3. SUPERSEDED</strong></td>
+        <td>Historical release formally replaced by a newer approved successor version (e.g. v1.0 &rarr; v2.0). Protects legacy audit history.</td>
+        <td><span class="badge badge-amber">SUPERSEDED</span></td>
+        <td>Automated Test Suite</td>
+      </tr>
+      <tr>
+        <td><strong>4. REVOKED</strong></td>
+        <td>Compliance cancellation due to regulatory recall, false advertising injunction, or statutory medical breach.</td>
+        <td><span class="badge badge-red">REVOKED</span></td>
+        <td>Automated Test Suite</td>
+      </tr>
+      <tr>
+        <td><strong>5. UNKNOWN_RECORD</strong></td>
+        <td>Seal identifier or content does not exist in the audit ledger. Immediately flags fabricated or forged approval stamps.</td>
+        <td><span class="badge badge-red">FABRICATED</span></td>
+        <td>Live API (979ms)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>3. Live Production Verification API Responses</h2>
+  <div class="grid-2">
+    <div class="code-block">// 1. Authentic Content Verification (State 1)
+POST /api/ledger/verify-record
+{
+  "identifier": "LEDGER-REC-F1D147-44220",
+  "content_to_test": "Unlock next-generation spatial computing..."
+}
+// Live Response (HTTP 200 in 770ms):
+{
+  "state": "VALID_UNCHANGED",
+  "is_authentic": true,
+  "ledger_hash": "d65798e363339aaec99f4a80f22a9a63...",
+  "explanation": "Valid & Unchanged: Cryptographic seal verified."
+}</div>
+    <div class="code-block">// 2. Tampered Copy Verification (State 2)
+POST /api/ledger/verify-record
+{
+  "identifier": "LEDGER-REC-F1D147-44220",
+  "content_to_test": "Unlock next-generation [TAMPERED]..."
+}
+// Live Response (HTTP 200 in 772ms):
+{
+  "state": "MODIFIED_AFTER_APPROVAL",
+  "is_authentic": false,
+  "computed_hash": "b890f1...",
+  "explanation": "Modified After Approval: Hash mismatch detected!"
+}</div>
+  </div>
+
+  <h2>4. Architectural Disclosure &amp; Security Limitations</h2>
+  <div class="callout callout-amber">
+    <div class="callout-title">Software-Based Assurance Boundary</div>
+    - <strong>Not a Blockchain / Not an HSM:</strong> The Trust &amp; Audit Ledger is implemented using deterministic SHA-256 hashing within MongoDB Atlas. It does not utilize distributed consensus (blockchain) or Hardware Security Modules.<br>
+    - <strong>Database Boundary:</strong> Ledger tamper-resistance relies on MongoDB server-side RBAC, authenticated API gates, and append-only database collections. While highly secure against client-side tampering, it does not defend against a compromised database super-administrator.<br>
+    - <strong>Verification Coverage:</strong> States 1, 2, and 5 are exercised in the live production demonstration. States 3 and 4 are validated via automated regression tests to prevent mutating live demo seals.
+  </div>
+
+  <div class="doc-footer">
+    <span><strong>BRANDTRACE AI</strong> &bull; Round 3 Final Master Submission &bull; Team: <strong>Storm Crackers</strong></span>
+    <span>Live App: <a href="https://brand-trace-ai-dun.vercel.app/">https://brand-trace-ai-dun.vercel.app/</a> &bull; Chapter 7: Trust Ledger</span>
+  </div>
+</div>
+
+<!-- ================= CHAPTER 8: ROUND 2 VS ROUND 3 COMPARISON ================= -->
+<div class="page-break">
+  <div class="chapter-banner">
+    <div class="chapter-title">📈 CHAPTER 8: ROUND 2 VS ROUND 3 COMPREHENSIVE COMPARISON</div>
+    <div class="chapter-meta">What We Built in Round 2 vs Round 3 &bull; <strong>15 Dimensions</strong></div>
+  </div>
+
+  <h2>Detailed Comparison: Evolution from Round 2 to Round 3</h2>
+  <p>
+    This section documents what was originally developed in Round 2 and the substantial architectural and functional enhancements implemented in Round 3 across 15 technical dimensions:
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 20%;">Dimension</th>
+        <th style="width: 32%;">What We Built in Round 2</th>
+        <th style="width: 36%;">What We Developed &amp; Hardened in Round 3</th>
+        <th style="width: 12%;">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>1. Completeness &amp; UX</strong></td>
+        <td>Prototype UI with unhandled empty states and incomplete styling.</td>
+        <td>Enterprise white/slate design system across all 13 modules with full empty states.</td>
+        <td><span class="badge badge-green">IMPROVED</span></td>
+      </tr>
+      <tr>
+        <td><strong>2. Architecture Decoupling</strong></td>
+        <td>Monolithic tight coupling with partial local in-memory states.</td>
+        <td>Fully decoupled React 19 SPA on Vercel + FastAPI on Render Cloud PaaS.</td>
+        <td><span class="badge badge-green">IMPLEMENTED</span></td>
+      </tr>
+      <tr>
+        <td><strong>3. Brand Knowledge Base</strong></td>
+        <td>Basic fact listing; limited schema validation or source citations.</td>
+        <td>Persistent facts in MongoDB Atlas with citations, dates, and vector search.</td>
+        <td><span class="badge badge-green">IMPROVED</span></td>
+      </tr>
+      <tr>
+        <td><strong>4. AI Content Inspection</strong></td>
+        <td>Basic rule matching; generic failure messages without offsets.</td>
+        <td>Concurrent 3-agent inspection with token character offsets &amp; legal citations.</td>
+        <td><span class="badge badge-green">IMPROVED</span></td>
+      </tr>
+      <tr>
+        <td><strong>5. Digital Twin Simulator</strong></td>
+        <td>Conceptual graph demo; volatile in-memory DAG without commit gates.</td>
+        <td>Proactive DAG ripple engine with RBAC commit gate &amp; revision task sync.</td>
+        <td><span class="badge badge-green">DELIVERED</span></td>
+      </tr>
+      <tr>
+        <td><strong>6. Multimodal Inspection</strong></td>
+        <td>Not documented in Round 2 specification.</td>
+        <td>Active image upload and OCR text extraction; visual layout ongoing.</td>
+        <td><span class="badge badge-amber">PARTIAL</span></td>
+      </tr>
+      <tr>
+        <td><strong>7. Campaign &amp; Risk Intel</strong></td>
+        <td>Ad-hoc asset lists without statutory regulatory taxonomy.</td>
+        <td>Formal taxonomy: FDA 21 CFR §870, FTC §260.4, Lanham Act §43(a).</td>
+        <td><span class="badge badge-green">IMPLEMENTED</span></td>
+      </tr>
+      <tr>
+        <td><strong>8. Human Approval Center</strong></td>
+        <td>Mock approval buttons without persistent workflow tasks.</td>
+        <td>MongoDB-backed <code>revision_tasks</code> queue with reviewer diffs &amp; notes.</td>
+        <td><span class="badge badge-green">IMPLEMENTED</span></td>
+      </tr>
+      <tr>
+        <td><strong>9. Trust &amp; Audit Ledger</strong></td>
+        <td>Ad-hoc Python <code>hash()</code> generation lacking cryptographic rigor.</td>
+        <td>Deterministic SHA-256 Merkle block sealing with 5 statutory lifecycle states.</td>
+        <td><span class="badge badge-green">DELIVERED</span></td>
+      </tr>
+      <tr>
+        <td><strong>10. API Implementation</strong></td>
+        <td>Inconsistent error schemas and missing CORS/security headers.</td>
+        <td>Standardized REST routing, ErrorSanitizationMiddleware, rate limiting.</td>
+        <td><span class="badge badge-green">IMPROVED</span></td>
+      </tr>
+      <tr>
+        <td><strong>11. Database Integration</strong></td>
+        <td>Partial local database with volatile schema drift.</td>
+        <td>MongoDB Atlas 7.0+ Replica Set with 35 collections and compound indexes.</td>
+        <td><span class="badge badge-green">IMPLEMENTED</span></td>
+      </tr>
+      <tr>
+        <td><strong>12. Deployment Readiness</strong></td>
+        <td>Localhost development setup; unverified public endpoints.</td>
+        <td>Global Vercel Edge CDN + Render Cloud PaaS + Atlas cloud persistence.</td>
+        <td><span class="badge badge-green">IMPROVED</span></td>
+      </tr>
+      <tr>
+        <td><strong>13. Automated Testing</strong></td>
+        <td>Limited unit test coverage (~40 tests) with missing edge cases.</td>
+        <td>Exactly <strong>136 / 136 tests passing</strong> in 6.39s (100% pass across 21 files).</td>
+        <td><span class="badge badge-green">IMPROVED</span></td>
+      </tr>
+      <tr>
+        <td><strong>14. Technical Documentation</strong></td>
+        <td>Basic README with fragmented developer notes.</td>
+        <td>Complete 9-guide documentation suite in <code>docs/</code> + 20-section report.</td>
+        <td><span class="badge badge-green">IMPROVED</span></td>
+      </tr>
+      <tr>
+        <td><strong>15. Mobile &amp; PWA Readiness</strong></td>
+        <td>Desktop-only layout; broken sidebar on mobile screens.</td>
+        <td>Mobile slide-over drawer, responsive tables, W3C manifest, service worker.</td>
+        <td><span class="badge badge-amber">IN PROGRESS</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Summary of Genuine Round 3 Advancement</h2>
+  <div class="callout callout-success">
+    <div class="callout-title">The Engineering Shift</div>
+    Round 3 transformed BrandTrace AI from an early-stage hackathon prototype into a <strong>production-hardened enterprise SaaS platform</strong>. Every core workflow (knowledge, inspection, simulation, approval, ledger) is now backed by persistent cloud data, automated regression testing, and robust security middleware.
+  </div>
+
+  <div class="doc-footer">
+    <span><strong>BRANDTRACE AI</strong> &bull; Round 3 Final Master Submission &bull; Team: <strong>Storm Crackers</strong></span>
+    <span>Live App: <a href="https://brand-trace-ai-dun.vercel.app/">https://brand-trace-ai-dun.vercel.app/</a> &bull; Chapter 8: Round 2 vs 3</span>
+  </div>
+</div>
+
+<!-- ================= CHAPTER 9: TESTING, RESULTS & LIMITATIONS ================= -->
+<div class="page-break">
+  <div class="chapter-banner">
+    <div class="chapter-title">📊 CHAPTER 9: TESTING, VERIFICATION, RESULTS &amp; LIMITATIONS</div>
+    <div class="chapter-meta">136 Tests Passed &bull; <strong>Empirical Verification Evidence</strong></div>
+  </div>
+
+  <h2>1. Verified Automated Testing &amp; Build Results</h2>
+  <div class="grid-4" style="margin-bottom: 3px;">
+    <div class="card">
+      <div class="card-stat" style="color: #16a34a;">136 / 136</div>
+      <div class="card-desc">Pytest Unit &amp; Integration Tests Passed (6.39s across 21 files)</div>
+    </div>
+    <div class="card">
+      <div class="card-stat" style="color: #2563eb;">0 Errors</div>
+      <div class="card-desc">TypeScript Static Compilation (<code>tsc && vite build</code> in 9.98s)</div>
+    </div>
+    <div class="card">
+      <div class="card-stat" style="color: #0891b2;">HTTP 200</div>
+      <div class="card-desc">Production Health Check (Vercel Edge &amp; Render Cloud API)</div>
+    </div>
+    <div class="card">
+      <div class="card-stat" style="color: #7c3aed;">35 Colls</div>
+      <div class="card-desc">MongoDB Atlas Collections Connected via Motor Async Driver</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 32%;">Test Suite File</th>
+        <th style="width: 12%;">Count</th>
+        <th style="width: 44%;">Verified Core Capabilities</th>
+        <th style="width: 12%;">Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>test_commitment1_digital_twin.py</code></td>
+        <td>6 tests</td>
+        <td>Virtual DAG simulation, 4 touchpoints, DB fact unchanged, RBAC commit gate</td>
+        <td><span class="badge badge-green">PASSED</span></td>
+      </tr>
+      <tr>
+        <td><code>test_commitment2_multi_agent_pipeline.py</code></td>
+        <td>6 tests</td>
+        <td>Concurrent 3 agents, statutory citations (FDA/FTC), Unicode reverse-offset fix</td>
+        <td><span class="badge badge-green">PASSED</span></td>
+      </tr>
+      <tr>
+        <td><code>test_commitment3_cryptographic_ledger.py</code></td>
+        <td>9 tests</td>
+        <td>Deterministic SHA-256 seals, all 5 statutory verification states</td>
+        <td><span class="badge badge-green">PASSED</span></td>
+      </tr>
+      <tr>
+        <td><code>test_round3_final_e2e_journeys.py</code></td>
+        <td>7 tests</td>
+        <td>Complete Journeys A through G: Demo, facts, copy, sim, approval, ledger, resilience</td>
+        <td><span class="badge badge-green">PASSED</span></td>
+      </tr>
+      <tr>
+        <td><code>test_round3_reliability_security.py</code></td>
+        <td>20 tests</td>
+        <td>PBKDF2 hashing, rate limiting, error sanitization, RBAC, input boundaries</td>
+        <td><span class="badge badge-green">PASSED</span></td>
+      </tr>
+      <tr>
+        <td><code>test_round3_pwa_readiness.py</code></td>
+        <td>5 tests</td>
+        <td>Manifest metadata, service worker cache policy, offline fallback screen</td>
+        <td><span class="badge badge-green">PASSED</span></td>
+      </tr>
+      <tr>
+        <td>15 Additional Core Test Suites</td>
+        <td>83 tests</td>
+        <td>Knowledge graph, auth tokens, database persistence, regression suites</td>
+        <td><span class="badge badge-green">PASSED</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>2. Empirical Benchmark Evaluation &amp; Mandatory Disclosures</h2>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Internal Evaluation Benchmark Sample (23 Cases)</div>
+      <table style="font-size: 7.2pt; margin: 1px 0;">
+        <tr><td><strong>Evaluated Samples:</strong></td><td>23 realistic enterprise marketing &amp; specification cases</td></tr>
+        <tr><td><strong>Empirical Precision:</strong></td><td><strong>100.0%</strong> (17 / 17 correctly flagged violations)</td></tr>
+        <tr><td><strong>Empirical Recall:</strong></td><td><strong>94.4%</strong> (17 / 18 violations detected)</td></tr>
+        <tr><td><strong>Composite F1-Score:</strong></td><td><strong>0.971</strong></td></tr>
+        <tr><td><strong>Clean Copy Latency:</strong></td><td><strong>619ms</strong> (Risk: 0.0 &bull; APPROVED_FOR_RELEASE)</td></tr>
+        <tr><td><strong>Violation Copy Latency:</strong></td><td><strong>887ms</strong> (Risk: 35.0 &bull; REJECTED_GATED &bull; FDA citation)</td></tr>
+      </table>
+    </div>
+    <div class="callout callout-amber" style="margin: 0;">
+      <div class="callout-title">Mandatory Truthfulness &amp; Testing Disclosures</div>
+      1. <strong>Internal Team Evaluation:</strong> The 23-sample test suite represents an internal team validation benchmark; it is NOT an externally certified industry benchmark.<br>
+      2. <strong>No 100% Real-World Claim:</strong> Real-world marketing copy exhibits infinite linguistic variations; no software guarantees 100% real-world accuracy.<br>
+      3. <strong>Render Free-Tier Cold Starts:</strong> Backend containers sleep after 15 min of inactivity; initial cold-start wake-up takes <strong>30–45 seconds</strong>. Subsequent calls respond in 300–800ms.
+    </div>
+  </div>
+
+  <h2>3. Known Limitations &amp; Development Scope Separation</h2>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title" style="color: #15803d;">Fully Implemented</div>
+      <ul style="font-size: 7pt; padding-left: 10px; margin: 1px 0;">
+        <li>All 3 Round 2 Commitments</li>
+        <li>136/136 automated test suite</li>
+        <li>MongoDB Atlas 35 collections</li>
+        <li>PBKDF2-SHA256 auth &amp; rate limit</li>
+        <li>5-State cryptographic ledger</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color: #b45309;">Partially Implemented</div>
+      <ul style="font-size: 7pt; padding-left: 10px; margin: 1px 0;">
+        <li>Multimodal image OCR active; full visual layout ongoing</li>
+        <li>Mobile browser responsive layout (drawer works; refinement active)</li>
+        <li>Vector search configured (768-dim)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color: #475569;">Future Planned Scope</div>
+      <ul style="font-size: 7pt; padding-left: 10px; margin: 1px 0;">
+        <li>Chrome extension for Google Docs/Figma</li>
+        <li>CI/CD content gates for GitHub Actions</li>
+        <li>Enterprise CMS sync (AEM, Bynder)</li>
+        <li>Physical per-tenant database clusters</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <span><strong>BRANDTRACE AI</strong> &bull; Round 3 Final Master Submission &bull; Team: <strong>Storm Crackers</strong></span>
+    <span>Live App: <a href="https://brand-trace-ai-dun.vercel.app/">https://brand-trace-ai-dun.vercel.app/</a> &bull; Chapter 9: Testing &amp; Results</span>
+  </div>
+</div>
+
+<!-- ================= CHAPTER 10: MOBILE, WORKFLOW & THANK YOU ================= -->
+<div class="page-break">
+  <div class="chapter-banner">
+    <div class="chapter-title">📱 CHAPTER 10: MOBILE EXPERIENCE, EVALUATOR WORKFLOW &amp; THANK YOU</div>
+    <div class="chapter-meta">Evaluator Guide &bull; <strong>Acknowledgments &amp; Gratitude</strong></div>
+  </div>
+
+  <h2>1. Mobile Browser Accessibility &amp; Responsive Status</h2>
+  <div class="callout callout-amber">
+    <div class="callout-title">Accurate Mobile Experience Disclosure</div>
+    <strong>"Mobile browser access is available. Further responsive layout refinement and device-level validation are in progress."</strong>
+  </div>
+  <div class="grid-3" style="margin-top: 3px;">
+    <div class="card">
+      <div class="card-title">Mobile Navigation Drawer</div>
+      <p class="card-desc">Slide-over navigation drawer with hamburger toggle button, allowing full module access on screens under 768px width.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Responsive Cards &amp; Forms</div>
+      <p class="card-desc">Multi-column grids reflow into single-column vertical stacks on mobile; dialogs feature full-width mobile padding.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Ongoing Mobile Refinement</div>
+      <p class="card-desc">Complex visual graphs (@xyflow/react) and wide tabular ledgers are best experienced on desktop displays (&gt;1024px).</p>
+    </div>
+  </div>
+
+  <h2>2. Short End-to-End Evaluator Demonstration Journey</h2>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title">Steps 1–3: Access &amp; Knowledge</div>
+      <ol style="font-size: 7pt; padding-left: 10px; margin: 1px 0;">
+        <li>Open <a href="https://brand-trace-ai-dun.vercel.app/login">https://brand-trace-ai-dun.vercel.app/login</a>.</li>
+        <li>Click <em>"Explore BrandTrace AI Demo"</em> to log in.</li>
+        <li>Browse <strong>Knowledge Base</strong> facts (₹499 subscription).</li>
+      </ol>
+    </div>
+    <div class="card">
+      <div class="card-title">Steps 4–6: Inspect &amp; Simulate</div>
+      <ol style="font-size: 7pt; padding-left: 10px; margin: 1px 0;" start="4">
+        <li>Open <strong>Content Studio</strong> &amp; load medical violation.</li>
+        <li>Hit <em>Inspect Content</em> &rarr; Verify FDA 21 CFR §870 citation.</li>
+        <li>Open <strong>Impact Simulator</strong> &rarr; Propose ₹599 price change.</li>
+      </ol>
+    </div>
+    <div class="card">
+      <div class="card-title">Steps 7–9: Approve &amp; Verify</div>
+      <ol style="font-size: 7pt; padding-left: 10px; margin: 1px 0;" start="7">
+        <li>Review blast radius: 4 touchpoints &amp; $320k risk.</li>
+        <li>In <strong>Approval Center</strong>, resolve pending task.</li>
+        <li>In <strong>Trust Ledger</strong>, verify SHA-256 seal authenticity.</li>
+      </ol>
+    </div>
+  </div>
+
+  <h2>3. Enterprise Impact &amp; Concluding Vision</h2>
+  <div class="callout callout-success">
+    <div class="callout-title">The Future of Brand Governance: Detect. Predict. Verify. Prevent.</div>
+    BrandTrace AI transitions brand governance from an archaic, manual, punitive legal review process into an <strong>autonomous, real-time control plane</strong>. By uniting factual knowledge graphs, proactive change simulations, and cryptographic release verification, enterprise brands can operate at full digital speed without sacrificing compliance, truth, or legal safety.
+  </div>
+
+  <h2>4. Formal Round 3 Certification &amp; Team Details</h2>
+  <div class="card" style="background: #f8fafc; border: 1.5px solid #0f172a; padding: 6px 9px;">
+    <div class="grid-2">
+      <div>
+        <p style="font-size: 7.5pt; margin-bottom: 2px;"><strong>Team Name:</strong> Storm Crackers</p>
+        <p style="font-size: 7.5pt; margin-bottom: 2px;"><strong>Team Leader:</strong> Jaswant Karun S A (Lead Software Architect &amp; Security Engineer)</p>
+        <p style="font-size: 7.5pt; margin-bottom: 2px;"><strong>Team Member:</strong> Jaiwant Karrun S A (Frontend Lead &amp; Knowledge Graph Engineer)</p>
+        <p style="font-size: 7.5pt; margin-bottom: 2px;"><strong>Institution:</strong> KPR Institute of Engineering and Technology</p>
+      </div>
+      <div>
+        <p style="font-size: 7.5pt; margin-bottom: 2px;"><strong>Hackathon Round:</strong> Round 3 — Final Master Product Submission</p>
+        <p style="font-size: 7.5pt; margin-bottom: 2px;"><strong>Automated Test Status:</strong> 136 / 136 Passed (100% PASS in 6.39s)</p>
+        <p style="font-size: 7.5pt; margin-bottom: 2px;"><strong>TypeScript Build:</strong> 0 Compilation Errors (Clean Vite Build)</p>
+        <p style="font-size: 7.5pt; margin-bottom: 2px;"><strong>Submission Date:</strong> November 14, 2026</p>
+      </div>
+    </div>
+  </div>
+
+  <h2>5. Sincere Acknowledgments &amp; Thank You Message</h2>
+  <div class="card" style="background: linear-gradient(135deg, #091326 0%, #1e3a8a 100%); color: #ffffff; padding: 10px 14px; border-radius: 4px; margin-top: 5px;">
+    <h3 style="color: #38bdf8; font-size: 9.5pt; margin-bottom: 4px;">Thank You to the Hackathon Judges, Mentors &amp; Organizing Committee! 🙏</h3>
+    <p style="color: #f1f5f9; font-size: 7.8pt; line-height: 1.4; margin-bottom: 4px;">
+      We extend our heartfelt gratitude to the esteemed hackathon judges, technical mentors, and organizers for providing this incredible platform to build and showcase <strong>BrandTrace AI</strong>.
+    </p>
+    <p style="color: #cbd5e1; font-size: 7.5pt; line-height: 1.4; margin-bottom: 0;">
+      Throughout Rounds 1, 2, and 3, your rigorous feedback, high technical standards, and challenging problem statement inspired us to engineer beyond simple prototypes—driving us to deliver real cloud persistence, deterministic cryptographic verification, and a proactive Digital Twin that solves genuine enterprise brand compliance challenges. Thank you for your time, dedication, and thoughtful evaluation of our work!
+    </p>
+  </div>
+
+  <div class="doc-footer">
+    <span><strong>BRANDTRACE AI</strong> &bull; Round 3 Final Master Submission &bull; Team: <strong>Storm Crackers</strong></span>
+    <span>GitHub: <a href="https://github.com/Jaswant-Karun/BrandTrace-AI">Jaswant-Karun/BrandTrace-AI</a> &bull; Chapter 10: Conclusion &amp; Thank You</span>
+  </div>
+</div>
+
+</body>
+</html>
