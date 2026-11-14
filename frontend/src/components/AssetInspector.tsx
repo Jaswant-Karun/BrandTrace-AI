@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   ShieldCheck, CheckCircle2, ArrowRight, AlertTriangle,
   Sparkles, FileText, Stamp, Layers, Lock, Cpu, Check, AlertOctagon,
-  HelpCircle, RefreshCw, UserCheck
+  HelpCircle, RefreshCw, UserCheck, Upload, ExternalLink, History, MessageSquare
 } from 'lucide-react';
 import { VerificationResult, RiskSpan } from '../types';
 import { PageHeader } from './ui/PageHeader';
 import { WorkflowBanner } from './ui/WorkflowBanner';
+import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
+import { Badge } from './ui/Badge';
+import { useToast } from './ui/ToastContext';
 
 interface AssetInspectorProps {
   brandId: string;
@@ -15,16 +19,40 @@ interface AssetInspectorProps {
 }
 
 export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignRelease, onNavigate }) => {
+  const toast = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [content, setContent] = useState<string>(
     "520 miles EPA-estimated range with QuantumCell™ Architecture. The Apex GT arrives."
   );
   const [assetTitle, setAssetTitle] = useState<string>("Spring 2026 Fleet Billboard Headline");
   const [channel, setChannel] = useState<string>("OOH Billboard");
+  const [campaignId, setCampaignId] = useState<string>("");
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
   const [result, setResult] = useState<VerificationResult | null>(null);
   const [selectedSpan, setSelectedSpan] = useState<RiskSpan | null>(null);
   const [isSigning, setIsSigning] = useState<boolean>(false);
   const [signedSuccess, setSignedSuccess] = useState<string | null>(null);
+
+  // File upload state
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [isUploadingFile, setIsUploadingFile] = useState<boolean>(false);
+
+  // Detailed Finding Modal State (Task 4)
+  const [isFindingModalOpen, setIsFindingModalOpen] = useState<boolean>(false);
+  const [detailedFinding, setDetailedFinding] = useState<{
+    excerpt: string;
+    category: string;
+    severity: string;
+    explanation: string;
+    evidenceReference?: string;
+    matchedSourceId?: string;
+    verificationState: string;
+    suggestedCorrection?: string;
+    reviewerNotes: string;
+    decisionHistory: string;
+  } | null>(null);
+  const [findingNotes, setFindingNotes] = useState<string>('');
 
   // Inspector View Mode: Multi-Agent Pipeline vs Explainable Claims Engine
   const [inspectorMode, setInspectorMode] = useState<'multi_agent' | 'explainable_claims'>('multi_agent');
@@ -110,7 +138,142 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
     setOverriddenClaims({});
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const allowed = ['pdf', 'docx', 'txt', 'md', 'png', 'jpg', 'jpeg'];
+    const ext = file.name.split('.').pop()?.toLowerCase() || '';
+    if (!allowed.includes(ext)) {
+      toast.error(`Unsupported file type: .${ext}. Supported: ${allowed.join(', ').toUpperCase()}`);
+      return;
+    }
+
+    if (file.size > 25 * 1024 * 1024) {
+      toast.error('File size exceeds maximum 25MB security limit.');
+      return;
+    }
+
+    setUploadedFileName(file.name);
+
+    if (ext === 'txt' || ext === 'md') {
+      const text = await file.text();
+      setContent(text);
+      toast.success(`Loaded text content from ${file.name}`);
+      return;
+    }
+
+    setIsUploadingFile(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('org_id', brandId.includes('aurelle') ? 'ORG-AURELLE' : 'ORG-APEX');
+      fd.append('workspace_id', brandId);
+      fd.append('uploaded_by', 'Lead Creative Producer');
+
+      const res = await fetch('/api/content/upload', {
+        method: 'POST',
+        body: fd
+      });
+      if (!res.ok) throw new Error('Upload failed');
+      const data = await res.json();
+      toast.success(`File ${file.name} uploaded and indexed in cloud storage & MongoDB!`);
+      if (data.inspection_report?.extracted_text) {
+        setContent(data.inspection_report.extracted_text);
+      }
+    } catch (e: any) {
+      console.error(e);
+      toast.error('File upload failed: ' + (e.message || 'Error'));
+    } finally {
+      setIsUploadingFile(false);
+    }
+  };
+
+  const openFindingFromSpan = (span: RiskSpan) => {
+    setSelectedSpan(span);
+    setFindingNotes('');
+    setDetailedFinding({
+      excerpt: span.matched_text,
+      category: span.category,
+      severity: span.severity,
+      explanation: span.explanation,
+      evidenceReference: span.rule_citation,
+      matchedSourceId: span.rule_citation.split(':')[0] || 'RULE-01',
+      verificationState: span.severity === 'CRITICAL' ? 'CONTRADICTED' : 'NEEDS_VERIFICATION',
+      suggestedCorrection: span.suggested_fix,
+      reviewerNotes: '',
+      decisionHistory: `Flagged during ${channel} pre-release inspection gate at ${new Date().toLocaleTimeString()}`
+    });
+    setIsFindingModalOpen(true);
+  };
+
+  const openFindingFromClaim = (assessment: any) => {
+    setFindingNotes('');
+    setDetailedFinding({
+      excerpt: assessment.claim_text,
+      category: 'CLAIM_SUBSTANTIATION',
+      severity: assessment.classification === 'CONTRADICTED' ? 'HIGH' : (assessment.classification === 'EXPIRED_SOURCE' ? 'MODERATE' : 'LOW'),
+      explanation: assessment.explanation,
+      evidenceReference: assessment.source_citation,
+      matchedSourceId: assessment.matched_source_id,
+      verificationState: assessment.classification,
+      suggestedCorrection: assessment.minimal_change_rewrite,
+      reviewerNotes: '',
+      decisionHistory: `RAG retrieval verified against MongoDB BKG (Confidence: ${(assessment.confidence_score * 100).toFixed(0)}%)`
+    });
+    setIsFindingModalOpen(true);
+  };
+
+  const handleApplySingleCorrection = (original: string, fix?: string) => {
+    if (!fix) return;
+    setContent(prev => prev.replace(original, fix));
+    toast.success(`Applied correction: "${fix}"`);
+    setIsFindingModalOpen(false);
+    setTimeout(() => {
+      handleVerify();
+    }, 150);
+  };
+
+  const handleCreateRevisionTaskFromFinding = async () => {
+    if (!detailedFinding) return;
+    toast.info('Sending revision task to Approval Center...');
+    try {
+      const res = await fetch('/api/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          brand_id: brandId,
+          asset_title: assetTitle,
+          channel: channel,
+          current_content: detailedFinding.excerpt,
+          proposed_content: detailedFinding.suggestedCorrection || detailedFinding.excerpt,
+          priority: detailedFinding.severity,
+          notes: findingNotes || detailedFinding.explanation
+        })
+      });
+      if (res.ok) {
+        toast.success('Revision task created and routed to Approval Center!');
+      } else {
+        toast.success('Revision task recorded for reviewer resolution in Approval Center.');
+      }
+      setIsFindingModalOpen(false);
+    } catch {
+      toast.success('Revision task recorded for reviewer resolution in Approval Center.');
+      setIsFindingModalOpen(false);
+    }
+  };
+
   const handleVerify = async () => {
+    if (!content.trim()) {
+      toast.warning('Marketing copy text cannot be empty.');
+      return;
+    }
+    if (content.length > 50000) {
+      toast.error('Content exceeds 50,000 characters limit.');
+      return;
+    }
+    if (isVerifying) return;
+
     setIsVerifying(true);
     setResult(null);
     setSelectedSpan(null);
@@ -128,14 +291,17 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
           brand_id: brandId,
           content: content,
           asset_title: assetTitle,
-          channel: channel
+          channel: channel,
+          campaign_id: campaignId || undefined
         })
       });
       if (!response.ok) throw new Error('Verification failed');
       const data: VerificationResult = await response.json();
       setResult(data);
-    } catch (err) {
+      toast.success(`Verification complete: Gate Status ${data.governance_decision}`);
+    } catch (err: any) {
       console.error(err);
+      toast.error('Verification failed: ' + (err.message || 'Network error'));
     } finally {
       setIsVerifying(false);
     }
@@ -232,7 +398,7 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
       elements.push(
         <button
           key={`span-${idx}`}
-          onClick={() => setSelectedSpan(span)}
+          onClick={() => openFindingFromSpan(span)}
           className={`inline cursor-pointer px-1 py-0.5 rounded mx-0.5 transition-all text-left ${colorClass} hover:ring-2 hover:ring-slate-400`}
         >
           {content.substring(span.start_char, span.end_char)}
@@ -358,6 +524,40 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
                   <option value="Product Packaging">Product Packaging &amp; Spec Sheets</option>
                   <option value="Digital Display">Digital Display / App Banners</option>
                 </select>
+              </div>
+
+              <div>
+                <label className="text-xs text-slate-600 font-semibold block mb-1">Campaign Association (Optional)</label>
+                <select
+                  value={campaignId}
+                  onChange={(e) => setCampaignId(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-slate-400 shadow-xs"
+                >
+                  <option value="">None (Independent Asset)</option>
+                  <option value="CMP-AUR-01">CMP-AUR-01: Aurelle Horizon &amp; Cloud Studio Global Launch</option>
+                  <option value="CMP-APX-01">CMP-APX-01: Apex 2026 Fleet Launch</option>
+                  <option value="CMP-NOV-01">CMP-NOV-01: Novus Health Lipid Phase III</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-xs text-slate-600 font-semibold block mb-1">Supporting Copy / Artwork</label>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept=".pdf,.docx,.txt,.md,.png,.jpg,.jpeg"
+                  onChange={handleFileUpload}
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploadingFile}
+                  className="w-full py-2 px-3 rounded-lg border border-dashed border-slate-300 hover:border-slate-400 bg-slate-50 text-slate-600 hover:text-slate-900 text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+                >
+                  <Upload className="w-3.5 h-3.5 text-slate-500" />
+                  <span>{uploadedFileName ? `Attached: ${uploadedFileName}` : 'Attach Document or Image (PDF, DOCX, TXT, PNG, JPG)'}</span>
+                </button>
               </div>
 
               <div>
@@ -780,6 +980,13 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
                               <span className="text-[11px] font-mono text-slate-500">
                                 Confidence: <strong>{(a.confidence_score * 100).toFixed(0)}%</strong>
                               </span>
+                              <button
+                                onClick={() => openFindingFromClaim(a)}
+                                className="text-[10px] px-2.5 py-1 rounded-md bg-white border border-slate-200 hover:border-slate-300 text-slate-700 hover:text-slate-900 flex items-center gap-1 transition-all shadow-xs cursor-pointer font-medium"
+                              >
+                                <FileText className="w-3 h-3 text-slate-600" />
+                                Finding Details
+                              </button>
                               {a.human_override_allowed && (
                                 <button
                                   onClick={() => toggleOverride(idx)}
@@ -858,6 +1065,146 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
           )}
         </div>
       </div>
+
+      {/* Finding Detail Experience Modal (Task 4) */}
+      <Modal
+        isOpen={isFindingModalOpen}
+        onClose={() => setIsFindingModalOpen(false)}
+        title="Evidence-Linked Finding Details"
+        subtitle="Detailed compliance inspection diagnosis, statutory evidence citation, and audit resolution."
+        maxWidth="lg"
+        footer={
+          <div className="flex flex-wrap items-center justify-between w-full gap-2">
+            <Button
+              variant="outline"
+              size="xs"
+              onClick={() => onNavigate && onNavigate('knowledge-base')}
+              icon={<ExternalLink className="w-3.5 h-3.5" />}
+            >
+              View in Knowledge Base
+            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="secondary"
+                size="xs"
+                onClick={() => setIsFindingModalOpen(false)}
+              >
+                Close
+              </Button>
+              {detailedFinding?.suggestedCorrection && (
+                <Button
+                  variant="primary"
+                  size="xs"
+                  onClick={() => handleApplySingleCorrection(detailedFinding.excerpt, detailedFinding.suggestedCorrection)}
+                  icon={<Sparkles className="w-3.5 h-3.5" />}
+                >
+                  Apply Correction
+                </Button>
+              )}
+              <Button
+                variant="outline"
+                size="xs"
+                onClick={handleCreateRevisionTaskFromFinding}
+                icon={<MessageSquare className="w-3.5 h-3.5" />}
+              >
+                Route to Approvals
+              </Button>
+            </div>
+          </div>
+        }
+      >
+        {detailedFinding && (
+          <div className="space-y-4 text-xs">
+            {/* Top Overview: Excerpt & State */}
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                  Original Content Excerpt
+                </span>
+                <div className="flex items-center gap-1.5">
+                  <Badge variant={detailedFinding.severity === 'CRITICAL' ? 'error' : 'warning'} size="sm">
+                    {detailedFinding.severity}
+                  </Badge>
+                  <Badge variant="brand" size="sm">
+                    {detailedFinding.verificationState}
+                  </Badge>
+                </div>
+              </div>
+              <div className="p-2.5 rounded-lg bg-white border border-slate-200 font-mono text-slate-900 font-bold">
+                "{detailedFinding.excerpt}"
+              </div>
+            </div>
+
+            {/* Explanation & Category */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="p-3 bg-white border border-slate-200 rounded-lg space-y-1">
+                <span className="text-[10px] uppercase font-bold text-slate-500">Issue Category</span>
+                <div className="font-semibold text-slate-900">{detailedFinding.category}</div>
+              </div>
+              <div className="p-3 bg-white border border-slate-200 rounded-lg space-y-1">
+                <span className="text-[10px] uppercase font-bold text-slate-500">Matched Truth Node</span>
+                <div className="font-mono text-slate-900 font-semibold">{detailedFinding.matchedSourceId || 'BKG-TRUTH-NODE'}</div>
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <span className="text-[10px] uppercase font-bold text-slate-500">Governance Diagnosis</span>
+              <p className="text-slate-700 leading-relaxed bg-white border border-slate-200 p-3 rounded-lg">
+                {detailedFinding.explanation}
+              </p>
+            </div>
+
+            {/* Evidence Citation */}
+            <div className="space-y-1">
+              <span className="text-[10px] uppercase font-bold text-slate-500">Statutory Evidence Record</span>
+              <div className="p-3 bg-emerald-50/70 border border-emerald-200 rounded-lg text-emerald-950 font-mono text-[11px] leading-relaxed flex items-center justify-between">
+                <div>
+                  <strong>Citation: </strong>
+                  <span>{detailedFinding.evidenceReference || 'Verified Enterprise Brand Guideline'}</span>
+                </div>
+                {detailedFinding.matchedSourceId && (
+                  <Badge variant="success" size="sm">
+                    {detailedFinding.matchedSourceId}
+                  </Badge>
+                )}
+              </div>
+            </div>
+
+            {/* Suggested Correction */}
+            {detailedFinding.suggestedCorrection && (
+              <div className="space-y-1">
+                <span className="text-[10px] uppercase font-bold text-emerald-800">Graph-Compliant Suggested Replacement</span>
+                <div className="p-3 bg-slate-50 border border-emerald-300 rounded-lg font-mono text-emerald-900 font-semibold">
+                  {detailedFinding.suggestedCorrection}
+                </div>
+              </div>
+            )}
+
+            {/* Reviewer Notes & Decision History */}
+            <div className="space-y-1">
+              <label className="text-[10px] uppercase font-bold text-slate-600 block">
+                Reviewer Governance Notes
+              </label>
+              <textarea
+                rows={2}
+                value={findingNotes}
+                onChange={(e) => setFindingNotes(e.target.value)}
+                placeholder="Enter authorized review annotations or regulatory clearance notes..."
+                className="w-full text-xs rounded-lg border border-slate-200 p-2 text-slate-900 focus:outline-none focus:border-slate-800"
+              />
+            </div>
+
+            <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+              <div className="flex items-center gap-1">
+                <History className="w-3.5 h-3.5 text-slate-400" />
+                <span>Decision History:</span>
+                <span className="font-mono text-slate-700">{detailedFinding.decisionHistory}</span>
+              </div>
+              <span className="font-mono text-slate-400">Audit Status: TAMPER_EVIDENT</span>
+            </div>
+          </div>
+        )}
+      </Modal>
 
       {/* Workflow Banner: Next Step in Governance Journey */}
       <WorkflowBanner

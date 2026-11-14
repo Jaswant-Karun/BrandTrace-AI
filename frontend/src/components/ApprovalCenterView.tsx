@@ -19,6 +19,7 @@ export const ApprovalCenterView: React.FC<ApprovalCenterViewProps> = ({ brandId,
   const toast = useToast();
   const [tasks, setTasks] = useState<RevisionTask[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [selectedTask, setSelectedTask] = useState<RevisionTask | null>(null);
   const [reviewerName, setReviewerName] = useState<string>('Chief Governance Officer');
   const [resolutionNotes, setResolutionNotes] = useState<string>('Approved revision for live release flighting.');
@@ -43,9 +44,10 @@ export const ApprovalCenterView: React.FC<ApprovalCenterViewProps> = ({ brandId,
     loadTasks();
   }, [brandId]);
 
-  const handleResolve = async () => {
+  const handleResolve = async (decision: 'APPROVED' | 'REJECTED' | 'REVISION_REQUESTED' = 'APPROVED') => {
     if (!selectedTask) return;
     setIsResolving(true);
+    const chosenDecision = decision;
     const token = localStorage.getItem('brandtrace_jwt_token');
     try {
       const res = await fetch(`/api/tasks/${selectedTask.task_id}/resolve`, {
@@ -56,14 +58,17 @@ export const ApprovalCenterView: React.FC<ApprovalCenterViewProps> = ({ brandId,
         },
         body: JSON.stringify({
           reviewer_name: reviewerName,
-          decision: 'APPROVED',
+          decision: chosenDecision,
           final_content: selectedTask.proposed_content,
           resolution_notes: resolutionNotes
         })
       });
-      if (!res.ok) throw new Error('Resolution failed');
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || 'Resolution failed');
+      }
       const data = await res.json();
-      toast.success(`Task ${selectedTask.task_id} approved & sealed with audit proof: ${data.task.audit_proof}`);
+      toast.success(`Task ${selectedTask.task_id} resolved as ${chosenDecision}! ${data.task?.audit_proof ? `Seal: ${data.task.audit_proof}` : ''}`);
       loadTasks();
       setSelectedTask(null);
     } catch (e: any) {
@@ -73,6 +78,12 @@ export const ApprovalCenterView: React.FC<ApprovalCenterViewProps> = ({ brandId,
       setIsResolving(false);
     }
   };
+
+  const filteredTasks = tasks.filter((t) => {
+    if (statusFilter === 'ALL') return true;
+    if (statusFilter === 'PENDING') return t.status === 'PENDING_REVIEW' || t.status === 'IN_REVISION';
+    return t.status === statusFilter;
+  });
 
   const pendingCount = tasks.filter((t) => t.status === 'PENDING_REVIEW' || t.status === 'IN_REVISION').length;
 
@@ -114,16 +125,33 @@ export const ApprovalCenterView: React.FC<ApprovalCenterViewProps> = ({ brandId,
         </div>
       </PageHeader>
 
+      {/* Filter Tabs */}
+      <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs w-fit">
+        {['ALL', 'PENDING', 'APPROVED_SEALED', 'REJECTED'].map((st) => (
+          <button
+            key={st}
+            onClick={() => setStatusFilter(st)}
+            className={`px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer text-xs ${
+              statusFilter === st
+                ? 'bg-white text-slate-900 border border-slate-200 shadow-2xs font-semibold'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            {st.replace(/_/g, ' ')}
+          </button>
+        ))}
+      </div>
+
       {/* Main Content Area */}
       {isLoading ? (
         <div className="p-12 text-center text-xs text-slate-500 bg-white border border-slate-200 rounded-xl shadow-2xs">
           <div className="w-6 h-6 border-2 border-slate-900 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
           Loading governance approval tasks...
         </div>
-      ) : tasks.length === 0 ? (
+      ) : filteredTasks.length === 0 ? (
         <EmptyState
-          title="All Governance Tasks Cleared"
-          description="Zero pending revision tasks. To generate live tasks, run the Change Impact Simulator to model prospective mutations (such as increasing subscription price from ₹499 to ₹599)."
+          title="No Governance Tasks Match Filter"
+          description="Zero tasks in this category. To generate live tasks, run the Change Impact Simulator to model prospective mutations (such as increasing subscription price from ₹499 to ₹599)."
           actionLabel="Launch Change Impact Simulator"
           onAction={() => onNavigate && onNavigate('impact-simulator')}
           icon={<CheckCircle2 className="w-6 h-6 text-emerald-600" />}
@@ -139,7 +167,7 @@ export const ApprovalCenterView: React.FC<ApprovalCenterViewProps> = ({ brandId,
             </tr>
           </TableHeader>
           <TableBody>
-            {tasks.map((task) => (
+            {filteredTasks.map((task) => (
               <TableRow key={task.task_id}>
                 <TableCell className="align-top">
                   <div className="font-bold text-slate-900 text-xs mb-0.5">{task.asset_name}</div>
@@ -208,14 +236,30 @@ export const ApprovalCenterView: React.FC<ApprovalCenterViewProps> = ({ brandId,
         subtitle={`Reviewing ${selectedTask?.asset_name || selectedTask?.task_id}`}
         maxWidth="lg"
         footer={
-          <>
+          <div className="flex items-center justify-between w-full">
             <Button variant="secondary" onClick={() => setSelectedTask(null)} disabled={isResolving}>
               Cancel
             </Button>
-            <Button variant="primary" onClick={handleResolve} isLoading={isResolving} icon={<Check className="w-3.5 h-3.5" />}>
-              Sign &amp; Seal into Ledger
-            </Button>
-          </>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => handleResolve('REJECTED')}
+                disabled={isResolving}
+              >
+                Reject Revision
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => handleResolve('APPROVED')}
+                isLoading={isResolving}
+                icon={<Check className="w-3.5 h-3.5" />}
+              >
+                Authorize &amp; Seal into Ledger
+              </Button>
+            </div>
+          </div>
         }
       >
         {selectedTask && (
