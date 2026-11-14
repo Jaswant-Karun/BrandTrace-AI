@@ -358,7 +358,7 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
                   {props.current_value && (
                     <div className="flex items-center gap-1.5">
                       <span className="text-slate-500 font-sans">Approved Value:</span>
-                      <span className="text-slate-900 font-bold bg-slate-100 px-1.5 py-0.2 rounded font-mono">
+                      <span className="text-slate-900 font-bold bg-slate-100 px-1.5 py-0.5 rounded font-mono">
                         {props.current_value}
                       </span>
                     </div>
@@ -369,11 +369,54 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
                       <span className="text-purple-800 font-bold">{props.exact_mark}</span>
                     </div>
                   )}
+                  {props.source_date && (
+                    <div className="flex items-center gap-1">
+                      <Calendar className="w-3 h-3 text-slate-400" />
+                      <span className="text-slate-500 font-sans">Source Date:</span>
+                      <span className="text-slate-700 font-mono">{props.source_date}</span>
+                    </div>
+                  )}
+                  {props.expiry_date && (
+                    <div className="flex items-center gap-1">
+                      <Calendar className="w-3 h-3 text-amber-500" />
+                      <span className="text-amber-700 font-sans">Expires:</span>
+                      <span className="text-amber-800 font-mono">{props.expiry_date}</span>
+                    </div>
+                  )}
+                  {props.restricted_terms && props.restricted_terms.length > 0 && (
+                    <div className="flex items-start gap-1">
+                      <Tag className="w-3 h-3 text-rose-500 shrink-0 mt-0.5" />
+                      <span className="text-rose-700 font-sans shrink-0">Restricted:</span>
+                      <span className="text-rose-800 truncate">{props.restricted_terms.join(', ')}</span>
+                    </div>
+                  )}
                   {props.department_owner && (
                     <div className="flex items-center gap-1">
                       <span className="text-slate-500 font-sans">Owner:</span>
                       <span className="text-slate-700 font-sans">{props.department_owner}</span>
                     </div>
+                  )}
+                </div>
+
+                {/* Card Action Footers */}
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <Button
+                    variant="outline"
+                    size="xs"
+                    onClick={() => handleOpenEdit(n)}
+                    icon={<Edit2 className="w-3 h-3" />}
+                  >
+                    Edit Fact
+                  </Button>
+                  {isFact && (
+                    <Button
+                      variant="ghost"
+                      size="xs"
+                      onClick={() => onNavigate && onNavigate('impact-simulator')}
+                      icon={<Flame className="w-3 h-3 text-amber-500" />}
+                    >
+                      Simulate
+                    </Button>
                   )}
                 </div>
               </div>
@@ -390,11 +433,11 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
         />
       )}
 
-      {/* Register Approved Fact Modal */}
+      {/* Register Approved Fact / Guideline Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Register Approved Brand Fact"
+        title={registrationMode === 'FACT' ? 'Register Approved Brand Fact' : 'Register Brand Guideline & Policy'}
         subtitle="Adds an immutable truth node into the Brand Knowledge Graph and MongoDB Atlas."
         maxWidth="lg"
         footer={
@@ -403,15 +446,37 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
               Cancel
             </Button>
             <Button variant="primary" onClick={handleCreateFact} isLoading={isSubmitting}>
-              Register Certified Fact
+              {registrationMode === 'FACT' ? 'Register Certified Fact' : 'Register Policy Guideline'}
             </Button>
           </>
         }
       >
         <form onSubmit={handleCreateFact} className="space-y-4">
+          {/* Mode Switcher */}
+          <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-lg">
+            <button
+              type="button"
+              onClick={() => setRegistrationMode('FACT')}
+              className={`flex-1 py-1.5 rounded-md text-xs font-semibold cursor-pointer transition-all ${
+                registrationMode === 'FACT' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600'
+              }`}
+            >
+              Approved Fact (Price, Claim, Spec)
+            </button>
+            <button
+              type="button"
+              onClick={() => setRegistrationMode('GUIDELINE')}
+              className={`flex-1 py-1.5 rounded-md text-xs font-semibold cursor-pointer transition-all ${
+                registrationMode === 'GUIDELINE' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600'
+              }`}
+            >
+              Brand Guideline &amp; Guardrails
+            </button>
+          </div>
+
           <Input
-            label="Fact Name / Label"
-            placeholder="e.g. Aurelle Cloud Studio Subscription"
+            label={registrationMode === 'FACT' ? 'Fact Name / Identifier' : 'Guideline Title'}
+            placeholder={registrationMode === 'FACT' ? 'e.g. Aurelle Cloud Studio Monthly Subscription' : 'e.g. Clean Energy Lifecycle Substantiation'}
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             requiredIndicator
@@ -419,34 +484,71 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
 
           <div className="grid grid-cols-2 gap-3">
             <Select
-              label="Fact Category"
+              label="Category"
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              options={[
+              options={registrationMode === 'FACT' ? [
                 { value: 'PRICE', label: 'PRICE (Commercial)' },
                 { value: 'SPECIFICATION', label: 'SPECIFICATION (Technical)' },
                 { value: 'CLAIM', label: 'CLAIM (Performance)' },
-                { value: 'GUIDELINE', label: 'GUIDELINE (Brand Voice)' },
-                { value: 'TRADEMARK', label: 'TRADEMARK (Legal Mark)' }
+                { value: 'STATUTORY', label: 'STATUTORY (Legal)' },
+                { value: 'POLICY', label: 'POLICY (Corporate)' }
+              ] : [
+                { value: 'VOICE', label: 'VOICE & TONE' },
+                { value: 'REGULATORY', label: 'REGULATORY MANDATE' },
+                { value: 'TRADEMARK', label: 'TRADEMARK & TYPOGRAPHY' },
+                { value: 'SUSTAINABILITY', label: 'SUSTAINABILITY (Green Guides)' }
               ]}
             />
 
             <Input
-              label="Approved Value"
-              placeholder="e.g. ₹599"
+              label={registrationMode === 'FACT' ? 'Approved Value' : 'Primary Rule Requirement'}
+              placeholder={registrationMode === 'FACT' ? 'e.g. ₹599' : 'e.g. Must state EPA-estimated'}
               value={formData.current_value}
               onChange={(e) => setFormData({ ...formData, current_value: e.target.value })}
-              requiredIndicator
+              requiredIndicator={registrationMode === 'FACT'}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              label="Source Effective Date"
+              placeholder="YYYY-MM-DD"
+              value={formData.source_date}
+              onChange={(e) => setFormData({ ...formData, source_date: e.target.value })}
+              helperText="Date this truth node became legally effective."
+            />
+            <Input
+              label="Expiry Date (Optional)"
+              placeholder="YYYY-MM-DD"
+              value={formData.expiry_date}
+              onChange={(e) => setFormData({ ...formData, expiry_date: e.target.value })}
+              helperText="Set if promotional or seasonal fact."
             />
           </div>
 
           <Input
             label="Statutory / Legal Source Citation"
-            placeholder="e.g. Executive Governance Resolution #2026-AUT / Certificate #EV-APX-982"
+            placeholder="e.g. Executive Pricing Resolution #2026-AUT / EPA Cycle Certificate #EV-APX-982"
             value={formData.source_citation}
             onChange={(e) => setFormData({ ...formData, source_citation: e.target.value })}
             helperText="Provides statutory or corporate verification proof for multi-agent compliance audits."
           />
+
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              label="Restricted Terminology (Comma-separated)"
+              placeholder="e.g. insane, miraculous, 100% cure"
+              value={formData.restricted_terms}
+              onChange={(e) => setFormData({ ...formData, restricted_terms: e.target.value })}
+            />
+            <Input
+              label="Required Phrases (Comma-separated)"
+              placeholder="e.g. EPA-estimated, IEC 62133"
+              value={formData.required_phrases}
+              onChange={(e) => setFormData({ ...formData, required_phrases: e.target.value })}
+            />
+          </div>
 
           <Input
             label="Department Owner"
@@ -460,10 +562,109 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
               Description / Policy Scope
             </label>
             <textarea
-              rows={3}
+              rows={2}
               placeholder="Detailed explanation of the certified truth condition and applicability."
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              className="w-full text-xs rounded-lg border border-slate-200 p-2.5 text-slate-900 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+            />
+          </div>
+        </form>
+      </Modal>
+
+      {/* Edit Approved Fact Modal */}
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        title={`Edit Fact: ${editingNode?.id || ''}`}
+        subtitle="Modifies certified fact attributes and writes an immutable audit event to MongoDB."
+        maxWidth="lg"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setIsEditModalOpen(false)} disabled={isSubmitting}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleUpdateFact} isLoading={isSubmitting}>
+              Save Authorized Updates
+            </Button>
+          </>
+        }
+      >
+        <form onSubmit={handleUpdateFact} className="space-y-4">
+          <Input
+            label="Fact Name"
+            value={editFormData.name}
+            onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+            requiredIndicator
+          />
+
+          <div className="grid grid-cols-2 gap-3">
+            <Select
+              label="Category"
+              value={editFormData.category}
+              onChange={(e) => setEditFormData({ ...editFormData, category: e.target.value })}
+              options={[
+                { value: 'PRICE', label: 'PRICE (Commercial)' },
+                { value: 'SPECIFICATION', label: 'SPECIFICATION (Technical)' },
+                { value: 'CLAIM', label: 'CLAIM (Performance)' },
+                { value: 'STATUTORY', label: 'STATUTORY (Legal)' },
+                { value: 'POLICY', label: 'POLICY (Corporate)' }
+              ]}
+            />
+            <Input
+              label="Approved Value"
+              value={editFormData.current_value}
+              onChange={(e) => setEditFormData({ ...editFormData, current_value: e.target.value })}
+              requiredIndicator
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              label="Source Effective Date"
+              value={editFormData.source_date}
+              onChange={(e) => setEditFormData({ ...editFormData, source_date: e.target.value })}
+            />
+            <Input
+              label="Expiry Date (Optional)"
+              value={editFormData.expiry_date}
+              onChange={(e) => setEditFormData({ ...editFormData, expiry_date: e.target.value })}
+            />
+          </div>
+
+          <Input
+            label="Statutory / Legal Source Citation"
+            value={editFormData.source_citation}
+            onChange={(e) => setEditFormData({ ...editFormData, source_citation: e.target.value })}
+          />
+
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              label="Restricted Terminology (Comma-separated)"
+              value={editFormData.restricted_terms}
+              onChange={(e) => setEditFormData({ ...editFormData, restricted_terms: e.target.value })}
+            />
+            <Input
+              label="Required Phrases (Comma-separated)"
+              value={editFormData.required_phrases}
+              onChange={(e) => setEditFormData({ ...editFormData, required_phrases: e.target.value })}
+            />
+          </div>
+
+          <Input
+            label="Department Owner"
+            value={editFormData.department_owner}
+            onChange={(e) => setEditFormData({ ...editFormData, department_owner: e.target.value })}
+          />
+
+          <div className="space-y-1">
+            <label className="block text-xs font-semibold text-slate-800">
+              Description
+            </label>
+            <textarea
+              rows={2}
+              value={editFormData.description}
+              onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
               className="w-full text-xs rounded-lg border border-slate-200 p-2.5 text-slate-900 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
             />
           </div>
