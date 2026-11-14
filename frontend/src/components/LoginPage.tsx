@@ -156,7 +156,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onOpenLanding }
     <div className="min-h-screen bg-white text-slate-900 flex flex-col justify-between selection:bg-slate-900 selection:text-white">
       {/* Top Header */}
       <header className="border-b border-slate-200 bg-white sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center shadow-xs">
               <ShieldCheck className="w-4 h-4 stroke-[2.2]" />
@@ -194,8 +194,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onOpenLanding }
       </header>
 
       {/* Main Auth Section */}
-      <main className="flex-1 flex items-center justify-center p-6 max-w-6xl w-full mx-auto my-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full items-start">
+      <main className="flex-1 flex items-center justify-center p-4 sm:p-6 max-w-6xl w-full mx-auto my-3 sm:my-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 w-full items-start">
           
           {/* Left Column: Tabbed Sign In / Register Card (7 Cols) */}
           <div className="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-7 sm:p-8 shadow-xs space-y-6">

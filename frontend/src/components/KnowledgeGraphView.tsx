@@ -343,7 +343,7 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
       </div>
 
       {/* Main Canvas + Detail Drawer */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 h-[700px]">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 min-h-[480px] h-[65vh] lg:h-[720px]">
         {/* Canvas */}
         <div className={`${selectedNode ? 'lg:col-span-8' : 'lg:col-span-12'} h-full bg-white border border-slate-200 rounded-xl overflow-hidden relative shadow-xs transition-all`}>
           {isLoading ? (
