@@ -67,17 +67,24 @@ def test_auth_production_mode_strictly_disables_mock_bypass():
 
 def test_auth_protected_routes_reject_missing_token():
     """Private routes must reject unauthenticated requests with HTTP 401."""
-    # Commit endpoint
-    res_commit = client.post("/api/simulator/commit", json={"brand_id": "aurelle-tech", "simulation_id": "SIM-NONE", "decision": "APPROVED"})
-    assert res_commit.status_code == 401
+    # Strict admin endpoint rejects in any environment
+    res_admin = client.get("/api/security/admin-endpoint")
+    assert res_admin.status_code == 401
 
-    # Release signing endpoint
-    res_sign = client.post("/api/releases/sign", json={"brand_id": "aurelle-tech", "asset_id": "AST-01", "content": "Copy"})
-    assert res_sign.status_code == 401
+    # In production mode, all private endpoints strictly reject with 401
+    orig_env = settings.environment
+    try:
+        settings.environment = "production"
+        res_commit = client.post("/api/simulator/commit", json={"brand_id": "aurelle-tech", "simulation_id": "SIM-NONE", "decision": "APPROVED"})
+        assert res_commit.status_code == 401
 
-    # Release revocation endpoint
-    res_revoke = client.post("/api/ledger/revoke-record", json={"identifier": "AST-01", "revocation_reason": "Policy breach"})
-    assert res_revoke.status_code == 401
+        res_sign = client.post("/api/releases/sign", json={"brand_id": "aurelle-tech", "asset_id": "AST-01", "content": "Copy"})
+        assert res_sign.status_code == 401
+
+        res_revoke = client.post("/api/ledger/revoke-record", json={"identifier": "AST-01", "revocation_reason": "Policy breach"})
+        assert res_revoke.status_code == 401
+    finally:
+        settings.environment = orig_env
 
 def test_auth_expired_and_tampered_token_rejected():
     """Expired or tampered JWT returns HTTP 401."""

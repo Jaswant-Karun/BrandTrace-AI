@@ -232,7 +232,7 @@ def validate_file_upload(filename: str, file_size: int, content_type: Optional[s
 # ==============================================================================
 
 MONGODB_URI_REGEX = re.compile(r"mongodb(?:\+srv)?:\/\/[^\s\"'<>]+", re.IGNORECASE)
-API_KEY_REGEX = re.compile(r"(?:AIza[0-9A-Za-z-_]{35}|sk-[a-zA-Z0-9_-]{20,})")
+API_KEY_REGEX = re.compile(r"(?:AIza[0-9A-Za-z-_]{30,}|sk-[a-zA-Z0-9_-]{20,})")
 JWT_SECRET_REGEX = re.compile(rf"{re.escape(SECRET_KEY)}")
 
 def mask_sensitive_data(content: str) -> str:
