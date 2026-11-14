@@ -11,6 +11,7 @@
 ## 1. Provenance of Round 2 Commitments
 
 The three commitments were recovered from two authoritative historical records within the project repository:
+
 1. **The Phase 8 Hackathon Specification:** Documented in [PHASE_8_SIGNATURE_DIFFERENTIATORS.md](file:///C:/Users/jaswant%20karun/BRANDTRACE%20AI/PHASE_8_SIGNATURE_DIFFERENTIATORS.md) and conversation transcript step 1275 ("Phase 8 — Three Signature Hackathon Differentiators").
 2. **The Direct Round 2 Submission Answers:** Formally recorded in conversation transcript steps 3430, 3432, and 3434 responding to the evaluation prompts ("Improvement 1", "Improvement 2", "Improvement 3: What it is, and what it changes for the user").
 
@@ -41,12 +42,14 @@ These commitments are **not invented, substituted, or simplified**. Below is the
 ### 3.1 Commitment 1: The Brand Governance Digital Twin (Change Impact & Blast Radius Simulator)
 
 #### Operational Capabilities
+
 - **Proactive Sandboxing:** Enables brand managers to simulate prospective mutations across product pricing, technical specifications, color palettes, naming conventions, and regulatory statements.
 - **DAG Reachability:** Traverses the MongoDB-backed graph ontology to determine every downstream asset connected to the mutated root node.
 - **Financial & Regulatory Exposure:** For the canonical Aurelle showcase, changing Cloud Studio pricing from ₹499 to ₹599 flags 4 marketing touchpoints (OOH billboard, PR release, website hero banner, social ad) and projects $320,000 in unbudgeted reprint/ad expenditure if uncorrected.
 - **Policy Conflict Detection:** Identifies `DIRECT_CONTRADICTION`, `REGIONAL_OVERRIDE_CONFLICT`, `REGULATORY_NON_COMPLIANCE`, and `AMBIGUOUS_SCOPE`.
 
 #### Verification Status
+
 - Backend test: `test_digital_twin_fact_simulation_and_conflict_detection` (**PASSED**)
 - Backend test: `test_digital_twin_authorized_commit_activation` (**PASSED**)
 - Frontend: `BlastRadiusSimulator.tsx` interactive simulation controls and before/after charts fully rendered.
@@ -56,12 +59,14 @@ These commitments are **not invented, substituted, or simplified**. Below is the
 ### 3.2 Commitment 2: 4-Agent Autonomous Governance Pipeline with Graph-Preserving Remediation
 
 #### Operational Capabilities
+
 - **Concurrent Inspection:** Executes 3 agent pipelines (Voice & Persona, Claim Substantiation, Regulatory & Legal Compliance) in parallel, combined with visual rule verification.
 - **Statutory Grounding:** Checks claims against statutory laws including FTC Green Guides (16 CFR §260.4), FDA Fair Balance (21 CFR §202.1), NHTSA Standing General Order 2021-01, and Lanham Act §43(a).
 - **Reverse-Offset Remediation:** Calculates exact start and end character indices for each defect, sorting replacements in descending reverse-offset order to ensure subsequent string injections do not corrupt earlier token alignments.
 - **Speed & Explainability:** Inspection runs in &lt;800ms with token-level citations and explanations.
 
 #### Verification Status
+
 - Backend test: `test_explainable_review_claims_classification` (**PASSED**)
 - Backend test: `test_empirical_evaluation_dataset_precision_and_recall` (**PASSED** - 22/22 benchmark cases)
 - Frontend: `AssetInspector.tsx` side-by-side copy editor with finding cards and 1-click "Apply Rewrite" action.
@@ -71,6 +76,7 @@ These commitments are **not invented, substituted, or simplified**. Below is the
 ### 3.3 Commitment 3: 5-State Cryptographic Release Ledger & Tamper Verifier
 
 #### Operational Capabilities
+
 - **Deterministic Sealing:** When an authorized reviewer signs off in the Approval Center, the engine computes a SHA-256 digest of the final content, binds it to the reviewer identity, timestamp ISO-8601, and parent block hash, producing a tamper-evident seal (`BT-SEAL-...`).
 - **5-State Verification Engine:**
   - `VALID_UNCHANGED`: Content SHA-256 matches active ledger record.
@@ -81,6 +87,7 @@ These commitments are **not invented, substituted, or simplified**. Below is the
 - **No Automatic Publishing:** Content is sealed into the immutable ledger only with human sign-off.
 
 #### Verification Status
+
 - Backend test: `test_audit_ledger_5_integrity_verification_states` (**PASSED**)
 - Backend test: `test_supersede_and_revoke_endpoints` (**PASSED**)
 - Frontend: `AuditTrustCenterView.tsx` real-time integrity verifier and audit ledger table.
