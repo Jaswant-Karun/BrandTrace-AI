@@ -1476,6 +1476,11 @@ async def supersede_ledger_record(
 
     return {"status": "SUPERSEDED", "message": msg, "record": rec}
 
+# Mount Public Verification Router
+from brandtrace.modules.public_verification.router import router as public_verification_router
+router.include_router(public_verification_router)
+
+
 
 
 
