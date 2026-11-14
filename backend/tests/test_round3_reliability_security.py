@@ -8,7 +8,7 @@ from brandtrace.core.config import settings
 from brandtrace.modules.auth.service import auth_service, PRESET_USERS
 from brandtrace.database.mongo import mongo_manager
 from brandtrace.data.seed_data import APPROVED_FACTS_CATALOG, BRAND_SEEDS
-from brandtrace.engine.audit_ledger import audit_ledger_engine, ReleaseRecord
+from brandtrace.engine.audit_ledger import audit_ledger_engine, LedgerAuditRecord
 from brandtrace.graph.dependency_engine import dependency_engine
 
 client = TestClient(app)
@@ -114,31 +114,25 @@ def test_demo_account_cannot_access_admin_endpoint():
 async def test_demo_scenario_reset_isolates_workspaces():
     """Resetting the AURELLE demo scenario must not delete records from other workspaces."""
     # Register an APEX release in ledger
-    apex_record = ReleaseRecord(
-        record_id="BT-REL-APEX-ISOLATION-01",
-        timestamp=int(time.time()),
-        timestamp_iso=datetime.now(timezone.utc).isoformat(),
+    apex_record = audit_ledger_engine.record_release(
         user_identity="Elena Rostova",
         user_role="BRAND_MANAGER",
         resource_id="AST-APX-01",
         resource_type="ASSET",
-        content_hash="hash-apex-01",
-        verification_hash="vhash-apex-01",
-        relevant_sources=["FACT-PRC-01"],
-        approval_decision="APPROVED",
+        content="Apex Autonomous Fleet Solutions Q1 Campaign Copy.",
+        decision="APPROVED",
         review_notes="Apex Fleet Approval",
         approved_version="v1.0",
-        tamper_evident_seal="BT-SEAL-APEX-01",
-        brand_id="apex-dynamics"
+        relevant_sources=["FACT-PRC-01"]
     )
-    audit_ledger_engine.records["BT-REL-APEX-ISOLATION-01"] = apex_record
+    rec_id = apex_record.record_id
 
     # Trigger AURELLE scenario reset
     res_reset = client.post("/api/demo/reset")
     assert res_reset.status_code == 200
 
     # Verify APEX record is still present and untouched
-    assert "BT-REL-APEX-ISOLATION-01" in audit_ledger_engine.records
+    assert rec_id in audit_ledger_engine.records
 
 # ==============================================================================
 # TASK 3 & 4: INPUT VALIDATION & DEFENSIVE REJECTIONS
