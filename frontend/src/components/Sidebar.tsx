@@ -45,34 +45,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const NAV_SECTIONS: { title: string; items: { id: NavigationTab; label: string; icon: React.ReactNode }[] }[] = [
     {
-      title: 'Overview',
+      title: 'WORKSPACE',
       items: [
-        { id: 'command-center', label: 'Command Center', icon: <LayoutDashboard className="w-4 h-4" /> },
+        { id: 'command-center', label: 'Overview', icon: <LayoutDashboard className="w-4 h-4" /> },
+        { id: 'knowledge-base', label: 'Brand Knowledge', icon: <BookOpen className="w-4 h-4" /> },
+        { id: 'bdig', label: 'Knowledge Graph', icon: <GitFork className="w-4 h-4" /> },
       ]
     },
     {
-      title: 'Intelligence & Graph',
+      title: 'INTELLIGENCE',
       items: [
-        { id: 'bdig', label: 'Brand Knowledge Graph', icon: <GitFork className="w-4 h-4" /> },
         { id: 'content-studio', label: 'Content Intelligence', icon: <Sparkles className="w-4 h-4" /> },
-        { id: 'impact-simulator', label: 'Change Impact Simulator', icon: <Flame className="w-4 h-4" /> },
         { id: 'multimodal', label: 'Multimodal Inspection', icon: <Eye className="w-4 h-4" /> },
-      ]
-    },
-    {
-      title: 'Governance & Risk',
-      items: [
         { id: 'campaigns', label: 'Campaign Intelligence', icon: <FileText className="w-4 h-4" /> },
         { id: 'risks', label: 'Risk Intelligence', icon: <AlertTriangle className="w-4 h-4" /> },
-        { id: 'approvals', label: 'Approval Center', icon: <CheckSquare className="w-4 h-4" /> },
-        { id: 'knowledge-base', label: 'Knowledge Base', icon: <BookOpen className="w-4 h-4" /> },
       ]
     },
     {
-      title: 'Assurance & Trust',
+      title: 'GOVERNANCE',
       items: [
-        { id: 'analytics', label: 'Governance Analytics', icon: <BarChart3 className="w-4 h-4" /> },
+        { id: 'impact-simulator', label: 'Change Impact Simulator', icon: <Flame className="w-4 h-4" /> },
+        { id: 'approvals', label: 'Approval Center', icon: <CheckSquare className="w-4 h-4" /> },
         { id: 'audit-trust', label: 'Trust & Audit Ledger', icon: <Lock className="w-4 h-4" /> },
+      ]
+    },
+    {
+      title: 'MANAGEMENT',
+      items: [
+        { id: 'analytics', label: 'Analytics', icon: <BarChart3 className="w-4 h-4" /> },
         { id: 'settings', label: 'Settings', icon: <Settings className="w-4 h-4" /> },
       ]
     }

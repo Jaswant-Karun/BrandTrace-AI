@@ -166,18 +166,18 @@ export const App: React.FC = () => {
 
   const getTabTitle = (tab: NavigationTab) => {
     switch (tab) {
-      case 'command-center': return 'Executive Command Center';
-      case 'bdig': return 'Brand Dependency Intelligence Graph';
-      case 'content-studio': return 'Content Studio & Multi-Agent Inspection';
-      case 'impact-simulator': return 'Cascading Blast Radius Simulator';
-      case 'multimodal': return 'Multimodal & Creative Inspection';
-      case 'campaigns': return 'Campaign Intelligence Portfolio';
-      case 'risks': return 'Enterprise Risk Intelligence & Taxonomy';
-      case 'approvals': return 'Governance Approval Center';
-      case 'knowledge-base': return 'Brand Knowledge Base & Truth-Set';
-      case 'analytics': return 'Governance Velocity & Analytics';
-      case 'audit-trust': return 'Audit & Trust Center (Ledger)';
-      case 'settings': return 'Control Plane Enterprise Settings';
+      case 'command-center': return 'Overview';
+      case 'knowledge-base': return 'Brand Knowledge';
+      case 'bdig': return 'Knowledge Graph';
+      case 'content-studio': return 'Content Intelligence';
+      case 'multimodal': return 'Multimodal Inspection';
+      case 'campaigns': return 'Campaign Intelligence';
+      case 'risks': return 'Risk Intelligence';
+      case 'impact-simulator': return 'Change Impact Simulator';
+      case 'approvals': return 'Approval Center';
+      case 'audit-trust': return 'Trust & Audit Ledger';
+      case 'analytics': return 'Analytics';
+      case 'settings': return 'Settings';
       default: return 'BrandTrace AI';
     }
   };
