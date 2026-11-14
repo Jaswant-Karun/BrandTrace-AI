@@ -58,7 +58,7 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({
         {onToggleMobileMenu && (
           <button
             onClick={onToggleMobileMenu}
-            className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors md:hidden cursor-pointer shadow-2xs"
+            className="p-2 min-w-[38px] min-h-[38px] flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors md:hidden cursor-pointer shadow-2xs"
             title="Open Navigation Menu"
             aria-label="Open Navigation Menu"
           >
