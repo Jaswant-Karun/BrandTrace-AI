@@ -43,8 +43,19 @@ class ApiClient {
         } catch {
           errorData = { message: response.statusText };
         }
+        
+        // Handle 401 Session Expiry
+        if (response.status === 401) {
+          localStorage.removeItem('brandtrace_jwt_token');
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('brandtrace_session_expired', {
+              detail: { message: errorData.detail || 'Session expired or invalid credentials. Please log in again.' }
+            }));
+          }
+        }
+
         const error: ApiError = {
-          message: errorData.detail || errorData.message || 'Request failed',
+          message: errorData.detail || errorData.message || `Request failed with status ${response.status}`,
           status: response.status,
           detail: errorData
         };
@@ -57,7 +68,7 @@ class ApiClient {
         throw err;
       }
       throw {
-        message: err.message || 'Network communication error with BrandTrace API',
+        message: err.message || 'Backend API server unreachable or offline. Ensure the FastAPI service is running.',
         status: 0
       } as ApiError;
     }
