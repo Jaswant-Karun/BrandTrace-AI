@@ -471,125 +471,99 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
               </div>
             </div>
 
-            {/* Body Text with numbered badges and red highlights */}
+            {/* Body Text — dynamic annotated rendering for any content */}
             <div className="text-sm sm:text-base leading-relaxed font-sans text-neutral-900">
               {contentMode === 'suggested' ? (
-                <p className="text-emerald-800 font-sans leading-relaxed">{suggestedContent}</p>
-              ) : rawContent.includes('100% natural') ? (
-                <p className="leading-relaxed">
-                  <span className="w-4 h-4 rounded-full bg-neutral-300 text-neutral-700 text-[9px] font-mono font-bold inline-flex items-center justify-center align-middle mx-1">
-                    8
-                  </span>
-                  <span>Meet the NEW Aurelle Vitamin-C serum!!!</span>
-                  <span className="w-4 h-4 rounded-full bg-neutral-300 text-neutral-700 text-[9px] font-mono font-bold inline-flex items-center justify-center align-middle mx-1">
-                    9
-                  </span>
-                  <span className="w-4 h-4 rounded-full bg-neutral-300 text-neutral-700 text-[9px] font-mono font-bold inline-flex items-center justify-center align-middle mx-1">
-                    10
-                  </span>
-                  <span className="w-4 h-4 rounded-full bg-neutral-300 text-neutral-700 text-[9px] font-mono font-bold inline-flex items-center justify-center align-middle mx-1">
-                    11
-                  </span>
-                  <span
-                    onClick={() => handleHighlightClick('f-1')}
-                    className="inline-flex items-center cursor-pointer bg-[#ffd9d6] text-[#1c1c1e] px-1 py-0.5 rounded hover:ring-2 hover:ring-[#ff5247] transition-all font-medium mx-0.5"
-                    title="Click to view finding #1"
-                  >
-                    <span className="w-4.5 h-4.5 rounded-full bg-[#ff5247] text-white text-[9px] font-mono font-bold inline-flex items-center justify-center mr-1 shadow-xs shrink-0">
-                      1
-                    </span>
-                    <span>100% natural,</span>
-                  </span>
-                  <span
-                    onClick={() => handleHighlightClick('f-2')}
-                    className="inline-flex items-center cursor-pointer bg-[#ffd9d6] text-[#1c1c1e] px-1 py-0.5 rounded hover:ring-2 hover:ring-[#ff5247] transition-all font-medium mx-0.5"
-                    title="Click to view finding #2"
-                  >
-                    <span className="w-4.5 h-4.5 rounded-full bg-[#ff5247] text-white text-[9px] font-mono font-bold inline-flex items-center justify-center mr-1 shadow-xs shrink-0">
-                      2
-                    </span>
-                    <span>eco-friendly</span>
-                  </span>
-                  <span> and </span>
-                  <span
-                    onClick={() => handleHighlightClick('f-4')}
-                    className="inline-flex items-center cursor-pointer bg-[#ffd9d6] text-[#1c1c1e] px-1 py-0.5 rounded hover:ring-2 hover:ring-[#ff5247] transition-all font-medium mx-0.5"
-                    title="Click to view finding #4"
-                  >
-                    <span className="w-4.5 h-4.5 rounded-full bg-[#ff5247] text-white text-[9px] font-mono font-bold inline-flex items-center justify-center mr-1 shadow-xs shrink-0">
-                      4
-                    </span>
-                    <span>clinically proven to fade dark spots by 60% in just 2 weeks</span>
-                  </span>
-                  <span
-                    onClick={() => handleHighlightClick('f-3')}
-                    className="inline-flex items-center cursor-pointer mx-0.5"
-                  >
-                    <span className="w-4.5 h-4.5 rounded-full bg-[#ff5247] text-white text-[9px] font-mono font-bold inline-flex items-center justify-center mr-1 shadow-xs shrink-0">
-                      3
-                    </span>
-                    <span>.</span>
-                  </span>
-                  <span> </span>
-                  <span
-                    onClick={() => handleHighlightClick('f-5')}
-                    className="inline-flex items-center cursor-pointer bg-[#ffd9d6] text-[#1c1c1e] px-1 py-0.5 rounded hover:ring-2 hover:ring-[#ff5247] transition-all font-medium mx-0.5"
-                    title="Click to view finding #5"
-                  >
-                    <span className="w-4.5 h-4.5 rounded-full bg-[#ff5247] text-white text-[9px] font-mono font-bold inline-flex items-center justify-center mr-1 shadow-xs shrink-0">
-                      5
-                    </span>
-                    <span>Dermatologist recommended.</span>
-                  </span>
-                  <span> </span>
-                  <span
-                    onClick={() => handleHighlightClick('f-6')}
-                    className="inline-flex items-center cursor-pointer bg-[#ffd9d6] text-[#1c1c1e] px-1 py-0.5 rounded hover:ring-2 hover:ring-[#ff5247] transition-all font-medium mx-0.5"
-                    title="Click to view finding #6"
-                  >
-                    <span className="w-4.5 h-4.5 rounded-full bg-[#ff5247] text-white text-[9px] font-mono font-bold inline-flex items-center justify-center mr-1 shadow-xs shrink-0">
-                      6
-                    </span>
-                    <span>Launching with our Mumbai flagship on 15 Nov.</span>
-                  </span>
-                  <span> </span>
-                  <span className="inline-flex items-center bg-blue-100/70 text-blue-900 px-1 py-0.5 rounded mx-0.5">
-                    <span className="w-4.5 h-4.5 rounded-full bg-blue-600 text-white text-[9px] font-mono font-bold inline-flex items-center justify-center mr-1 shrink-0">
-                      7
-                    </span>
-                    <span>Click here to shop!</span>
-                  </span>
-                  <span className="w-4 h-4 rounded-full bg-neutral-300 text-neutral-700 text-[9px] font-mono font-bold inline-flex items-center justify-center align-middle mx-1">
-                    12
-                  </span>
-                </p>
-              ) : (
-                <div className="leading-relaxed space-y-2">
-                  <p>{rawContent}</p>
-                  {normalizedFindings.some((f) => f.rejectedText) && (
-                    <div className="pt-2 border-t border-neutral-300/80 text-xs text-neutral-600 space-y-1">
-                      <div className="font-mono font-bold text-[10px] uppercase text-neutral-500">
-                        Highlighted Findings:
-                      </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {normalizedFindings.map((f) => (
-                          <button
-                            key={f.id}
-                            type="button"
-                            onClick={() => handleHighlightClick(f.id)}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#ffd9d6] hover:bg-[#ffb3ad] text-[#1c1c1e] text-xs font-medium cursor-pointer transition-colors"
-                          >
-                            <span className="w-4 h-4 rounded-full bg-[#ff5247] text-white text-[9px] font-mono font-bold inline-flex items-center justify-center shrink-0">
-                              {f.number}
-                            </span>
-                            <span>{f.rejectedText || `Finding #${f.number}`}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
+                <p className="text-emerald-800 font-sans leading-relaxed whitespace-pre-wrap">{suggestedContent}</p>
+              ) : (() => {
+                  // Build an inline-annotated version of rawContent for ANY post
+                  const activeFindings = normalizedFindings.filter(
+                    (f) => f.rejectedText && f.rejectedText.length > 0 && rawContent.includes(f.rejectedText)
+                  );
+
+                  if (activeFindings.length === 0) {
+                    return <p className="whitespace-pre-wrap">{rawContent}</p>;
+                  }
+
+                  // Collect all match positions, sorted by start index
+                  const matches: { start: number; end: number; finding: FindingDetail }[] = [];
+                  activeFindings.forEach((f) => {
+                    const idx = rawContent.indexOf(f.rejectedText);
+                    if (idx !== -1) {
+                      matches.push({ start: idx, end: idx + f.rejectedText.length, finding: f });
+                    }
+                  });
+                  matches.sort((a, b) => a.start - b.start);
+
+                  // Deduplicate overlapping matches (keep first by start)
+                  const deduped: typeof matches = [];
+                  let lastEnd = -1;
+                  for (const m of matches) {
+                    if (m.start >= lastEnd) {
+                      deduped.push(m);
+                      lastEnd = m.end;
+                    }
+                  }
+
+                  const parts: React.ReactNode[] = [];
+                  let cursor = 0;
+
+                  deduped.forEach((m, i) => {
+                    // Plain text before this match
+                    if (m.start > cursor) {
+                      parts.push(
+                        <span key={`plain-${i}`}>{rawContent.slice(cursor, m.start)}</span>
+                      );
+                    }
+
+                    const f = m.finding;
+                    const isSelected = selectedFindingId === f.id;
+
+                    // Severity-based colors
+                    const badgeBg =
+                      f.severity === 'BLOCKING' ? 'bg-[#ff5247]' :
+                      f.severity === 'MAJOR'    ? 'bg-amber-500' :
+                      f.severity === 'NEEDS_HUMAN' ? 'bg-purple-500' :
+                      f.severity === 'MINOR'    ? 'bg-blue-500' :
+                                                   'bg-neutral-500';
+                    const underlineColor =
+                      f.severity === 'BLOCKING' ? 'decoration-rose-500' :
+                      f.severity === 'MAJOR'    ? 'decoration-amber-500' :
+                      f.severity === 'NEEDS_HUMAN' ? 'decoration-purple-500' :
+                      f.severity === 'MINOR'    ? 'decoration-blue-500' :
+                                                   'decoration-neutral-500';
+
+                    parts.push(
+                      <span
+                        key={`match-${i}`}
+                        onClick={() => handleHighlightClick(f.id)}
+                        className={`inline cursor-pointer transition-all ${isSelected ? 'ring-2 ring-offset-1 ring-blue-400 rounded' : ''}`}
+                        title={`Finding #${f.number}: ${f.title}`}
+                      >
+                        {/* Number badge */}
+                        <span
+                          className={`inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1 text-[9px] font-mono font-bold text-white align-middle mx-0.5 shrink-0 ${badgeBg}`}
+                        >
+                          {f.number}
+                        </span>
+                        {/* Underlined flagged text */}
+                        <span className={`underline ${underlineColor} decoration-2 font-medium`}>
+                          {f.rejectedText}
+                        </span>
+                      </span>
+                    );
+
+                    cursor = m.end;
+                  });
+
+                  // Remaining plain text after last match
+                  if (cursor < rawContent.length) {
+                    parts.push(<span key="tail">{rawContent.slice(cursor)}</span>);
+                  }
+
+                  return <p className="whitespace-pre-wrap leading-[1.9]">{parts}</p>;
+                })()
+              }
             </div>
           </div>
 
