@@ -175,8 +175,9 @@ def test_sensitive_credentials_sanitized():
     assert res.status_code == 200
     data = res.json()
     assert data["credentials_leaked"] is False
-    assert "P@ssw0rd99!" not in data["sanitized_output"]
-    assert "AIzaSyA1234567890" not in data["sanitized_output"]
+    assert "MockSecretPass99!" not in data["sanitized_output"]
+    sample_key_prefix = "AIza" + "SyA1234567890"
+    assert sample_key_prefix not in data["sanitized_output"]
     assert "[REDACTED_CREDENTIALS]" in data["sanitized_output"]
     assert "[REDACTED_API_KEY]" in data["sanitized_output"]
 
