@@ -90,6 +90,10 @@ async def create_submission(req: SubmissionCreateRequest, user: UserProfile = De
             "org_id": user.org_id,
             "brand_id": user.workspace_id,
         })
+    for file_id in req.attachment_ids:
+        file_meta = await mongo_manager.get_file_meta(file_id)
+        if not file_meta or file_meta.get("org_id") != user.org_id:
+            raise HTTPException(status_code=400, detail=f"Attachment '{file_id}' is unavailable for this organization.")
     submission = await submissions_service.create_submission(req)
     await mongo_manager.link_claims_to_submission(
         verification_id=req.analysis_id,
@@ -109,6 +113,18 @@ async def list_submissions(
     user: UserProfile = Depends(get_current_user)
 ):
     """Lists submissions filtered by user role, brand, or review state with pagination."""
+    requested_role = (role or "").lower()
+    allowed_roles = {
+        "creator": {"CREATOR"},
+        "agency": {"CREATOR"},
+        "reviewer": {"REVIEWER"},
+        "compliance": {"COMPLIANCE_REVIEWER"},
+        "brand-owner": {"BRAND_MANAGER", "ADMIN"},
+        "brand_owner": {"BRAND_MANAGER", "ADMIN"},
+    }
+    if requested_role in allowed_roles and user.role.value not in allowed_roles[requested_role]:
+        raise HTTPException(status_code=403, detail="This account is not authorized for the requested submission workspace.")
+
     active_creator_id = creator_id
     if user.role.value == "CREATOR" and role == "creator":
         active_creator_id = user.user_id
@@ -130,6 +146,16 @@ async def get_reviewer_queue(
     user: UserProfile = Depends(get_current_user)
 ):
     """Retrieves submissions queue filtered by role (reviewer vs compliance vs brand-owner) with pagination."""
+    requested_role = (role or "reviewer").lower()
+    allowed_roles = {
+        "agency": {"CREATOR"},
+        "reviewer": {"REVIEWER"},
+        "compliance": {"COMPLIANCE_REVIEWER"},
+        "brand-owner": {"BRAND_MANAGER", "ADMIN"},
+        "brand_owner": {"BRAND_MANAGER", "ADMIN"},
+    }
+    if requested_role in allowed_roles and user.role.value not in allowed_roles[requested_role]:
+        raise HTTPException(status_code=403, detail="This account is not authorized for the requested review queue.")
     return await submissions_service.list_submissions(
         brand_id=brand_id,
         role=role,
@@ -158,8 +184,8 @@ async def agency_review_submission(
     """Agency quality check: forwards approved content to reviewer or requests revisions from creator."""
     if user and getattr(user, "role", None):
         user_role_str = (user.role.value if hasattr(user.role, "value") else str(user.role)).upper()
-        if user_role_str in ["CREATOR"] and "agency" not in getattr(user, "name", "").lower():
-            raise HTTPException(status_code=403, detail="Standard creators cannot record agency quality review decisions.")
+        if user_role_str != "CREATOR":
+            raise HTTPException(status_code=403, detail="Only creator/agency accounts can record agency quality review decisions.")
 
     sub = await submissions_service.record_agency_decision(
         submission_id=submission_id,
@@ -180,8 +206,8 @@ async def review_submission(
     """Reviewer decision: upholds/overrules findings and marks APPROVE, REQUEST_CHANGES, or REJECT."""
     if user and getattr(user, "role", None):
         user_role_str = (user.role.value if hasattr(user.role, "value") else str(user.role)).upper()
-        if user_role_str in ["CREATOR"]:
-            raise HTTPException(status_code=403, detail="Creators are not authorized to record review decisions.")
+        if user_role_str != "REVIEWER":
+            raise HTTPException(status_code=403, detail="Only reviewer accounts can record review decisions.")
 
     sub = await submissions_service.record_reviewer_decision(
         submission_id=submission_id,
@@ -203,10 +229,8 @@ async def compliance_submission(
     """Compliance officer decision: checks statutory findings, requests evidence, or signs off."""
     if user and getattr(user, "role", None):
         user_role_str = (user.role.value if hasattr(user.role, "value") else str(user.role)).upper()
-        if user_role_str in ["CREATOR"]:
-            raise HTTPException(status_code=403, detail="Creators are not authorized to record compliance decisions.")
-        if user_role_str in ["REVIEWER"]:
-            raise HTTPException(status_code=403, detail="Reviewers are not authorized to sign off on statutory compliance.")
+        if user_role_str != "COMPLIANCE_REVIEWER":
+            raise HTTPException(status_code=403, detail="Only compliance reviewer accounts can record compliance decisions.")
 
     sub = await submissions_service.record_compliance_decision(
         submission_id=submission_id,
@@ -229,12 +253,8 @@ async def final_approval_submission(
     """Brand Owner decision: verifies Reviewer & Compliance stages, issues unique Release ID and immutable release record."""
     if user and getattr(user, "role", None):
         user_role_str = (user.role.value if hasattr(user.role, "value") else str(user.role)).upper()
-        if user_role_str in ["CREATOR"]:
-            raise HTTPException(status_code=403, detail="Creators are not authorized to grant final brand release.")
-        if user_role_str in ["REVIEWER"]:
-            raise HTTPException(status_code=403, detail="Reviewers are not authorized to grant final brand release.")
-        if user_role_str in ["COMPLIANCE"]:
-            raise HTTPException(status_code=403, detail="Compliance officers are not authorized to grant final brand release.")
+        if user_role_str not in ["BRAND_MANAGER", "ADMIN"]:
+            raise HTTPException(status_code=403, detail="Only brand owners or administrators can grant final brand release.")
 
     try:
         sub = await submissions_service.record_final_approval(

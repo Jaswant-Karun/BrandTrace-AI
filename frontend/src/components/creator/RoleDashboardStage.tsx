@@ -12,6 +12,7 @@ import { ReviewDetailView, ReviewDecisionType } from './ReviewDetailView';
 import { PublicVerificationView } from '../PublicVerificationView';
 import { CheckCircle2, ExternalLink, X } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
+import { useAuth } from '../../context/AuthContext';
 
 export type DashboardRole = 'agency' | 'reviewer' | 'compliance' | 'brand-owner';
 
@@ -270,10 +271,11 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
   brandName = 'Aurelle Skin',
   onBackToLanding,
 }) => {
+  const { user } = useAuth();
   // Determine role metadata
   const roleConfig = {
     agency: {
-      userName: 'AGENCY SANA',
+      userName: user?.name?.toUpperCase() || 'AUTHENTICATED USER',
       roleName: 'AGENCY',
       title: 'CHECK A POST',
       defaultTab: 'check' as CreatorTab,
@@ -289,7 +291,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
       ],
     },
     reviewer: {
-      userName: 'REVIEWER MEERA',
+      userName: user?.name?.toUpperCase() || 'AUTHENTICATED USER',
       roleName: 'REVIEWER',
       title: 'REVIEW QUEUE',
       defaultTab: 'queue' as CreatorTab,
@@ -304,7 +306,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
       ],
     },
     compliance: {
-      userName: 'COMPLIANCE ARJUN',
+      userName: user?.name?.toUpperCase() || 'AUTHENTICATED USER',
       roleName: 'COMPLIANCE',
       title: 'COMPLIANCE QUEUE',
       defaultTab: 'queue' as CreatorTab,
@@ -319,7 +321,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
       ],
     },
     'brand-owner': {
-      userName: 'BRAND OWNER KABIR',
+      userName: user?.name?.toUpperCase() || 'AUTHENTICATED USER',
       roleName: 'BRAND OWNER',
       title: 'FINAL APPROVAL & RELEASE',
       defaultTab: 'queue' as CreatorTab,
@@ -338,7 +340,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
 
   const shouldReduceMotion = useReducedMotion();
   const [activeTab, setActiveTab] = useState<CreatorTab>(roleConfig.defaultTab);
-  const [queuePosts, setQueuePosts] = useState<QueueItem[]>(DEFAULT_QUEUE_POSTS);
+  const [queuePosts, setQueuePosts] = useState<QueueItem[]>([]);
   const [selectedPost, setSelectedPost] = useState<QueueItem | null>(null);
   const [feedbackToast, setFeedbackToast] = useState<string | null>(null);
   const [revisionData, setRevisionData] = useState<{
@@ -386,35 +388,25 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
                 status: s.status?.replace(/_/g, ' ') || 'IN REVIEW',
                 statusColor: sColor,
                 title: s.title || (s.original_content ? s.original_content.slice(0, 80) + '...' : 'Submission'),
-                meta: `${s.creator_name || 'Creator Asha'} · ${s.creator_type || 'employee'} · ${s.channel || 'instagram'} · version ${s.version || 1}`,
+                meta: `${s.creator_name || 'Unknown creator'} · ${s.creator_type || 'creator'} · ${s.channel || 'instagram'} · version ${s.version || 1}`,
                 badges: blocking > 0 ? ['REVIEW', 'COMPLIANCE'] : ['1 REVIEW'],
                 content: s.current_content || s.original_content || '',
                 findings: s.findings || [],
-                creatorName: s.creator_name || 'Creator Asha',
+                creatorName: s.creator_name || 'Unknown creator',
                 creatorType: s.creator_type || 'creator',
-                orgId: s.org_id || (s.creator_type === 'agency' ? 'ORG-AGENCY-PULSE' : 'ORG-AURELLE'),
+                orgId: s.org_id || user?.org_id || '',
                 channel: s.channel || 'instagram',
                 version: s.version || 1,
                 reviewerFeedback: s.reviewer_feedback || '',
               };
             });
 
-            // Role-specific defaults
-            const allowedDefaults =
-              role === 'brand-owner'
-                ? DEFAULT_QUEUE_POSTS.filter((dp) => dp.status === 'APPROVED' || dp.status === 'RELEASED')
-                : role === 'compliance'
-                ? DEFAULT_QUEUE_POSTS.filter((dp) => dp.status === 'APPROVED' || dp.status === 'REVIEW APPROVED')
-                : DEFAULT_QUEUE_POSTS;
-
-            // Merge with default posts to guarantee richness
-            const existingIds = new Set(mapped.map((m) => m.id));
-            const combined = [...mapped, ...allowedDefaults.filter((dp) => !existingIds.has(dp.id))];
-            setQueuePosts(combined);
+            setQueuePosts(mapped);
           }
         })
-        .catch(() => {
-          // Use default posts on network drop
+        .catch((error: any) => {
+          setQueuePosts([]);
+          setFeedbackToast(`Queue unavailable: ${error?.message || 'Unable to load persisted submissions.'}`);
         });
     }
   }, [activeTab, role]);
@@ -506,7 +498,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
           decision === 'APPROVE'
             ? `Post approved and advanced to Compliance Queue by ${roleConfig.userName}.`
             : decision === 'REQUEST_CHANGES'
-            ? `Changes requested. Post returned to ${selectedPost.creatorType === 'agency' ? 'Agency Sana' : 'Creator Asha'}.`
+            ? `Changes requested. Post returned to ${selectedPost.creatorType === 'agency' ? 'the agency submitter' : 'the creator'}.`
             : `Post marked as rejected.`
         );
       }
@@ -544,9 +536,8 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
       );
       setSelectedPost(null);
     } catch (err: any) {
-      console.warn('Review decision notice:', err);
-      setFeedbackToast(`Decision recorded for ${selectedPost.id}.`);
-      setSelectedPost(null);
+      console.error('Review decision failed:', err);
+      setFeedbackToast(`Decision failed: ${err?.message || 'The workflow action was not saved.'}`);
     }
   };
 
@@ -679,7 +670,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
                     ? queuePosts.filter((p) => p.status.includes('COMPLIANCE')).length
                     : role === 'compliance'
                     ? queuePosts.filter((p) => p.status.includes('EVIDENCE')).length
-                    : 5}
+                    : queuePosts.filter((p) => p.status.includes('COMPLIANCE')).length}
                 </div>
                 <div className="text-[10px] sm:text-xs font-mono text-neutral-400 uppercase font-semibold">
                   {role === 'brand-owner' ? 'COMPLIANCE CERTIFIED' : role === 'compliance' ? 'EVIDENCE REQUESTED' : 'NEED COMPLIANCE'}

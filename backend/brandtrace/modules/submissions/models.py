@@ -100,6 +100,9 @@ class SubmissionCreateRequest(BaseModel):
     original_content: str
     current_content: str
     findings: List[FindingModel] = Field(default_factory=list)
+    attachment_ids: List[str] = Field(default_factory=list)
+    inspection_report: Optional[Dict[str, Any]] = None
+    extracted_text: Optional[str] = None
     key_phrases: Optional[str] = ""
     call_to_action: Optional[str] = ""
     submission_notes: Optional[str] = ""
@@ -121,6 +124,9 @@ class SubmissionResponse(BaseModel):
     original_content: str
     current_content: str
     findings: List[FindingModel]
+    attachment_ids: List[str] = Field(default_factory=list)
+    inspection_report: Optional[Dict[str, Any]] = None
+    extracted_text: Optional[str] = None
     status: str  # DRAFT, PENDING_REVIEW, CHANGES_REQUESTED, REVIEW_APPROVED, COMPLIANCE_APPROVED, APPROVED, REJECTED
     submitted_at: str
     updated_at: str

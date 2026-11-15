@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   CheckCircle2, 
   Send, RefreshCw, Check, ArrowRight, X, ChevronDown, ChevronRight,
-  AlertCircle, AlertTriangle, ShieldCheck, Eye, HelpCircle, Sparkles, Edit3
+  AlertCircle, AlertTriangle, ShieldCheck, Eye, HelpCircle, Sparkles, Edit3,
+  UploadCloud, Image as ImageIcon, Trash2
 } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 
@@ -165,6 +166,10 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
   const [isChecking, setIsChecking] = useState<boolean>(false);
   const [hasChecked, setHasChecked] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [uploadedAsset, setUploadedAsset] = useState<{ file_id: string; filename: string; size_bytes: number } | null>(null);
+  const [inspectionReport, setInspectionReport] = useState<any | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [submissionStatus, setSubmissionStatus] = useState<string | null>(null);
   const [analysisId, setAnalysisId] = useState<string | null>(null);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
@@ -287,7 +292,14 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      if (!file.type.startsWith('image/') || file.size > 25 * 1024 * 1024) {
+        setSubmissionStatus('Please choose a PNG, JPG, JPEG, or WebP image smaller than 25 MB.');
+        return;
+      }
       setSelectedFile(file);
+      setUploadedAsset(null);
+      setInspectionReport(null);
+      setImagePreviewUrl(URL.createObjectURL(file));
       // If it's a text file, populate the text area
       if (file.type.includes('text') || file.name.endsWith('.txt')) {
         const reader = new FileReader();
@@ -299,6 +311,34 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
         };
         reader.readAsText(file);
       }
+    }
+  };
+
+  const handleRemoveFile = () => {
+    if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+    setSelectedFile(null);
+    setImagePreviewUrl(null);
+    setUploadedAsset(null);
+    setInspectionReport(null);
+  };
+
+  const uploadAsset = async () => {
+    if (!selectedFile) return null;
+    setUploadProgress(0);
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    try {
+      const response = await apiClient.request<any>('/api/content/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      setUploadProgress(100);
+      setUploadedAsset(response.file_metadata);
+      setInspectionReport(response.inspection_report);
+      return response;
+    } catch (error: any) {
+      setUploadProgress(null);
+      throw new Error(error?.message || 'Image upload and inspection failed.');
     }
   };
 
@@ -437,7 +477,27 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
     setSubmissionStatus(null);
 
     try {
+      const assetResponse = selectedFile && !uploadedAsset ? await uploadAsset() : null;
       await executeAnalysis(draftContent);
+      const report = assetResponse?.inspection_report || inspectionReport;
+      if (report?.findings?.length) {
+        setFindings((current) => [
+          ...current,
+          ...report.findings.map((finding: any, index: number): FindingItem => ({
+            id: `asset-${finding.id || index + 1}`,
+            number: current.length + index + 1,
+            title: finding.category || 'Visual finding',
+            category: finding.category || 'Visual intelligence',
+            source: 'Multimodal asset inspection',
+            ruleCitation: finding.rule_citation || 'Visual inspection',
+            rejectedText: '',
+            approvedText: finding.suggested_fix || '',
+            recommendation: `${finding.explanation || 'Visual inspection finding.'} (${finding.verification_status || 'UNCERTAIN'})`,
+            severity: finding.severity === 'CRITICAL' ? 'BLOCKING' : finding.severity === 'HIGH' ? 'MAJOR' : finding.severity === 'MODERATE' ? 'MINOR' : 'ADVISORY',
+            accepted: false,
+          })),
+        ]);
+      }
     } catch (e: any) {
       setSubmissionStatus(`Check failed: ${e?.message || 'The content analysis service is unavailable.'}`);
     } finally {
@@ -561,6 +621,9 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
             title: draftContent.slice(0, 95) + (draftContent.length > 95 ? '...' : ''),
             original_content: draftContent,
             current_content: draftContent,
+            attachment_ids: uploadedAsset ? [uploadedAsset.file_id] : [],
+            inspection_report: inspectionReport || undefined,
+            extracted_text: inspectionReport?.extracted_text_preview || undefined,
             version: subVersion,
             findings: findings.map((f, idx) => ({
               id: f.id || `f-${f.number || idx + 1}`,
@@ -866,15 +929,13 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
           </button>
 
           <label className="w-full sm:w-auto flex items-center justify-center gap-2 text-xs font-mono text-neutral-400 cursor-pointer">
-            <span className="w-full sm:w-auto px-4 py-3 sm:py-2 rounded-xl border border-neutral-700 bg-neutral-950 hover:bg-neutral-900 text-white font-medium transition-colors text-center">
-              Choose File
-            </span>
-            <span className="text-neutral-500 text-[11px] truncate max-w-[120px] sm:max-w-[150px]">
-              {selectedFile ? selectedFile.name : 'No file chosen'}
+            <span className="w-full sm:w-auto px-4 py-3 sm:py-2 rounded-xl border border-neutral-700 bg-neutral-950 hover:bg-neutral-900 text-white font-medium transition-colors text-center flex items-center justify-center gap-2">
+              <UploadCloud className="w-4 h-4" />
+              Upload Image
             </span>
             <input
               type="file"
-              accept=".txt,.docx,.pdf,image/*"
+              accept="image/png,image/jpeg,image/webp"
               onChange={handleFileChange}
               className="hidden"
             />
@@ -900,6 +961,42 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
           )}
         </button>
       </div>
+
+      {selectedFile && (
+        <div className="rounded-2xl border border-indigo-500/40 bg-indigo-950/20 p-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            {imagePreviewUrl ? (
+              <img src={imagePreviewUrl} alt="Selected campaign asset preview" className="h-24 w-24 rounded-xl object-cover border border-neutral-700" />
+            ) : (
+              <div className="h-24 w-24 rounded-xl border border-neutral-700 bg-neutral-900 flex items-center justify-center">
+                <ImageIcon className="h-8 w-8 text-neutral-500" />
+              </div>
+            )}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-3">
+                <div className="truncate text-sm font-semibold text-white">{selectedFile.name}</div>
+                <button type="button" onClick={handleRemoveFile} className="text-neutral-400 hover:text-rose-300" aria-label="Remove selected image">
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="mt-1 text-xs text-neutral-400">
+                {(selectedFile.size / 1024 / 1024).toFixed(2)} MB · {selectedFile.type || 'image'}
+              </div>
+              {uploadProgress !== null && (
+                <div className="mt-3">
+                  <div className="mb-1 flex justify-between text-[10px] font-mono uppercase text-neutral-400">
+                    <span>{uploadProgress === 100 ? 'Uploaded and inspected' : 'Uploading and inspecting'}</span>
+                    <span>{uploadProgress}%</span>
+                  </div>
+                  <div className="h-1.5 overflow-hidden rounded-full bg-neutral-800">
+                    <div className="h-full rounded-full bg-indigo-400 transition-all" style={{ width: `${uploadProgress}%` }} />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* MORE EXAMPLES Pills Row */}
       <div className="flex flex-wrap items-center gap-2.5 pt-1">

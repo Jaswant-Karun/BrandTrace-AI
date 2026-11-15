@@ -399,6 +399,9 @@ class SubmissionDoc(BaseMongoRecord):
     original_content: str
     current_content: str
     findings: List[SubmissionFinding] = Field(default_factory=list)
+    attachment_ids: List[str] = Field(default_factory=list)
+    inspection_report: Optional[Dict[str, Any]] = None
+    extracted_text: Optional[str] = None
     status: str = "PENDING_REVIEW"  # DRAFT, PENDING_REVIEW, CHANGES_REQUESTED, REVIEW_APPROVED, COMPLIANCE_APPROVED, APPROVED, REJECTED
     submitted_at: int = Field(default_factory=current_epoch_ms)
     submission_notes: Optional[str] = None

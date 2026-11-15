@@ -58,7 +58,7 @@ const ViewLoadingFallback: React.FC = () => (
 );
 
 export const App: React.FC = () => {
-  const { currentWorkspace, setWorkspace } = useAuth();
+  const { currentWorkspace, setWorkspace, user, isAuthenticated } = useAuth();
 
   const [viewMode, setViewMode] = useState<
     | 'landing'
@@ -241,6 +241,44 @@ export const App: React.FC = () => {
   };
 
   const currentBrand = brands.find((b) => b.brand_id === selectedBrandId);
+  const requestedRole =
+    viewMode === 'creator-dashboard' ? 'creator' :
+    viewMode === 'agency-dashboard' ? 'agency' :
+    viewMode === 'reviewer-dashboard' ? 'reviewer' :
+    viewMode === 'compliance-dashboard' ? 'compliance' :
+    viewMode === 'brand-owner-dashboard' ? 'brand-owner' : null;
+  const canAccessRequestedRole = !requestedRole || (
+    isAuthenticated && !!user && (
+      requestedRole === 'creator' && user.role === 'CREATOR' ||
+      requestedRole === 'agency' && user.role === 'CREATOR' ||
+      requestedRole === 'reviewer' && user.role === 'REVIEWER' ||
+      requestedRole === 'compliance' && user.role === 'COMPLIANCE_REVIEWER' ||
+      requestedRole === 'brand-owner' && (user.role === 'BRAND_MANAGER' || user.role === 'ADMIN')
+    )
+  );
+
+  if (requestedRole && !canAccessRequestedRole) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center p-6">
+        <div className="max-w-md rounded-2xl border border-neutral-800 bg-neutral-950 p-6 text-center">
+          <h1 className="text-xl font-bold">Workspace access required</h1>
+          <p className="mt-2 text-sm text-neutral-400">
+            Sign in with an authorized account for the {requestedRole} workspace.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setViewMode('login');
+              window.history.pushState({ view: 'login' }, '', '/login');
+            }}
+            className="mt-5 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-bold hover:bg-indigo-500"
+          >
+            Go to sign in
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // 1. PUBLIC ZERO-AUTHENTICATION VERIFICATION VIEW
   if (viewMode === 'verify') {
