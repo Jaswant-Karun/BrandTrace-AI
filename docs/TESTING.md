@@ -12,7 +12,7 @@
 The backend contains 16 automated test suites executing across all architectural layers, security perimeters, and governance modules:
 
 | # | Test Suite File | Domain Scope & Verifications | Tests | Status |
-|---|---|---|:---:|:---:|
+| --- | --- | --- | :---: | :---: |
 | 1 | `test_round3_final_e2e_journeys.py` | Complete Round 3 Journeys A through G end-to-end | 7 | ✅ PASS |
 | 2 | `test_commitment1_digital_twin.py` | Brand Governance Digital Twin, DAG ripple simulation, RBAC gate | 6 | ✅ PASS |
 | 3 | `test_commitment2_multi_agent_pipeline.py` | 4-agent inspection, <800ms latency, statutory legal citations | 6 | ✅ PASS |
@@ -35,20 +35,23 @@ The backend contains 16 automated test suites executing across all architectural
 
 ## 2. Execution Commands
 
-### Backend Automated Test Suite:
+### Backend Automated Test Suite
+
 ```bash
 # From workspace root
 cd backend
 .\.venv\Scripts\python -m pytest tests/ -v
 ```
 
-### End-to-End User Journeys Only:
+### End-to-End User Journeys Only
+
 ```bash
 cd backend
 .\.venv\Scripts\python -m pytest tests/test_round3_final_e2e_journeys.py -v
 ```
 
-### Frontend Type-Check & Production Build:
+### Frontend Type-Check & Production Build
+
 ```bash
 cd frontend
 npm run build
@@ -98,11 +101,13 @@ The test file `backend/tests/test_round3_final_e2e_journeys.py` verifies the 7 c
 ## 4. Empirical Ground-Truth Benchmark Results
 
 Evaluated against 23 realistic, labelled ground-truth test cases across three enterprise profiles:
+
 - **AURELLE Global** (12 cases): Consumer electronics, smart wearables, cloud audio.
 - **Apex Dynamics** (7 cases): Autonomous commercial fleet and connected mobility.
 - **Novus Health** (4 cases): Certified medical wellness diagnostics and clinical claims.
 
-### Benchmark Metrics:
+### Benchmark Metrics
+
 - **Total Test Samples:** 23
 - **True Positives (Correctly Flagged Violations):** 17 / 18
 - **False Positives (Erroneously Flagged Compliant Content):** 0 / 5

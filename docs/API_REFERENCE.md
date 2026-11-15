@@ -10,9 +10,11 @@
 ## 1. System Health & Infrastructure
 
 ### `GET /health`
+
 Returns live system operational telemetry, MongoDB Atlas connection state, and active agents.
 
 **Response (`200 OK`):**
+
 ```json
 {
   "status": "operational",
@@ -40,7 +42,8 @@ All authenticated endpoints require a Bearer token in the `Authorization` header
 Authorization: Bearer <jwt_access_token>
 ```
 
-### Supported Roles & Scopes:
+### Supported Roles & Scopes
+
 - `ADMIN`: Full organizational management, tenant configuration, and benchmark execution.
 - `BRAND_MANAGER`: Brand guidelines, approved facts, and digital twin simulation commits.
 - `CREATOR`: Submitting creative assets and remediating flagged copy.
@@ -48,9 +51,11 @@ Authorization: Bearer <jwt_access_token>
 - `COMPLIANCE_REVIEWER`: Regulatory sign-off, clinical validation, and cryptographic release authorization.
 
 ### `POST /api/auth/login`
+
 Authenticates a user via email and password, returning an access JWT and user profile.
 
 **Request Body:**
+
 ```json
 {
   "email": "demo@brandtrace.ai",
@@ -59,6 +64,7 @@ Authenticates a user via email and password, returning an access JWT and user pr
 ```
 
 **Response (`200 OK`):**
+
 ```json
 {
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -74,9 +80,11 @@ Authenticates a user via email and password, returning an access JWT and user pr
 ```
 
 ### `GET /api/auth/me`
+
 Returns current authenticated user details extracted from the JWT token. Requires `Authorization: Bearer <token>`.
 
 ### `GET /api/auth/personas`
+
 Lists available demonstration personas across different RBAC roles (`ADMIN`, `BRAND_MANAGER`, `CREATOR`, `REVIEWER`, `COMPLIANCE_REVIEWER`).
 
 ---
@@ -84,12 +92,15 @@ Lists available demonstration personas across different RBAC roles (`ADMIN`, `BR
 ## 3. Brand Knowledge Base & Facts (`/api/facts`)
 
 ### `GET /api/facts`
+
 Lists approved brand facts. Filterable by query parameter `brand_id` (e.g. `?brand_id=aurelle-tech`).
 
 ### `POST /api/facts`
+
 Registers a new approved fact with server-side validation and persistence into MongoDB Atlas and in-memory cache.
 
 **Request Body:**
+
 ```json
 {
   "brand_id": "aurelle-tech",
@@ -105,18 +116,23 @@ Registers a new approved fact with server-side validation and persistence into M
 ```
 
 ### `GET /api/facts/{fact_id}`
+
 Retrieves a specific approved fact by ID. Returns `404 Not Found` if the identifier does not exist.
 
 ### `PUT /api/facts/{fact_id}`
+
 Updates an approved fact with server-side input validation and historical lineage tracking.
 
 ### `POST /api/facts/mutate`
+
 Initiates a brand fact mutation, calculating cross-departmental impact, identifying affected content assets, and generating revision tasks. Enforces server-side RBAC (requires `BRAND_MANAGER` or `ADMIN`).
 
 ### `POST /api/knowledge-base/vector-search`
+
 Executes MongoDB Atlas Vector Search (`$vectorSearch`) across approved facts and guidelines using 768-dimensional embeddings.
 
 **Request Body:**
+
 ```json
 {
   "query_text": "titanium durability warranty",
@@ -128,12 +144,15 @@ Executes MongoDB Atlas Vector Search (`$vectorSearch`) across approved facts and
 ```
 
 ### `GET /api/brands/{brand_id}/graph`
+
 Returns all graph nodes and semantic dependency edges formatted for interactive Directed Canvas visualization.
 
 ### `POST /api/graph/traverse`
+
 Executes depth-bounded DAG traversal from a specific root fact or guideline node to trace upstream dependencies and downstream blast radius.
 
 **Request Body:**
+
 ```json
 {
   "brand_id": "aurelle-tech",
@@ -147,9 +166,11 @@ Executes depth-bounded DAG traversal from a specific root fact or guideline node
 ## 4. Multi-Agent Content Inspection (`/api/verify`)
 
 ### `POST /api/verify`
+
 Executes the Autonomous Multi-Agent Governance Pipeline on marketing content. Evaluates Voice & Persona, Claim Substantiation, and Regulatory Compliance.
 
 **Request Body:**
+
 ```json
 {
   "brand_id": "aurelle-tech",
@@ -160,6 +181,7 @@ Executes the Autonomous Multi-Agent Governance Pipeline on marketing content. Ev
 ```
 
 **Response (`200 OK`):**
+
 ```json
 {
   "verification_id": "VRF-98234-A7B2",
@@ -189,9 +211,11 @@ Executes the Autonomous Multi-Agent Governance Pipeline on marketing content. Ev
 ## 5. Change Impact Simulator & Digital Twin (`/api/simulator`)
 
 ### `POST /api/simulator/propose`
+
 Non-destructive Digital Twin simulation. Evaluates blast radius, affected touchpoints, and policy contradictions before committing changes.
 
 **Request Body:**
+
 ```json
 {
   "brand_id": "aurelle-tech",
@@ -206,6 +230,7 @@ Non-destructive Digital Twin simulation. Evaluates blast radius, affected touchp
 ```
 
 ### `POST /api/simulator/commit`
+
 Formally activates the proposed change in the live knowledge graph. Generates revision tasks and persists state. Requires `BRAND_MANAGER` or `ADMIN` role.
 
 ---
@@ -213,12 +238,15 @@ Formally activates the proposed change in the live knowledge graph. Generates re
 ## 6. Human Approval Center (`/api/tasks`)
 
 ### `GET /api/tasks`
+
 Lists pending and historical revision tasks. Filterable by `brand_id`.
 
 ### `POST /api/tasks/{task_id}/resolve`
+
 Resolves or approves a revision task with human-in-the-loop sign-off.
 
 **Request Body:**
+
 ```json
 {
   "reviewer_name": "Alex Mercer (Brand Manager)",
@@ -233,15 +261,19 @@ Resolves or approves a revision task with human-in-the-loop sign-off.
 ## 7. Trust Ledger & Cryptographic Verification (`/api/ledger` & `/api/releases`)
 
 ### `GET /api/releases`
+
 Lists immutable releases from MongoDB Atlas release ledger.
 
 ### `POST /api/releases/sign`
+
 Signs an approved asset into the cryptographic release ledger with a deterministic SHA-256 seal. Enforces RBAC.
 
 ### `POST /api/ledger/verify-record`
+
 Validates content authenticity against the immutable audit ledger.
 
 **Request Body:**
+
 ```json
 {
   "identifier": "AST-AUR-01",
@@ -250,6 +282,7 @@ Validates content authenticity against the immutable audit ledger.
 ```
 
 **Response (`200 OK`):**
+
 ```json
 {
   "state": "VALID_UNCHANGED",
@@ -267,11 +300,13 @@ Validates content authenticity against the immutable audit ledger.
 ## 8. Demo Lifecycle & Reset (`/api/demo`)
 
 ### `GET /api/demo/scenario-status`
+
 Returns current step in the 12-step enterprise lifecycle demonstration.
 
 ### `POST /api/demo/execute-step`
+
 Executes a discrete step in the demonstration sequence (1 to 12).
 
 ### `POST /api/demo/reset`
-Restores the AURELLE demonstration workspace to pristine factory state without affecting production settings. Requires `BRAND_MANAGER` or `ADMIN` role.
 
+Restores the AURELLE demonstration workspace to pristine factory state without affecting production settings. Requires `BRAND_MANAGER` or `ADMIN` role.

@@ -15,6 +15,7 @@ During Round 3, BRANDTRACE AI evolved from a working prototype into a hardened, 
 ## 2. Chronological Record of Improvements
 
 ### Phase 1: Round 2 Commitments Implementation
+
 1. **Commitment 1 — Brand Governance Digital Twin (Change Impact Simulator):**
    - Implemented proactive DAG simulation in an isolated virtual graph before any production commit.
    - Built the downstream blast radius traversal engine identifying affected omnichannel touchpoints (e.g., Aurelle 4 touchpoints, $320,000 projected risk exposure).
@@ -36,6 +37,7 @@ During Round 3, BRANDTRACE AI evolved from a working prototype into a hardened, 
 ---
 
 ### Phase 2: Enterprise UI Redesign & Usability
+
 1. **Modern White / Light Enterprise Interface:**
    - Redesigned visual presentation from dark prototype theme to an executive white/slate enterprise design system inspired by top SaaS governance platforms (Plumbline, Verytas).
    - Clean white page backgrounds (`#FFFFFF`, `#F8FAFC`), dark slate typography (`#0F172A`, `#334155`), and restrained blue/cyan accents (`#2563EB`, `#0284C7`).
@@ -49,6 +51,7 @@ During Round 3, BRANDTRACE AI evolved from a working prototype into a hardened, 
 ---
 
 ### Phase 3: Progressive Web App (PWA) & Browser Readiness
+
 1. **W3C Web App Manifest:**
    - Created valid `frontend/public/manifest.webmanifest` with standalone display mode, theme colors, and icon definitions.
 2. **Branded Visual Assets:**
@@ -63,6 +66,7 @@ During Round 3, BRANDTRACE AI evolved from a working prototype into a hardened, 
 ---
 
 ### Phase 4: Reliability & Application Security Hardening
+
 1. **Sliding-Window Rate Limiting:**
    - Implemented `RateLimitMiddleware` enforcing 120 req/minute per IP/token with standard `Retry-After` headers and automated test quota overrides.
 2. **Salted Password Hashing:**
@@ -78,6 +82,7 @@ During Round 3, BRANDTRACE AI evolved from a working prototype into a hardened, 
 ---
 
 ### Phase 5: Public Demonstration Experience
+
 1. **Dedicated Restricted Demo Account:**
    - Seeded `demo@brandtrace.ai` with password `DemoAurelle2026!`.
    - Assigned restricted `BRAND_MANAGER` role scoped exclusively to the `aurelle-tech` workspace.
@@ -91,6 +96,7 @@ During Round 3, BRANDTRACE AI evolved from a working prototype into a hardened, 
 ---
 
 ### Phase 6: Automated Test Suite Expansion
+
 1. **Backend Tests:**
    - Expanded backend test suite from 60 tests to **136 tests** across 16 test files.
    - 100% pass rate achieved in `6.38s`.
@@ -98,4 +104,3 @@ During Round 3, BRANDTRACE AI evolved from a working prototype into a hardened, 
    - Authored `test_round3_final_e2e_journeys.py` covering Journeys A through G end-to-end.
 3. **Frontend Production Build:**
    - Production Vite bundle compiles cleanly with 0 TypeScript errors in `11.47s`.
-

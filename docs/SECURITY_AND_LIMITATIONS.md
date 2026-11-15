@@ -10,11 +10,13 @@
 BrandTrace AI implements a multi-tenant, role-based access control architecture:
 
 ### A. Authentication Protocol
+
 - **JWT Bearer Tokens:** State-bearing, cryptographically signed JSON Web Tokens using standard HMAC-SHA256 (`HS256`) algorithms with a high-entropy secret key.
 - **Password Hashing:** Passwords are salted and hashed using PBKDF2-HMAC-SHA256 with constant-time verification (`hmac.compare_digest`) to prevent timing side-channel attacks.
 - **Session Lifecycle:** Tokens carry expiration timestamps (`exp`). The client automatically purges expired tokens and prompts for re-authentication.
 
 ### B. Enterprise Role Matrix
+
 The platform defines five distinct organizational roles with strict server-side authorization enforcement:
 
 | Role | Permissions & Scope |
@@ -45,7 +47,9 @@ BrandTrace AI enforces strict multi-tenancy at the organizational level (`ORGANI
 ## 3. Input Validation, SSRF Defense & Upload Security
 
 ### A. Server-Side Request Forgery (SSRF) Protection
+
 The website import feature (`POST /api/documents/import-website/preview`) implements multi-layered SSRF defenses:
+
 - **Protocol Restriction:** Only `http://` and `https://` schemes are permitted.
 - **DNS Resolution Verification:** Hostnames are resolved to IP addresses before initiating requests.
 - **Private IP Space Blocking:** Requests targeting loopback, private RFC 1918, link-local, and cloud metadata endpoints are immediately rejected with HTTP 400:
@@ -57,6 +61,7 @@ The website import feature (`POST /api/documents/import-website/preview`) implem
   - `0.0.0.0` and IPv6 localhost (`::1`)
 
 ### B. File Upload Security
+
 - **Magic-Byte Signature Verification:** Uploaded files (`POST /api/documents/upload` and `POST /api/public/verify-image`) are validated against binary magic headers:
   - PNG: `\x89PNG\r\n\x1a\n`
   - JPEG: `\xFF\xD8\xFF`
@@ -88,7 +93,8 @@ The Audit Trust Ledger maintains an immutable chain of release records using SHA
 $$\text{Block Material} = \text{rec\_id} \parallel \text{last\_block\_hash} \parallel \text{resource\_id} \parallel \text{content\_hash} \parallel \text{user\_identity} \parallel \text{timestamp}$$
 $$\text{Tamper-Evident Seal} = \text{BT-SEAL-} \parallel \text{SHA-256}(\text{Block Material})[:16].\text{upper()}$$
 
-### Honest Technical Claims:
+### Honest Technical Claims
+
 - **Designation:** Accurately designated across all documentation, UI copy, and APIs as **"SHA-256 Tamper-Evident Ledger Digest (Internal Merkle-Style Chaining)"**.
 - **No False Claims:** BrandTrace AI makes **zero false claims** of writing to public decentralized blockchains, zero unsubstantiated claims of HMAC without configured shared keys, and zero claims of patent grant status.
 

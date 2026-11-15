@@ -9,7 +9,8 @@
 
 **BrandTrace AI** is engineered as a zero-trust, human-in-the-loop autonomous governance control plane. It bridges the gap between approved brand truth-sets (guidelines, pricing, product specifications, claims) and multi-channel creative publication.
 
-### Core Architectural Principles:
+### Core Architectural Principles
+
 1. **Grounded Graph Truth-Set (BDIG):** Marketing copy and commercial claims are never evaluated in a vacuum; they are grounded in the **Brand Dependency Intelligence Graph (BDIG)**.
 2. **Concurrent Multi-Agent Reasoning (<800ms SLA):** Specialized agents execute in parallel using asynchronous concurrency (`asyncio.gather`), returning explainable evidence and exact character spans without causing creative bottlenecks.
 3. **Predictive Digital Twin Sandbox:** Changes to brand facts are simulated in a virtual sandbox before altering production records, quantifying blast radius and financial risk exposure upfront.
@@ -17,7 +18,7 @@
 5. **Tamper-Evident Ledger Provenance:** Releases receive internal SHA-256 chained block digest seals, verifiable by consumers worldwide without corporate sign-in.
 6. **Strict Multi-Tenant Isolation:** Enforces `org_id` and `workspace_id` boundaries across all database queries, document indexing, and agent pipelines.
 
-### Technology Stack & Runtime Specifications:
+### Technology Stack & Runtime Specifications
 
 | Tier | Component / Technology | Specification | Enterprise Role |
 | :--- | :--- | :--- | :--- |
@@ -85,6 +86,7 @@ flowchart TB
 ## 3. Specialized Workflows & Data Flows
 
 ### A. Document Indexing & Ingestion Flow
+
 ```mermaid
 sequenceDiagram
     autonumber
@@ -114,6 +116,7 @@ sequenceDiagram
 ---
 
 ### B. Concurrent Multi-Agent Content Intelligence Pipeline
+
 ```mermaid
 sequenceDiagram
     autonumber
@@ -154,6 +157,7 @@ sequenceDiagram
 ---
 
 ### C. Brand Governance Digital Twin (Change Impact Simulation)
+
 ```mermaid
 flowchart TD
     A["Brand Manager Proposes Fact Mutation<br/>(e.g., FACT-AUR-PRC-01 ₹499 &rarr; ₹599)"] --> B["Digital Twin Simulation Sandbox<br/>(POST /api/simulator/propose)"]
@@ -174,6 +178,7 @@ flowchart TD
 ---
 
 ### D. Cryptographic Release Ledger & Public Verification Flow
+
 ```mermaid
 sequenceDiagram
     autonumber
@@ -227,6 +232,7 @@ BrandTrace AI is backed by a structured MongoDB Atlas cluster with **27 enterpri
 | **Approvals & Governance** | `approval_decisions`, `review_assignments`, `revision_tasks`, `comments` | `org_id`, `workspace_id` |
 | **Audit & Cryptographic Ledger** | `release_ledger`, `audit_events`, `notifications` | `org_id`, `workspace_id` |
 
-### Multi-Tenant Boundary Enforcement:
+### Multi-Tenant Boundary Enforcement
+
 - Every query to `brand_documents`, `knowledge_nodes`, `verifications`, and `release_ledger` scopes automatically by the authenticated user's `org_id` and `workspace_id`.
 - Cross-tenant access attempts return HTTP 404 (preventing cross-tenant entity enumeration).

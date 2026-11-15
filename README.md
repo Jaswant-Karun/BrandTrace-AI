@@ -29,9 +29,10 @@
 
 ## 1. Problem Statement
 
-Modern consumer enterprises publish thousands of commercial touchpoints across social channels, advertising campaigns, packaging assets, regulatory filings, and regional distributor portals. 
+Modern consumer enterprises publish thousands of commercial touchpoints across social channels, advertising campaigns, packaging assets, regulatory filings, and regional distributor portals.
 
 In this distributed environment, brand governance faces four critical failure modes:
+
 1. **Disconnected Truth-Sets:** Approved commercial facts (product prices, battery specs, warranty terms, ingredients) live separated from marketing creative workflows in static PDF decks or spreadsheets.
 2. **Cascading Brand Blindspots:** When a single commercial fact changes (e.g., a subscription price shifts from ₹499 to ₹599, or an engine thermal threshold is revised), teams have no mechanism to calculate which published or in-flight marketing assets are now outdated or legally non-compliant.
 3. **Regulatory Exposure:** Non-compliant marketing copy triggers severe statutory penalties under FTC Green Guides (16 CFR §260.4), FDA wellness vs. medical device regulations (21 CFR §202.1/§870), Lanham Act trademark rules (§43(a)), and NHTSA autonomous driving claims (SGO 2021-01).
@@ -43,7 +44,7 @@ In this distributed environment, brand governance faces four critical failure mo
 
 **BrandTrace AI** is an autonomous governance and brand intelligence control plane that connects brand truth-sets directly to creative production, simulation, and public verification.
 
-Rather than treating marketing copy as isolated strings of text, BrandTrace AI grounds every asset in a **Brand Dependency Intelligence Graph (BDIG)**. When marketing copy is submitted, an autonomous multi-agent reasoning gate inspects claims against verified guidelines and statutory rules under 800ms. 
+Rather than treating marketing copy as isolated strings of text, BrandTrace AI grounds every asset in a **Brand Dependency Intelligence Graph (BDIG)**. When marketing copy is submitted, an autonomous multi-agent reasoning gate inspects claims against verified guidelines and statutory rules under 800ms.
 
 Before brand policies or commercial facts change, the **Brand Governance Digital Twin** simulates the change in a virtual sandbox, mapping the blast radius across downstream assets, quantifying financial exposure, and preventing silent brand contradictions before they happen. Once reviewed and authorized by designated human reviewers, releases receive a tamper-evident **SHA-256 Release Seal**, verifiable by anyone worldwide on the zero-auth **Public Verification Portal**.
 
@@ -93,6 +94,7 @@ flowchart TB
 ## 4. Key Features & Working Capabilities
 
 ### A. Brand Knowledge Management & Document Studio
+
 - **Custom Document Authoring:** Create and categorize documents across Brand Guidelines, Product Facts, Pricing Policies, Brand Voice, Regulatory Policies, and Marketing Claims.
 - **Multi-Format Upload:** Upload and extract readable text from PDF, DOCX, TXT, and Markdown files.
 - **SSRF-Protected Website Import:** Safely import public web pages with DNS rebinding protection and private IP range blocking (`10.*`, `172.16.*`, `192.168.*`, `127.0.0.1`, `169.254.169.254`).
@@ -100,6 +102,7 @@ flowchart TB
 - **Benchmark Protection:** Seeded demo benchmark documents are protected from deletion (`403 Forbidden`).
 
 ### B. Autonomous Multi-Agent Content Intelligence
+
 - **Concurrent Inspection Pipeline:** Three specialist agents run concurrently via `asyncio.gather` with monotonic sub-800ms latency (average: 210ms):
   1. **VoicePersonaAgent:** Evaluates brand voice consistency, banned superlatives, and tonal alignment.
   2. **ClaimSubstantiationAgent:** Grounded claim verification against approved brand facts in MongoDB Atlas.
@@ -107,16 +110,19 @@ flowchart TB
 - **Non-Destructive Character Spans:** Returns exact character start and end offsets for non-destructive visual highlighting.
 
 ### C. Brand Governance Digital Twin (Change Impact Simulator)
+
 - **Virtual Mutation Sandbox:** Propose price, policy, or specification mutations without modifying production data.
 - **Blast Radius Mapping:** Traverses the BDIG directed graph to identify all directly and indirectly connected marketing touchpoints.
 - **Financial & Workload Quantification:** Projects organizational dollar risk exposure and estimated departmental review hours.
 - **Policy Contradiction Detection:** Surfaces direct contradictions and regulatory non-compliance before changes are committed.
 
 ### D. Human Governance & Atomic Approvals Gate
+
 - **Strict Human-in-the-Loop:** Zero automatic publishing. All release candidates and fact mutations require explicit sign-off by an authorized role (`COMPLIANCE_REVIEWER`, `BRAND_MANAGER`, or `ADMIN`).
 - **Atomic Task Resolution:** Reviewers accept, reject, or request revisions with mandatory audit notes.
 
 ### E. Cryptographic Release Ledger & Public Verification
+
 - **SHA-256 Tamper-Evident Chaining:** Approved releases are sealed into an internal Merkle-style block chain:
   $$\text{Seal} = \text{SHA-256}(\text{rec\_id} \parallel \text{last\_block\_hash} \parallel \text{resource\_id} \parallel \text{content\_hash} \parallel \text{user\_identity} \parallel \text{timestamp})[:16]$$
 - **Zero-Auth Public Verification Portal:** External consumers verify assets without signing in:
@@ -149,17 +155,20 @@ flowchart TB
 ## 6. Installation & Local Setup
 
 ### Prerequisites
+
 - Python 3.11 or higher
 - Node.js 18 or higher (v20+ recommended)
 - Git
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/Jaswant-Karun/BrandTrace-AI.git
 cd BrandTrace-AI
 ```
 
 ### 2. Backend Setup
+
 ```bash
 cd backend
 python -m venv .venv
@@ -172,14 +181,17 @@ source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn brandtrace.main:app --port 8000 --reload
 ```
+
 The backend API documentation will be available at: `http://localhost:8000/docs`
 
 ### 3. Frontend Setup
+
 ```bash
 cd ../frontend
 npm install
 npm run dev
 ```
+
 The frontend application will be accessible at: `http://localhost:5173`
 
 ---
@@ -212,11 +224,13 @@ backend\.venv\Scripts\pytest backend\tests -v -q --tb=short
 ```
 
 **Results:**
+
 ```text
 ============================= 242 passed in 15.40s =============================
 ```
 
 To run the frontend TypeScript and production build verification:
+
 ```bash
 cd frontend
 npm run build

@@ -12,6 +12,7 @@
 BrandTrace AI's documentation structure underwent a systematic, zero-information-loss audit and cleanup. Prior to cleanup, the repository accumulated 43 Markdown (`.md`) files containing substantial duplication across iterative hackathon phases, sprint logs, redundant architecture drafts, and split API/Database docs.
 
 Following the approved cleanup protocol:
+
 - **Discovered Files**: 43 Markdown files (29 in repository root, 14 in `docs/`).
 - **Consolidated / Merged Files**: 5 document pairs merged to ensure zero technical information, endpoint definition, database pattern, or operational boundary was lost.
 - **Deleted Redundant Files**: 29 files safely removed from disk.
@@ -28,7 +29,7 @@ Following the approved cleanup protocol:
 ## 2. Complete Inventory & Action Register
 
 | # | File Path | Original Purpose | Unique Content Preserved | Action Taken | Canonical Destination |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | 1 | `README.md` | Primary GitHub project overview & quickstart | Yes | **RETAINED** | `README.md` |
 | 2 | `DEPLOYMENT.md` | Root deployment guide | Yes | **RETAINED (ENRICHED)** | `DEPLOYMENT.md` |
 | 3 | `DEMO_ACCESS_GUIDE.md` | Live demo credentials and 5-role walkthrough | Yes | **RETAINED** | `DEMO_ACCESS_GUIDE.md` |
@@ -80,6 +81,7 @@ Following the approved cleanup protocol:
 All consolidations strictly followed the **Zero Information Loss Safeguard**:
 
 ### Merge 1: Knowledge-Base & Graph Traversal Endpoints
+
 - **Source**: `docs/API.md`
 - **Destination**: `docs/API_REFERENCE.md`
 - **Consolidated Content**:
@@ -89,12 +91,14 @@ All consolidations strictly followed the **Zero Information Loss Safeguard**:
   - Bearer Token authentication security specifications across all private endpoints.
 
 ### Merge 2: Hybrid Schema Architecture & Relational Patterns
+
 - **Source**: `docs/DATABASE.md`
 - **Destination**: `docs/DATABASE_SCHEMA.md`
 - **Consolidated Content**:
   - Section 1: Architectural principles governing MongoDB document structures, subdocument embedding strategies for immutable verification results, and reference patterns for cross-entity relations.
 
 ### Merge 3: Operational Boundaries & Multi-Tenancy Architecture
+
 - **Sources**: `docs/KNOWN_LIMITATIONS.md` and `FINAL_ROUND3_KNOWN_LIMITATIONS.md`
 - **Destination**: `docs/SECURITY_AND_LIMITATIONS.md`
 - **Consolidated Content**:
@@ -105,6 +109,7 @@ All consolidations strictly followed the **Zero Information Loss Safeguard**:
     4. 25MB multimodal upload payload ceiling for video and high-resolution assets.
 
 ### Merge 4: Complete Production Environment Variables Matrix
+
 - **Source**: `docs/DEPLOYMENT.md`
 - **Destination**: Root `DEPLOYMENT.md`
 - **Consolidated Content**:
@@ -112,6 +117,7 @@ All consolidations strictly followed the **Zero Information Loss Safeguard**:
   - Section 5: Step-by-step Render backend and Vercel frontend deployment blueprints.
 
 ### Merge 5: Runtime Technology Stack & Specification Table
+
 - **Source**: `ROUND3_CURRENT_ARCHITECTURE.md`
 - **Destination**: `docs/ARCHITECTURE.md`
 - **Consolidated Content**:
@@ -122,6 +128,7 @@ All consolidations strictly followed the **Zero Information Loss Safeguard**:
 ## 4. Link & Reference Integrity Validation
 
 A recursive Python link verification script was executed across all 14 canonical Markdown documents:
+
 - Scanned all internal relative paths, anchor targets, and directory references.
 - Verified that updated links in `README.md` and `DEPLOYMENT.md` accurately resolve to existing files.
 - **Result**: **0 broken internal markdown links detected**.
@@ -131,9 +138,11 @@ A recursive Python link verification script was executed across all 14 canonical
 ## 5. Non-Functional, Build & Test Verification
 
 ### Frontend Production Build
+
 ```bash
 cd frontend && pnpm run build
 ```
+
 - **Execution Command**: `tsc && vite build`
 - **Duration**: `19.28s`
 - **Modules Transformed**: `2548`
@@ -146,9 +155,11 @@ cd frontend && pnpm run build
   - Dynamic route & role chunks: `RoleDashboardStage`, `LandingPage`, `CreatorSubmissionsView`, `InstallAppModal`, etc.
 
 ### Backend Automated Test Suite
+
 ```bash
 backend\.venv\Scripts\pytest.exe backend/tests -q
 ```
+
 - **Execution Command**: Full test suite across unit, integration, API, security, and PWA test modules
 - **Duration**: `15.40s`
 - **Tests Passed**: `242`
@@ -157,6 +168,7 @@ backend\.venv\Scripts\pytest.exe backend/tests -q
 - **Pass Rate**: `100.0%`
 
 ### Vercel Deployment Health Note
+
 - The previous Vercel deployment check error shown on commit `2d2b4ee` (`All checks have failed - 1 failing check`) was caused by an unused motion import/variable in `CreatorFactsLedger.tsx`.
 - This was diagnosed and resolved in commit `d249849` (`fix(frontend): resolve unused motion variable in CreatorFactsLedger to fix Vercel deployment`).
 - The subsequent production updates (`2a8aeb2` and `d42963e`) and our local `tsc && vite build` validation confirm that the build pipeline is fully healthy and ready for seamless Vercel deployment.

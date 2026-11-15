@@ -7,6 +7,7 @@
 ## 1. Ethical AI Architecture
 
 In high-stakes enterprise brand governance, pure generative language models introduce unacceptable legal and operational risks:
+
 - **Hallucinated Citations:** Generating fabricated FTC regulations or ASTM testing standards.
 - **Silent Degradation:** Silently approving non-compliant marketing claims during LLM drift or API timeouts.
 - **Loss of Agency:** Publishing marketing assets autonomously without designated human accountability.
@@ -28,15 +29,18 @@ flowchart LR
 ## 2. Hard Limits & Non-Destructive Guardrails
 
 ### 1. Zero Autonomous Publishing
+
 - The AI pipeline cannot publish, schedule, or push content to production.
 - All high-risk and critical violations trigger `STAGED_FOR_HUMAN_REVIEW` or `REJECTED_GATED`.
 - Every release proof requires a digital sign-off with an authorized reviewer persona (`ADMIN`, `BRAND_MANAGER`, or `COMPLIANCE_REVIEWER`).
 
 ### 2. Mandatory Evidentiary Citation
+
 - The AI inspection engine is forbidden from flagging a violation or recommending a fix without attaching a valid `source_citation` linked to an active record in MongoDB Atlas.
 - Uncited hallucinations fail the verification step and trigger immediate reviewer escalation.
 
 ### 3. Non-Destructive Digital Twin Simulations
+
 - Proposed governance changes in the Change Impact Simulator are strictly demarcated with `is_simulated: true` and `simulated_status: "SIMULATED_PREVIEW_ONLY"`.
 - Simulations run against isolated memory and snapshot branches; active production brand facts are never overwritten until an explicit commit endpoint is authorized.
 
@@ -53,6 +57,7 @@ flowchart LR
 ## 4. Resilience & Circuit Breaker Architecture
 
 If the upstream AI provider (e.g. Google Gemini API) experiences latency spikes or network timeouts:
+
 1. The system engages an internal **deterministic heuristic fallback** based on regex pattern matching, AST tree parsing, and exact brand taxonomy matching.
 2. The inspection score is flagged with `circuit_breaker_active: true`, alerting reviewers that heuristic rules evaluated the copy.
 3. Operations continue uninterrupted without application crashes or security compromises.

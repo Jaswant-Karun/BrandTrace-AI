@@ -183,9 +183,10 @@ pnpm dev
 
 ## 📋 Comprehensive Environment Variables Guide
 
-### Backend Environment Variables (`backend/.env`):
+### Backend Environment Variables (`backend/.env`)
+
 | Variable | Description | Example / Allowed Values |
-|---|---|---|
+| --- | --- | --- |
 | `ENVIRONMENT` | Runtime execution mode | `production` / `development` / `testing` |
 | `PORT` | Listening server port | `8000` |
 | `MONGODB_URI` | MongoDB Atlas TLS connection string | `mongodb+srv://<user>:<password>@cluster.mongodb.net/brandtrace_admin` |
@@ -195,8 +196,9 @@ pnpm dev
 | `GEMINI_API_KEY` | Optional key for live LLM grounding | `<google_ai_studio_api_key>` |
 | `DEMO_ACCOUNT_PASSWORD` | Restricted demo password | `DemoAurelle2026!` |
 
-### Frontend Environment Variables (`frontend/.env`):
+### Frontend Environment Variables (`frontend/.env`)
+
 | Variable | Description | Example / Value |
-|---|---|---|
+| --- | --- | --- |
 | `VITE_API_BASE_URL` | Backend REST API base URL | `https://brandtrace-backend.onrender.com` |
 | `VITE_APP_NAME` | Application title | `BRANDTRACE AI` |

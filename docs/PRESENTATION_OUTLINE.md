@@ -9,6 +9,7 @@
 ---
 
 ### Slide 1: Title & Product Vision
+
 - **Header:** BRANDTRACE AI — The Autonomous Brand Intelligence & Governance Control Plane
 - **Tagline:** *Detect. Predict. Verify. Prevent.*
 - **Presenter Team:** Storm Crackers (Jaswant Karun S A, Jaiwant Karrun S A) — KPR Institute of Engineering and Technology
@@ -18,6 +19,7 @@
 ---
 
 ### Slide 2: The Problem Statement
+
 - **Headline:** Modern Brands Move Faster Than Brand Governance Can Keep Up
 - **The Core Challenges:**
   1. **Disconnected Truth-Sets:** Approved commercial facts (pricing, claims, ingredients, warranties) live separated from marketing teams in static PDF guidelines and spreadsheets.
@@ -28,6 +30,7 @@
 ---
 
 ### Slide 3: The Proposed Solution
+
 - **Headline:** A Connected Control Plane from Brand Truth to Public Release
 - **The BrandTrace Approach:**
   - **Single Source of Truth:** A unified Brand Knowledge Base supporting manual documents, multi-format uploads (PDF, DOCX, TXT), and SSRF-protected website imports.
@@ -39,6 +42,7 @@
 ---
 
 ### Slide 4: System Architecture
+
 - **Headline:** Resilient, Low-Latency Architecture Built for Enterprise Scale
 - **Key Architectural Pillars:**
   - **Presentation Layer:** React 19, TypeScript, Tailwind CSS, `@xyflow/react` interactive graph canvas, and PWA offline fallback shell.
@@ -50,6 +54,7 @@
 ---
 
 ### Slide 5: Core Features & End-to-End Workflow
+
 - **Headline:** Six Seamless Steps from Policy to Verification
 - **The Workflow:**
   1. **Document Ingestion:** Brand managers upload guidelines or import web URLs into the Brand Knowledge Studio.
@@ -62,6 +67,7 @@
 ---
 
 ### Slide 6: The Innovation — Brand Governance Digital Twin
+
 - **Headline:** Moving from Reactive Linting to Predictive Impact Simulation
 - **How Ordinary Tools Differ:**
   - Standard AI linters and grammar checkers only review the text currently in front of them in isolation.
@@ -75,6 +81,7 @@
 ---
 
 ### Slide 7: Technology Stack, Implementation & Validation Evidence
+
 - **Headline:** Engineered, Tested, and Proven with Real Data
 - **Technology Stack:**
   - Backend: Python 3.11 / 3.13, FastAPI, Uvicorn, NetworkX, Motor async driver.
@@ -89,6 +96,7 @@
 ---
 
 ### Slide 8: Real-World Impact, Limitations & Future Roadmap
+
 - **Headline:** Practical Enterprise Value with Responsible AI Guardrails
 - **Measurable Value:**
   - Eliminates silent brand contradictions and stale pricing across distributed marketing channels.

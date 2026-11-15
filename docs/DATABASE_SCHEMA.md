@@ -25,7 +25,7 @@
 ## 2. Complete Inventory of the 27 BSON Collections
 
 | # | Collection Name | Domain Role | Primary Keys & References |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 1 | `organisations` | Enterprise tenant root entities | `organisation_id` (PK), `slug` |
 | 2 | `brand_workspaces` | Brand portfolios within an organization | `workspace_id` (PK), `organisation_id` (FK) |
 | 3 | `users` | User credentials, roles, profile metadata | `user_id` (PK), `email` (unique), `organisation_id` |
@@ -59,6 +59,7 @@
 ## 3. Key Schema Definitions (Pydantic / BSON)
 
 ### `approved_facts`
+
 ```json
 {
   "_id": "fact_FACT-AUR-PRC-01",
@@ -84,6 +85,7 @@
 ```
 
 ### `release_ledger`
+
 ```json
 {
   "_id": "rel_BT-REL-91823",
@@ -108,6 +110,7 @@
 ```
 
 ### `change_simulations`
+
 ```json
 {
   "_id": "sim_SIM-2026-001",
@@ -180,6 +183,7 @@ The `knowledge_nodes` collection stores 768-dimensional embeddings generated via
 ```
 
 The application queries this vector index using the native MongoDB aggregation pipeline:
+
 ```python
 pipeline = [
     {
@@ -193,4 +197,3 @@ pipeline = [
     }
 ]
 ```
-
