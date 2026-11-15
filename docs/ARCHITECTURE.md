@@ -1,273 +1,217 @@
 # BRANDTRACE AI — Enterprise System Architecture 🏛️
 
 > **The Autonomous Brand Intelligence & Governance Control Plane**  
-> *Every brand decision connected. Every risk traceable. Every release accountable.*
+> *Tagline: Detect. Predict. Verify. Prevent.*
 
 ---
 
-## 1. Executive Architectural Overview
+## 1. Architectural Overview & Design Principles
 
-BRANDTRACE AI is an autonomous enterprise brand intelligence and governance control plane. It unifies marketing operations, compliance teams, legal counsel, and creative directors into a single connected workspace.
+**BrandTrace AI** is engineered as a zero-trust, human-in-the-loop autonomous governance control plane. It bridges the gap between approved brand truth-sets (guidelines, pricing, product specifications, claims) and multi-channel creative publication.
 
-Instead of evaluating marketing and commercial copy as disconnected text fragments, BRANDTRACE AI connects every marketing asset, campaign, document, and claim to an immutable truth-set: the **Brand Dependency Intelligence Graph (BDIG)**.
+### Core Architectural Principles:
+1. **Grounded Graph Truth-Set (BDIG):** Marketing copy and commercial claims are never evaluated in a vacuum; they are grounded in the **Brand Dependency Intelligence Graph (BDIG)**.
+2. **Concurrent Multi-Agent Reasoning (<800ms SLA):** Specialized agents execute in parallel using asynchronous concurrency (`asyncio.gather`), returning explainable evidence and exact character spans without causing creative bottlenecks.
+3. **Predictive Digital Twin Sandbox:** Changes to brand facts are simulated in a virtual sandbox before altering production records, quantifying blast radius and financial risk exposure upfront.
+4. **Strict Human Gate:** Zero autonomous publishing. All releases, guideline updates, and fact mutations require explicit human review and cryptographic authorization.
+5. **Tamper-Evident Ledger Provenance:** Releases receive internal SHA-256 chained block digest seals, verifiable by consumers worldwide without corporate sign-in.
+6. **Strict Multi-Tenant Isolation:** Enforces `org_id` and `workspace_id` boundaries across all database queries, document indexing, and agent pipelines.
+
+---
+
+## 2. End-to-End System Architecture
 
 ```mermaid
 flowchart TB
-    subgraph PresentationLayer ["1. Presentation Layer (React 19 + TypeScript + Vite + PWA)"]
-        UI_Nav["Responsive App Shell & Navigation (Desktop / Tablet / Mobile Drawer)"]
-        UI_CC["Executive Command Center (Real-Time Governance Telemetry)"]
-        UI_Canvas["Interactive BDIG Canvas (@xyflow/react Directed Graph)"]
-        UI_Sim["Governance Digital Twin (Change Impact Simulator)"]
-        UI_Inspect["Multi-Agent Content Inspector & Multimodal Studio"]
-        UI_Trust["Cryptographic Trust & Audit Center (5-State Ledger Verifier)"]
-        UI_PWA["Zero-Trust Service Worker (PWA Offline Fallback Shell)"]
+    subgraph ClientLayer ["1. Presentation Layer (React 19 + TypeScript + Vite + Tailwind CSS)"]
+        UI_Nav["Responsive App Shell (Desktop / Tablet / Mobile Drawer)"]
+        UI_Doc["Brand Knowledge Studio (Document Management, File Upload, SSRF Import)"]
+        UI_BDIG["Brand Dependency Graph (@xyflow/react Directed Canvas)"]
+        UI_Sim["Brand Governance Digital Twin (Blast Radius &amp; Risk Simulator)"]
+        UI_Agents["Multi-Agent Content Intelligence &amp; Inspection Studio"]
+        UI_Approvals["Human Governance Approval Center (Atomic Review Queue)"]
+        UI_Public["Public Verification Portal (Zero-Auth Seal / Text / Image Verifier)"]
     end
 
-    subgraph SecurityLayer ["2. Edge Security, Middleware & Boundary Guard"]
-        RateLimit["Sliding Window Rate Limiter (120 req/min per client IP/Token)"]
-        SecHeaders["Enterprise OWASP Security Headers (nosniff, DENY, XSS-block)"]
-        Sanitization["Credential, URI & Stack-Trace Redactor"]
-        RBAC_Guard["Strict Server-Side RBAC & Multi-Tenant Organization Boundary"]
+    subgraph SecurityLayer ["2. Edge Security, Middleware &amp; Boundary Guard"]
+        RateLimit["Rate Limiter (120 req/min auth, 60 req/min public)"]
+        SecHeaders["OWASP Security Headers (nosniff, DENY, strict-origin, XSS-block)"]
+        TenantGuard["Strict Multi-Tenant Boundary Guard (org_id &amp; workspace_id)"]
+        SSRFGuard["SSRF Defense Engine (Private IP &amp; DNS resolution validator)"]
+        ErrorSanitizer["Error Sanitization &amp; Information Leakage Redactor"]
     end
 
-    subgraph CoreEngines ["3. Autonomous Governance & Intelligence Engines"]
-        Graph_Engine["Brand Knowledge Graph Engine (NetworkX + BDIG Directed Traversal)"]
-        DigitalTwin["Brand Governance Digital Twin (Policy Contradiction & Blast Radius)"]
-        AgentPipeline["Autonomous Multi-Agent Orchestrator (Voice, Claims, Legal, Blast)"]
-        Ledger_Engine["Cryptographic Trust Ledger (Deterministic SHA-256 Merkle Sealing)"]
+    subgraph CoreEngines ["3. Autonomous Governance &amp; Intelligence Engines"]
+        DocIngest["Document Ingestion Engine (PDF, DOCX, TXT, MD Extraction)"]
+        AgentCoord["Concurrent Multi-Agent Coordinator (asyncio.gather)"]
+        VoiceAgent["VoicePersonaAgent (Tone, Superlatives, Style)"]
+        ClaimAgent["ClaimSubstantiationAgent (Fact Grounding)"]
+        RegAgent["RegulatoryComplianceAgent (FTC, FDA, Lanham, NHTSA)"]
+        DigitalTwin["Digital Twin Blast Radius Engine (NetworkX Graph)"]
+        LedgerEngine["Audit Trust Ledger (SHA-256 Merkle-Style Chained Blocks)"]
     end
 
-    subgraph PersistenceLayer ["4. Persistence & Semantic Grounding"]
-        Atlas_DB[("MongoDB Atlas 7.0 Cluster (27 Enterprise BSON Collections)")]
-        Atlas_Vector["MongoDB Atlas Vector Search ($vectorSearch, 768-dim Embeddings)"]
-        Memory_Fallback["Pragmatic In-Memory Resilient Cache & Deterministic Mock Store"]
+    subgraph PersistenceLayer ["4. Persistence &amp; Grounding Layer"]
+        Atlas_DB[("MongoDB Atlas 7.0 Cluster (Motor Async Driver)")]
+        Atlas_Vector["Atlas Vector Search (768-dim Embeddings with Lexical Fallback)"]
+        Memory_Fallback["Resilient In-Memory Repository Fallback"]
     end
 
-    PresentationLayer --> SecurityLayer
+    ClientLayer --> SecurityLayer
     SecurityLayer --> CoreEngines
+    AgentCoord --> VoiceAgent
+    AgentCoord --> ClaimAgent
+    AgentCoord --> RegAgent
     CoreEngines --> PersistenceLayer
 ```
 
 ---
 
-## 2. C4 Architecture Breakdown
+## 3. Specialized Workflows & Data Flows
 
-### Level 1: System Context
-The System Context diagram portrays how BRANDTRACE AI interfaces with external enterprise personas, marketing channels, and storage engines:
-
-```mermaid
-flowchart LR
-    User_Creator["Marketing Creator / Copywriter"]
-    User_Manager["Brand Governance Manager"]
-    User_Legal["Regulatory & Legal Counsel"]
-    User_Auditor["External Compliance Auditor / Judge"]
-
-    BrandTrace["BRANDTRACE AI Control Plane\n(Vercel Frontend + Render FastAPI Backend)"]
-
-    MongoDB_Atlas[("MongoDB Atlas Cloud\n(27 Collections + Atlas Vector Index)")]
-    AI_Grounding["Gemini 2.5 Structured LLM Grounding\n(Strict JSON Schema & Zero Hallucination)"]
-
-    User_Creator -->|Submits Content for Inspection| BrandTrace
-    User_Manager -->|Simulates Fact & Policy Mutations| BrandTrace
-    User_Legal -->|Signs Formal Immutable Release Seals| BrandTrace
-    User_Auditor -->|Validates SHA-256 Ledger Authenticity| BrandTrace
-
-    BrandTrace -->|Persists Facts, Graphs, Ledger & Audit Events| MongoDB_Atlas
-    BrandTrace -->|Token-Level Grounded Verification| AI_Grounding
-```
-
-### Level 2: Container Diagram
-The Container diagram highlights the deployed execution environments:
-
-```mermaid
-flowchart TB
-    subgraph ClientBrowser ["Client Web Application (PWA)"]
-        SPA["React 19 Single Page App\n(Vite 6, TypeScript, Tailwind CSS)"]
-        ServiceWorker["Service Worker (sw.js)\n(Static Asset Stash, Zero-Cache Private APIs)"]
-    end
-
-    subgraph EdgeCDN ["Edge Infrastructure (Vercel)"]
-        VercelCDN["Vercel Global Edge Network\n(Static Hosting, Brotli/Gzip, HTTPS/HSTS)"]
-    end
-
-    subgraph ComputeBackend ["Application Server (Render Cloud Container)"]
-        FastAPI_App["FastAPI REST Application (Python 3.13 / Uvicorn)\nModular Routers: /auth, /facts, /verify, /simulator, /ledger"]
-        Middlewares["Security Middleware Stack\n(RateLimiter, SecurityHeaders, ErrorSanitizer)"]
-    end
-
-    subgraph DatabaseCloud ["Data Storage (MongoDB Atlas)"]
-        MongoCluster[("MongoDB Atlas Replica Set\nbrandtrace_admin DB")]
-        AtlasSearch["Atlas Vector Search Index\n(vector_index, 768 dimensions)"]
-    end
-
-    ClientBrowser -->|HTTPS / W3C Manifest| VercelCDN
-    SPA -->|Authenticated REST API / JWT| FastAPI_App
-    FastAPI_App --> Middlewares
-    FastAPI_App -->|Async Motor Driver / TLS| MongoCluster
-    FastAPI_App -->|Semantic Nearest Neighbor| AtlasSearch
-```
-
-### Level 3: Component Diagram (FastAPI Backend Control Plane)
-```mermaid
-flowchart TD
-    subgraph ModularRouters ["FastAPI API Gateway & Routers"]
-        R_Auth["/api/auth (Login, Register, Personas, /me)"]
-        R_Facts["/api/facts (CRUD Approved Facts, Mutate)"]
-        R_Verify["/api/verify (Multi-Agent Content Inspection)"]
-        R_Sim["/api/simulator (Propose Simulation, Commit)"]
-        R_Ledger["/api/releases & /api/ledger (Sign, Verify, Revoke)"]
-        R_Demo["/api/demo (Execute Steps, Reset Workspace)"]
-    end
-
-    subgraph PipelineEngines ["Domain Business Logic"]
-        Agent_Voice["Voice & Persona Agent (Tone, Slang, Target Audience)"]
-        Agent_Claim["Claim Substantiation Agent (Price, Spec, Warranty)"]
-        Agent_Legal["Regulatory Compliance Agent (FDA, FTC, Trademark)"]
-        Agent_Blast["Cascading Blast Radius Agent (Graph Dependency Traversal)"]
-        Engine_Sim["Change Simulation Engine (Digital Twin Projections)"]
-        Engine_Ledger["Cryptographic Trust Ledger (SHA-256 Merkle Chains)"]
-    end
-
-    subgraph DataRepositories ["Data Access Layer (motor / pymongo)"]
-        MongoMgr["MongoManager Singleton (Connection Pool, Auto-Reconnection)"]
-        AtlasRepo["AtlasRepository (27 Document Collections)"]
-    end
-
-    R_Verify --> Agent_Voice & Agent_Claim & Agent_Legal & Agent_Blast
-    R_Sim --> Engine_Sim
-    R_Ledger --> Engine_Ledger
-    R_Facts --> MongoMgr
-    PipelineEngines --> MongoMgr
-    MongoMgr --> AtlasRepo
-```
-
----
-
-## 3. Autonomous Multi-Agent Reasoning Pipeline
-
-The inspection pipeline evaluates content against 4 specialized autonomous agents executing sequentially or in parallel:
-
+### A. Document Indexing & Ingestion Flow
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Creator as Marketing Creator
-    participant Gateway as FastAPI Router (/api/verify)
-    participant Orchestrator as Governance Pipeline Orchestrator
-    participant VoiceAgent as 1. Voice & Persona Agent
-    participant ClaimAgent as 2. Claim Substantiation Agent
-    participant LegalAgent as 3. Regulatory Compliance Agent
-    participant GraphEngine as 4. Blast Radius Graph Traversal
-    participant Ledger as Cryptographic Trust Ledger
+    actor User as Brand Manager / Reviewer
+    participant Router as /api/documents Router
+    participant SSRF as SSRF & Upload Guard
+    participant Ingest as Document Ingestion Engine
+    participant DB as MongoDB Atlas (brand_documents)
+    participant Graph as Knowledge Graph (nodes)
 
-    Creator->>Gateway: POST /api/verify {brand_id, channel, content}
-    Gateway->>Orchestrator: Verify asset against active Brand Knowledge Graph
-    
-    par Agent Analysis
-        Orchestrator->>VoiceAgent: Inspect Tone, Banned Lexicon & Persona Alignment
-        VoiceAgent-->>Orchestrator: Voice Report (Spans + Score)
-        
-        Orchestrator->>ClaimAgent: Extract Claims & Match Approved Fact Catalog
-        ClaimAgent-->>Orchestrator: Claim Report (Substantiated / Unverified / Contradictory)
-        
-        Orchestrator->>LegalAgent: Cross-Reference Statutory Regulations (FTC, FDA, Trademark)
-        LegalAgent-->>Orchestrator: Regulatory Report (Critical Violations + Legal Citations)
-    end
-
-    Orchestrator->>GraphEngine: Traverse Downstream Graph Dependencies
-    GraphEngine-->>Orchestrator: Connected Campaigns, Assets & Document Risks
-
-    Orchestrator->>Orchestrator: Calculate Composite Risk Score (0-100) & Synthesize Remediation
-    Orchestrator->>Ledger: Generate Cryptographic Release Proof (Deterministic Hash)
-    Orchestrator-->>Gateway: Return Structured VerificationResult
-    Gateway-->>Creator: Render Token-Level Spans, Citations, Remediated Copy & Decision
+    User->>Router: Upload File (PDF/DOCX/TXT) or Import URL
+    Router->>SSRF: Validate Magic Bytes / DNS & Private IP Ranges
+    SSRF-->>Router: Validation Passed
+    Router->>Ingest: Extract Readable Text & Generate Chunks
+    Ingest->>DB: Store Document Record (Status: PROCESSING)
+    Ingest->>Graph: Ingest Knowledge Nodes & Compute Hashes
+    Graph-->>Ingest: Nodes Indexed Successfully
+    Ingest->>DB: Update Status to INDEXED (version: 1.0)
+    DB-->>User: Document Indexed & Search Ready
 ```
 
-### Agent Roles & Governance Responsibilities:
-1. **Voice & Brand Persona Agent:**
-   - Detects deviations from defined tonal attributes (e.g., authoritative, elevated, accessible).
-   - Identifies prohibited informalities, excessive hyperbole, or unauthorized slang.
-   - Evaluates channel-specific constraints (Instagram ads vs. Investor presentations).
-2. **Claim Substantiation Agent:**
-   - Performs named entity and numeric extraction on pricing, battery specs, speed claims, and guarantees.
-   - Grounded strictly against the MongoDB-backed Approved Facts Catalog (`APPROVED_FACTS_CATALOG`).
-   - Flags unverified assertions with clear citation gaps.
-3. **Regulatory & Legal Compliance Agent:**
-   - Scans for statutory non-compliance: medical diagnosis claims without FDA clearance (21 CFR §870), unsubstantiated environmental guarantees (FTC Green Guides), or uncredited trademark marks (™ / ®).
-   - Assigns severity ratings: `CRITICAL`, `HIGH`, `MEDIUM`, or `LOW`.
-4. **Cascading Blast Radius Agent:**
-   - Traverses the NetworkX directed acyclic graph to identify upstream dependencies and downstream exposure.
-   - Computes organizational ripple effects across active campaigns and public channels.
+1. **Upload & Ingestion:** Uploads support PDF, DOCX, TXT, and Markdown. The service verifies file signatures (magic bytes) to prevent executable file masking.
+2. **SSRF Defense:** URL imports pass through `validate_url_safe()`, which resolves hostnames and strictly blocks private, loopback, and link-local IP spaces (`127.0.0.1`, `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`, `169.254.169.254`).
+3. **Status Progression:** Status advances honestly through `UPLOADED` &rarr; `PROCESSING` &rarr; `INDEXED`. If extraction fails, the status updates to `FAILED` with sanitized error details.
+4. **Immutable Versioning:** Modifying an indexed document archives previous versions in `document_versions` and creates incremented versions (e.g. `1.1`), ensuring full historical traceability.
 
 ---
 
-## 4. Brand Dependency Intelligence Graph (BDIG)
-
-The BDIG is modeled as an in-memory NetworkX directed graph backed by MongoDB Atlas collections (`graph_nodes`, `graph_relationships`, `knowledge_nodes`).
-
-### Node Types:
-- `GUIDELINE`: Brand rules, tone policies, regulatory mandates, and design constraints.
-- `FACT`: Verified pricing, hardware specifications, battery life metrics, warranty terms.
-- `CLAIM`: Approved marketing assertions grounded in substantiated evidence.
-- `CAMPAIGN`: Active commercial flights (e.g., "Aurelle Spatial Audio Q1 Launch").
-- `ASSET`: Published or pending marketing touchpoints (Instagram feed ads, landing pages, packaging).
-- `DOCUMENT`: Legal disclaimers, FDA filings, technical whitepapers, SLA agreements.
-
-### Edge Types:
-- `GOVERNED_BY`: Content asset governed by a specific brand guideline or policy.
-- `SUBSTANTIATED_BY`: Claim or copy substantiated by an approved fact or source document.
-- `PART_OF_CAMPAIGN`: Asset belonging to an omnichannel campaign flight.
-- `DEPENDS_ON`: Commercial dependency between two brand parameters.
-- `SUPERSEDES`: Version lineage connecting current approved facts with historical precedents.
-
----
-
-## 5. Cryptographic Release Ledger & 5-State Architecture
-
-Every approved release is sealed with a deterministic SHA-256 cryptographic signature that chains the asset identifier, canonical content string, approving reviewer identity, and timestamp into an immutable tamper-evident seal.
-
+### B. Concurrent Multi-Agent Content Intelligence Pipeline
 ```mermaid
-stateDiagram-v2
-    [*] --> DRAFT: Ingestion / Authoring
-    DRAFT --> INSPECTED: Multi-Agent Inspection (/api/verify)
-    
-    INSPECTED --> FLAGGED: Critical Violations Detected (Score >= 50)
-    INSPECTED --> PENDING_REVIEW: Medium Risk (Score 20-49)
-    INSPECTED --> APPROVED: Clean Inspection (Score < 20)
-    
-    FLAGGED --> REVISED: One-Click Remediation
-    REVISED --> INSPECTED
-    
-    PENDING_REVIEW --> APPROVED_SEALED: Authorized Brand Manager Sign-Off (/api/releases/sign)
-    APPROVED --> APPROVED_SEALED: Authorized Brand Manager Sign-Off (/api/releases/sign)
-    
-    APPROVED_SEALED --> VALID_UNCHANGED: Content Matches SHA-256 Seal
-    APPROVED_SEALED --> MODIFIED_AFTER_APPROVAL: Tampered / Divergent Content
-    APPROVED_SEALED --> SUPERSEDED: Replaced by Newer Approved Version (e.g. ₹499 -> ₹599)
-    APPROVED_SEALED --> REVOKED: Recalled Due to Regulatory Violation
+sequenceDiagram
+    autonumber
+    actor Creator as Marketing Creator / Copywriter
+    participant API as /api/verify Endpoint
+    participant Coord as Multi-Agent Coordinator
+    participant Voice as VoicePersonaAgent
+    participant Claim as ClaimSubstantiationAgent
+    participant Reg as RegulatoryComplianceAgent
+    participant Atlas as MongoDB Atlas Truth-Set
+
+    Creator->>API: POST /api/verify (Content, Asset Title, Channel)
+    API->>Coord: Trigger Concurrent Pipeline
+    par Parallel Agent Execution (asyncio.gather)
+        Coord->>Voice: Check Tone, Superlatives & Prohibited Words
+        Voice-->>Coord: Voice Report & Risk Spans
+    and
+        Coord->>Claim: Query Active Facts from Truth-Set
+        Claim->>Atlas: Fetch Approved Facts for Workspace
+        Atlas-->>Claim: Grounding Nodes (e.g. FACT-AUR-PRC-01: ₹499)
+        Claim-->>Coord: Substantiation Report & Price Citations
+    and
+        Coord->>Reg: Match Statutory Rules (FTC, FDA, Lanham, NHTSA)
+        Reg-->>Coord: Regulatory Citations & Violations
+    end
+    Coord->>Coord: Compute Composite Risk Score & Character Offsets
+    Coord-->>API: Return Unified Verification Report (<800ms)
+    API-->>Creator: Display Interactive Risk Spans & Remediation Suggestions
 ```
 
-### 5 Statutory Release States:
-1. `VALID_UNCHANGED`: Content perfectly matches the cryptographic seal generated at the time of human sign-off.
-2. `MODIFIED_AFTER_APPROVAL`: Content has drifted or been maliciously edited after authorized approval. Tampering is flagged instantly.
-3. `SUPERSEDED`: Content was legally approved for a prior version, but has been legitimately superseded by a newer approved master record (e.g., historical ₹499 pricing replaced by ₹599 master).
-4. `REVOKED`: The release seal has been explicitly invalidated due to an active product recall or regulatory decree.
-5. `UNKNOWN_RECORD`: Content hash does not exist in either active memory or MongoDB Atlas release ledger archives.
+- **Monotonic Latency Target:** Strict <800ms SLA enforced across concurrent agents.
+- **Explainable Evidence:** Violations return exact character offsets (`[start, end]`) for non-destructive visual highlighting, alongside direct statutory legal citations:
+  - **FTC 16 CFR §260.4:** Unsubstantiated environmental / green claims.
+  - **FDA 21 CFR §202.1 & §870:** Medical diagnostic cures vs. general wellness device claims.
+  - **Lanham Act §43(a):** Trademark symbol omission and comparative deception.
+  - **NHTSA SGO 2021-01:** False autonomous self-driving safety assertions.
 
 ---
 
-## 6. Resilience, Security & Multi-Tenant Isolation
+### C. Brand Governance Digital Twin (Change Impact Simulation)
+```mermaid
+flowchart TD
+    A["Brand Manager Proposes Fact Mutation<br/>(e.g., FACT-AUR-PRC-01 ₹499 &rarr; ₹599)"] --> B["Digital Twin Simulation Sandbox<br/>(POST /api/simulator/propose)"]
+    B --> C["Traverse Brand Dependency Graph (BDIG)<br/>(Upstream Guidelines &amp; Downstream Touchpoints)"]
+    C --> D{"Detect Contradictions &amp; Conflicts"}
+    D -->|Direct Contradiction| E["Flag Severe Policy Incompatibilities"]
+    D -->|Downstream Exposure| F["Calculate Dollar Exposure &amp; Review Hours"]
+    E & F --> G["Generate Impact Simulation Report<br/>(Non-Destructive: Production Facts Untouched)"]
+    G --> H["Human Governance Gate: Approval Center<br/>(Requires Authorized Sign-off)"]
+    H -->|Approved by Authorized Role| I["Commit Mutation &amp; Enqueue Revision Tasks<br/>(POST /api/simulator/commit)"]
+```
 
-1. **Sliding-Window Rate Limiter:** 
-   - Protects backend APIs from denial-of-service bursts (120 req/minute per IP/token).
-   - Test suites and internal services utilize elevated limits (`X-Test-Rate-Limit`).
-2. **Server-Side RBAC Enforcement:**
-   - 5 organizational personas: `ADMIN`, `BRAND_MANAGER`, `COMPLIANCE_REVIEWER`, `REVIEWER`, `CREATOR`.
-   - Critical mutation endpoints (`/api/simulator/commit`, `/api/facts/mutate`, `/api/demo/reset`) enforce role boundaries strictly on the server.
-3. **Data Redaction & Error Sanitization:**
-   - Custom `ErrorSanitizationMiddleware` scrubs database URIs, API tokens, and internal stack traces before HTTP responses leave the server perimeter.
-4. **Tenant Isolation:**
-   - Multi-tenant architecture logically partitions all records by `organisation_id` (`ORG-AURELLE`, `ORG-APEX`) and `workspace_id`.
-   - Cross-tenant lookups and mutations are blocked at the repository layer.
-5. **Progressive Web App (PWA) Zero-Trust Caching:**
-   - Service worker caches only immutable static assets (HTML, CSS, JS, SVG).
-   - API endpoints (`/api/*`), authentication credentials, and customer data are explicitly excluded from browser storage caches to prevent stale compliance states.
+1. **Virtual Sandbox:** Changes are simulated without modifying production facts in MongoDB Atlas.
+2. **Blast Radius Computation:** Traverses the BDIG graph to identify all dependent campaigns, ad copies, packaging designs, and partner touchpoints.
+3. **Quantified Exposure:** Projects financial risk exposure (e.g., $320,000 for Aurelle price mutation) and calculates required departmental review workload (e.g., 12.5 hours).
+4. **Human Commit Gate:** Commits require explicit authorization by a user with `ADMIN` or `COMPLIANCE_REVIEWER` privileges.
+
+---
+
+### D. Cryptographic Release Ledger & Public Verification Flow
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Reviewer as Authorized Reviewer
+    participant Approvals as Approval Center
+    participant Ledger as Audit Trust Ledger
+    actor PublicUser as External Consumer / Auditor
+    participant Portal as Public Verification Portal
+
+    Reviewer->>Approvals: Sign & Approve Release Candidate
+    Approvals->>Ledger: record_release(content, resource_id, reviewer, timestamp)
+    Ledger->>Ledger: Compute Content SHA-256 & Chain Block Digest
+    Ledger->>Approvals: Generate Tamper-Evident Seal (BT-SEAL-XXXX)
+    Approvals-->>Reviewer: Release Sealed & Published to Ledger
+
+    Note over PublicUser,Portal: Public Zero-Authentication Verification
+    PublicUser->>Portal: Submit Seal Code, Text Copy, or Image
+    alt Verify by Seal Code
+        Portal->>Ledger: Lookup Record by Seal Code
+        Ledger-->>Portal: Match Found -> Check superseded/revoked -> Status: APPROVED / OUTDATED
+    else Verify by Text Content
+        Portal->>Ledger: Canonicalize Text & Compare SHA-256 Hash
+        Ledger-->>Portal: Content Match -> Status: APPROVED (or MODIFIED if altered)
+    else Verify by Image Upload
+        Portal->>Ledger: Compute File SHA-256 Hash
+        Ledger-->>Portal: Hash Match -> Status: APPROVED
+    end
+    Portal-->>PublicUser: Display Verified Status & Safe Evidence (Zero Private Metadata Leak)
+```
+
+1. **SHA-256 Tamper-Evident Digest Chaining:**
+   $$\text{Block Material} = \text{rec\_id} \parallel \text{last\_block\_hash} \parallel \text{resource\_id} \parallel \text{content\_hash} \parallel \text{user\_identity} \parallel \text{timestamp}$$
+   $$\text{Seal Code} = \text{BT-SEAL-} \parallel \text{SHA-256}(\text{Block Material})[:16].\text{upper()}$$
+2. **Zero-Auth Verification:** External consumers verify published marketing assets without creating accounts or passing corporate credentials.
+3. **Canonical Text Normalization:** Strips smart quotes (`“`, `”`, `‘`, `’`, `"`, `'`), collapses redundant whitespace and newlines, while preserving numbers and case to ensure formatting variations do not cause false modification alarms.
+4. **Privacy Shield:** Public verification responses strictly exclude reviewer email addresses, internal user IDs, employee roles, and MongoDB `_id` identifiers.
+
+---
+
+## 4. Database Design & Multi-Tenant Model
+
+BrandTrace AI is backed by a structured MongoDB Atlas cluster with **27 enterprise BSON collections**:
+
+| Domain | Collections | Tenant Isolation Key |
+| :--- | :--- | :--- |
+| **Organizations & Users** | `organizations`, `users`, `workspace_memberships`, `roles_permissions` | `org_id` |
+| **Brand Knowledge Base** | `brand_documents`, `document_versions`, `knowledge_nodes`, `approved_facts`, `brand_guidelines`, `terminology`, `fact_sources` | `org_id`, `workspace_id` |
+| **Graph Intelligence** | `graph_nodes`, `graph_relationships` | `workspace_id` |
+| **Content & Multi-Agent** | `content_assets`, `content_versions`, `verifications`, `suggested_corrections`, `evidence_references` | `org_id`, `workspace_id` |
+| **Simulation & Digital Twin** | `change_simulations`, `impact_reports` | `workspace_id` |
+| **Approvals & Governance** | `approval_decisions`, `review_assignments`, `revision_tasks`, `comments` | `org_id`, `workspace_id` |
+| **Audit & Cryptographic Ledger** | `release_ledger`, `audit_events`, `notifications` | `org_id`, `workspace_id` |
+
+### Multi-Tenant Boundary Enforcement:
+- Every query to `brand_documents`, `knowledge_nodes`, `verifications`, and `release_ledger` scopes automatically by the authenticated user's `org_id` and `workspace_id`.
+- Cross-tenant access attempts return HTTP 404 (preventing cross-tenant entity enumeration).
