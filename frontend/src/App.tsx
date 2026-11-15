@@ -22,11 +22,16 @@ const CreatorDashboard = lazy(() =>
   import('./components/creator/CreatorDashboard').then((m) => ({ default: m.CreatorDashboard }))
 );
 
+// Lazy-load dedicated Role Dashboard Stage (Agency, Reviewer, Compliance, Brand Owner)
+const RoleDashboardStage = lazy(() =>
+  import('./components/creator/RoleDashboardStage').then((m) => ({ default: m.RoleDashboardStage }))
+);
+
 const ViewLoadingFallback: React.FC = () => (
-  <div className="flex flex-col items-center justify-center py-24 space-y-3 bg-white dark:bg-slate-950 transition-colors duration-200 min-h-screen">
-    <div className="w-8 h-8 rounded-full border-2 border-slate-200 dark:border-slate-800 border-t-blue-600 dark:border-t-blue-400 animate-spin" />
-    <span className="text-xs font-mono text-slate-500 dark:text-slate-400 tracking-wide">
-      Loading Verification Portal...
+  <div className="flex flex-col items-center justify-center py-24 space-y-3 bg-black transition-colors duration-200 min-h-screen">
+    <div className="w-8 h-8 rounded-full border-2 border-neutral-800 border-t-indigo-500 animate-spin" />
+    <span className="text-xs font-mono text-neutral-400 tracking-wide">
+      Loading BrandTrace Workspace...
     </span>
   </div>
 );
@@ -34,12 +39,29 @@ const ViewLoadingFallback: React.FC = () => (
 export const App: React.FC = () => {
   const { currentWorkspace, setWorkspace } = useAuth();
 
-  const [viewMode, setViewMode] = useState<'landing' | 'login' | 'verify' | 'creator-dashboard'>(() => {
+  const [viewMode, setViewMode] = useState<
+    | 'landing'
+    | 'login'
+    | 'verify'
+    | 'creator-dashboard'
+    | 'agency-dashboard'
+    | 'reviewer-dashboard'
+    | 'compliance-dashboard'
+    | 'brand-owner-dashboard'
+  >(() => {
     if (typeof window !== 'undefined') {
       const pathname = window.location.pathname;
       if (pathname === '/dashboard/creator' || pathname.startsWith('/dashboard/creator')) return 'creator-dashboard';
+      if (pathname === '/dashboard/agency' || pathname.startsWith('/dashboard/agency')) return 'agency-dashboard';
+      if (pathname === '/dashboard/reviewer' || pathname.startsWith('/dashboard/reviewer')) return 'reviewer-dashboard';
+      if (pathname === '/dashboard/compliance' || pathname.startsWith('/dashboard/compliance')) return 'compliance-dashboard';
+      if (pathname === '/dashboard/brand-owner' || pathname.startsWith('/dashboard/brand-owner')) return 'brand-owner-dashboard';
       const params = new URLSearchParams(window.location.search);
       if (params.get('view') === 'creator' || params.get('view') === 'creator-dashboard') return 'creator-dashboard';
+      if (params.get('view') === 'agency' || params.get('view') === 'agency-dashboard') return 'agency-dashboard';
+      if (params.get('view') === 'reviewer' || params.get('view') === 'reviewer-dashboard') return 'reviewer-dashboard';
+      if (params.get('view') === 'compliance' || params.get('view') === 'compliance-dashboard') return 'compliance-dashboard';
+      if (params.get('view') === 'brand-owner' || params.get('view') === 'brand-owner-dashboard') return 'brand-owner-dashboard';
       if (params.get('view') === 'verify' || window.location.hash === '#verify') return 'verify';
       if (params.get('view') === 'login') return 'login';
       return 'landing';
@@ -90,6 +112,14 @@ export const App: React.FC = () => {
       const pathname = window.location.pathname;
       if (pathname === '/dashboard/creator' || pathname.startsWith('/dashboard/creator')) {
         setViewMode('creator-dashboard');
+      } else if (pathname === '/dashboard/agency' || pathname.startsWith('/dashboard/agency')) {
+        setViewMode('agency-dashboard');
+      } else if (pathname === '/dashboard/reviewer' || pathname.startsWith('/dashboard/reviewer')) {
+        setViewMode('reviewer-dashboard');
+      } else if (pathname === '/dashboard/compliance' || pathname.startsWith('/dashboard/compliance')) {
+        setViewMode('compliance-dashboard');
+      } else if (pathname === '/dashboard/brand-owner' || pathname.startsWith('/dashboard/brand-owner')) {
+        setViewMode('brand-owner-dashboard');
       } else if (pathname === '/login') {
         setViewMode('login');
       } else if (pathname === '/verify' || window.location.hash === '#verify') {
@@ -106,6 +136,21 @@ export const App: React.FC = () => {
     setViewMode('creator-dashboard');
     if (typeof window !== 'undefined') {
       window.history.pushState({ view: 'creator-dashboard' }, '', '/dashboard/creator');
+    }
+  };
+
+  const handleNavigateRole = (role: 'creator' | 'agency' | 'reviewer' | 'compliance' | 'brand-owner') => {
+    const routeMap = {
+      creator: 'creator-dashboard' as const,
+      agency: 'agency-dashboard' as const,
+      reviewer: 'reviewer-dashboard' as const,
+      compliance: 'compliance-dashboard' as const,
+      'brand-owner': 'brand-owner-dashboard' as const,
+    };
+    const targetMode = routeMap[role];
+    setViewMode(targetMode);
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ view: targetMode }, '', `/dashboard/${role}`);
     }
   };
 
@@ -237,6 +282,78 @@ export const App: React.FC = () => {
     );
   }
 
+  // DEDICATED INDEPENDENT AGENCY DASHBOARD VIEW
+  if (viewMode === 'agency-dashboard') {
+    return (
+      <Suspense fallback={<ViewLoadingFallback />}>
+        <RoleDashboardStage
+          role="agency"
+          brandName={currentBrand?.brand_name || 'Aurelle Skin'}
+          onBackToLanding={() => {
+            setViewMode('landing');
+            if (typeof window !== 'undefined') {
+              window.history.pushState({}, '', '/');
+            }
+          }}
+        />
+      </Suspense>
+    );
+  }
+
+  // DEDICATED INDEPENDENT REVIEWER DASHBOARD VIEW
+  if (viewMode === 'reviewer-dashboard') {
+    return (
+      <Suspense fallback={<ViewLoadingFallback />}>
+        <RoleDashboardStage
+          role="reviewer"
+          brandName={currentBrand?.brand_name || 'Aurelle Skin'}
+          onBackToLanding={() => {
+            setViewMode('landing');
+            if (typeof window !== 'undefined') {
+              window.history.pushState({}, '', '/');
+            }
+          }}
+        />
+      </Suspense>
+    );
+  }
+
+  // DEDICATED INDEPENDENT COMPLIANCE DASHBOARD VIEW
+  if (viewMode === 'compliance-dashboard') {
+    return (
+      <Suspense fallback={<ViewLoadingFallback />}>
+        <RoleDashboardStage
+          role="compliance"
+          brandName={currentBrand?.brand_name || 'Aurelle Skin'}
+          onBackToLanding={() => {
+            setViewMode('landing');
+            if (typeof window !== 'undefined') {
+              window.history.pushState({}, '', '/');
+            }
+          }}
+        />
+      </Suspense>
+    );
+  }
+
+  // DEDICATED INDEPENDENT BRAND OWNER DASHBOARD VIEW
+  if (viewMode === 'brand-owner-dashboard') {
+    return (
+      <Suspense fallback={<ViewLoadingFallback />}>
+        <RoleDashboardStage
+          role="brand-owner"
+          brandName={currentBrand?.brand_name || 'Aurelle Skin'}
+          onBackToLanding={() => {
+            setViewMode('landing');
+            if (typeof window !== 'undefined') {
+              window.history.pushState({}, '', '/');
+            }
+          }}
+        />
+      </Suspense>
+    );
+  }
+
   // PRIMARY VIEW: Unified Product-First Website
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans selection:bg-slate-900 selection:text-white dark:selection:bg-blue-600 dark:selection:text-white overflow-x-hidden transition-colors duration-200">
@@ -261,6 +378,7 @@ export const App: React.FC = () => {
         onVerify={() => setViewMode('verify')}
         onSignIn={() => setViewMode('login')}
         onOpenCreatorDashboard={handleOpenCreatorDashboard}
+        onNavigateRole={handleNavigateRole}
         onSignRelease={handleSignRelease}
         onReseed={handleReseed}
         isReseeding={isReseeding}

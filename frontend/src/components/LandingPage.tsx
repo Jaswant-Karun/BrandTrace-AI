@@ -34,7 +34,10 @@ interface LandingPageProps {
   onReseed?: () => void;
   isReseeding?: boolean;
   onOpenCreatorDashboard?: () => void;
+  onNavigateRole?: (role: RoleType) => void;
 }
+
+export type RoleType = 'creator' | 'agency' | 'reviewer' | 'compliance' | 'brand-owner';
 
 export const LandingPage: React.FC<LandingPageProps> = ({
   onEnterApp = () => { },
@@ -53,7 +56,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   initialSubTab,
   onReseed: _onReseed = () => { },
   isReseeding: _isReseeding = false,
-  onOpenCreatorDashboard
+  onOpenCreatorDashboard,
+  onNavigateRole
 }) => {
   const { user, isAuthenticated, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -1414,8 +1418,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:pl-6 xl:pl-8 lg:pr-6 xl:pr-8 space-y-12">
 
           <div className="text-center max-w-3xl mx-auto space-y-3">
+            <span className="text-[11px] font-mono font-bold tracking-widest text-indigo-400 uppercase">
+              TRY IT AS ONE OF THE TEAM
+            </span>
             <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white font-sans uppercase">
-              PICK A ROLE, NO SIGN UP.
+              PICK A ROLE. NO SIGN-UP.
             </h2>
             <p className="text-xs sm:text-sm text-neutral-400 font-sans">
               Five demo accounts for Aurelle Skin, a fictional brand. Each one opens where its work is.
@@ -1443,7 +1450,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
               </div>
               <button
-                onClick={onOpenCreatorDashboard || (() => handleSelectCapability('content-intelligence', 'inspector'))}
+                onClick={() => onNavigateRole ? onNavigateRole('creator') : onOpenCreatorDashboard ? onOpenCreatorDashboard() : null}
                 className="w-full py-2.5 px-3 rounded-xl bg-[#544df2] hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider cursor-pointer shadow-md transition-colors"
               >
                 TRY AS CREATOR
@@ -1468,7 +1475,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
               </div>
               <button
-                onClick={() => handleSelectCapability('content-intelligence', 'inspector')}
+                onClick={() => onNavigateRole ? onNavigateRole('agency') : null}
                 className="w-full py-2.5 px-3 rounded-xl bg-[#f0ede6] hover:bg-white text-neutral-900 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
               >
                 TRY AS AGENCY
@@ -1493,7 +1500,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
               </div>
               <button
-                onClick={() => handleSelectCapability('governance-approval', 'approvals')}
+                onClick={() => onNavigateRole ? onNavigateRole('reviewer') : null}
                 className="w-full py-2.5 px-3 rounded-xl bg-[#f0ede6] hover:bg-white text-neutral-900 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
               >
                 TRY AS REVIEWER
@@ -1518,7 +1525,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
               </div>
               <button
-                onClick={() => handleSelectCapability('governance-approval', 'approvals')}
+                onClick={() => onNavigateRole ? onNavigateRole('compliance') : null}
                 className="w-full py-2.5 px-3 rounded-xl bg-[#f0ede6] hover:bg-white text-neutral-900 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
               >
                 TRY AS COMPLIANCE
@@ -1543,7 +1550,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
               </div>
               <button
-                onClick={() => handleSelectCapability('brand-knowledge', 'guidelines')}
+                onClick={() => onNavigateRole ? onNavigateRole('brand-owner') : null}
                 className="w-full py-2.5 px-3 rounded-xl bg-[#f0ede6] hover:bg-white text-neutral-900 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
               >
                 TRY AS BRAND OWNER

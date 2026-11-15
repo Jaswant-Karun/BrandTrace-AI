@@ -1,7 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-export type CreatorTab = 'check' | 'audit' | 'rulebook' | 'facts' | 'health' | 'watch';
+export type CreatorTab = 'check' | 'queue' | 'audit' | 'rulebook' | 'facts' | 'health' | 'watch';
+
+export interface TabItem {
+  id: CreatorTab;
+  label: string;
+}
 
 interface CreatorHeaderProps {
   activeTab: CreatorTab;
@@ -9,6 +14,7 @@ interface CreatorHeaderProps {
   onSignOut: () => void;
   userName?: string;
   roleName?: string;
+  customTabs?: TabItem[];
 }
 
 export const CreatorHeader: React.FC<CreatorHeaderProps> = ({
@@ -17,8 +23,9 @@ export const CreatorHeader: React.FC<CreatorHeaderProps> = ({
   onSignOut,
   userName = 'CREATOR ASHA',
   roleName = 'CREATOR',
+  customTabs,
 }) => {
-  const tabs: { id: CreatorTab; label: string }[] = [
+  const tabs: TabItem[] = customTabs || [
     { id: 'check', label: 'CHECK A POST' },
     { id: 'audit', label: 'AUDIT LOG' },
     { id: 'rulebook', label: 'RULEBOOK' },
