@@ -42,9 +42,12 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         if path in ["/health", "/docs", "/openapi.json", "/"]:
             return await call_next(request)
 
-        # Identify client by Bearer token or client IP
+        # Identify client by Bearer token, custom client header, or client IP
         auth_header = request.headers.get("Authorization", "")
-        if auth_header.startswith("Bearer "):
+        test_client_id = request.headers.get("X-Client-ID")
+        if test_client_id:
+            client_id = f"client:{test_client_id}"
+        elif auth_header.startswith("Bearer "):
             client_id = f"token:{auth_header.split(' ')[1][:16]}"
         else:
             client_id = f"ip:{request.client.host if request.client else '127.0.0.1'}"

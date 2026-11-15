@@ -105,7 +105,10 @@ def test_cross_tenant_isolation_enforcement():
 
 def test_rate_limiter_burst_enforcement():
     """Verify rate limiter blocks bursts exceeding quota with HTTP 429 and Retry-After header."""
-    headers = {"X-Test-Rate-Limit": "3"}
+    headers = {
+        "X-Client-ID": "rate-limiter-isolated-test-client-99",
+        "X-Test-Rate-Limit": "3"
+    }
     
     # 3 allowed requests
     for _ in range(3):
@@ -261,18 +264,19 @@ def test_ai_fallback_on_simulated_service_failure():
 
 def test_empirical_evaluation_dataset_precision_and_recall():
     """
-    Executes all 22 labelled ground-truth evaluation cases across ORG-AURELLE, ORG-APEX, and ORG-NOVUS.
+    Executes all 23 labelled ground-truth evaluation cases across ORG-AURELLE, ORG-APEX, and ORG-NOVUS.
     Empirically verifies:
     - Precision >= 0.85
     - Recall >= 0.85
     - F1-Score >= 0.85
-    - Total samples == 22 with coverage across all 3 organisations.
+    - Total samples >= 20 with coverage across all 3 organisations.
     """
     res = client.post("/api/security/run-benchmark")
     assert res.status_code == 200
     metrics = res.json()
 
-    assert metrics["total_samples"] == 22
+    assert metrics["total_samples"] >= 20
+    assert metrics["total_samples"] == 23
     assert metrics["true_positives"] >= 15
     assert metrics["true_negatives"] >= 5
     assert metrics["false_positives"] <= 1
