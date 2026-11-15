@@ -41,9 +41,10 @@ export const CreatorHeader: React.FC<CreatorHeaderProps> = ({
         {/* Left: Brand Identity / Plumbline Logo */}
         <div className="flex items-center gap-2.5 shrink-0 cursor-pointer" onClick={() => onTabChange('check')}>
           <div className="w-5 h-5 flex items-center justify-center text-indigo-400">
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-              <path d="M12 2v4m0 0l3 5-3 9-3-9 3-5z" stroke="currentColor" strokeWidth="1.5" fill="none" />
-              <polygon points="12,11 15,16 9,16" fill="currentColor" />
+            <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none">
+              <line x1="6" y1="3" x2="18" y2="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              <line x1="12" y1="3" x2="12" y2="12" stroke="currentColor" strokeWidth="1.5" />
+              <polygon points="12,12 16,16 12,21 8,16" fill="#818cf8" stroke="currentColor" strokeWidth="1" />
             </svg>
           </div>
           <span className="font-extrabold text-sm sm:text-base tracking-wider text-white font-mono">
@@ -79,7 +80,7 @@ export const CreatorHeader: React.FC<CreatorHeaderProps> = ({
         </nav>
 
         {/* Right: Authenticated Creator Indicator & Sign Out */}
-        <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+        <div className="flex items-center gap-3 sm:gap-4 shrink-0 relative">
           <div className="hidden sm:flex flex-col items-end text-right">
             <span className="text-[11px] font-mono text-neutral-400">
               SIGNED IN AS <strong className="text-neutral-200 uppercase">{userName}</strong>
@@ -96,16 +97,14 @@ export const CreatorHeader: React.FC<CreatorHeaderProps> = ({
           >
             SIGN OUT
           </button>
-        </div>
 
-        {/* Hanging Plumb Bob Visual Ornament (matching user reference) */}
-        <div className="hidden xl:block absolute right-32 -bottom-14 pointer-events-none z-40">
-          <div className="flex flex-col items-center">
+          {/* Hanging Plumb Bob Visual Ornament (matching user reference) */}
+          <div className="hidden sm:flex flex-col items-center absolute -bottom-16 right-28 pointer-events-none z-40">
             <div className="w-[1px] h-14 border-l border-dashed border-indigo-400/50" />
             <motion.div
               animate={{ rotate: [-2, 2, -2] }}
               transition={{ duration: 4.0, repeat: Infinity, ease: 'easeInOut' }}
-              className="w-3 h-3 bg-gradient-to-br from-indigo-400 to-indigo-600 rotate-45 shadow-[0_0_12px_rgba(99,102,241,0.9)]"
+              className="w-3.5 h-3.5 bg-gradient-to-br from-indigo-400 to-indigo-600 rotate-45 shadow-[0_0_12px_rgba(99,102,241,0.9)]"
             />
           </div>
         </div>
