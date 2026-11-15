@@ -1,0 +1,18 @@
+{
+  "buildCommand": "cd frontend && pnpm install && pnpm build",
+  "outputDirectory": "frontend/dist",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://brandtrace-backend.onrender.com/api/:path*"
+    },
+    {
+      "source": "/health",
+      "destination": "https://brandtrace-backend.onrender.com/health"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

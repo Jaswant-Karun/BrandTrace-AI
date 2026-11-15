@@ -4,7 +4,7 @@
  * and enforces tenant-aware requests to the FastAPI backend.
  */
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || '';
 
 export interface ApiError {
   message: string;

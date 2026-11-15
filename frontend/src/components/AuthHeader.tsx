@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useAuth, UserPersona } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { 
-  Building, UserCheck, ShieldCheck, ChevronDown, 
-  Database, Sparkles, Check, Lock
+  Building, UserCheck, ChevronDown, 
+  Database, Sparkles
 } from 'lucide-react';
 
 interface AuthHeaderProps {

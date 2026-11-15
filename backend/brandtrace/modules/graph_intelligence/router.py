@@ -35,8 +35,8 @@ async def list_database_relationships(
         from brandtrace.data.seed_data import BRAND_SEEDS
         if brand_id in BRAND_SEEDS:
             seed = BRAND_SEEDS[brand_id]
-            node_dicts = [n.dict() if hasattr(n, "dict") else dict(n) for n in seed.nodes]
-            edge_dicts = [e.dict() if hasattr(e, "dict") else dict(e) for e in seed.edges]
+            node_dicts = [n.model_dump() if hasattr(n, "model_dump") else (n.dict() if hasattr(n, "dict") else dict(n)) for n in seed.nodes]
+            edge_dicts = [e.model_dump() if hasattr(e, "model_dump") else (e.dict() if hasattr(e, "dict") else dict(e)) for e in seed.edges]
             await mongo_manager.save_graph(brand_id, node_dicts, edge_dicts)
             edges = edge_dicts
     

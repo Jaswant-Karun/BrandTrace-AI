@@ -41,6 +41,7 @@ Thumbs.db
 *.db
 *.log
 logs/
+storage/
 .coverage
 htmlcov/
 .pytest_cache/
