@@ -6,18 +6,29 @@ import {
   Network, RotateCcw,
   FileText, Globe, Cpu,
   X, Menu,
-  Hash, Sliders
+  Hash, Sliders, BookOpen, Sparkles, ShieldAlert
 } from 'lucide-react';
 import { ThemeToggle } from './ui/ThemeToggle';
 import { PlumbBob } from './ui/PlumbBob';
 import { useAuth } from '../context/AuthContext';
+import { ContextualWorkspace, WorkspaceCategory } from './ContextualWorkspace';
+import { BrandProfile, VerificationResult, DatabaseStatus } from '../types';
 
 interface LandingPageProps {
-  onEnterApp: (targetTab?: string) => void;
+  onEnterApp?: (targetTab?: string) => void;
   brandName?: string;
   onVerify?: () => void;
   onSignIn?: () => void;
   animateEntrance?: boolean;
+  brands?: BrandProfile[];
+  selectedBrandId?: string;
+  setSelectedBrandId?: (id: string) => void;
+  dbStatus?: DatabaseStatus | null;
+  activeWorkspaceCategory?: WorkspaceCategory | null;
+  onSelectWorkspaceCategory?: (category: WorkspaceCategory, subTab?: string) => void;
+  onCloseWorkspace?: () => void;
+  onSignRelease?: (result: VerificationResult, reviewerName: string) => Promise<void>;
+  initialSubTab?: string;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ 
@@ -25,7 +36,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onVerify, 
   onSignIn,
   brandName: _brandName = 'Apex Dynamics',
-  animateEntrance
+  animateEntrance,
+  brands = [],
+  selectedBrandId = 'aurelle-tech',
+  setSelectedBrandId = () => {},
+  dbStatus: _dbStatus = null,
+  activeWorkspaceCategory = null,
+  onSelectWorkspaceCategory,
+  onCloseWorkspace,
+  onSignRelease,
+  initialSubTab
 }) => {
   const { user, isAuthenticated, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -66,6 +86,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       clearTimeout(t3);
     };
   }, [shouldAnimate]);
+
+  const handleSelectCapability = (catId: WorkspaceCategory, targetSubTab?: string) => {
+    setActiveCapabilityId(catId);
+    if (onSelectWorkspaceCategory) {
+      onSelectWorkspaceCategory(catId, targetSubTab);
+    }
+    setTimeout(() => {
+      const el = document.getElementById('workspace');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 120);
+  };
 
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false);
@@ -109,12 +142,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <button onClick={() => scrollToSection('overview')} className="hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer">
               Overview
             </button>
-            <button onClick={() => scrollToSection('platform')} className="hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer">
-              Platform
-            </button>
             <button onClick={() => scrollToSection('features')} className="hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer">
-              Features
+              Capabilities
             </button>
+            {activeWorkspaceCategory && (
+              <button
+                onClick={() => scrollToSection('workspace')}
+                className="text-blue-600 dark:text-blue-400 font-bold transition-colors cursor-pointer flex items-center gap-1.5 bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/80 px-2.5 py-1 rounded-full animate-pulse"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400" />
+                <span>Active Workspace</span>
+              </button>
+            )}
             <button onClick={() => scrollToSection('how-it-works')} className="hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer">
               How It Works
             </button>
@@ -122,7 +161,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               Digital Twin
             </button>
             <button onClick={() => scrollToSection('security')} className="hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer">
-              Security
+              Trust &amp; Security
             </button>
           </div>
 
@@ -205,13 +244,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               className="xl:hidden border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 px-4 pt-3 pb-6 space-y-3"
             >
               <div className="flex flex-col space-y-2 text-sm font-medium text-slate-700 dark:text-slate-200">
-                <button onClick={() => scrollToSection('overview')} className="text-left py-1.5 hover:text-indigo-600">Overview</button>
-                <button onClick={() => scrollToSection('platform')} className="text-left py-1.5 hover:text-indigo-600">Platform</button>
-                <button onClick={() => scrollToSection('features')} className="text-left py-1.5 hover:text-indigo-600">Features</button>
-                <button onClick={() => scrollToSection('how-it-works')} className="text-left py-1.5 hover:text-indigo-600">How It Works</button>
-                <button onClick={() => scrollToSection('digital-twin')} className="text-left py-1.5 hover:text-indigo-600">Digital Twin</button>
-                <button onClick={() => scrollToSection('security')} className="text-left py-1.5 hover:text-indigo-600">Security</button>
-                <button onClick={onVerify || (() => onEnterApp('public-verification'))} className="text-left py-1.5 text-indigo-600 dark:text-indigo-400 font-semibold flex items-center gap-1.5">
+                <button onClick={() => scrollToSection('overview')} className="text-left py-1.5 hover:text-blue-600">Overview</button>
+                <button onClick={() => scrollToSection('features')} className="text-left py-1.5 hover:text-blue-600">Capabilities</button>
+                {activeWorkspaceCategory && (
+                  <button onClick={() => scrollToSection('workspace')} className="text-left py-1.5 text-blue-600 dark:text-blue-400 font-bold flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+                    <span>Active Workspace</span>
+                  </button>
+                )}
+                <button onClick={() => scrollToSection('how-it-works')} className="text-left py-1.5 hover:text-blue-600">How It Works</button>
+                <button onClick={() => scrollToSection('digital-twin')} className="text-left py-1.5 hover:text-blue-600">Digital Twin</button>
+                <button onClick={() => scrollToSection('security')} className="text-left py-1.5 hover:text-blue-600">Trust &amp; Security</button>
+                <button onClick={onVerify || (() => onEnterApp && onEnterApp('public-verification'))} className="text-left py-1.5 text-indigo-600 dark:text-indigo-400 font-semibold flex items-center gap-1.5">
                   <CheckCircle2 className="w-4 h-4" />
                   <span>Public Verification Portal</span>
                 </button>
@@ -221,10 +265,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 {isAuthenticated ? (
                   <>
                     <button
-                      onClick={() => onEnterApp('command-center')}
-                      className="w-full py-2.5 text-xs font-bold rounded-lg bg-indigo-600 text-white text-center shadow-xs flex items-center justify-center gap-2"
+                      onClick={() => handleSelectCapability('content-intelligence', 'inspector')}
+                      className="w-full py-2.5 text-xs font-bold rounded-lg bg-blue-600 text-white text-center shadow-xs flex items-center justify-center gap-2"
                     >
-                      <span>Continue to Dashboard</span>
+                      <span>Open Product Workspace</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                     <button
@@ -240,14 +284,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 ) : (
                   <div className="flex gap-2">
                     <button
-                      onClick={onSignIn || (() => onEnterApp('command-center'))}
+                      onClick={onSignIn || (() => handleSelectCapability('content-intelligence', 'inspector'))}
                       className="flex-1 py-2 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-center"
                     >
                       Sign In
                     </button>
                     <button
-                      onClick={onSignIn || (() => onEnterApp('command-center'))}
-                      className="flex-1 py-2 text-xs font-bold rounded-lg bg-indigo-600 text-white text-center shadow-xs"
+                      onClick={onSignIn || (() => handleSelectCapability('content-intelligence', 'inspector'))}
+                      className="flex-1 py-2 text-xs font-bold rounded-lg bg-blue-600 text-white text-center shadow-xs"
                     >
                       Get Started
                     </button>
@@ -408,10 +452,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               {/* Action Buttons */}
               <div className="pt-2 flex flex-wrap items-center gap-3">
                 <button
-                  onClick={() => onEnterApp('command-center')}
-                  className="px-6 py-3.5 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer ring-2 ring-indigo-500/20"
+                  onClick={() => handleSelectCapability('content-intelligence', 'inspector')}
+                  className="px-6 py-3.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer ring-2 ring-blue-500/20"
                 >
-                  <span>Continue to Dashboard</span>
+                  <span>Open Product Workspace</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
 
@@ -419,14 +463,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   onClick={() => scrollToSection('features')}
                   className="px-5 py-3.5 rounded-xl text-sm font-semibold text-slate-800 dark:text-slate-200 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-all flex items-center gap-2 cursor-pointer"
                 >
-                  <span>Explore Platform</span>
+                  <span>Explore Capabilities</span>
                 </button>
 
                 <button
-                  onClick={onVerify || (() => onEnterApp('public-verification'))}
-                  className="px-5 py-3.5 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 hover:text-indigo-600 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all flex items-center gap-2 cursor-pointer shadow-2xs"
+                  onClick={onVerify || (() => onEnterApp && onEnterApp('public-verification'))}
+                  className="px-5 py-3.5 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 hover:text-blue-600 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all flex items-center gap-2 cursor-pointer shadow-2xs"
                 >
-                  <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                  <ShieldCheck className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   <span>Public Verification</span>
                 </button>
               </div>
