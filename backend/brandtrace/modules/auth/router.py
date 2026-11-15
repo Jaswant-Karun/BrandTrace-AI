@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, Header
 from typing import Optional
-from brandtrace.modules.auth.models import LoginRequest, LoginResponse, UserProfile
+from brandtrace.modules.auth.models import LoginRequest, RegisterRequest, LoginResponse, UserProfile
 from brandtrace.modules.auth.service import auth_service
 
 router = APIRouter(prefix="/auth", tags=["Authentication & RBAC"])
@@ -36,6 +36,20 @@ async def login(req: LoginRequest):
         access_token=token,
         user=user
     )
+
+@router.post("/register", response_model=LoginResponse)
+async def register(req: RegisterRequest):
+    try:
+        user = await auth_service.register_user(req)
+        token = auth_service.create_user_token(user)
+        return LoginResponse(
+            access_token=token,
+            user=user
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to register user account.")
 
 @router.get("/me", response_model=UserProfile)
 async def get_me(user: UserProfile = Depends(get_current_user)):
