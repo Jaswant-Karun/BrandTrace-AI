@@ -8,7 +8,7 @@ import { DemoWalkthroughModal } from './components/DemoWalkthroughModal';
 import { AuthHeader } from './components/AuthHeader';
 import { useAuth } from './context/AuthContext';
 import { BrandProfile, DatabaseStatus, VerificationResult } from './types';
-import { ExternalLink, Database, RefreshCw, Sparkles, Search } from 'lucide-react';
+import { ExternalLink, RefreshCw, Search } from 'lucide-react';
 
 // Code-split heavy views via React.lazy for optimized initial bundle loading
 const KnowledgeGraphView = lazy(() => import('./components/KnowledgeGraphView').then(m => ({ default: m.KnowledgeGraphView })));
