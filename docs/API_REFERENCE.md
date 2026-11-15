@@ -34,6 +34,19 @@ Returns live system operational telemetry, MongoDB Atlas connection state, and a
 
 ## 2. Authentication & Personas (`/api/auth`)
 
+All authenticated endpoints require a Bearer token in the `Authorization` header:
+
+```http
+Authorization: Bearer <jwt_access_token>
+```
+
+### Supported Roles & Scopes:
+- `ADMIN`: Full organizational management, tenant configuration, and benchmark execution.
+- `BRAND_MANAGER`: Brand guidelines, approved facts, and digital twin simulation commits.
+- `CREATOR`: Submitting creative assets and remediating flagged copy.
+- `REVIEWER`: Editorial review, annotations, and preliminary approvals.
+- `COMPLIANCE_REVIEWER`: Regulatory sign-off, clinical validation, and cryptographic release authorization.
+
 ### `POST /api/auth/login`
 Authenticates a user via email and password, returning an access JWT and user profile.
 
@@ -99,6 +112,35 @@ Updates an approved fact with server-side input validation and historical lineag
 
 ### `POST /api/facts/mutate`
 Initiates a brand fact mutation, calculating cross-departmental impact, identifying affected content assets, and generating revision tasks. Enforces server-side RBAC (requires `BRAND_MANAGER` or `ADMIN`).
+
+### `POST /api/knowledge-base/vector-search`
+Executes MongoDB Atlas Vector Search (`$vectorSearch`) across approved facts and guidelines using 768-dimensional embeddings.
+
+**Request Body:**
+```json
+{
+  "query_text": "titanium durability warranty",
+  "org_id": "ORG-AURELLE",
+  "workspace_id": "aurelle-tech",
+  "limit": 5,
+  "min_score": 0.10
+}
+```
+
+### `GET /api/brands/{brand_id}/graph`
+Returns all graph nodes and semantic dependency edges formatted for interactive Directed Canvas visualization.
+
+### `POST /api/graph/traverse`
+Executes depth-bounded DAG traversal from a specific root fact or guideline node to trace upstream dependencies and downstream blast radius.
+
+**Request Body:**
+```json
+{
+  "brand_id": "aurelle-tech",
+  "root_node_id": "FACT-AUR-PRC-01",
+  "max_depth": 5
+}
+```
 
 ---
 

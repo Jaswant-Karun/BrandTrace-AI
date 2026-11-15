@@ -103,6 +103,14 @@ $$\text{Tamper-Evident Seal} = \text{BT-SEAL-} \parallel \text{SHA-256}(\text{Bl
    - Current regulatory compliance rule-sets focus on United States statutes (FTC, FDA, Lanham Act, NHTSA). International compliance frameworks (e.g., EU Green Claims Directive, UK ASA CAP Code) are on the product roadmap.
 3. **MongoDB Atlas Vector Search Synchronization:**
    - When deploying to new local environments without Atlas vector index configuration, semantic search gracefully falls back to deterministic keyword, regex, and graph-lookup matching.
+4. **Cloud Infrastructure & Render Free-Tier Container Spindown:**
+   - The production backend runs on Render managed containers. On standard free tiers, instances automatically sleep after 15 minutes of zero inbound traffic. An initial cold-start wake-up takes 30–45 seconds, after which all requests execute with sub-20ms latency.
+5. **Multi-Tenant Logical Separation vs. Dedicated Clusters:**
+   - Multi-tenancy is enforced logically at the software and database layer using strict `organisation_id` and `workspace_id` filtering on all queries. Ultra-high-security environments requiring physically isolated hardware clusters require enterprise multi-cluster provisioning.
+6. **Progressive Web App (PWA) Zero-Trust Caching Boundary:**
+   - The PWA Service Worker explicitly excludes private API responses, authentication tokens, and customer marketing drafts from local browser cache. Offline usage is intentionally restricted to the application shell to prevent unverified brand drift.
+7. **Multimodal File Ingestion Ceiling:**
+   - File uploads are capped at 25MB to prevent denial-of-service memory exhaustion. Video files are analyzed via deterministic keyframe image sampling rather than full continuous video stream decoding.
 
 ---
 

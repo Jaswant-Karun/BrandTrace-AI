@@ -178,3 +178,25 @@ pnpm install
 pnpm dev
 # Opens at http://localhost:5173
 ```
+
+---
+
+## 📋 Comprehensive Environment Variables Guide
+
+### Backend Environment Variables (`backend/.env`):
+| Variable | Description | Example / Allowed Values |
+|---|---|---|
+| `ENVIRONMENT` | Runtime execution mode | `production` / `development` / `testing` |
+| `PORT` | Listening server port | `8000` |
+| `MONGODB_URI` | MongoDB Atlas TLS connection string | `mongodb+srv://<user>:<password>@cluster.mongodb.net/brandtrace_admin` |
+| `JWT_SECRET_KEY` | Secret key for signing JWT tokens | `min 32 character high-entropy string` |
+| `JWT_ALGORITHM` | Algorithm used for JWT signatures | `HS256` |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | Token validity duration | `1440` (24 hours) |
+| `GEMINI_API_KEY` | Optional key for live LLM grounding | `<google_ai_studio_api_key>` |
+| `DEMO_ACCOUNT_PASSWORD` | Restricted demo password | `DemoAurelle2026!` |
+
+### Frontend Environment Variables (`frontend/.env`):
+| Variable | Description | Example / Value |
+|---|---|---|
+| `VITE_API_BASE_URL` | Backend REST API base URL | `https://brandtrace-backend.onrender.com` |
+| `VITE_APP_NAME` | Application title | `BRANDTRACE AI` |

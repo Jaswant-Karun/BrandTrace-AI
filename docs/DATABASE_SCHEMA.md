@@ -17,6 +17,8 @@
    - Cross-tenant queries are blocked at both database query and application middleware levels.
 3. **Resilient Memory Fallback:**
    - The application boots seamlessly even if cloud database connectivity is temporarily interrupted or during offline development, providing deterministic mock caches while logging clear telemetry.
+4. **Hybrid Schema & Document Model:**
+   - Combines strictly validated Pydantic schemas for core entities (releases, facts, audit ledger) with flexible BSON structures for polymorphic graph nodes, semantic edges, and multi-agent inspection findings.
 
 ---
 

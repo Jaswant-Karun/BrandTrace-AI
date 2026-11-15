@@ -17,6 +17,21 @@
 5. **Tamper-Evident Ledger Provenance:** Releases receive internal SHA-256 chained block digest seals, verifiable by consumers worldwide without corporate sign-in.
 6. **Strict Multi-Tenant Isolation:** Enforces `org_id` and `workspace_id` boundaries across all database queries, document indexing, and agent pipelines.
 
+### Technology Stack & Runtime Specifications:
+
+| Tier | Component / Technology | Specification | Enterprise Role |
+| :--- | :--- | :--- | :--- |
+| **Frontend Framework** | React 19 + TypeScript 5.7 | React 19.0.0 / TS 5.7.3 | Reactive presentation layer with compile-time type safety |
+| **Bundler & Tooling** | Vite 6.2 | Vite 6.2.0 | Sub-second HMR development and code-split production chunks |
+| **Canvas & DAGs** | `@xyflow/react` | 12.4.4 | Hardware-accelerated canvas for Brand Knowledge Graph |
+| **Styling & Motion** | Tailwind CSS + Framer Motion | Tailwind 3.4 / Motion 14 | Pitch dark enterprise UI with `prefers-reduced-motion` |
+| **Backend Framework** | FastAPI + Uvicorn | FastAPI 0.115 / Starlette | Asynchronous ASGI API engine with sub-10ms response times |
+| **Data Validation** | Pydantic v2 | 2.10.6 | Strict schema serialization and input sanitization |
+| **Database Engine** | MongoDB Atlas M0 / Dedicated | MongoDB 7.0+ Cluster | Multi-tenant document persistence with `$graphLookup` |
+| **Vector Search** | Atlas Vector Search | 768-dim cosine index | Hybrid semantic grounding with lexical fallback |
+| **Database Driver** | Motor (AsyncIOMotorClient) | Motor 3.7.0 | Non-blocking async driver for concurrent request handling |
+| **AI Intelligence** | Gemini Structured Grounding | Multi-Agent Coordination | Specialized agents for Voice, Claims, and Regulations |
+
 ---
 
 ## 2. End-to-End System Architecture

@@ -4,10 +4,10 @@
 
 > **Tagline:** *Detect. Predict. Verify. Prevent.*
 
-[![Backend Tests](https://img.shields.io/badge/Backend%20Tests-163%2F163%20Passing-emerald?style=for-the-badge&logo=pytest)](docs/TESTING.md)
+[![Backend Tests](https://img.shields.io/badge/Backend%20Tests-242%2F242%20Passing-emerald?style=for-the-badge&logo=pytest)](docs/TESTING.md)
 [![Frontend Build](https://img.shields.io/badge/Frontend%20Build-0%20Errors-cyan?style=for-the-badge&logo=typescript)](frontend)
 [![Database](https://img.shields.io/badge/Database-MongoDB%20Atlas-green?style=for-the-badge&logo=mongodb)](docs/DATABASE_SCHEMA.md)
-[![PWA Ready](https://img.shields.io/badge/PWA-Installable%20Offline%20Ready-blue?style=for-the-badge&logo=pwa)](docs/DEPLOYMENT.md)
+[![PWA Ready](https://img.shields.io/badge/PWA-Installable%20Offline%20Ready-blue?style=for-the-badge&logo=pwa)](DEPLOYMENT.md)
 [![Live Frontend](https://img.shields.io/badge/Live%20App-Vercel-black?style=for-the-badge&logo=vercel)](https://brand-trace-ai-dun.vercel.app/)
 [![Live Backend](https://img.shields.io/badge/Live%20API-Render-46E3B7?style=for-the-badge&logo=render)](https://brandtrace-backend.onrender.com/health)
 
