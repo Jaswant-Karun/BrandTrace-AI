@@ -126,9 +126,13 @@ class SubmissionResponse(BaseModel):
     reviewer_feedback: Optional[str] = None
     compliance_notes: Optional[str] = None
     evidence_requested_notes: Optional[str] = None
+    brand_owner_notes: Optional[str] = None
     rejection_reason: Optional[str] = None
     approval_history: List[ApprovalStepModel]
+    release_id: Optional[str] = None
     release_seal: Optional[str] = None
+    release_digest: Optional[str] = None
+    released_at: Optional[str] = None
 
 class ReviewDecisionRequest(BaseModel):
     decision: str  # APPROVE, REQUEST_CHANGES, REJECT
@@ -146,9 +150,23 @@ class ComplianceDecisionRequest(BaseModel):
     finding_decisions: Optional[Dict[str, Any]] = None
 
 class FinalApprovalRequest(BaseModel):
+    decision: str = "FINAL_APPROVE"  # FINAL_APPROVE, APPROVE, REQUEST_CHANGES, REJECT
     approver_name: str = "Brand Owner Kabir"
     approver_role: str = "BRAND_OWNER"
     notes: Optional[str] = None
+    reason: Optional[str] = None
+
+class PublishRequest(BaseModel):
+    platform: str = "instagram"
+    destination_account: str
+    authorized_integration: bool = False
+    oauth_token: Optional[str] = None
+
+class PublishResponse(BaseModel):
+    status: str  # PUBLISHED, RESTRICTED, ERROR
+    published_url: Optional[str] = None
+    message: str
+    release_id: Optional[str] = None
 
 class AuditRecordRequest(BaseModel):
     what: str
