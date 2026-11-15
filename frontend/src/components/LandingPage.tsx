@@ -489,7 +489,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
 
               {/* Composition Container with subtle dark blueprint / glow background */}
-              <div className="relative max-w-[560px] lg:max-w-[610px] ml-auto p-2.5 sm:p-3.5 pb-5 sm:pb-6 rounded-2xl sm:rounded-3xl bg-slate-900/60 dark:bg-slate-950/70 border border-slate-800/80 shadow-2xl backdrop-blur-md overflow-hidden">
+              <div className="relative max-w-[560px] lg:max-w-[610px] ml-auto p-2.5 sm:p-3 pb-3 sm:pb-3.5 rounded-2xl sm:rounded-3xl bg-slate-900/60 dark:bg-slate-950/70 border border-slate-800/80 shadow-2xl backdrop-blur-md overflow-hidden">
                 
                 {/* Background ambient lighting */}
                 <div className="absolute top-1/4 right-1/4 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -564,11 +564,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     </div>
                   </div>
 
-                  {/* Right Side: Stacked Floating Issue Cards & Aligned Seal with Subtle Contrasting Book Slant */}
+                  {/* Right Side: Stacked Floating Issue Cards with Subtle Contrasting Book Slant */}
                   <div className="md:col-span-5 space-y-1.5 sm:space-y-2 relative flex flex-col justify-start rotate-[0.4deg] sm:rotate-[0.6deg]">
                     
                     {/* Dotted connecting line behind cards */}
-                    <div className="hidden md:block absolute -left-2 top-3 bottom-6 border-l border-dashed border-slate-700/50 pointer-events-none" />
+                    <div className="hidden md:block absolute -left-2 top-3 bottom-2 border-l border-dashed border-slate-700/50 pointer-events-none" />
 
                     {/* Issue Card 1 */}
                     <div className="bg-white rounded-xl p-2 sm:p-2.5 shadow-md border border-slate-100/90 relative">
@@ -632,32 +632,47 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                       </div>
                     </div>
 
-                    {/* Aligned Approved Circular Stamp Seal ("APPROVED VLM-SEALED") */}
-                    {/* Positioned directly under findings, cleanly inside the boundary line with enlarged scale */}
-                    <div className="pt-2 sm:pt-3 pb-1 flex justify-center items-center relative z-20 select-none">
-                      <motion.div
-                        initial={{ scale: 1, opacity: 1, rotate: -12 }}
-                        animate={{ scale: 1, opacity: 1, rotate: -12 }}
-                        transition={{ duration: 0.2 }}
-                        className="relative flex items-center justify-center select-none"
-                      >
-                        {/* Concentric Double Rings - Enlarged per user instruction */}
-                        <div className="w-36 h-36 sm:w-40 sm:h-40 lg:w-[156px] lg:h-[156px] rounded-full border-2 border-emerald-500/90 bg-[#06281e]/95 backdrop-blur-md shadow-[0_0_35px_rgba(16,185,129,0.35)] flex items-center justify-center p-2 hover:scale-105 transition-transform duration-200 cursor-default">
-                          <div className="w-full h-full rounded-full border border-dashed border-emerald-400/85 flex flex-col items-center justify-center text-center p-2.5">
-                            <span className="text-sm sm:text-[15px] lg:text-[16px] font-black tracking-widest text-emerald-300 uppercase font-sans">
-                              APPROVED
-                            </span>
-                            <div className="w-14 sm:w-16 h-[1.5px] bg-emerald-500/70 my-1" />
-                            <span className="text-[10px] sm:text-[11px] lg:text-xs font-mono font-extrabold tracking-widest text-emerald-400">
-                              VLM-SEALED
-                            </span>
-                          </div>
-                        </div>
-                      </motion.div>
-                    </div>
-
                   </div>
 
+                </div>
+
+                {/* Motion Approved Circular Stamp Seal ("APPROVED VLM-SEALED") */}
+                {/* Dynamically stamps onto the inspection upon entering the page, centered with zero wasted empty space */}
+                <div className="mt-2.5 sm:mt-3 flex justify-center items-center relative z-20 select-none">
+                  <motion.div
+                    key={`stamp-seal-${motionStep}`}
+                    initial={{ scale: 2.3, opacity: 0, rotate: -32 }}
+                    animate={{ scale: 1, opacity: 1, rotate: -12 }}
+                    transition={{
+                      delay: 0.35,
+                      duration: 0.45,
+                      type: 'spring',
+                      damping: 13,
+                      stiffness: 250
+                    }}
+                    className="relative flex items-center justify-center select-none"
+                  >
+                    {/* Concentric Double Rings */}
+                    <div className="w-34 h-34 sm:w-38 sm:h-38 lg:w-[150px] lg:h-[150px] rounded-full border-2 border-emerald-500/90 bg-[#06281e]/95 backdrop-blur-md shadow-[0_0_35px_rgba(16,185,129,0.35)] flex items-center justify-center p-2 hover:scale-105 transition-transform duration-200 cursor-default">
+                      <div className="w-full h-full rounded-full border border-dashed border-emerald-400/85 flex flex-col items-center justify-center text-center p-2.5">
+                        <span className="text-sm sm:text-[15px] lg:text-[16px] font-black tracking-widest text-emerald-300 uppercase font-sans">
+                          APPROVED
+                        </span>
+                        <div className="w-14 sm:w-16 h-[1.5px] bg-emerald-500/70 my-1" />
+                        <span className="text-[10px] sm:text-[11px] lg:text-xs font-mono font-extrabold tracking-widest text-emerald-400">
+                          VLM-SEALED
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Shockwave Impact Ring upon sealing */}
+                    <motion.span
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: [0.85, 1.45], opacity: [0.9, 0] }}
+                      transition={{ delay: 0.42, duration: 0.6, ease: 'easeOut' }}
+                      className="absolute inset-0 rounded-full border-2 border-emerald-400 pointer-events-none"
+                    />
+                  </motion.div>
                 </div>
 
               </div>
