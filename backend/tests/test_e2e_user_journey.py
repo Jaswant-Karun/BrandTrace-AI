@@ -102,8 +102,10 @@ async def test_e2e_complete_user_journey():
             "brand_id": "aurelle-tech",
             "target_record_id": "FACT-AUR-PRC-01",
             "target_record_type": "PRICE",
+            "record_label": "Aurelle Studio Subscription",
+            "old_value": "₹499",
             "proposed_value": "₹599",
-            "rationale": "Global commercial master resolution indexing audio mastering infrastructure costs.",
+            "change_rationale": "Global commercial master resolution indexing audio mastering infrastructure costs.",
             "proposed_by": "Alex Mercer, VP Global Brand Governance"
         }
         sim_res = await client.post("/api/simulator/propose", json=propose_payload)
@@ -113,7 +115,8 @@ async def test_e2e_complete_user_journey():
         assert sim_data["old_value"] == "₹499"
         assert sim_data["proposed_value"] == "₹599"
         assert len(sim_data["affected_touchpoints"]) >= 4
-        assert sim_data["estimated_financial_exposure_usd"] > 0
+        assert sim_data["overall_risk_score"] > 0
+        assert sim_data["workload_estimate"]["estimated_review_hours"] > 0
         sim_id = sim_data["simulation_id"]
 
         # Step 8: Change Impact Simulator: Digital Twin Commit (Human gate approval)
@@ -158,12 +161,12 @@ async def test_e2e_complete_user_journey():
         # Step 12: Cryptographic Proof Verifier
         verify_seal_res = await client.post("/api/ledger/verify-record", json={
             "identifier": "AST-AUR-01",
-            "asset_content": "Unlock next-generation spatial computing with Aurelle Cloud Studio for only ₹599 per month. Real-time audio rendering included."
+            "content_to_test": "Unlock next-generation spatial computing with Aurelle Cloud Studio for only ₹599 per month. Real-time audio rendering included."
         })
         assert verify_seal_res.status_code == 200
         verify_seal_data = verify_seal_res.json()
-        assert "verification_state" in verify_seal_data
-        assert verify_seal_data["verification_state"] in ["VALID_UNCHANGED", "UNKNOWN_RECORD", "MODIFIED_AFTER_APPROVAL"]
+        assert "state" in verify_seal_data
+        assert verify_seal_data["state"] in ["VALID_UNCHANGED", "UNKNOWN_RECORD", "MODIFIED_AFTER_APPROVAL"]
 
         # Step 13: Risk Intelligence & Regulatory Taxonomy
         risk_res = await client.get("/api/risks/taxonomy?brand_id=aurelle-tech")
