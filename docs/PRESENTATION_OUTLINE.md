@@ -66,7 +66,7 @@
 
 ---
 
-### Slide 6: The Innovation — Brand Governance Digital Twin
+## Slide 6: The Innovation — Brand Governance Digital Twin
 
 - **Headline:** Moving from Reactive Linting to Predictive Impact Simulation
 - **How Ordinary Tools Differ:**
@@ -80,7 +80,7 @@
 
 ---
 
-### Slide 7: Technology Stack, Implementation & Validation Evidence
+## Slide 7: Technology Stack, Implementation & Validation Evidence
 
 - **Headline:** Engineered, Tested, and Proven with Real Data
 - **Technology Stack:**
