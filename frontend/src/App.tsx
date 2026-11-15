@@ -57,6 +57,9 @@ export const App: React.FC = () => {
     return 'login';
   });
 
+  // Track if user just transitioned from the sign-in page to play entrance motion once
+  const [justLoggedIn, setJustLoggedIn] = useState<boolean>(false);
+
   const [currentTab, setCurrentTab] = useState<NavigationTab>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -184,12 +187,20 @@ export const App: React.FC = () => {
     return (
       <LandingPage
         brandName={currentBrand?.brand_name}
+        animateEntrance={justLoggedIn}
         onEnterApp={(targetTab) => {
           if (targetTab) setCurrentTab(targetTab as NavigationTab);
+          setJustLoggedIn(false);
           setViewMode(isAuthenticated ? 'app' : 'login');
         }}
-        onVerify={() => setViewMode('verify')}
-        onSignIn={() => setViewMode('login')}
+        onVerify={() => {
+          setJustLoggedIn(false);
+          setViewMode('verify');
+        }}
+        onSignIn={() => {
+          setJustLoggedIn(false);
+          setViewMode('login');
+        }}
       />
     );
   }
@@ -199,9 +210,13 @@ export const App: React.FC = () => {
     return (
       <LoginPage
         onSuccess={() => {
+          setJustLoggedIn(true);
           setViewMode('landing');
         }}
-        onOpenLanding={() => setViewMode('landing')}
+        onOpenLanding={() => {
+          setJustLoggedIn(true);
+          setViewMode('landing');
+        }}
       />
     );
   }
@@ -211,9 +226,13 @@ export const App: React.FC = () => {
     return (
       <LoginPage
         onSuccess={() => {
+          setJustLoggedIn(true);
           setViewMode('landing');
         }}
-        onOpenLanding={() => setViewMode('landing')}
+        onOpenLanding={() => {
+          setJustLoggedIn(true);
+          setViewMode('landing');
+        }}
       />
     );
   }

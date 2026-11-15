@@ -17,13 +17,15 @@ interface LandingPageProps {
   brandName?: string;
   onVerify?: () => void;
   onSignIn?: () => void;
+  animateEntrance?: boolean;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ 
   onEnterApp, 
   onVerify, 
   onSignIn,
-  brandName: _brandName = 'Apex Dynamics' 
+  brandName: _brandName = 'Apex Dynamics',
+  animateEntrance
 }) => {
   const { user, isAuthenticated, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -31,41 +33,39 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const [activeCapabilityId, setActiveCapabilityId] = useState<string | null>(null);
   const [activeStepIndex, setActiveStepIndex] = useState<number>(3);
 
+  // Check if entrance animation was requested (either via prop or URL param ?fromLogin=true)
+  const shouldAnimate = typeof animateEntrance === 'boolean' 
+    ? animateEntrance 
+    : (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('fromLogin') === 'true');
+
   // Motion choreography state for hero headline:
-  // Step 0: "EVERY CLAIM" and "CHECKED." displayed first
-  // Step 1: "CLINICALLY PROVEN" appears
-  // Step 2: Strike line strikes through "CLINICALLY PROVEN"
-  // Step 3: Green "SHOWN TO VISIBLY REDUCE*" appears (smaller font)
-  const [motionStep, setMotionStep] = useState<number>(0);
-  const [isHeroHovered, setIsHeroHovered] = useState<boolean>(false);
+  // Default is 3 (text fully shown as permanent).
+  // If arriving from sign in page, starts at 0 and runs once to 3, then stays permanent.
+  const [motionStep, setMotionStep] = useState<number>(shouldAnimate ? 0 : 3);
 
   useEffect(() => {
+    // If not arriving fresh from sign-in, keep text fully shown as permanent
+    if (!shouldAnimate) {
+      setMotionStep(3);
+      return;
+    }
+
     let t1: any;
     let t2: any;
     let t3: any;
-    let tReset: any;
 
-    const runSequence = () => {
-      setMotionStep(0);
-      t1 = setTimeout(() => setMotionStep(1), 900);
-      t2 = setTimeout(() => setMotionStep(2), 1900);
-      t3 = setTimeout(() => setMotionStep(3), 2900);
-      tReset = setTimeout(() => {
-        if (!isHeroHovered) {
-          runSequence();
-        }
-      }, 9500);
-    };
+    setMotionStep(0);
+    t1 = setTimeout(() => setMotionStep(1), 900);
+    t2 = setTimeout(() => setMotionStep(2), 1900);
+    t3 = setTimeout(() => setMotionStep(3), 2900);
 
-    runSequence();
-
+    // IMPORTANT: No auto-reset or loop! Once step 3 is reached, it remains permanently fully shown.
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
-      clearTimeout(tReset);
     };
-  }, [isHeroHovered]);
+  }, [shouldAnimate]);
 
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false);
@@ -289,11 +289,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Left Column: Bold Editorial Typography & CTA */}
             <div className="lg:col-span-7 space-y-6 text-left">
               
-              <div 
-                onMouseEnter={() => setIsHeroHovered(true)}
-                onMouseLeave={() => setIsHeroHovered(false)}
-                className="space-y-3 select-none"
-              >
+              <div className="space-y-3 select-none">
                 
                 {/* Meta Tag & Brand Context Pill */}
                 <div className="flex items-center gap-2.5 flex-wrap">
