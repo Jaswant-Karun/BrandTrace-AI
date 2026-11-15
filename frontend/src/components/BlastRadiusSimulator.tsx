@@ -4,6 +4,7 @@ import {
   CheckCircle2, XCircle, AlertTriangle, Lock, Sparkles, Clock, Check
 } from 'lucide-react';
 import { BlastRadiusResponse } from '../types';
+import { PageHeader } from './ui/PageHeader';
 
 interface BlastRadiusSimulatorProps {
   brandId: string;
@@ -190,6 +191,19 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
 
   return (
     <div className="space-y-6">
+      {/* Standardized Enterprise Page Header */}
+      <PageHeader
+        title="Change Impact Simulator (Digital Twin)"
+        description="Preview how a proposed change to an approved brand fact or guideline may affect connected content before approving it."
+        category="Digital Twin Simulation"
+        workspaceName={brandId || 'aurelle-tech'}
+        primaryAction={{
+          label: isSimulating ? "Simulating..." : "Run Blast Radius Simulation",
+          onClick: handleRunSimulation,
+          icon: <Flame className="w-3.5 h-3.5 text-amber-300" />
+        }}
+      />
+
       {/* Top Banner & Header */}
       <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs flex flex-wrap items-center justify-between gap-4">
         <div>

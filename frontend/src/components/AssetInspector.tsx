@@ -5,6 +5,7 @@ import {
   HelpCircle, RefreshCw, UserCheck
 } from 'lucide-react';
 import { VerificationResult, RiskSpan } from '../types';
+import { PageHeader } from './ui/PageHeader';
 
 interface AssetInspectorProps {
   brandId: string;
@@ -31,6 +32,27 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
 
   // Preset Scenarios
   const PRESETS = [
+    {
+      title: "Aurelle Price & Trademark (₹499 vs Claims)",
+      assetTitle: "Meta Feed Ad: Aurelle Horizon & Cloud Studio",
+      channel: "Social Media",
+      brand: "aurelle-tech",
+      text: "Experience the revolutionary Aurelle Horizun Watch with QuantumAcoustics spatial sound streaming. Aurelle Cloud Studio subscription is ₹499/mo with 72-hour battery life."
+    },
+    {
+      title: "Aurelle Prohibited Medical Claim (FDA 21 CFR §870)",
+      assetTitle: "Digital Display: Pulse Smart Ring Health Benefit",
+      channel: "Digital Display",
+      brand: "aurelle-tech",
+      text: "Aurelle Pulse Smart Ring is a medical-grade diagnostic cure that eliminates all symptoms of cardiovascular disease."
+    },
+    {
+      title: "Aurelle Expired Founder Trial Promotion",
+      assetTitle: "Email Promotion: Founder Launch Tier",
+      channel: "Digital Display",
+      brand: "aurelle-tech",
+      text: "Claim your Aurelle Cloud Studio subscription for ₹0 free for 6 months under the Founder Launch Trial."
+    },
     {
       title: "Compliant Range Copy (Passes Gate)",
       assetTitle: "Billboard: 520 Miles of Zero Compromise",
@@ -235,6 +257,19 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
 
   return (
     <div className="space-y-6">
+      {/* Standardized Enterprise Page Header */}
+      <PageHeader
+        title="Content Studio & Multi-Agent Inspection"
+        description="Inspect marketing content against certified brand knowledge and identify claims, outdated facts, and guidelines that require verification."
+        category="Content Intelligence"
+        workspaceName={brandId}
+        primaryAction={{
+          label: isVerifying ? "Verifying Copy..." : "Start Pre-Release Verification",
+          onClick: handleVerify,
+          icon: <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+        }}
+      />
+
       {/* Top Banner / Presets */}
       <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
         <div className="flex items-center justify-between mb-3">

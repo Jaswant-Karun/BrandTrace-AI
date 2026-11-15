@@ -2,13 +2,16 @@ import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sidebar, NavigationTab } from './components/Sidebar';
 import { LandingPage } from './components/LandingPage';
+import { LoginPage } from './components/LoginPage';
 import { CommandCenter } from './components/CommandCenter';
 import { DatabaseStatusModal } from './components/DatabaseStatusModal';
 import { DemoWalkthroughModal } from './components/DemoWalkthroughModal';
+import { WelcomeModal } from './components/WelcomeModal';
+import { GuidedTourOverlay } from './components/GuidedTourOverlay';
 import { AuthHeader } from './components/AuthHeader';
 import { useAuth } from './context/AuthContext';
 import { BrandProfile, DatabaseStatus, VerificationResult } from './types';
-import { ExternalLink, RefreshCw, Search } from 'lucide-react';
+import { ExternalLink, RefreshCw, Search, LogOut } from 'lucide-react';
 
 // Code-split heavy views via React.lazy for optimized initial bundle loading
 const KnowledgeGraphView = lazy(() => import('./components/KnowledgeGraphView').then(m => ({ default: m.KnowledgeGraphView })));
@@ -32,15 +35,26 @@ const ViewLoadingFallback: React.FC = () => (
 );
 
 export const App: React.FC = () => {
-  const [viewMode, setViewMode] = useState<'landing' | 'app'>('app');
+  const { currentWorkspace, setWorkspace, isAuthenticated, user, logout } = useAuth();
+  
+  const [viewMode, setViewMode] = useState<'landing' | 'login' | 'app'>(() => {
+    // If token exists, enter app directly; otherwise show login
+    return localStorage.getItem('brandtrace_jwt_token') ? 'app' : 'login';
+  });
+
   const [currentTab, setCurrentTab] = useState<NavigationTab>('command-center');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
   const [brands, setBrands] = useState<BrandProfile[]>([]);
-  const { currentWorkspace, setWorkspace } = useAuth();
-  const [selectedBrandId, setSelectedBrandId] = useState<string>(currentWorkspace || 'apex-dynamics');
+  const [selectedBrandId, setSelectedBrandId] = useState<string>(currentWorkspace || 'aurelle-tech');
   const [dbStatus, setDbStatus] = useState<DatabaseStatus | null>(null);
+  
+  // Modals & Interactive Tour State
   const [isDbModalOpen, setIsDbModalOpen] = useState<boolean>(false);
   const [isDemoModalOpen, setIsDemoModalOpen] = useState<boolean>(false);
+  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState<boolean>(false);
+  const [isTourOpen, setIsTourOpen] = useState<boolean>(false);
+  const [tourStepIndex, setTourStepIndex] = useState<number>(0);
+
   const [isReseeding, setIsReseeding] = useState<boolean>(false);
   const [bdigSubTab, setBdigSubTab] = useState<'canvas' | 'workflow'>('canvas');
 
@@ -61,7 +75,9 @@ export const App: React.FC = () => {
         const brandData: BrandProfile[] = await brandsRes.json();
         setBrands(brandData);
         if (brandData.length > 0 && !selectedBrandId) {
-          setSelectedBrandId(brandData[0].brand_id);
+          // Default to aurelle-tech if available
+          const aurelleBrand = brandData.find(b => b.brand_id === 'aurelle-tech');
+          setSelectedBrandId(aurelleBrand ? aurelleBrand.brand_id : brandData[0].brand_id);
         }
       }
       if (statusRes.ok) {
@@ -110,6 +126,12 @@ export const App: React.FC = () => {
     if (!res.ok) throw new Error('Failed to sign release');
   };
 
+  const handleStartTour = () => {
+    setIsTourOpen(true);
+    setTourStepIndex(0);
+    setCurrentTab('command-center');
+  };
+
   const currentBrand = brands.find((b) => b.brand_id === selectedBrandId);
 
   // If user requests Public Landing Page
@@ -119,8 +141,21 @@ export const App: React.FC = () => {
         brandName={currentBrand?.brand_name}
         onEnterApp={(targetTab) => {
           if (targetTab) setCurrentTab(targetTab as NavigationTab);
-          setViewMode('app');
+          setViewMode(isAuthenticated ? 'app' : 'login');
         }}
+      />
+    );
+  }
+
+  // If not authenticated or in login mode, render dedicated LoginPage
+  if (viewMode === 'login' || (!isAuthenticated && viewMode !== 'landing')) {
+    return (
+      <LoginPage
+        onSuccess={() => {
+          setViewMode('app');
+          setIsWelcomeModalOpen(true);
+        }}
+        onOpenLanding={() => setViewMode('landing')}
       />
     );
   }
@@ -167,6 +202,8 @@ export const App: React.FC = () => {
         <AuthHeader
           onOpenDbStatus={() => setIsDbModalOpen(true)}
           onOpenDemoWalkthrough={() => setIsDemoModalOpen(true)}
+          onStartTour={handleStartTour}
+          onLogout={() => setViewMode('login')}
         />
 
         {/* Top Control Bar */}
@@ -179,7 +216,7 @@ export const App: React.FC = () => {
             </div>
             <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-slate-300" />
             <span className="hidden sm:inline-block text-[11px] text-slate-600 font-mono bg-slate-50 border border-slate-200 px-2 py-0.5 rounded">
-              {currentBrand ? currentBrand.brand_name : 'Apex Dynamics'}
+              {currentBrand ? currentBrand.brand_name : 'Aurelle Technologies'}
             </span>
           </div>
 
@@ -229,7 +266,11 @@ export const App: React.FC = () => {
             >
               <Suspense fallback={<ViewLoadingFallback />}>
                 {currentTab === 'command-center' && (
-                  <CommandCenter brandId={selectedBrandId} onNavigate={setCurrentTab} />
+                  <CommandCenter
+                    brandId={selectedBrandId}
+                    onNavigate={setCurrentTab}
+                    onStartTour={handleStartTour}
+                  />
                 )}
 
                 {currentTab === 'bdig' && (
@@ -341,6 +382,28 @@ export const App: React.FC = () => {
           else if (viewName.includes('Studio') || viewName.includes('Content')) setCurrentTab('content-studio');
           else setCurrentTab('command-center');
         }}
+      />
+
+      {/* Welcome Onboarding Modal */}
+      <WelcomeModal
+        isOpen={isWelcomeModalOpen}
+        onClose={() => setIsWelcomeModalOpen(false)}
+        onStartTour={handleStartTour}
+        onLaunchDemoScenario={() => {
+          setIsWelcomeModalOpen(false);
+          setCurrentTab('impact-simulator');
+        }}
+      />
+
+      {/* Interactive Guided Tour Overlay */}
+      <GuidedTourOverlay
+        isOpen={isTourOpen}
+        currentStepIndex={tourStepIndex}
+        onStepChange={(idx, tab) => {
+          setTourStepIndex(idx);
+          setCurrentTab(tab);
+        }}
+        onClose={() => setIsTourOpen(false)}
       />
     </div>
   );
