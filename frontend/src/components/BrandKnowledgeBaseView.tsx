@@ -20,6 +20,28 @@ interface BrandKnowledgeBaseViewProps {
   onNavigate?: (tab: any) => void;
 }
 
+const formatDateSafe = (dateVal: any): string => {
+  if (!dateVal) return 'Today';
+  try {
+    if (typeof dateVal === 'number') {
+      const d = new Date(dateVal);
+      return !isNaN(d.getTime()) ? d.toISOString().split('T')[0] : 'Today';
+    }
+    if (typeof dateVal === 'string') {
+      if (dateVal.includes('T')) return dateVal.split('T')[0];
+      const parsed = new Date(dateVal);
+      if (!isNaN(parsed.getTime())) return parsed.toISOString().split('T')[0];
+      return dateVal;
+    }
+    if (dateVal instanceof Date) {
+      return !isNaN(dateVal.getTime()) ? dateVal.toISOString().split('T')[0] : 'Today';
+    }
+  } catch {
+    return 'Today';
+  }
+  return 'Today';
+};
+
 export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ brandId, onNavigate }) => {
   const toast = useToast();
   
@@ -599,17 +621,17 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
       />
 
       {/* Top View Mode Switcher (Documents Studio vs Truth Graph Nodes) */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between bg-slate-100 p-1 rounded-xl border border-slate-200 gap-2">
-        <div className="flex items-center gap-1 overflow-x-auto w-full sm:w-auto">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between bg-slate-100 dark:bg-slate-900/90 p-1.5 rounded-xl border border-slate-200 dark:border-slate-800 gap-2">
+        <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto">
           <button
             onClick={() => setActiveStudioView('DOCUMENTS')}
             className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer ${
               activeStudioView === 'DOCUMENTS'
-                ? 'bg-white text-slate-900 border border-slate-200 shadow-2xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 shadow-2xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <FileText className="w-3.5 h-3.5 text-indigo-600" />
+            <FileText className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
             <span>Brand Documents Studio</span>
             <Badge variant="brand" size="sm">{documents.length}</Badge>
           </button>
@@ -618,11 +640,11 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
             onClick={() => setActiveStudioView('GRAPH_NODES')}
             className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer ${
               activeStudioView === 'GRAPH_NODES'
-                ? 'bg-white text-slate-900 border border-slate-200 shadow-2xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 shadow-2xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <Layers className="w-3.5 h-3.5 text-slate-600" />
+            <Layers className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
             <span>Certified Graph Nodes</span>
             <Badge variant="neutral" size="sm">{allNodes.length}</Badge>
           </button>
@@ -635,7 +657,7 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
                 variant="outline"
                 size="xs"
                 onClick={() => setIsUploadDocModalOpen(true)}
-                icon={<Upload className="w-3 h-3 text-slate-700" />}
+                icon={<Upload className="w-3 h-3 text-slate-700 dark:text-slate-300" />}
               >
                 Upload File
               </Button>
@@ -643,7 +665,7 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
                 variant="outline"
                 size="xs"
                 onClick={() => setIsImportModalOpen(true)}
-                icon={<Globe className="w-3 h-3 text-slate-700" />}
+                icon={<Globe className="w-3 h-3 text-slate-700 dark:text-slate-300" />}
               >
                 Import Website
               </Button>
@@ -659,14 +681,16 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
         <div className="space-y-5">
           
           {/* Studio Filters & Search Toolbar */}
-          <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-2xs">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-2xs">
             
             {/* Filter Tabs: ALL, CUSTOM, DEMO */}
-            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs font-medium">
+            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-lg border border-slate-200 dark:border-slate-700/80 text-xs font-medium">
               <button
                 onClick={() => setDocFilter('ALL')}
                 className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${
-                  docFilter === 'ALL' ? 'bg-white text-slate-900 font-semibold shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                  docFilter === 'ALL'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-semibold shadow-2xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 All Documents ({documents.length})
@@ -674,7 +698,9 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
               <button
                 onClick={() => setDocFilter('CUSTOM')}
                 className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${
-                  docFilter === 'CUSTOM' ? 'bg-white text-emerald-900 font-semibold shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                  docFilter === 'CUSTOM'
+                    ? 'bg-white dark:bg-slate-700 text-emerald-900 dark:text-emerald-300 font-semibold shadow-2xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 Custom Documents ({documents.filter((d) => !d.is_demo).length})
@@ -682,7 +708,9 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
               <button
                 onClick={() => setDocFilter('DEMO')}
                 className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${
-                  docFilter === 'DEMO' ? 'bg-white text-indigo-900 font-semibold shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                  docFilter === 'DEMO'
+                    ? 'bg-white dark:bg-slate-700 text-indigo-900 dark:text-indigo-300 font-semibold shadow-2xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 Demo Benchmarks ({documents.filter((d) => d.is_demo).length})
@@ -694,7 +722,7 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
               <select
                 value={docCategory}
                 onChange={(e) => setDocCategory(e.target.value)}
-                className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 font-medium focus:outline-none focus:border-slate-900 shadow-2xs"
+                className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:border-slate-900 dark:focus:border-slate-400 shadow-2xs"
               >
                 <option value="ALL">All Categories</option>
                 <option value="BRAND_GUIDELINES">Brand Guidelines</option>
@@ -712,7 +740,7 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
                   placeholder="Search documents, policies..."
                   value={docSearch}
                   onChange={(e) => setDocSearch(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-900 shadow-2xs"
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-slate-900 dark:focus:border-slate-400 shadow-2xs"
                 />
               </div>
             </div>
@@ -722,8 +750,8 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
           {/* Documents Grid */}
           {isLoadingDocs ? (
             <div className="py-20 flex flex-col items-center justify-center space-y-3">
-              <div className="w-7 h-7 rounded-full border-2 border-slate-200 border-t-indigo-600 animate-spin" />
-              <span className="text-xs font-mono text-slate-500">Retrieving certified tenant document library...</span>
+              <div className="w-7 h-7 rounded-full border-2 border-slate-200 dark:border-slate-800 border-t-indigo-600 dark:border-t-indigo-400 animate-spin" />
+              <span className="text-xs font-mono text-slate-500 dark:text-slate-400">Retrieving certified tenant document library...</span>
             </div>
           ) : filteredDocuments.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -732,29 +760,29 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
                 return (
                   <div
                     key={doc.doc_id}
-                    className="bg-white border border-slate-200 hover:border-slate-300 rounded-2xl p-5 shadow-2xs flex flex-col justify-between space-y-4 transition-all"
+                    className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 rounded-2xl p-5 shadow-2xs flex flex-col justify-between space-y-4 transition-all"
                   >
                     <div className="space-y-3">
                       
                       {/* Header Row: Category Badge, Version & Demo/Custom Label */}
-                      <div className="flex items-center justify-between pb-2 border-b border-slate-100 flex-wrap gap-2">
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800 flex-wrap gap-2">
                         <div className="flex items-center gap-1.5">
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-800 border border-slate-200">
-                            {doc.category.replace(/_/g, ' ')}
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
+                            {(doc.category || 'GENERAL').replace(/_/g, ' ')}
                           </span>
-                          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                            v{doc.version_number}
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                            v{doc.version_number || '1.0'}
                           </span>
                         </div>
 
                         <div className="flex items-center gap-1.5">
                           {doc.is_demo ? (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-200 flex items-center gap-1">
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 flex items-center gap-1">
                               <Lock className="w-2.5 h-2.5" />
                               DEMO BENCHMARK
                             </span>
                           ) : (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
                               <CheckCircle2 className="w-2.5 h-2.5" />
                               CUSTOM TENANT DOC
                             </span>
@@ -762,15 +790,15 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
 
                           {/* Real-time processing status badge */}
                           <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 ${
-                            doc.processing_status === 'INDEXED' ? 'bg-emerald-100 text-emerald-900' :
-                            doc.processing_status === 'PROCESSING' ? 'bg-blue-100 text-blue-900 animate-pulse' :
-                            doc.processing_status === 'FAILED' ? 'bg-rose-100 text-rose-900' :
-                            'bg-slate-100 text-slate-700'
+                            doc.processing_status === 'INDEXED' ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' :
+                            doc.processing_status === 'PROCESSING' ? 'bg-blue-100 dark:bg-blue-950/60 text-blue-900 dark:text-blue-300 border border-blue-200 dark:border-blue-800 animate-pulse' :
+                            doc.processing_status === 'FAILED' ? 'bg-rose-100 dark:bg-rose-950/60 text-rose-900 dark:text-rose-300 border border-rose-200 dark:border-rose-800' :
+                            'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
                           }`}>
                             {doc.processing_status === 'INDEXED' && <Check className="w-3 h-3" />}
                             {doc.processing_status === 'PROCESSING' && <RefreshCw className="w-2.5 h-2.5 animate-spin" />}
                             {doc.processing_status === 'FAILED' && <AlertTriangle className="w-2.5 h-2.5" />}
-                            <span>{doc.processing_status}</span>
+                            <span>{doc.processing_status || 'INDEXED'}</span>
                           </span>
                         </div>
                       </div>
@@ -778,27 +806,27 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
                       {/* Title & Description */}
                       <div>
                         <div className="flex items-start justify-between gap-2">
-                          <h3 className="text-sm font-bold text-slate-900 leading-snug">
-                            {doc.title}
+                          <h3 className="text-sm font-bold text-slate-900 dark:text-white leading-snug">
+                            {doc.title || 'Untitled Document'}
                           </h3>
-                          <span className="text-[10px] font-mono text-slate-400 shrink-0">
-                            {doc.doc_id}
+                          <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 shrink-0">
+                            {doc.doc_id || 'DOC-UNKNOWN'}
                           </span>
                         </div>
                         {doc.description && (
-                          <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                          <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
                             {doc.description}
                           </p>
                         )}
                       </div>
 
                       {/* Content Preview & Expand Toggle */}
-                      <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-3 text-xs text-slate-700 space-y-2">
-                        <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 uppercase font-mono">
+                      <div className="bg-slate-50 dark:bg-slate-950/70 border border-slate-200/80 dark:border-slate-800 rounded-xl p-3 text-xs text-slate-700 dark:text-slate-300 space-y-2">
+                        <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase font-mono">
                           <span>Document Body Preview</span>
                           <button
                             onClick={() => toggleExpandDoc(doc.doc_id)}
-                            className="text-indigo-600 hover:text-indigo-800 flex items-center gap-0.5 cursor-pointer lowercase"
+                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-0.5 cursor-pointer lowercase"
                           >
                             <span>{isExpanded ? 'collapse' : 'view full text'}</span>
                             {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
@@ -810,19 +838,19 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
                       </div>
 
                       {/* Metadata Row */}
-                      <div className="pt-2 flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-100">
+                      <div className="pt-2 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500 border-t border-slate-100 dark:border-slate-800">
                         <div className="flex items-center gap-3">
-                          <span>Source: <strong className="font-medium text-slate-600">{doc.source_type}</strong></span>
+                          <span>Source: <strong className="font-medium text-slate-600 dark:text-slate-300">{doc.source_type}</strong></span>
                           {doc.file_name && <span className="truncate max-w-[150px]">File: {doc.file_name}</span>}
                           {doc.source_url && <span className="truncate max-w-[150px]">URL: {doc.source_url}</span>}
                         </div>
-                        <span>Updated: {doc.updated_at ? doc.updated_at.split('T')[0] : 'Today'}</span>
+                        <span>Updated: {formatDateSafe(doc.updated_at)}</span>
                       </div>
 
                     </div>
 
                     {/* Action Footers */}
-                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <Button
                           variant="outline"
@@ -880,10 +908,10 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
       {activeStudioView === 'GRAPH_NODES' && (
         <div className="space-y-5">
           {/* Filter and Search Bar */}
-          <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-2xs">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-2xs">
             <div className="flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-slate-700" />
-              <span className="text-xs font-semibold text-slate-900">Certified Knowledge Repository</span>
+              <BookOpen className="w-4 h-4 text-slate-700 dark:text-slate-300" />
+              <span className="text-xs font-semibold text-slate-900 dark:text-white">Certified Knowledge Repository</span>
               <Badge variant="neutral" size="sm">{filteredNodes.length} Nodes</Badge>
             </div>
 
@@ -895,7 +923,7 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
                   placeholder="Search facts, guidelines, citations..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-900 shadow-2xs"
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-slate-900 dark:focus:border-slate-400 shadow-2xs"
                 />
               </div>
               <Button
@@ -910,18 +938,18 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
           </div>
 
           {/* Category Tabs */}
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs overflow-x-auto">
+          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200 dark:border-slate-700/80 text-xs overflow-x-auto">
             {['ALL', 'APPROVED_FACT', 'APPROVED_CLAIM', 'TRADEMARK', 'TONE_ATTRIBUTE', 'REGULATION'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer whitespace-nowrap text-xs ${
                   activeTab === tab
-                    ? 'bg-white text-slate-900 border border-slate-200 shadow-2xs font-semibold'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-600 shadow-2xs font-semibold'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                {tab.replace(/_/g, ' ')}
+                {(tab || '').replace(/_/g, ' ')}
               </button>
             ))}
           </div>
@@ -936,75 +964,75 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
                 return (
                   <div
                     key={d.id}
-                    className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-3 hover:border-slate-300 transition-all flex flex-col justify-between"
+                    className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-2xs space-y-3 hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between"
                   >
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
                         <Badge variant={isFact ? 'brand' : 'neutral'} size="sm">
                           {d.nodeType ? d.nodeType.replace(/_/g, ' ') : 'KNOWLEDGE NODE'}
                         </Badge>
-                        <span className="text-[11px] font-mono text-slate-500 font-semibold">{d.id}</span>
+                        <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 font-semibold">{d.id}</span>
                       </div>
 
                       <div>
-                        <h4 className="text-xs font-bold text-slate-900 mb-1">{d.label}</h4>
-                        <p className="text-xs text-slate-600 leading-relaxed">{d.description}</p>
+                        <h4 className="text-xs font-bold text-slate-900 dark:text-white mb-1">{d.label}</h4>
+                        <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">{d.description}</p>
                       </div>
                     </div>
 
                     {/* Citations & Metadata */}
-                    <div className="pt-2 border-t border-slate-100 space-y-1.5 text-[11px] text-slate-500 font-mono">
+                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1.5 text-[11px] text-slate-500 dark:text-slate-400 font-mono">
                       {props.citation && (
                         <div className="flex items-start gap-1">
-                          <span className="text-slate-500 font-sans shrink-0">Citation:</span>
-                          <span className="text-emerald-800 font-medium truncate">{props.citation}</span>
+                          <span className="text-slate-500 dark:text-slate-400 font-sans shrink-0">Citation:</span>
+                          <span className="text-emerald-800 dark:text-emerald-400 font-medium truncate">{props.citation}</span>
                         </div>
                       )}
                       {props.current_value && (
                         <div className="flex items-center gap-1.5">
-                          <span className="text-slate-500 font-sans">Approved Value:</span>
-                          <span className="text-slate-900 font-bold bg-slate-100 px-1.5 py-0.5 rounded font-mono">
+                          <span className="text-slate-500 dark:text-slate-400 font-sans">Approved Value:</span>
+                          <span className="text-slate-900 dark:text-white font-bold bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono">
                             {props.current_value}
                           </span>
                         </div>
                       )}
                       {props.exact_mark && (
                         <div className="flex items-center gap-1.5">
-                          <span className="text-slate-500 font-sans">Registered Mark:</span>
-                          <span className="text-purple-800 font-bold">{props.exact_mark}</span>
+                          <span className="text-slate-500 dark:text-slate-400 font-sans">Registered Mark:</span>
+                          <span className="text-purple-800 dark:text-purple-400 font-bold">{props.exact_mark}</span>
                         </div>
                       )}
                       {props.source_date && (
                         <div className="flex items-center gap-1">
                           <Calendar className="w-3 h-3 text-slate-400" />
-                          <span className="text-slate-500 font-sans">Source Date:</span>
-                          <span className="text-slate-700 font-mono">{props.source_date}</span>
+                          <span className="text-slate-500 dark:text-slate-400 font-sans">Source Date:</span>
+                          <span className="text-slate-700 dark:text-slate-300 font-mono">{props.source_date}</span>
                         </div>
                       )}
                       {props.expiry_date && (
                         <div className="flex items-center gap-1">
                           <Calendar className="w-3 h-3 text-amber-500" />
-                          <span className="text-amber-700 font-sans">Expires:</span>
-                          <span className="text-amber-800 font-mono">{props.expiry_date}</span>
+                          <span className="text-amber-700 dark:text-amber-400 font-sans">Expires:</span>
+                          <span className="text-amber-800 dark:text-amber-300 font-mono">{props.expiry_date}</span>
                         </div>
                       )}
                       {props.restricted_terms && props.restricted_terms.length > 0 && (
                         <div className="flex items-start gap-1">
                           <Tag className="w-3 h-3 text-rose-500 shrink-0 mt-0.5" />
-                          <span className="text-rose-700 font-sans shrink-0">Restricted:</span>
-                          <span className="text-rose-800 truncate">{props.restricted_terms.join(', ')}</span>
+                          <span className="text-rose-700 dark:text-rose-400 font-sans shrink-0">Restricted:</span>
+                          <span className="text-rose-800 dark:text-rose-300 truncate">{props.restricted_terms.join(', ')}</span>
                         </div>
                       )}
                       {props.department_owner && (
                         <div className="flex items-center gap-1">
-                          <span className="text-slate-500 font-sans">Owner:</span>
-                          <span className="text-slate-700 font-sans">{props.department_owner}</span>
+                          <span className="text-slate-500 dark:text-slate-400 font-sans">Owner:</span>
+                          <span className="text-slate-700 dark:text-slate-300 font-sans">{props.department_owner}</span>
                         </div>
                       )}
                     </div>
 
                     {/* Card Action Footers */}
-                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
                       <Button
                         variant="outline"
                         size="xs"
@@ -1020,6 +1048,14 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
                           onClick={() => onNavigate && onNavigate('impact-simulator')}
                           icon={<Flame className="w-3 h-3 text-amber-500" />}
                         >
+                          Simulate
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
                           Simulate
                         </Button>
                       )}
@@ -1362,22 +1398,22 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
           ) : versionList.length > 0 ? (
             <div className="space-y-3">
               {versionList.map((ver, idx) => (
-                <div key={ver.version_id || idx} className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
+                <div key={ver.version_id || idx} className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 space-y-2">
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-indigo-900 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded text-[11px] font-mono">
-                        v{ver.version_number}
+                      <span className="font-bold text-indigo-900 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 px-2 py-0.5 rounded text-[11px] font-mono">
+                        v{ver.version_number || '1.0'}
                       </span>
-                      <span className="font-semibold text-slate-800">{ver.title}</span>
+                      <span className="font-semibold text-slate-800 dark:text-slate-200">{ver.title}</span>
                     </div>
-                    <span className="text-[11px] font-mono text-slate-400">{ver.created_at ? ver.created_at.split('T')[0] : 'Historical'}</span>
+                    <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">{formatDateSafe(ver.created_at)}</span>
                   </div>
 
-                  <p className="text-xs text-slate-600 italic">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 italic">
                     Reason: {ver.change_summary || 'Document revision committed.'}
                   </p>
 
-                  <div className="bg-white border border-slate-200 rounded-lg p-2.5 text-[11px] font-mono text-slate-700 max-h-32 overflow-y-auto whitespace-pre-wrap">
+                  <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-2.5 text-[11px] font-mono text-slate-700 dark:text-slate-300 max-h-32 overflow-y-auto whitespace-pre-wrap">
                     {ver.raw_content}
                   </div>
                 </div>

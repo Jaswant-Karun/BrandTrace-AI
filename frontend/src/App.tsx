@@ -16,6 +16,7 @@ import { useAuth } from './context/AuthContext';
 import { BrandProfile, DatabaseStatus, VerificationResult } from './types';
 import { ExternalLink, RefreshCw, Search, ShieldCheck } from 'lucide-react';
 import { ThemeToggle } from './components/ui/ThemeToggle';
+import { ErrorBoundary } from './components/ui/ErrorBoundary';
 
 // Code-split heavy views via React.lazy for optimized initial bundle loading
 const KnowledgeGraphView = lazy(() => import('./components/KnowledgeGraphView').then(m => ({ default: m.KnowledgeGraphView })));
