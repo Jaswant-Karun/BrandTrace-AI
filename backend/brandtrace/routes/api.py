@@ -676,9 +676,10 @@ async def verify_ledger_record(req: VerifyRecordRequest):
     Verifies content integrity against the immutable audit ledger.
     Distinguishes VALID_UNCHANGED, MODIFIED_AFTER_APPROVAL, SUPERSEDED, REVOKED, UNKNOWN_RECORD.
     """
-    # Seed sample baseline records in audit ledger if empty
-    if not audit_ledger_engine.records:
-        # Apex GT valid release
+    # Ensure sample baseline records exist in audit ledger
+    resource_ids = {r.resource_id for r in audit_ledger_engine.records.values()}
+    
+    if "AST-01" not in resource_ids:
         audit_ledger_engine.record_release(
             user_identity="David Sterling, Chief Governance Officer",
             user_role="COMPLIANCE_REVIEWER",
@@ -688,6 +689,8 @@ async def verify_ledger_record(req: VerifyRecordRequest):
             approved_version="v1.0",
             relevant_sources=["AC-01", "TM-01", "TONE-01"]
         )
+
+    if "AST-AUR-01" not in resource_ids:
         # Aurelle Studio v2 valid release (after ₹599 approval)
         audit_ledger_engine.record_release(
             user_identity="Marcus Aurelius, Content Review Lead",
@@ -698,6 +701,8 @@ async def verify_ledger_record(req: VerifyRecordRequest):
             approved_version="v2.0",
             relevant_sources=["FACT-AUR-PRC-01", "TM-AUR-01"]
         )
+
+    if "AST-AUR-HIST-01" not in resource_ids:
         # Aurelle historical v1 (superseded)
         r_old = audit_ledger_engine.record_release(
             user_identity="Julian Vance, VP Brand Governance",
@@ -710,6 +715,7 @@ async def verify_ledger_record(req: VerifyRecordRequest):
         )
         audit_ledger_engine.supersede_release(r_old.record_id, "v2.0", "Julian Vance")
 
+    if "AST-AUR-RECALLED" not in resource_ids:
         # Revoked unapproved cure claim
         r_rev = audit_ledger_engine.record_release(
             user_identity="David Sterling, Compliance Reviewer",

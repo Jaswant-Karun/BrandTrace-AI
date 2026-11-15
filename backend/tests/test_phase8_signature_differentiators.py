@@ -270,3 +270,4 @@ def test_supersede_and_revoke_endpoints():
     })
     assert rev_res.status_code == 200
     assert rev_res.json()["status"] == "REVOKED"
+

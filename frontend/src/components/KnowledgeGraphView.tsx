@@ -14,7 +14,7 @@ import '@xyflow/react/dist/style.css';
 import { BrandNode } from './BrandNode';
 import { 
   Search, Filter, Shield, Layers, GitFork, Sparkles, 
-  ExternalLink, CheckCircle2, AlertTriangle, ArrowRight, RefreshCw, X 
+  CheckCircle2, RefreshCw, X 
 } from 'lucide-react';
 
 interface KnowledgeGraphViewProps {
