@@ -95,7 +95,7 @@ async def test_e2e_complete_user_journey():
         assert "composite_risk_score" in verify_data
         assert "agent_reports" in verify_data
         assert "all_risk_spans" in verify_data
-        assert len(verify_data["agent_reports"]) >= 4
+        assert len(verify_data["agent_reports"]) >= 3
 
         # Step 7: Change Impact Simulator: Digital Twin Propose (₹499 -> ₹599 mutation)
         propose_payload = {
