@@ -68,6 +68,8 @@ export function usePWA() {
         setDeferredPrompt(null);
         return true;
       }
+      setIsInstallable(false);
+      setDeferredPrompt(null);
       return false;
     } catch (err) {
       console.warn('[BrandTrace PWA] Install prompt error:', err);

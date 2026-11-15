@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
 import {
-  Download, Monitor, ShieldCheck, CheckCircle2,
-  Globe, Sparkles, Check, Smartphone, Laptop, HelpCircle
+  Check,
+  CheckCircle2,
+  Download,
+  Globe,
+  Laptop,
+  Monitor,
+  ShieldCheck,
+  Smartphone,
+  Sparkles,
 } from 'lucide-react';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
@@ -14,23 +21,29 @@ interface InstallAppModalProps {
   onPromptInstall: () => Promise<boolean>;
 }
 
+type PlatformTab = 'desktop' | 'ios' | 'android';
+
+const platformTabs: Array<{ id: PlatformTab; label: string; icon: React.ReactNode }> = [
+  { id: 'desktop', label: 'Desktop', icon: <Laptop className="h-4 w-4" /> },
+  { id: 'ios', label: 'iOS', icon: <Smartphone className="h-4 w-4" /> },
+  { id: 'android', label: 'Android', icon: <Smartphone className="h-4 w-4" /> },
+];
+
 export const InstallAppModal: React.FC<InstallAppModalProps> = ({
   isOpen,
   onClose,
   isInstallable,
   isInstalled,
-  onPromptInstall
+  onPromptInstall,
 }) => {
   const [installing, setInstalling] = useState(false);
-  const [activePlatformTab, setActivePlatformTab] = useState<'desktop' | 'ios' | 'android'>('desktop');
+  const [activePlatformTab, setActivePlatformTab] = useState<PlatformTab>('desktop');
 
   const handleInstallClick = async () => {
     setInstalling(true);
     try {
       const success = await onPromptInstall();
-      if (success) {
-        onClose();
-      }
+      if (success) onClose();
     } finally {
       setInstalling(false);
     }
@@ -40,15 +53,31 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Install BrandTrace AI Application"
+      title="Install BrandTrace AI"
+      subtitle="Get faster access to your Brand Intelligence Control Plane."
       maxWidth="md"
       footer={
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between w-full gap-2">
-          <span className="text-[11px] text-slate-500 dark:text-neutral-400 font-mono text-center sm:text-left">
-            {isInstalled ? 'Mode: Standalone Installed' : isInstallable ? 'Ready: Direct Install Supported' : 'Mode: Browser Navigation'}
-          </span>
-          <div className="flex flex-wrap items-center justify-end gap-2 w-full sm:w-auto">
-            <Button variant="secondary" size="sm" onClick={onClose} className="flex-1 sm:flex-none justify-center">
+        <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2 text-xs text-slate-500">
+            <span
+              className={`h-2 w-2 rounded-full ${isInstalled ? 'bg-emerald-500' : isInstallable ? 'bg-blue-500' : 'bg-slate-300'}`}
+              aria-hidden="true"
+            />
+            <span>
+              {isInstalled
+                ? 'Running in standalone mode'
+                : isInstallable
+                  ? 'Install is available in this browser'
+                  : 'Use the guide for your platform'}
+            </span>
+          </div>
+          <div className="flex w-full flex-col-reverse gap-2 sm:w-auto sm:flex-row">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onClose}
+              className="w-full justify-center sm:w-auto"
+            >
               Dismiss
             </Button>
             {isInstallable && !isInstalled && (
@@ -57,166 +86,165 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
                 size="sm"
                 onClick={handleInstallClick}
                 disabled={installing}
-                icon={<Download className={`w-3.5 h-3.5 ${installing ? 'animate-bounce' : ''}`} />}
-                className="flex-1 sm:flex-none justify-center bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm"
+                icon={<Download className="h-4 w-4" />}
+                className="w-full justify-center bg-blue-600 text-white shadow-sm hover:bg-blue-700 sm:w-auto"
               >
-                {installing ? 'Installing...' : 'Install Now'}
+                {installing ? 'Installing...' : 'Install App'}
               </Button>
             )}
           </div>
         </div>
       }
     >
-      <div className="space-y-4 text-xs text-slate-700 dark:text-neutral-300">
-        {/* Banner Graphic */}
-        <div className="p-4 bg-gradient-to-r from-neutral-900 via-neutral-900 to-indigo-950 border border-neutral-800 text-white rounded-xl flex items-center gap-3.5 shadow-md">
-          <div className="w-10 h-10 rounded-xl bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center shrink-0">
-            <ShieldCheck className="w-5 h-5 text-indigo-400" />
+      <div className="space-y-5 text-sm text-slate-700">
+        <section className="flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50/60 p-4">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
+            <ShieldCheck className="h-6 w-6" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider bg-indigo-500 text-white px-1.5 py-0.5 rounded font-mono">
-                PWA Standalone
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="font-semibold tracking-tight text-slate-900">
+                BrandTrace AI Control Plane
+              </h3>
+              <span className="rounded-full border border-blue-200 bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-blue-700">
+                Progressive Web App
               </span>
-              <span className="text-[11px] text-neutral-400 font-mono">Windows · macOS · iOS · Android</span>
             </div>
-            <h3 className="text-sm font-bold text-white tracking-tight mt-0.5">
-              BrandTrace AI Control Plane
-            </h3>
-          </div>
-        </div>
-
-        {/* Benefits Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="p-3 rounded-lg border border-slate-200 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/60 space-y-1">
-            <div className="flex items-center gap-1.5 font-semibold text-slate-900 dark:text-neutral-100">
-              <Monitor className="w-3.5 h-3.5 text-indigo-500" />
-              <span>Standalone Window</span>
-            </div>
-            <p className="text-[11px] text-slate-500 dark:text-neutral-400 leading-snug">
-              Launch in dedicated window without address bar or tab clutter for distraction-free enterprise governance.
+            <p className="mt-1 text-xs text-slate-500">
+              Windows, macOS, iOS, and Android
             </p>
           </div>
+        </section>
 
-          <div className="p-3 rounded-lg border border-slate-200 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/60 space-y-1">
-            <div className="flex items-center gap-1.5 font-semibold text-slate-900 dark:text-neutral-100">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              <span>Taskbar &amp; Dock Launch</span>
+        <section aria-labelledby="install-benefits-heading">
+          <h4 id="install-benefits-heading" className="sr-only">
+            Installation benefits
+          </h4>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-xl border border-slate-200 bg-white p-4 transition-shadow hover:shadow-sm">
+              <div className="flex items-center gap-2 font-semibold text-slate-900">
+                <Monitor className="h-4 w-4 text-blue-600" />
+                <span>Standalone Window</span>
+              </div>
+              <p className="mt-2 text-xs leading-relaxed text-slate-500">
+                Launch BrandTrace AI in a dedicated application window without browser tab clutter.
+              </p>
             </div>
-            <p className="text-[11px] text-slate-500 dark:text-neutral-400 leading-snug">
-              Pin BrandTrace AI directly to Windows Taskbar, macOS Dock, or mobile home screen with instant access.
-            </p>
+            <div className="rounded-xl border border-slate-200 bg-white p-4 transition-shadow hover:shadow-sm">
+              <div className="flex items-center gap-2 font-semibold text-slate-900">
+                <Sparkles className="h-4 w-4 text-blue-600" />
+                <span>Quick Access</span>
+              </div>
+              <p className="mt-2 text-xs leading-relaxed text-slate-500">
+                Pin BrandTrace AI to your desktop, taskbar, dock, or mobile home screen.
+              </p>
+            </div>
           </div>
-        </div>
+        </section>
 
-        {/* Dynamic Installation Guide */}
         {isInstalled ? (
-          <div className="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-xl flex items-center gap-2.5 text-emerald-900 dark:text-emerald-300">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+          <div className="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-900">
+            <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
             <div>
-              <span className="font-bold block text-xs">Application Already Installed</span>
-              <p className="text-[11px] text-emerald-800 dark:text-emerald-400/90">
-                You are currently running BrandTrace AI in standalone application mode.
+              <p className="font-semibold">Application already installed</p>
+              <p className="mt-1 text-xs leading-relaxed text-emerald-800">
+                BrandTrace AI is running in standalone application mode.
               </p>
             </div>
           </div>
         ) : isInstallable ? (
-          <div className="p-3.5 bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-200/80 dark:border-indigo-800/50 rounded-xl space-y-2">
-            <div className="flex items-center gap-2 font-semibold text-indigo-900 dark:text-indigo-200">
-              <Globe className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-              <span>1-Click Browser Installation Available</span>
+          <div className="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4 text-blue-950">
+            <Globe className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
+            <div>
+              <p className="font-semibold">Installation is ready</p>
+              <p className="mt-1 text-xs leading-relaxed text-blue-800">
+                Your browser supports direct installation. Select <strong>Install App</strong> below to continue.
+              </p>
             </div>
-            <p className="text-[11px] text-indigo-800 dark:text-indigo-300 leading-relaxed">
-              Your browser has unlocked the native installation engine. Click the <strong>"Install Now"</strong> button below to install BrandTrace AI instantly.
-            </p>
           </div>
         ) : (
-          <div className="p-3.5 bg-slate-50 dark:bg-neutral-900/60 border border-slate-200 dark:border-neutral-800 rounded-xl space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-200 dark:border-neutral-800 pb-2">
-              <div className="flex items-center gap-1.5 font-semibold text-slate-900 dark:text-neutral-100">
-                <HelpCircle className="w-3.5 h-3.5 text-indigo-500" />
-                <span>Manual Installation Steps:</span>
+          <section className="rounded-xl border border-slate-200 bg-slate-50 p-4" aria-labelledby="manual-install-heading">
+            <div className="flex flex-col gap-3 border-b border-slate-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h4 id="manual-install-heading" className="font-semibold text-slate-900">
+                  Install manually
+                </h4>
+                <p className="mt-1 text-xs text-slate-500">
+                  Choose your platform for the relevant browser steps.
+                </p>
               </div>
-              <div className="flex items-center gap-1 bg-slate-200/70 dark:bg-neutral-800 p-0.5 rounded-lg text-[10px]">
-                <button
-                  type="button"
-                  onClick={() => setActivePlatformTab('desktop')}
-                  className={`px-2 py-0.5 rounded font-medium transition-colors ${activePlatformTab === 'desktop' ? 'bg-white dark:bg-neutral-700 text-slate-900 dark:text-white shadow-2xs' : 'text-slate-500 dark:text-neutral-400'}`}
-                >
-                  <Laptop className="w-3 h-3 inline mr-1" /> Desktop
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActivePlatformTab('ios')}
-                  className={`px-2 py-0.5 rounded font-medium transition-colors ${activePlatformTab === 'ios' ? 'bg-white dark:bg-neutral-700 text-slate-900 dark:text-white shadow-2xs' : 'text-slate-500 dark:text-neutral-400'}`}
-                >
-                  iOS Safari
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActivePlatformTab('android')}
-                  className={`px-2 py-0.5 rounded font-medium transition-colors ${activePlatformTab === 'android' ? 'bg-white dark:bg-neutral-700 text-slate-900 dark:text-white shadow-2xs' : 'text-slate-500 dark:text-neutral-400'}`}
-                >
-                  <Smartphone className="w-3 h-3 inline mr-1" /> Android
-                </button>
+              <div className="grid grid-cols-3 gap-1 rounded-lg border border-slate-200 bg-white p-1" role="tablist" aria-label="Installation platform">
+                {platformTabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={activePlatformTab === tab.id}
+                    onClick={() => setActivePlatformTab(tab.id)}
+                    className={`flex min-h-10 items-center justify-center gap-1.5 rounded-md px-2 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+                      activePlatformTab === tab.id
+                        ? 'bg-blue-600 text-white shadow-sm'
+                        : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
+                    }`}
+                  >
+                    {tab.icon}
+                    <span>{tab.label}</span>
+                  </button>
+                ))}
               </div>
             </div>
 
-            {activePlatformTab === 'desktop' && (
-              <ul className="space-y-1.5 text-slate-600 dark:text-neutral-400 text-[11px]">
-                <li className="flex items-start gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>
-                    <strong>Chrome / Edge (Windows &amp; Mac):</strong> Click the <strong>Install</strong> icon (⊕) on the right side of the address bar, or menu (⋮) ➔ <strong>Save and share ➔ Install BrandTrace AI</strong>.
-                  </span>
-                </li>
-                <li className="flex items-start gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>
-                    <strong>macOS Safari:</strong> Click <strong>File ➔ Add to Dock...</strong> to pin BrandTrace AI as an independent macOS desktop app.
-                  </span>
-                </li>
-              </ul>
-            )}
-
-            {activePlatformTab === 'ios' && (
-              <ul className="space-y-1.5 text-slate-600 dark:text-neutral-400 text-[11px]">
-                <li className="flex items-start gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5" />
-                  <span>Tap the <strong>Share</strong> icon (square with upward arrow) in Safari's bottom toolbar.</span>
-                </li>
-                <li className="flex items-start gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5" />
-                  <span>Scroll down and tap <strong>Add to Home Screen</strong>.</span>
-                </li>
-                <li className="flex items-start gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5" />
-                  <span>Confirm with <strong>Add</strong> in the top-right corner.</span>
-                </li>
-              </ul>
-            )}
-
-            {activePlatformTab === 'android' && (
-              <ul className="space-y-1.5 text-slate-600 dark:text-neutral-400 text-[11px]">
-                <li className="flex items-start gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>Tap the menu icon (<strong>⋮</strong>) in Chrome's top-right corner.</span>
-                </li>
-                <li className="flex items-start gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>Select <strong>Install app</strong> or <strong>Add to Home screen</strong>.</span>
-                </li>
-              </ul>
-            )}
-          </div>
+            <div className="pt-4">
+              {activePlatformTab === 'desktop' && (
+                <InstructionList
+                  items={[
+                    <>
+                      <strong>Chrome / Edge:</strong> Use the browser&apos;s <strong>Install App</strong> option or installation icon when available.
+                    </>,
+                    <>
+                      <strong>macOS Safari:</strong> Use <strong>File &rarr; Add to Dock</strong>, where supported.
+                    </>,
+                  ]}
+                />
+              )}
+              {activePlatformTab === 'ios' && (
+                <InstructionList
+                  items={[
+                    <>Open this website in <strong>Safari</strong>.</>,
+                    <>Tap <strong>Share</strong> in Safari.</>,
+                    <>Select <strong>Add to Home Screen</strong>, then confirm.</>,
+                  ]}
+                />
+              )}
+              {activePlatformTab === 'android' && (
+                <InstructionList
+                  items={[
+                    <>Open this website in <strong>Chrome</strong>.</>,
+                    <>Open the browser menu.</>,
+                    <>Select <strong>Install app</strong> or <strong>Add to Home screen</strong> when available.</>,
+                  ]}
+                />
+              )}
+            </div>
+          </section>
         )}
 
-        {/* Security Reassurance */}
-        <div className="p-3 bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-lg text-[11px] text-slate-500 dark:text-neutral-400 flex items-center justify-between">
-          <span>Browser tab usage remains 100% operational without installation.</span>
-          <span className="font-mono text-slate-400 dark:text-neutral-500 text-[10px]">Zero Vendor Lock-in</span>
+        <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-500">
+          <Check className="h-4 w-4 shrink-0 text-emerald-600" />
+          <span>Browser access remains available even when installation is not supported.</span>
         </div>
       </div>
     </Modal>
   );
 };
+
+const InstructionList: React.FC<{ items: React.ReactNode[] }> = ({ items }) => (
+  <ul className="space-y-3 text-xs leading-relaxed text-slate-600">
+    {items.map((item, index) => (
+      <li key={index} className="flex items-start gap-2">
+        <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+        <span>{item}</span>
+      </li>
+    ))}
+  </ul>
+);

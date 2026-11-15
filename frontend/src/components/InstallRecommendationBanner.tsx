@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Download, X, ShieldCheck, Laptop } from 'lucide-react';
+import { Download, X, ShieldCheck } from 'lucide-react';
 import { Button } from './ui/Button';
 
 interface InstallRecommendationBannerProps {
@@ -138,16 +138,6 @@ export const InstallRecommendationBanner: React.FC<InstallRecommendationBannerPr
               className="flex-1 justify-center bg-indigo-600 hover:bg-indigo-500 text-white shadow-xs text-xs py-1.5"
             >
               {isInstalling ? 'Installing...' : isInstallable ? 'Install App' : 'How to Install'}
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={onOpenModal}
-              icon={<Laptop className="w-3.5 h-3.5 text-neutral-400" />}
-              className="px-3 text-xs py-1.5 border-neutral-700 hover:bg-neutral-800 text-neutral-300"
-              title="View full installation guide"
-            >
-              Details
             </Button>
           </div>
         </div>
