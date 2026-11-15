@@ -268,6 +268,7 @@ def test_commitment3_empty_content_rejected():
         "verification_id": "VRF-EMPTY",
         "brand_id": "aurelle-tech",
         "asset_id": "AST-EMPTY",
+        "asset_title": "Empty Test Asset",
         "channel": "Web",
         "content": "   ",
         "decision": "APPROVED"
