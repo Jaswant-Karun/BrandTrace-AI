@@ -9,6 +9,7 @@ import {
   Hash, ArrowUpRight, Scale, Clock, Sliders
 } from 'lucide-react';
 import { ThemeToggle } from './ui/ThemeToggle';
+import { useAuth } from '../context/AuthContext';
 
 interface LandingPageProps {
   onEnterApp: (targetTab?: string) => void;
@@ -23,6 +24,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onSignIn,
   brandName: _brandName = 'Apex Dynamics' 
 }) => {
+  const { user, isAuthenticated, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const scrollToSection = (id: string) => {
@@ -99,22 +101,54 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Theme Toggle Button */}
             <ThemeToggle />
 
-            {/* Sign In Button */}
-            <button
-              onClick={onSignIn || (() => onEnterApp('command-center'))}
-              className="text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-            >
-              Sign In
-            </button>
+            {/* If Authenticated: Show Account Indicator & Continue to Dashboard CTA */}
+            {isAuthenticated ? (
+              <div className="flex items-center gap-2">
+                <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="font-semibold text-slate-800 dark:text-slate-200 max-w-[120px] truncate">
+                    {user?.name || 'Alex Mercer'}
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-mono">({user?.role || 'MANAGER'})</span>
+                </div>
 
-            {/* Primary Get Started CTA */}
-            <button
-              onClick={() => onEnterApp('command-center')}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 shadow-xs hover:shadow-md transition-all cursor-pointer"
-            >
-              <span>Get Started</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+                <button
+                  onClick={() => onEnterApp('command-center')}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md hover:shadow-lg transition-all cursor-pointer ring-2 ring-indigo-500/20"
+                >
+                  <span>Continue to Dashboard</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+
+                <button
+                  onClick={() => {
+                    logout();
+                    if (onSignIn) onSignIn();
+                  }}
+                  className="text-xs text-rose-600 dark:text-rose-400 hover:text-rose-700 font-medium px-2 py-1 cursor-pointer"
+                  title="Sign Out to Login Screen"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <>
+                <button
+                  onClick={onSignIn || (() => onEnterApp('command-center'))}
+                  className="text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                >
+                  Sign In
+                </button>
+
+                <button
+                  onClick={onSignIn || (() => onEnterApp('command-center'))}
+                  className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 shadow-xs hover:shadow-md transition-all cursor-pointer"
+                >
+                  <span>Get Started</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </>
+            )}
 
             {/* Mobile Menu Toggle Button */}
             <button
@@ -149,19 +183,42 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </button>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex gap-2">
-                <button
-                  onClick={onSignIn || (() => onEnterApp('command-center'))}
-                  className="flex-1 py-2 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-center"
-                >
-                  Sign In
-                </button>
-                <button
-                  onClick={() => onEnterApp('command-center')}
-                  className="flex-1 py-2 text-xs font-bold rounded-lg bg-indigo-600 text-white text-center shadow-xs"
-                >
-                  Get Started
-                </button>
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2">
+                {isAuthenticated ? (
+                  <>
+                    <button
+                      onClick={() => onEnterApp('command-center')}
+                      className="w-full py-2.5 text-xs font-bold rounded-lg bg-indigo-600 text-white text-center shadow-xs flex items-center justify-center gap-2"
+                    >
+                      <span>Continue to Dashboard</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        logout();
+                        if (onSignIn) onSignIn();
+                      }}
+                      className="w-full py-1.5 text-xs text-rose-600 dark:text-rose-400 text-center"
+                    >
+                      Sign Out ({user?.name || 'User'})
+                    </button>
+                  </>
+                ) : (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={onSignIn || (() => onEnterApp('command-center'))}
+                      className="flex-1 py-2 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-center"
+                    >
+                      Sign In
+                    </button>
+                    <button
+                      onClick={onSignIn || (() => onEnterApp('command-center'))}
+                      className="flex-1 py-2 text-xs font-bold rounded-lg bg-indigo-600 text-white text-center shadow-xs"
+                    >
+                      Get Started
+                    </button>
+                  </div>
+                )}
               </div>
             </motion.div>
           )}
@@ -197,22 +254,29 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </h1>
 
               <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
-                BrandTrace AI helps enterprises maintain brand consistency, validate marketing claims, simulate the impact of brand changes, and verify approved content through an intelligent governance platform.
+                BrandTrace AI brings brand knowledge, AI content intelligence, risk detection, impact simulation and release verification into one connected governance platform.
               </p>
 
               {/* Action Buttons */}
               <div className="pt-2 flex flex-wrap items-center gap-3">
                 <button
                   onClick={() => onEnterApp('command-center')}
-                  className="px-6 py-3.5 rounded-xl text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-6 py-3.5 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer ring-2 ring-indigo-500/20"
                 >
-                  <span>Explore the Platform</span>
+                  <span>Continue to Dashboard</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
 
                 <button
-                  onClick={onVerify || (() => onEnterApp('public-verification'))}
+                  onClick={() => scrollToSection('features')}
                   className="px-5 py-3.5 rounded-xl text-sm font-semibold text-slate-800 dark:text-slate-200 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <span>Explore Platform</span>
+                </button>
+
+                <button
+                  onClick={onVerify || (() => onEnterApp('public-verification'))}
+                  className="px-5 py-3.5 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 hover:text-indigo-600 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all flex items-center gap-2 cursor-pointer shadow-2xs"
                 >
                   <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                   <span>Public Verification</span>
@@ -969,9 +1033,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
             <button
               onClick={() => onEnterApp('command-center')}
-              className="px-8 py-4 rounded-xl text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 shadow-md hover:shadow-xl transition-all flex items-center gap-2 cursor-pointer"
+              className="px-8 py-4 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md hover:shadow-xl transition-all flex items-center gap-2 cursor-pointer ring-2 ring-indigo-500/20"
             >
-              <span>Get Started</span>
+              <span>Continue to Dashboard</span>
               <ArrowRight className="w-4 h-4" />
             </button>
 
@@ -979,7 +1043,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               onClick={onSignIn || (() => onEnterApp('command-center'))}
               className="px-7 py-4 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 shadow-xs transition-all cursor-pointer"
             >
-              Sign In to Control Plane
+              Switch Account / Sign In
             </button>
           </div>
 

@@ -48,9 +48,12 @@ export const App: React.FC = () => {
       if (params.get('view') === 'verify' || window.location.hash === '#verify') return 'verify';
       if (params.get('view') === 'landing') return 'landing';
       if (params.get('view') === 'login') return 'login';
-      if (params.get('view') === 'app' || params.get('demo') === 'true' || params.get('token')) return 'app';
+      if ((params.get('view') === 'app' || params.get('demo') === 'true' || params.get('token')) && localStorage.getItem('brandtrace_jwt_token')) {
+        return 'app';
+      }
     }
-    return localStorage.getItem('brandtrace_jwt_token') ? 'app' : 'landing';
+    // Main requirement: First page for visitors is always Sign In / Register
+    return 'login';
   });
 
   const [currentTab, setCurrentTab] = useState<NavigationTab>(() => {
@@ -169,13 +172,13 @@ export const App: React.FC = () => {
       <Suspense fallback={<ViewLoadingFallback />}>
         <PublicVerificationView
           initialBrand={currentBrand?.brand_name || 'Velora Money'}
-          onBack={() => setViewMode(isAuthenticated ? 'app' : 'landing')}
+          onBack={() => setViewMode(isAuthenticated ? 'landing' : 'login')}
         />
       </Suspense>
     );
   }
 
-  // If user requests Public Landing Page
+  // If user requests Public Landing Page (Second page in flow after sign in or explicit click)
   if (viewMode === 'landing') {
     return (
       <LandingPage
@@ -190,12 +193,24 @@ export const App: React.FC = () => {
     );
   }
 
-  // If not authenticated or in login mode, render dedicated LoginPage
+  // Protected route guard: unauthenticated attempts to enter dashboard redirect to login
+  if (viewMode === 'app' && !isAuthenticated) {
+    return (
+      <LoginPage
+        onSuccess={() => {
+          setViewMode('landing');
+        }}
+        onOpenLanding={() => setViewMode('landing')}
+      />
+    );
+  }
+
+  // If not authenticated or in login mode, render dedicated LoginPage (Page 1)
   if (viewMode === 'login' || !isAuthenticated) {
     return (
       <LoginPage
         onSuccess={() => {
-          setViewMode('app');
+          setViewMode('landing');
         }}
         onOpenLanding={() => setViewMode('landing')}
       />
@@ -251,7 +266,7 @@ export const App: React.FC = () => {
             onOpenDbStatus={() => setIsDbModalOpen(true)}
             onOpenDemoWalkthrough={() => setIsDemoModalOpen(true)}
             onStartTour={handleStartTour}
-            onLogout={() => setViewMode('landing')}
+            onLogout={() => setViewMode('login')}
             onToggleMobileMenu={() => setIsMobileNavOpen(!isMobileNavOpen)}
             onOpenInstallModal={() => setIsInstallModalOpen(true)}
             onOpenPublicVerification={() => setViewMode('verify')}

@@ -39,8 +39,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
     localStorage.setItem('brandtrace_theme', theme);
   }, [theme]);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
 
   const toggleTheme = () => {
     setThemeState(prev => (prev === 'dark' ? 'light' : 'dark'));
