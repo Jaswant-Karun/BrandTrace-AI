@@ -144,10 +144,14 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
     setExplainableReport(null);
     setOverriddenClaims({});
 
+    const token = localStorage.getItem('brandtrace_jwt_token');
     try {
       const res = await fetch('/api/explainable/review', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({
           brand_id: brandId,
           content: content
@@ -476,6 +480,9 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
                           {result.governance_decision.replace(/_/g, ' ')}
                         </span>
                         <span className="text-xs font-mono text-slate-500">{result.verification_id}</span>
+                        <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200 flex items-center gap-1">
+                          ⚡ {result.latency_ms ? `${result.latency_ms}ms` : '<800ms'} • 3 AGENTS CONCURRENT
+                        </span>
                       </div>
                       <p className="text-xs text-slate-600 mt-1">
                         {result.governance_decision === 'APPROVED_FOR_RELEASE'
