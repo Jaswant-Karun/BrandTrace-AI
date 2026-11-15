@@ -249,7 +249,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               />
               {(!isCollapsed || isMobileOpen) && (
                 <span className="text-[11px] font-medium text-slate-600 dark:text-slate-400 truncate">
-                  {dbStatus?.connected ? 'Atlas Connected' : 'Memory Mode'}
+                  {dbStatus?.connected ? 'System Online' : 'Local Mode'}
                 </span>
               )}
             </div>

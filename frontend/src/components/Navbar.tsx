@@ -132,7 +132,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <button
           onClick={onReseed}
           disabled={isReseeding}
-          title="Re-seed MongoDB & Knowledge Graph"
+          title="Reset Sample Data"
           className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:border-slate-300 transition-colors shadow-xs cursor-pointer"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${isReseeding ? 'animate-spin text-slate-900' : ''}`} />
@@ -143,7 +143,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border bg-white transition-colors border-slate-200 hover:border-slate-300 cursor-pointer shadow-xs text-slate-700"
         >
           <span className={`w-2 h-2 rounded-full ${dbStatus?.connected ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-          <span>{dbStatus?.connected ? 'Atlas Connected' : 'Memory DB'}</span>
+          <span>{dbStatus?.connected ? 'System Online' : 'Local Mode'}</span>
         </button>
       </div>
     </header>

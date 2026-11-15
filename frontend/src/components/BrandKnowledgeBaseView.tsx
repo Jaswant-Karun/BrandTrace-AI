@@ -471,7 +471,7 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
           })
         });
 
-        toast.success(`Approved Fact "${formData.name}" successfully registered in MongoDB Atlas & Brand Graph!`);
+        toast.success(`Approved Fact "${formData.name}" successfully registered in Enterprise Brand Knowledge Base!`);
       } else {
         await fetch('/api/guidelines', {
           method: 'POST',
@@ -600,12 +600,12 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
           { label: 'Knowledge Base', active: true }
         ]}
         helpContext={{
-          summary: "Brand Knowledge represents certified corporate ground truth. Custom documents are parsed, embedded into 768-dimensional Atlas vectors, and actively govern the Multi-Agent verification pipeline.",
+          summary: "Brand Knowledge represents certified corporate ground truth. Custom documents are parsed, converted into high-dimensional semantic vectors, and actively govern the multi-agent verification pipeline.",
           terms: [
             { term: "Custom Documents", definition: "Tenant-authored brand guidelines, pricing schedules, and clinical claims with full versioning and audit trails." },
             { term: "Demo Benchmarks", definition: "Pre-configured baseline reference documents used for regression tests and system evaluation." },
             { term: "INDEXED Status", definition: "Confirmed status indicating text parsing, semantic embedding generation, and graph indexing were 100% successful." },
-            { term: "SSRF Protection", definition: "Strict security gateway blocking private IP subnets and internal loopbacks during public website imports." }
+            { term: "Secure Ingestion Gateway", definition: "Enterprise security gateway blocking private IP subnets and internal loopbacks during public website imports." }
           ]
         }}
         primaryAction={{
@@ -1134,7 +1134,7 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
               className="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 font-mono shadow-2xs leading-relaxed"
             />
             <p className="text-[11px] text-slate-500">
-              Upon creation, content is parsed into knowledge statements and converted into 768-dimensional embeddings for Atlas Vector Search.
+              Upon creation, content is parsed into knowledge statements and indexed for semantic vector search.
             </p>
           </div>
         </form>
@@ -1221,7 +1221,7 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
         isOpen={isImportModalOpen}
         onClose={() => { setIsImportModalOpen(false); setWebsitePreview(null); }}
         title="Import Public Brand Website"
-        subtitle="Safely fetch and review content from a public brand website with SSRF protection."
+        subtitle="Safely fetch and review content from a public brand website with secure origin verification."
         maxWidth="lg"
         footer={
           <>
@@ -1258,7 +1258,7 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
 
           <div className="bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-[11px] text-slate-600 flex items-center gap-2">
             <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>Strict SSRF security gate blocks internal networks, cloud metadata, and loopbacks.</span>
+            <span>Enterprise security gateway blocks restricted network paths and metadata endpoints.</span>
           </div>
 
           {/* Preview Box */}
@@ -1451,7 +1451,7 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={registrationMode === 'FACT' ? 'Register Approved Brand Fact' : 'Register Brand Guideline & Policy'}
-        subtitle="Adds an immutable truth node into the Brand Knowledge Graph and MongoDB Atlas."
+        subtitle="Adds a certified truth node into the Brand Knowledge Graph."
         maxWidth="lg"
         footer={
           <>
@@ -1588,7 +1588,7 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         title={`Edit Fact: ${editingNode?.data?.label || ''}`}
-        subtitle={`Record ID: ${editingNode?.data?.id || ''} — Changes will be captured in the MongoDB Atlas Audit Ledger.`}
+        subtitle={`Record ID: ${editingNode?.data?.id || ''} — Changes will be captured in the enterprise Audit Ledger.`}
         maxWidth="lg"
         footer={
           <>

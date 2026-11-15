@@ -486,7 +486,7 @@ export const DemoWalkthroughModal: React.FC<DemoWalkthroughModalProps> = ({
         <div className="px-6 py-3 border-t border-slate-200 bg-white flex items-center justify-between text-xs text-slate-500">
           <div className="flex items-center space-x-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span>MongoDB Atlas Vector Search &amp; GraphLookup Active</span>
+            <span>Enterprise Semantic Search &amp; Graph Engine Active</span>
           </div>
           <span>BRANDTRACE AI v2.0 Enterprise Control Plane</span>
         </div>

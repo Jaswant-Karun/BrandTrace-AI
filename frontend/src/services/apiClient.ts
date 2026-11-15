@@ -68,7 +68,7 @@ class ApiClient {
         throw err;
       }
       throw {
-        message: err.message || 'Backend API server unreachable or offline. Ensure the FastAPI service is running.',
+        message: err.message || 'Service unreachable. Please ensure the backend control plane is online.',
         status: 0
       } as ApiError;
     }

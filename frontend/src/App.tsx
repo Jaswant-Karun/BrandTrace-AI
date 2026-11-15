@@ -328,7 +328,7 @@ export const App: React.FC = () => {
             <button
               onClick={handleReseed}
               disabled={isReseeding}
-              title="Re-seed MongoDB and Graph Data"
+              title="Reset Sample Data"
               className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-2xs cursor-pointer"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isReseeding ? 'animate-spin text-slate-900 dark:text-white' : ''}`} />

@@ -136,7 +136,7 @@ export const RiskIntelligenceView: React.FC<RiskIntelligenceViewProps> = ({ bran
       <WorkflowBanner
         currentStage="Risk Intelligence"
         nextStageTitle="Change Impact Simulator"
-        nextStageDescription="Test how mutating risk rules or changing product pricing ripples across dependent assets in an isolated virtual DAG sandbox."
+        nextStageDescription="Test how mutating risk rules or changing product pricing ripples across dependent assets in an isolated virtual simulation sandbox."
         nextStageActionLabel="Go to Change Impact Simulator"
         onNavigateNext={() => onNavigate && onNavigate('impact-simulator')}
         governanceHint="Policy conflicts and regulatory contradictions are intercepted before any changes are committed."

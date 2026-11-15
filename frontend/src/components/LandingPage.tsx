@@ -5,8 +5,8 @@ import {
   CheckCircle2, ChevronRight,
   Network, RotateCcw,
   FileText, Globe, Cpu,
-  Check, AlertCircle, X, Menu,
-  Hash, Clock, Sliders
+  AlertCircle, X, Menu,
+  Hash, Sliders
 } from 'lucide-react';
 import { ThemeToggle } from './ui/ThemeToggle';
 import { PlumbBob } from './ui/PlumbBob';

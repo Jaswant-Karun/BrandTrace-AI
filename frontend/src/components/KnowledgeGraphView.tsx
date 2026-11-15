@@ -206,10 +206,10 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
           { label: 'Knowledge Graph', active: true }
         ]}
         helpContext={{
-          summary: "The Brand Knowledge Graph models all enterprise touchpoints in a directed acyclic graph (DAG). Edges represent dependencies such as 'CITES_FACT', 'GOVERNED_BY', or 'PROHIBITS_CLAIM'.",
+          summary: "The Brand Knowledge Graph models all enterprise touchpoints in an interactive knowledge network. Edges represent dependencies such as 'CITES_FACT', 'GOVERNED_BY', or 'PROHIBITS_CLAIM'.",
           terms: [
             { term: "Node Types", definition: "Approved Facts, Guidelines, Registered Trademarks, Touchpoints, and Prohibited Claims." },
-            { term: "DAG Traversal", definition: "Click any node to highlight upstream root facts and downstream dependent marketing assets." },
+            { term: "Graph Traversal", definition: "Click any node to highlight upstream root facts and downstream dependent marketing assets." },
             { term: "Evidence Citations", definition: "Structural graph connections linking copy assertions to certified laboratory tests or regulatory filings." }
           ]
         }}
@@ -334,7 +334,7 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
 
           <button
             onClick={loadGraph}
-            title="Reload from MongoDB"
+            title="Reload Knowledge Graph"
             className="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 shadow-xs cursor-pointer"
           >
             <RefreshCw className="w-4 h-4" />
@@ -349,7 +349,7 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
           {isLoading ? (
             <div className="w-full h-full flex flex-col items-center justify-center space-y-3 bg-white">
               <div className="w-8 h-8 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
-              <p className="text-xs text-slate-500 font-medium">Loading Brand Knowledge Graph ontology from MongoDB Atlas...</p>
+              <p className="text-xs text-slate-500 font-medium">Loading Brand Knowledge Graph ontology...</p>
             </div>
           ) : (
             <ReactFlow
@@ -429,7 +429,7 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
                     ) : (
                       <GitFork className="w-3.5 h-3.5" />
                     )}
-                    Trace DAG
+                    Trace Dependencies
                   </button>
                 </div>
                 <p className="text-[11px] text-slate-500 leading-relaxed">

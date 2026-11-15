@@ -20,8 +20,8 @@ export const DatabaseStatusModal: React.FC<DatabaseStatusModalProps> = ({ isOpen
               <Database className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-900">Database Substrate Status</h3>
-              <p className="text-xs text-slate-500">MongoDB Connection &amp; Persistence Telemetry</p>
+              <h3 className="text-sm font-bold text-slate-900">Data Substrate Status</h3>
+              <p className="text-xs text-slate-500">Knowledge Base &amp; Persistence Telemetry</p>
             </div>
           </div>
           <button
@@ -46,12 +46,12 @@ export const DatabaseStatusModal: React.FC<DatabaseStatusModalProps> = ({ isOpen
           )}
           <div>
             <div className="text-xs font-bold text-slate-900">
-              {status?.connected ? 'MongoDB Live Cluster Connected' : 'In-Memory Fallback Active'}
+              {status?.connected ? 'Enterprise Cloud Cluster Connected' : 'Resilient In-Memory Mode Active'}
             </div>
             <div className="text-[11px] text-slate-600 mt-0.5">
               {status?.connected
-                ? `Active Motor Async driver connected to '${status.database}' database.`
-                : 'MongoDB service not detected locally. Operating in resilient memory mode for zero-crash judging.'}
+                ? `Active async storage driver connected to '${status.database}' database.`
+                : 'Cloud database cluster not connected. Operating in resilient in-memory mode.'}
             </div>
           </div>
         </div>
@@ -60,7 +60,7 @@ export const DatabaseStatusModal: React.FC<DatabaseStatusModalProps> = ({ isOpen
         <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2.5 text-xs font-mono">
           <div className="flex items-center justify-between">
             <span className="text-slate-500">Engine:</span>
-            <span className="text-slate-900 font-semibold">{status?.engine || 'Motor Async'}</span>
+            <span className="text-slate-900 font-semibold">{status?.connected ? 'Async Cloud Storage' : 'In-Memory Engine'}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-slate-500">Database Name:</span>
@@ -94,15 +94,15 @@ export const DatabaseStatusModal: React.FC<DatabaseStatusModalProps> = ({ isOpen
           </div>
         )}
 
-        {/* Docker & Deployment instructions */}
+        {/* Telemetry info */}
         <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 space-y-1">
           <div className="font-bold text-slate-800 flex items-center gap-1.5">
             <Server className="w-3.5 h-3.5 text-slate-700" />
-            Quickstart MongoDB with Docker Compose:
+            Infrastructure Telemetry &amp; Persistence:
           </div>
-          <code className="block p-2 rounded bg-white border border-slate-200 text-slate-800 font-mono text-[10px] select-all">
-            docker-compose up -d mongodb
-          </code>
+          <p className="text-[11px] text-slate-600">
+            Tenant knowledge graph, cryptographic release seals, and audit trails are backed by high-availability isolated document storage.
+          </p>
         </div>
       </div>
     </div>

@@ -21,12 +21,12 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
   const STEPS = [
     { number: 1, title: "Connected Workspace", desc: "Know what your brand allows across all channels." },
     { number: 2, title: "Certified Truth Nodes", desc: "Maintain approved prices (₹499), specs, and claims." },
-    { number: 3, title: "Multi-Agent Inspection", desc: "Detect voice, claim, and regulatory defects in <800ms." },
+    { number: 3, title: "Multi-Agent Inspection", desc: "Detect voice, claim, and regulatory defects in real time." },
     { number: 4, title: "Evidence-Linked Findings", desc: "View statutory legal citations (FTC, FDA, Lanham Act)." },
     { number: 5, title: "Reverse-Offset Remediation", desc: "Apply 1-click rewrites without character drift." },
-    { number: 6, title: "Change Impact Simulator", desc: "Preview downstream ripple (₹499 ➔ ₹599) in virtual DAG." },
+    { number: 6, title: "Change Impact Simulator", desc: "Preview downstream ripple (₹499 ➔ ₹599) in virtual sandbox." },
     { number: 7, title: "Approval Center Gate", desc: "Human sign-off records authorized decisions." },
-    { number: 8, title: "5-State Release Ledger", desc: "Deterministic SHA-256 seals verify immutable history." },
+    { number: 8, title: "5-State Release Ledger", desc: "Cryptographic seals verify immutable release history." },
   ];
 
   return (

@@ -213,9 +213,9 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
           { label: 'Change Impact Simulator', active: true }
         ]}
         helpContext={{
-          summary: "The Digital Twin provides a safe virtual DAG sandbox. You can simulate mutations (such as increasing subscription price from ₹499 to ₹599) to calculate downstream blast radius, affected touchpoints, and unbudgeted reprint/ad liability without altering live production facts until authorized human approval.",
+          summary: "The Digital Twin provides a safe virtual sandbox. You can simulate mutations (such as increasing subscription price from ₹499 to ₹599) to calculate downstream blast radius, affected touchpoints, and unbudgeted reprint/ad liability without altering live production facts until authorized human approval.",
           terms: [
-            { term: "Virtual DAG Sandbox", definition: "Isolated copy of the brand ontology graph where proposed changes are calculated without mutating production data." },
+            { term: "Virtual Simulation Sandbox", definition: "Isolated copy of the brand ontology graph where proposed changes are calculated without mutating production data." },
             { term: "Direct vs Indirect Dependency", definition: "Direct dependencies cite the specific fact ID; indirect dependencies reference the product or related terminology." },
             { term: "Policy Conflict Engine", definition: "Evaluates prospective mutations against active rules to catch contradictions, regulatory violations, and typography conflicts." },
             { term: "Commit Gate", definition: "Mandates authorized human role sign-off (BRAND_MANAGER or ADMIN) before updating approved facts and generating revision tasks." }
@@ -270,7 +270,7 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
             }`}
           >
             <Network className="w-3.5 h-3.5 shrink-0" />
-            <span className="hidden sm:inline">DAG Mutation Blast Radius</span>
+            <span className="hidden sm:inline">Cascade Blast Radius</span>
             <span className="sm:hidden">Mutation Blast Radius</span>
           </button>
         </div>
@@ -481,7 +481,7 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
                       <div className="text-[10px] font-bold uppercase text-slate-600">
                         Direct Graph Dependencies
                       </div>
-                      <div className="text-[10px] text-slate-500 mt-0.5">Connected DAG Assets</div>
+                      <div className="text-[10px] text-slate-500 mt-0.5">Connected Assets</div>
                     </div>
 
                     <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
@@ -726,7 +726,7 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
           <div className="lg:col-span-5 bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
             <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2 pb-2 border-b border-slate-100">
               <Network className="w-4 h-4 text-slate-700" />
-              DAG Policy Cascade Configuration
+              Policy Cascade Configuration
             </h3>
 
             <div>
@@ -776,7 +776,7 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
               {isCascadeLoading ? (
                 <>
                   <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Calculating DAG Cascade...
+                  Calculating Policy Cascade...
                 </>
               ) : (
                 <>

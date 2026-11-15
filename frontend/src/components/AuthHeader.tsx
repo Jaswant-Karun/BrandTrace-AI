@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { 
   Building2, UserCheck, ChevronDown, 
-  Database, Sparkles, LogOut, Compass,
+  ShieldCheck, Sparkles, LogOut, Compass,
   Menu, Download, CheckCircle2
 } from 'lucide-react';
 

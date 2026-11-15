@@ -73,7 +73,7 @@ const TOUR_STEPS: TourStep[] = [
     tab: 'impact-simulator',
     title: '7. The Change Impact Simulator (Digital Twin)',
     category: 'Predictive Governance',
-    description: 'Preview which content may be affected before changing approved brand knowledge. Simulate mutating Cloud Studio price from ₹499 to ₹599 in an isolated virtual DAG before production commit.',
+    description: 'Preview which content may be affected before changing approved brand knowledge. Simulate mutating Cloud Studio price from ₹499 to ₹599 in an isolated virtual sandbox before production commit.',
     actionText: 'Next: Approval & Audit Ledger',
     badge: 'Step 7 of 8',
     highlightTip: 'Simulating ₹499 ➔ ₹599 identifies 4 affected touchpoints and $320,000 in unbudgeted exposure before human sign-off.'
@@ -82,7 +82,7 @@ const TOUR_STEPS: TourStep[] = [
     tab: 'audit-trust',
     title: '8. Human Approval & Cryptographic Trust Ledger',
     category: 'Assurance & Ledger',
-    description: 'Conduct authorized human-in-the-loop sign-off in the Approval Center. Releases are sealed with deterministic SHA-256 Merkle digests and verified across 5 integrity states.',
+    description: 'Conduct authorized human-in-the-loop sign-off in the Approval Center. Releases are sealed with deterministic cryptographic digests and verified across 5 integrity states.',
     actionText: 'Finish Onboarding Tour',
     badge: 'Step 8 of 8',
     highlightTip: 'Test the 5-state integrity verifier on AST-AUR-01 to see authentic, modified, superseded, or revoked states.'

@@ -43,13 +43,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ brand, dbStatus, onR
         helpContext={{
           summary: "Control plane configuration manages the infrastructure supporting brand governance: database clusters, AI reasoning fallback engines, and external compliance dispatch webhooks.",
           terms: [
-            { term: "AI Engine", definition: "Gemini 2.5 Flash / Pro with deterministic heuristic fallback when external APIs are disconnected." },
-            { term: "MongoDB Atlas", definition: "Persistent multi-tenant document store with tenant isolation for graph nodes, releases, and audit logs." },
-            { term: "Webhook Dispatch", definition: "Real-time Slack / HTTP notifications whenever a critical FTC or FDA regulatory defect is intercepted." }
+            { term: "AI Engine", definition: "High-performance multimodal reasoning models with deterministic fallback when external networks are unavailable." },
+            { term: "Knowledge Storage", definition: "Persistent multi-tenant document repository with workspace isolation for graph nodes, releases, and audit logs." },
+            { term: "Webhook Dispatch", definition: "Real-time Slack / HTTP notifications whenever a critical regulatory defect is intercepted." }
           ]
         }}
         primaryAction={{
-          label: isReseeding ? "Re-seeding..." : "Re-seed Truth-Set",
+          label: isReseeding ? "Resetting..." : "Reset Sample Data",
           onClick: onReseed,
           icon: <RefreshCw className={`w-3.5 h-3.5 ${isReseeding ? 'animate-spin' : ''}`} />
         }}
@@ -118,7 +118,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ brand, dbStatus, onR
           <div className="flex items-center gap-2">
             <Database className="w-4 h-4 text-slate-700" />
             <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-              MongoDB Database Connection
+              Knowledge Base Storage Connection
             </h3>
           </div>
 
@@ -128,7 +128,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ brand, dbStatus, onR
             className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs w-full sm:w-auto"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isReseeding ? 'animate-spin text-slate-900' : ''}`} />
-            {isReseeding ? 'Re-seeding...' : 'Re-seed Graph Data'}
+            {isReseeding ? 'Resetting...' : 'Reset Sample Data'}
           </button>
         </div>
 
@@ -136,7 +136,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ brand, dbStatus, onR
           <div className="flex items-center justify-between">
             <span className="text-slate-500">Connection Status:</span>
             <span className={dbStatus?.connected ? 'text-emerald-700 font-bold' : 'text-amber-800 font-bold'}>
-              {dbStatus?.connected ? 'Connected (Motor Async)' : 'Operating in Memory Fallback'}
+              {dbStatus?.connected ? 'Connected (Cloud Storage)' : 'Operating in Local Sandbox'}
             </span>
           </div>
           <div className="flex items-center justify-between">
@@ -144,9 +144,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ brand, dbStatus, onR
             <span className="text-slate-900 font-semibold">{dbStatus?.database || 'brandtrace'}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-slate-500">Host Target:</span>
+            <span className="text-slate-500">Storage Endpoint:</span>
             <span className="text-slate-700 truncate max-w-[140px] xs:max-w-[180px] sm:max-w-[280px]">
-              {dbStatus?.uri || 'mongodb://localhost:27017'}
+              {dbStatus?.uri ? 'Secure Managed Endpoint' : 'Internal Secure Substrate'}
             </span>
           </div>
         </div>

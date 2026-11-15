@@ -58,7 +58,7 @@ export const ReleaseLedgerView: React.FC<ReleaseLedgerViewProps> = ({ brandId })
             </h2>
           </div>
           <p className="text-xs text-slate-500">
-            Cryptographically sealed marketing release approvals persisted in MongoDB with verifiable SHA-256 audit stamps.
+            Cryptographically sealed marketing release approvals persisted with verifiable cryptographic audit stamps.
           </p>
         </div>
 
@@ -95,7 +95,7 @@ export const ReleaseLedgerView: React.FC<ReleaseLedgerViewProps> = ({ brandId })
       {/* Ledger Table */}
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
         {isLoading ? (
-          <div className="p-12 text-center text-xs text-slate-500">Loading ledger from MongoDB...</div>
+          <div className="p-12 text-center text-xs text-slate-500">Loading ledger records...</div>
         ) : filteredReleases.length === 0 ? (
           <div className="p-12 text-center flex flex-col items-center justify-center space-y-3">
             <FileSpreadsheet className="w-8 h-8 text-slate-400" />

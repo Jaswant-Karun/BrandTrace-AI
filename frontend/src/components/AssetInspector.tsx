@@ -177,7 +177,7 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
       });
       if (!res.ok) throw new Error('Upload failed');
       const data = await res.json();
-      toast.success(`File ${file.name} uploaded and indexed in cloud storage & MongoDB!`);
+      toast.success(`File ${file.name} uploaded and indexed in cloud knowledge storage!`);
       if (data.inspection_report?.extracted_text) {
         setContent(data.inspection_report.extracted_text);
       }
@@ -1219,7 +1219,7 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
         nextStageDescription="Preview which content and downstream touchpoints may be affected before changing approved brand knowledge (e.g. ₹499 ➔ ₹599)."
         nextStageActionLabel="Go to Change Impact Simulator"
         onNavigateNext={() => onNavigate && onNavigate('impact-simulator')}
-        governanceHint="The Digital Twin sandboxes prospective changes in an isolated DAG so live production content is never altered prematurely."
+        governanceHint="The Digital Twin sandboxes prospective changes in an isolated simulation sandbox so live production content is never altered prematurely."
       />
     </div>
   );
