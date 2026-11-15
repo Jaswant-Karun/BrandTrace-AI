@@ -232,12 +232,12 @@ async def verify_asset(request: VerificationRequest, current_user: UserProfile =
                 request.image_analysis = rep.model_dump()
                 if not request.content or not request.content.strip():
                     if rep.extracted_text_preview:
-                        request.content = str(rep.extracted_text_preview)
+                        request.content = rep.extracted_text_preview
     elif not request.content or not request.content.strip():
         if request.image_analysis:
             extracted = request.image_analysis.get("extracted_text") or request.image_analysis.get("extracted_text_preview")
-            if extracted:
-                request.content = str(extracted)
+            if isinstance(extracted, str):
+                request.content = extracted
     if not request.content or not request.content.strip():
         raise HTTPException(status_code=400, detail="Content cannot be empty. Content or uploaded image is required for governance inspection.")
     if len(request.content) > 50000:
