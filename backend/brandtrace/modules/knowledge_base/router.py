@@ -157,6 +157,11 @@ async def create_approved_fact(req: CreateFactRequest):
         source_citation=req.source_citation,
         department_owner=req.department_owner,
         last_verified=now_iso,
+        source_date=req.source_date,
+        expiry_date=req.expiry_date,
+        evidence_reference=req.evidence_reference,
+        restricted_terms=req.restricted_terms,
+        required_phrases=req.required_phrases,
         created_at=now_int,
         updated_at=now_int
     )
@@ -187,7 +192,10 @@ async def create_approved_fact(req: CreateFactRequest):
             properties={
                 "current_value": req.current_value,
                 "citation": req.source_citation,
-                "department_owner": req.department_owner
+                "department_owner": req.department_owner,
+                "source_date": req.source_date,
+                "expiry_date": req.expiry_date,
+                "evidence_reference": req.evidence_reference
             }
         )
         existing_idx = next((i for i, n in enumerate(BRAND_SEEDS[req.workspace_id].nodes) if n.id == fact_id), None)
@@ -223,9 +231,286 @@ async def create_approved_fact(req: CreateFactRequest):
         description=req.description,
         source_citation=req.source_citation,
         department_owner=req.department_owner,
+        source_date=req.source_date,
+        expiry_date=req.expiry_date,
+        evidence_reference=req.evidence_reference,
+        restricted_terms=req.restricted_terms,
+        required_phrases=req.required_phrases,
         status="ACTIVE",
         created_at=now_iso
     )
+
+@router.put("/facts/{fact_id}", response_model=ApprovedFactResponse)
+async def update_approved_fact(
+    fact_id: str,
+    req: UpdateFactRequest,
+    workspace_id: str = "aurelle-tech",
+    org_id: Optional[str] = None
+):
+    """
+    Updates an approved brand fact in MongoDB Atlas and the active in-memory catalog/graph.
+    Maintains historical lineage and logs an audit event.
+    """
+    effective_org = org_id or ("ORG-AURELLE" if "aurelle" in workspace_id else "ORG-APEX")
+    now_int = int(time.time())
+    now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    
+    # Check existing fact
+    existing_fact = APPROVED_FACTS_CATALOG.get(fact_id)
+    if not existing_fact:
+        facts_list = await mongo_manager.repo.get_approved_facts(effective_org, workspace_id)
+        match = next((f for f in facts_list if f.get("fact_id") == fact_id), None)
+        if not match:
+            raise HTTPException(status_code=404, detail=f"Fact '{fact_id}' not found.")
+        existing_name = match.get("name") or match.get("fact_name", "")
+        existing_val = match.get("current_value", "")
+        existing_cat = match.get("category", "PRICE")
+        existing_unit = match.get("unit", "")
+        existing_desc = match.get("description", "")
+        existing_cite = match.get("source_citation", "")
+        existing_dept = match.get("department_owner", "Brand Governance Committee")
+    else:
+        existing_name = existing_fact.name
+        existing_val = existing_fact.current_value
+        existing_cat = existing_fact.category
+        existing_unit = existing_fact.unit
+        existing_desc = existing_fact.description
+        existing_cite = existing_fact.source_citation
+        existing_dept = existing_fact.department_owner
+
+    updated_name = req.name if req.name is not None else existing_name
+    updated_val = req.current_value if req.current_value is not None else existing_val
+    updated_cat = req.category if req.category is not None else existing_cat
+    updated_unit = req.unit if req.unit is not None else existing_unit
+    updated_desc = req.description if req.description is not None else existing_desc
+    updated_cite = req.source_citation if req.source_citation is not None else existing_cite
+    updated_dept = req.department_owner if req.department_owner is not None else existing_dept
+
+    # 1. Update in MongoDB
+    fact_doc = ApprovedFactDoc(
+        fact_id=fact_id,
+        organisation_id=effective_org,
+        workspace_id=workspace_id,
+        name=updated_name,
+        category=updated_cat,
+        current_value=updated_val,
+        unit=updated_unit or "",
+        description=updated_desc,
+        source_citation=updated_cite,
+        department_owner=updated_dept,
+        last_verified=now_iso,
+        source_date=req.source_date,
+        expiry_date=req.expiry_date,
+        evidence_reference=req.evidence_reference,
+        restricted_terms=req.restricted_terms,
+        required_phrases=req.required_phrases,
+        created_at=now_int,
+        updated_at=now_int
+    )
+    await mongo_manager.repo.add_approved_fact(fact_doc)
+
+    # 2. Update In-Memory Catalog
+    updated_fact_obj = ApprovedFact(
+        id=fact_id,
+        brand_id=workspace_id,
+        name=updated_name,
+        category=updated_cat,
+        current_value=updated_val,
+        unit=updated_unit or "",
+        description=updated_desc,
+        source_citation=updated_cite,
+        department_owner=updated_dept,
+        last_verified=now_iso
+    )
+    APPROVED_FACTS_CATALOG[fact_id] = updated_fact_obj
+
+    # 3. Update Knowledge Graph Node
+    from brandtrace.data.seed_data import BRAND_SEEDS
+    if workspace_id in BRAND_SEEDS:
+        node = GraphNode(
+            id=fact_id,
+            label=f"{updated_name}: {updated_val}",
+            type=NodeType.APPROVED_FACT,
+            description=updated_desc,
+            properties={
+                "current_value": updated_val,
+                "citation": updated_cite,
+                "department_owner": updated_dept,
+                "source_date": req.source_date,
+                "expiry_date": req.expiry_date,
+                "evidence_reference": req.evidence_reference
+            }
+        )
+        existing_idx = next((i for i, n in enumerate(BRAND_SEEDS[workspace_id].nodes) if n.id == fact_id), None)
+        if existing_idx is not None:
+            BRAND_SEEDS[workspace_id].nodes[existing_idx] = node
+        else:
+            BRAND_SEEDS[workspace_id].nodes.append(node)
+
+    # 4. Record Audit Event
+    if mongo_manager.is_connected and mongo_manager.db is not None:
+        try:
+            await mongo_manager.db.audit_events.insert_one({
+                "event_id": f"EVT-FACT-UPD-{int(time.time()*1000)%100000}",
+                "action_type": "FACT_UPDATED",
+                "resource_id": fact_id,
+                "user_identity": "Chief Governance Officer",
+                "old_value": existing_val,
+                "new_value": updated_val,
+                "timestamp": now_int
+            })
+        except Exception:
+            pass
+
+    return ApprovedFactResponse(
+        fact_id=fact_id,
+        workspace_id=workspace_id,
+        org_id=effective_org,
+        name=updated_name,
+        category=updated_cat,
+        current_value=updated_val,
+        unit=updated_unit or "",
+        description=updated_desc,
+        source_citation=updated_cite,
+        department_owner=updated_dept,
+        source_date=req.source_date,
+        expiry_date=req.expiry_date,
+        evidence_reference=req.evidence_reference,
+        restricted_terms=req.restricted_terms,
+        required_phrases=req.required_phrases,
+        status="ACTIVE",
+        created_at=now_iso
+    )
+
+@router.post("/guidelines", response_model=GuidelineResponse)
+async def create_brand_guideline(req: CreateGuidelineRequest):
+    """
+    Registers a new brand guideline, restricted terminology, or required phrase into MongoDB Atlas.
+    """
+    guideline_id = req.guideline_id or f"GL-{req.workspace_id[:3].upper()}-{int(time.time() * 1000) % 100000:05d}"
+    org_id = req.org_id or ("ORG-AURELLE" if "aurelle" in req.workspace_id else "ORG-APEX")
+    now_int = int(time.time())
+    now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    
+    # 1. Save to MongoDB Atlas Repository
+    guideline_doc = BrandGuidelineDoc(
+        guideline_id=guideline_id,
+        organisation_id=org_id,
+        workspace_id=req.workspace_id,
+        title=req.title,
+        category=req.category,
+        rule_statement=req.rule_statement,
+        severity=req.severity,
+        effective_date=now_int,
+        expiry_date=None,
+        restricted_terms=req.restricted_terms or [],
+        required_phrases=req.required_phrases or [],
+        source_citation=req.source_citation or "Corporate Brand Governance Directive",
+        created_at=now_int,
+        updated_at=now_int
+    )
+    await mongo_manager.repo.add_brand_guideline(guideline_doc)
+
+    # 2. If restricted terminology exists, persist into terminology collection
+    if req.restricted_terms and mongo_manager.is_connected and mongo_manager.db is not None:
+        for term in req.restricted_terms:
+            try:
+                await mongo_manager.db.terminology.insert_one({
+                    "term_id": f"TRM-{int(time.time()*1000)%100000}",
+                    "organisation_id": org_id,
+                    "workspace_id": req.workspace_id,
+                    "term_text": term,
+                    "classification": "RESTRICTED_TERM",
+                    "guidance": req.rule_statement,
+                    "created_at": now_int
+                })
+            except Exception:
+                pass
+
+    # 3. Add to Graph
+    from brandtrace.data.seed_data import BRAND_SEEDS
+    if req.workspace_id in BRAND_SEEDS:
+        node = GraphNode(
+            id=guideline_id,
+            label=f"{req.title}",
+            type=NodeType.BRAND_GUIDELINE,
+            description=req.rule_statement,
+            properties={
+                "category": req.category,
+                "severity": req.severity,
+                "restricted_terms": req.restricted_terms,
+                "required_phrases": req.required_phrases,
+                "citation": req.source_citation
+            }
+        )
+        BRAND_SEEDS[req.workspace_id].nodes.append(node)
+
+    return GuidelineResponse(
+        guideline_id=guideline_id,
+        workspace_id=req.workspace_id,
+        org_id=org_id,
+        title=req.title,
+        category=req.category,
+        rule_statement=req.rule_statement,
+        severity=req.severity,
+        effective_date=req.effective_date or now_iso,
+        expiry_date=req.expiry_date,
+        restricted_terms=req.restricted_terms or [],
+        required_phrases=req.required_phrases or [],
+        source_citation=req.source_citation,
+        status="ACTIVE"
+    )
+
+@router.get("/guidelines", response_model=List[GuidelineResponse])
+async def list_brand_guidelines(workspace_id: Optional[str] = None, org_id: Optional[str] = None):
+    """
+    Lists registered brand guidelines and policy guardrails from MongoDB Atlas and graph seeds.
+    """
+    effective_org = org_id or ("ORG-AURELLE" if workspace_id and "aurelle" in workspace_id else "ORG-APEX")
+    docs = await mongo_manager.repo.get_brand_guidelines(effective_org, workspace_id)
+    results = []
+    seen_ids = set()
+    for d in docs:
+        gid = d.get("guideline_id", "")
+        if gid and gid not in seen_ids:
+            seen_ids.add(gid)
+            results.append(GuidelineResponse(
+                guideline_id=gid,
+                workspace_id=d.get("workspace_id", workspace_id or "aurelle-tech"),
+                org_id=d.get("organisation_id", effective_org),
+                title=d.get("title", ""),
+                category=d.get("category", "VOICE"),
+                rule_statement=d.get("rule_statement", ""),
+                severity=d.get("severity", "HIGH"),
+                effective_date=str(d.get("effective_date", "")),
+                expiry_date=d.get("expiry_date"),
+                restricted_terms=d.get("restricted_terms") or [],
+                required_phrases=d.get("required_phrases") or [],
+                source_citation=d.get("source_citation"),
+                status=d.get("status", "ACTIVE")
+            ))
+
+    from brandtrace.data.seed_data import BRAND_SEEDS
+    if workspace_id and workspace_id in BRAND_SEEDS:
+        for node in BRAND_SEEDS[workspace_id].nodes:
+            if node.type in [NodeType.BRAND_GUIDELINE, NodeType.REGULATION, NodeType.PROHIBITED_CLAIM] and node.id not in seen_ids:
+                seen_ids.add(node.id)
+                results.append(GuidelineResponse(
+                    guideline_id=node.id,
+                    workspace_id=workspace_id,
+                    org_id=effective_org,
+                    title=node.label,
+                    category="REGULATORY" if node.type == NodeType.REGULATION else "VOICE",
+                    rule_statement=node.description or "",
+                    severity=node.properties.get("severity", "HIGH"),
+                    effective_date=datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                    expiry_date=None,
+                    restricted_terms=node.properties.get("restricted_terms", []),
+                    required_phrases=node.properties.get("required_phrases", []),
+                    source_citation=node.properties.get("citation") or node.properties.get("governing_policy"),
+                    status="ACTIVE"
+                ))
+    return results
 
 @router.get("/facts", response_model=List[ApprovedFactResponse])
 async def list_approved_facts(workspace_id: Optional[str] = None, org_id: Optional[str] = None):
