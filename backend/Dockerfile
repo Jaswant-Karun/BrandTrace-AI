@@ -19,8 +19,7 @@ COPY . .
 EXPOSE 8000
 
 ENV HOST=0.0.0.0
-ENV PORT=8000
 
-# Start Uvicorn server
-CMD ["uvicorn", "brandtrace.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Start server using dynamic port handler
+CMD ["python", "run.py"]
 
