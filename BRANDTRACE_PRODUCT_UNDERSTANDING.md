@@ -16,6 +16,7 @@ This document provides the foundational product audit and operational understand
 BrandTrace AI is an **Autonomous Enterprise Brand Intelligence & Governance Control Plane**. It serves as an institutional system of record, risk detection engine, dependency graph, and cryptographic verification ledger for enterprise brand assets.
 
 In modern multi-brand enterprises, marketing collateral, advertisements, creator posts, packaging dies, sales decks, and websites are produced at high velocity across fragmented internal teams and external agencies. BrandTrace AI sits between **content creation** and **market publication**, ensuring that:
+
 1. Every marketing claim is grounded in verified, approved brand knowledge.
 2. Every brand guideline (regulatory, visual, legal, trademark, accessibility) is enforced automatically.
 3. Every brand dependency (e.g., which ads cite a specific product price or battery spec) is mapped in a live knowledge graph.
@@ -32,6 +33,7 @@ In modern multi-brand enterprises, marketing collateral, advertisements, creator
 When an enterprise updates a core product fact—such as pricing, specifications, certifications, or legal disclosures—the change rarely propagates cleanly across hundreds of existing marketing assets and live campaigns.
 
 #### Concrete Enterprise Example: The Price Mutation Dilemma
+
 1. **Initial Baseline**: Enterprise **Aurelle Technologies** launches the *Aurelle Cloud Studio* subscription at an introductory approved price of **₹499/month** (`FACT-AUR-PRC-01`).
 2. **Dependent Assets Deployed**: Marketing teams launch:
    - Meta sponsored feed ads (`AST-AUR-AD-02`) citing ₹499/mo.
@@ -111,7 +113,7 @@ BrandTrace AI provides server-side Role-Based Access Control (RBAC) tailored to 
 
 The 14 modules form a continuous, closed-loop governance lifecycle:
 
-```
+```text
 [11. Brand Knowledge Base]
         │ (supplies certified truth-set: facts, rules, guidelines)
         ▼
@@ -158,7 +160,8 @@ BrandTrace AI persists all state in **27 strongly-typed MongoDB Atlas collection
 
 ## 8. HOW A USER SHOULD USE THE APPLICATION
 
-### The Ideal First-Time User Experience:
+### The Ideal First-Time User Experience
+
 1. **Login**: User navigates to the login screen, enters `demo@brandtrace.ai` with the secure demo password (or clicks the One-Click Demo Quick-Access card), and receives a valid JWT token.
 2. **Workspace Confirmation**: The active workspace automatically sets to **Aurelle Technologies (`aurelle-tech`)**, the flagship consumer tech enterprise.
 3. **Welcome & Guided Tour**: A welcome modal appears ("Welcome to BrandTrace AI"), introducing the 4-stage governance journey. The user can start an interactive sidebar tour that highlights each navigation item and explains its purpose.
@@ -219,4 +222,3 @@ During this comprehensive audit, the following specific UX and architectural gap
 ## CONCLUSION & READINESS FOR IMPLEMENTATION
 
 With this product understanding audit complete, the exact requirements for BrandTrace AI are crystallized. The next stages will execute the planned UX, onboarding, authentication, and design transformations in controlled, verified steps without disturbing existing backend logic or database integrity.
-

@@ -16,10 +16,13 @@ All changes were executed with strict preservation of existing backend APIs, 27 
 ## 1. PRODUCT UNDERSTANDING & VALUE PROPOSITION
 
 ### What BrandTrace AI Is
+
 BrandTrace AI is an **Autonomous Enterprise Brand Intelligence & Governance Control Plane**. It acts as an institutional system of record, risk detection engine, dependency graph, and cryptographic verification ledger for enterprise brand management.
 
 ### The Problem It Solves: Cascading Brand Drift
+
 When a company changes a core product fact (pricing, battery runtime, trademark styling, ingredients, or legal disclosures), old marketing content, ads, social posts, partner decks, and web pages often continue citing outdated numbers.
+
 - **Example Scenario**: Aurelle Technologies approves an introductory price of **₹499/mo** for *Aurelle Cloud Studio*. Later, commercial leadership votes to increase the approved price to **₹599/mo**. Without BrandTrace AI, distributed ads and sales decks continue publishing ₹499, causing customer dissatisfaction, regulatory penalties (e.g. FTC deceptive pricing action), and brand damage.
 - **BrandTrace AI Solution**: The change is proposed in the **Change Impact Simulator (Digital Twin)**, which automatically traverses the **Brand Dependency Intelligence Graph (BDIG)**, flags all 4 dependent live assets, calculates the commercial exposure ($320,000), routes revision tasks to authorized human reviewers, and stamps approved updates with immutable SHA-256 cryptographic release seals.
 
@@ -29,7 +32,7 @@ When a company changes a core product fact (pricing, battery runtime, trademark 
 
 Every module in BrandTrace AI is connected in a continuous, closed-loop governance pipeline:
 
-```
+```text
 [1. Brand Knowledge Base]
       │ (certified truth-set: approved facts at ₹499 & guidelines)
       ▼
@@ -142,6 +145,7 @@ In accordance with enterprise SaaS design references (`getplumbline.xyz`, `veryt
 ## 8. BUILD, TYPESCRIPT & TEST SUITE VERIFICATION
 
 ### Frontend Verification
+
 - **TypeScript Compiler Check (`npx tsc --noEmit`)**:
   - Result: **0 errors** (Clean).
 - **Vite Production Build (`npm run build`)**:
@@ -149,6 +153,7 @@ In accordance with enterprise SaaS design references (`getplumbline.xyz`, `veryt
   - Transformed 2568 modules into 20 optimized, code-split chunk bundles with 0 errors.
 
 ### Backend Test Suite Verification
+
 - **Test Command**: `pytest backend/tests`
 - **Total Tests Collected**: **75 tests** across 11 test modules:
   - `backend/tests/test_demo_account.py`: 3 passed (100%)
@@ -170,21 +175,25 @@ In accordance with enterprise SaaS design references (`getplumbline.xyz`, `veryt
 ## 9. USER GUIDE: HOW TO UNDERSTAND & DEMONSTRATE BRANDTRACE AI
 
 ### 1. What is BrandTrace AI?
+
 BrandTrace AI is the operating system for brand consistency, legal compliance, and release accountability in large enterprises. It prevents companies from publishing outdated, contradictory, or legally dangerous marketing claims across web, ads, PDFs, and packaging.
 
 ### 2. Who uses it?
+
 - **Brand Managers**: Maintain certified prices, specs, and guidelines; test what happens when a fact changes.
 - **Legal & Compliance Officers**: Review detected risks, inspect legal evidence, and authorize releases.
 - **Creative Directors & Content Creators**: Scan draft copy in real time, see exact highlighting of issues, and apply 1-click fixes.
 - **CTOs & System Admins**: Maintain tenant boundaries and cryptographic audit histories.
 
 ### 3. What should I do first after logging in?
+
 1. Open the application and sign in with `demo@brandtrace.ai` / `DemoAurelle2026!` (or click **Launch AURELLE Demo Workspace**).
 2. You will land on the **Executive Command Center** in the **Aurelle Technologies (`aurelle-tech`)** workspace.
 3. Review the visual **"How BrandTrace Works"** pipeline banner at the top of the dashboard.
 4. Click **"Start Interactive Guided Tour"** to understand every sidebar module in 2 minutes.
 
 ### 4. What does every sidebar page do?
+
 - **Command Center**: Macro executive overview, compliance health (94.2%), and quick shortcuts.
 - **Brand Knowledge Graph**: Visual map showing how brand facts, rules, and live ads connect to each other.
 - **Content Studio**: Real-time copy inspector using 4 AI agents to catch unapproved claims and missing trademarks.
@@ -199,7 +208,9 @@ BrandTrace AI is the operating system for brand consistency, legal compliance, a
 - **Settings**: System configuration, MongoDB status, and database re-seeding.
 
 ### 5. How do I demonstrate the project to judges?
+
 Follow this exact 5-minute winning flow:
+
 1. **Show the Truth**: Open **Brand Knowledge Base**. Show `FACT-AUR-PRC-01`: Aurelle Cloud Studio is officially approved at **₹499/mo**.
 2. **Scan an Asset**: Open **Content Studio**. Click the preset *"Aurelle Price & Trademark (₹499 vs Claims)"*. Click **Start Pre-Release Verification**. In under 800ms, the 4 agents highlight the text, confirm ₹499 is supported, but flag missing trademarks and misspelled marks. Click **Apply Graph-Preserving Fix**.
 3. **Simulate a Business Change**: Open **Change Impact Simulator**. Show the preset: Aurelle wants to change the price from **₹499 to ₹599**. Click **Run Blast Radius Simulation**. The Digital Twin instantly reveals:
@@ -211,8 +222,8 @@ Follow this exact 5-minute winning flow:
 5. **Prove Integrity**: Open **Trust & Audit Ledger**. Click the test preset. Run **Verify Cryptographic Seal**. Show the green badge: **VALID & UNCHANGED**. Show how changing even one character turns it red: **MODIFIED AFTER APPROVAL**.
 
 ### 6. What makes this project different?
+
 - **Not a Chatbot**: It is an autonomous, deterministic governance control plane with live MongoDB knowledge graphs.
 - **Predictive Digital Twin**: No other tool simulates the blast radius of a brand change across live assets before it happens.
 - **Zero Silent Overwrite**: Changing a fact never silently modifies or republishes content without authorized human review.
 - **Cryptographic Trust Ledger**: Every release is stamped with a tamper-evident SHA-256 release proof linking content, reviewer, and timestamp.
-

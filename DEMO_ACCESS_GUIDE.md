@@ -41,6 +41,7 @@
 ## 3. HOW TO LOG IN & RUN THE AURELLE DEMONSTRATION
 
 ### Option A: Interactive Web UI Login
+
 1. Open the BrandTrace AI application in your browser (`http://localhost:5173`).
 2. If presented with the Login View:
    - Enter `demo@brandtrace.ai` in the email field.
@@ -49,6 +50,7 @@
 3. The application will authenticate against `/api/auth/login`, store the JWT in `localStorage`, and redirect into the **Aurelle Technologies (`aurelle-tech`)** workspace.
 
 ### Option B: Direct API Authentication (cURL / PowerShell)
+
 ```powershell
 curl -X POST "http://localhost:8000/api/auth/login" `
   -H "Content-Type: application/json" `
@@ -56,6 +58,7 @@ curl -X POST "http://localhost:8000/api/auth/login" `
 ```
 
 Response:
+
 ```json
 {
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -84,4 +87,3 @@ Response:
 | `reviewer@aurelle.com` | Marcus Aurelius | `REVIEWER` | `aurelle-tech` |
 
 *Password for secondary pre-seeded personas: `brandtrace2026`*
-
