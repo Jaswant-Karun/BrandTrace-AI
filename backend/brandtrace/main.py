@@ -57,6 +57,7 @@ app.include_router(kb_router, prefix="/api")
 app.include_router(graph_router, prefix="/api")
 app.include_router(content_router, prefix="/api")
 app.include_router(approvals_router, prefix="/api")
+app.include_router(demo_router, prefix="/api")
 
 @app.get("/health")
 async def health_check():
