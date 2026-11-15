@@ -7,6 +7,11 @@ from brandtrace.database.mongo import mongo_manager
 from brandtrace.data.seed_data import BRAND_SEEDS, APPROVED_FACTS_CATALOG
 from brandtrace.graph.engine import BrandKnowledgeGraph
 from brandtrace.graph.dependency_engine import dependency_engine
+from brandtrace.engine.multimodal import multimodal_engine, MultimodalInspectionReport
+from brandtrace.engine.explainable_review import explainable_engine, ExplainableReviewReport
+from brandtrace.engine.simulation import simulation_engine, SimulationProposedChange, SimulationReport
+from brandtrace.engine.collaboration import collaboration_engine, UserRole
+from brandtrace.engine.audit_ledger import audit_ledger_engine, ReleaseVerificationState
 from brandtrace.graph.schema import (
     BrandGraphData, BlastRadiusResponse, SeverityLevel,
     FactMutationRequest, DependencyIntelligenceResult, RevisionTask
