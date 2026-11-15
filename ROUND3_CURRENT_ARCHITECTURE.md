@@ -82,6 +82,7 @@ flowchart TD
 ## 3. Frontend Architecture (14 Cohesive Views)
 
 ### 3.1 Component Hierarchy & Code-Splitting
+
 The frontend is built with React 19 and utilizes dynamic `React.lazy` code-splitting in [App.tsx](file:///C:/Users/jaswant%20karun/BRANDTRACE%20AI/frontend/src/App.tsx) to ensure lightning-fast initial page loads:
 
 ```text
@@ -121,6 +122,7 @@ frontend/src/
 ```
 
 ### 3.2 State Management & Centralized API Client
+
 - **`AuthContext.tsx`:** Manages user authentication state, current organization (`org_id`), active workspace (`workspace_id`), and user role (`ADMIN`, `BRAND_MANAGER`, `COMPLIANCE_REVIEWER`, `REVIEWER`, `CREATOR`).
 - **`apiClient.ts`:** Automatically injects `Authorization: Bearer <token>` into outgoing requests, normalizes HTTP 4xx/5xx responses into typed `ApiError` objects, and encapsulates domain methods across `auth`, `organizations`, `knowledgeBase`, `graph`, `approvals`, `content`, and `demo`.
 
@@ -129,13 +131,16 @@ frontend/src/
 ## 4. Backend Modular Architecture (FastAPI)
 
 ### 4.1 Application Pipeline & Middlewares
+
 In [backend/brandtrace/main.py](file:///C:/Users/jaswant%20karun/BRANDTRACE%20AI/backend/brandtrace/main.py), requests flow through a layered middleware pipeline:
+
 1. **`ErrorSanitizationMiddleware`:** Intercepts unhandled exceptions, sanitizes sensitive stack traces, and returns clean, uniform JSON error structures.
 2. **`SecurityHeadersMiddleware`:** Enforces standard enterprise headers (`X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `X-XSS-Protection: 1; mode=block`).
 3. **`RateLimitMiddleware`:** Enforces rate limiting (120 requests/minute per client IP) to protect against volumetric abuse.
 4. **`CORSMiddleware`:** Permits cross-origin requests from configured origins (`ALLOWED_ORIGINS`).
 
 ### 4.2 Router Architecture
+
 The API exposes endpoints structured across core legacy routes and modular business domain routers:
 
 ```text
@@ -201,6 +206,7 @@ erDiagram
 ```
 
 ### Complete Collection Inventory
+
 1. **`users`:** User accounts, roles, departments, and password hashes.
 2. **`organisations`:** Multi-tenant enterprise accounts (e.g. Aurelle Luxury Group, Apex Dynamics).
 3. **`workspace_memberships`:** User-to-workspace role and permission mappings.
@@ -234,15 +240,19 @@ erDiagram
 ## 6. Multi-Agent Reasoning & Cryptographic Assurance
 
 ### 6.1 Multi-Agent Pipeline Topology
+
 When content is submitted for inspection, three autonomous agents execute concurrently:
+
 1. **Voice & Persona Agent:** Computes linguistic formality, tonal consistency, and lexical deviations from brand identity directives.
 2. **Claim Substantiation Agent:** Extracts all numerical, superlative, and factual assertions, verifying them against the Brand Knowledge Graph catalog.
 3. **Regulatory Compliance Agent:** Cross-examines content against federal and international advertising statutes (FTC Green Guides, FDA 21 CFR §202.1/§870, Lanham Act §43(a), NHTSA SGO 2021-01).
 
 ### 6.2 Reverse-Offset Remediation Synthesizer
+
 To guarantee that 1-click rewrites do not alter or corrupt adjacent text spans, the engine sorts all detected findings in descending order of character start offsets (`sorted(findings, key=lambda f: f.start_offset, reverse=True)`). Replacements are injected from the end of the text string to the beginning, preserving earlier character index alignments.
 
 ### 6.3 5-State Cryptographic Release Ledger
+
 Upon authorized sign-off, the release engine computes a chained SHA-256 Merkle block:
 
 $$\text{Block Material} = \text{rec\_id} \parallel \text{last\_block\_hash} \parallel \text{resource\_id} \parallel \text{content\_hash} \parallel \text{user\_identity} \parallel \text{timestamp}$$
@@ -250,6 +260,7 @@ $$\text{Block Material} = \text{rec\_id} \parallel \text{last\_block\_hash} \par
 $$\text{Seal} = \text{"BT-SEAL-"} \parallel \text{SHA-256}(\text{Block Material})[0:16]$$
 
 The verifier checks any content string against this immutable ledger, deterministically categorizing it into:
+
 - `VALID_UNCHANGED`
 - `MODIFIED_AFTER_APPROVAL`
 - `SUPERSEDED`

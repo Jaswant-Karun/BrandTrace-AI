@@ -45,6 +45,7 @@ flowchart TD
 ## 2. Phase 1: Round 2 Commitments Completion & Hardening (Mandatory)
 
 ### 1.1 Commitment 1: The Brand Governance Digital Twin (Change Impact & Blast Radius Simulator)
+
 - **Primary Goal:** Ensure simulation commit operations systematically generate and persist immutable revision tasks in MongoDB Atlas.
 - **Tasks:**
   1. In `backend/brandtrace/routes/api.py` (`commit_change_simulation`):
@@ -61,6 +62,7 @@ flowchart TD
 ---
 
 ### 1.2 Commitment 2: 4-Agent Autonomous Governance Pipeline with Graph-Preserving Remediation
+
 - **Primary Goal:** Verify sub-800ms multi-agent inspection speed, preserve brand voice, and render visual character-level risk badges.
 - **Tasks:**
   1. In `backend/brandtrace/engine/explainable_review.py`:
@@ -78,6 +80,7 @@ flowchart TD
 ---
 
 ### 1.3 Commitment 3: 5-State Cryptographic Release Ledger & Tamper Verifier
+
 - **Primary Goal:** Eliminate non-deterministic process `hash()` and harmonize all release signing under the SHA-256 Merkle-style engine.
 - **Tasks:**
   1. In `backend/brandtrace/routes/api.py` (`sign_release`):
@@ -99,6 +102,7 @@ flowchart TD
 ## 3. Phase 2: Security & Server-Side RBAC Enforcement (Priority 2)
 
 ### 2.1 Enforce Server-Side JWT Dependencies on Sensitive Endpoints (DEF-03)
+
 - **Files Involved:** `backend/brandtrace/routes/api.py`
 - **Actions:**
   - Inject `current_user: UserProfile = Depends(get_current_user)` into:
@@ -115,6 +119,7 @@ flowchart TD
 - **Effort / Risk:** 2.0 Hours / Low.
 
 ### 2.2 Workspace Switching Token Synchronization (DEF-08)
+
 - **Files Involved:** `backend/brandtrace/modules/auth/router.py`, `frontend/src/context/AuthContext.tsx`
 - **Actions:**
   - Add `POST /api/auth/switch-workspace` taking `workspace_id`.
@@ -126,6 +131,7 @@ flowchart TD
 ## 4. Phase 3: Production Observability & Live Deployment (Priority 3)
 
 ### 3.1 AI Provider Telemetry Badge in UI Header (DEF-07)
+
 - **Files Involved:** `frontend/src/components/AuthHeader.tsx`
 - **Actions:**
   - Display active status pill:
@@ -135,6 +141,7 @@ flowchart TD
 - **Effort / Risk:** 1.0 Hour / Low.
 
 ### 3.2 Vercel Production Frontend Deployment Trigger (DEF-06)
+
 - **Files Involved:** `frontend/vercel.json`, `vercel.json`, Vercel Dashboard
 - **Actions:**
   - Link repository to Vercel production dashboard.
@@ -147,6 +154,7 @@ flowchart TD
 ## 5. Phase 4: Polish, Localization & Evaluation Readiness (Priority 4)
 
 ### 4.1 Currency Localization in Blast Radius Simulator (DEF-09)
+
 - **Files Involved:** `frontend/src/components/BlastRadiusSimulator.tsx`
 - **Actions:**
   - Add a currency toggle button (`₹ INR` / `$ USD`).
@@ -154,6 +162,7 @@ flowchart TD
 - **Effort / Risk:** 0.5 Hours / Low.
 
 ### 4.2 Render Free-Tier Cold Start UX Helper (DEF-10)
+
 - **Files Involved:** `frontend/src/components/LoginPage.tsx`
 - **Actions:**
   - Add request timeout listener on login form.

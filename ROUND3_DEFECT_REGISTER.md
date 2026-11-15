@@ -10,6 +10,7 @@
 ## 1. Classification Methodology
 
 Defects and hardening items are prioritized into four standard enterprise tiers:
+
 - **P0 (Critical):** Immediate security vulnerability, credential compromise, or irreversible data corruption/loss.
 - **P1 (High):** Core governance workflow broken, cryptographic non-determinism, or permission bypass on sensitive actions.
 - **P2 (Medium):** Usability friction, missing UI status disclosures, or deployment domain configuration discrepancies.
@@ -41,6 +42,7 @@ Defects and hardening items are prioritized into four standard enterprise tiers:
 ## 4. Prioritized Active Defect Register
 
 ### P0: Critical Security & Data-Loss Issues
+
 *No active P0 defects detected in the codebase.* All Phase 11 P0 defects (DEF-01, DEF-02) have been verified remediated and covered by automated regression tests.
 
 ---
@@ -48,6 +50,7 @@ Defects and hardening items are prioritized into four standard enterprise tiers:
 ### P1: Core Workflow & Integrity Hardening
 
 #### DEF-03: Server-Side JWT & RBAC Binding on Legacy Approval & Commit Endpoints
+
 - **Severity:** P1 (High)
 - **Component:** `backend/brandtrace/routes/api.py` (`/releases/sign`, `/tasks/{task_id}/resolve`, `/simulator/commit`)
 - **Issue:** These three endpoints receive `reviewer_name` or `authorized_reviewer` inside the request body without injecting the FastAPI dependency `user: UserProfile = Depends(get_current_user)`. While `modules/approvals/router.py` checks role strings and `modules/security/router.py` has role checks, an unauthenticated client could call `/api/tasks/{task_id}/resolve` directly.
@@ -55,6 +58,7 @@ Defects and hardening items are prioritized into four standard enterprise tiers:
 - **Risk / Effort:** Low / 1.5 hours.
 
 #### DEF-04: Non-Deterministic Python `hash()` Used in Legacy `/api/releases/sign`
+
 - **Severity:** P1 (High)
 - **Component:** `backend/brandtrace/routes/api.py:182`
 - **Issue:** In `sign_release`, the audit stamp is calculated as:  
@@ -64,6 +68,7 @@ Defects and hardening items are prioritized into four standard enterprise tiers:
 - **Risk / Effort:** Low / 1.0 hour.
 
 #### DEF-05: Simulation Commit Task Persistence to MongoDB Atlas
+
 - **Severity:** P1 (High)
 - **Component:** `backend/brandtrace/routes/api.py:607-621`
 - **Issue:** When a brand manager commits a simulation via `POST /api/simulator/commit`, the engine creates `RevisionTask` objects in memory. If the backend process restarts before tasks are fetched, the tasks must persist in the MongoDB Atlas collection `revision_tasks`.
@@ -75,6 +80,7 @@ Defects and hardening items are prioritized into four standard enterprise tiers:
 ### P2: Important Usability & Integration Issues
 
 #### DEF-06: Production Frontend Domain Deployment Verification
+
 - **Severity:** P2 (Medium)
 - **Component:** Vercel Hosting / `vercel.json`
 - **Issue:** The designated production domain `https://brandtrace-ai.vercel.app` returns `404 Not Found DEPLOYMENT_NOT_FOUND` because the Vercel project needs to be triggered from the team's Vercel account. The Render backend is 100% live and operational at `https://brandtrace-backend.onrender.com/health`.
@@ -82,6 +88,7 @@ Defects and hardening items are prioritized into four standard enterprise tiers:
 - **Risk / Effort:** Low / 0.5 hours.
 
 #### DEF-07: Telemetry Badge for AI Provider State in UI Header
+
 - **Severity:** P2 (Medium)
 - **Component:** `frontend/src/components/AuthHeader.tsx`
 - **Issue:** When the platform runs in deterministic offline/fallback mode (if `GEMINI_API_KEY` is not present), the inspection engine functions perfectly and notes the fallback in the text, but the top header does not display an active "AI Mode: Gemini 1.5" vs "AI Mode: Deterministic Engine" status badge.
@@ -89,6 +96,7 @@ Defects and hardening items are prioritized into four standard enterprise tiers:
 - **Risk / Effort:** Low / 1.0 hour.
 
 #### DEF-08: Workspace Switching Context Synchronization
+
 - **Severity:** P2 (Medium)
 - **Component:** `frontend/src/App.tsx` & `AuthContext.tsx`
 - **Issue:** When switching brand workspaces between Aurelle, Apex, and Novus via the header dropdown, the UI updates local state, but does not update the JWT token claims if the user is registered under a different organization.
@@ -100,6 +108,7 @@ Defects and hardening items are prioritized into four standard enterprise tiers:
 ### P3: Cosmetic & Minor Issues
 
 #### DEF-09: Financial Liability Currency Symbol Localization
+
 - **Severity:** P3 (Low)
 - **Component:** `frontend/src/components/BlastRadiusSimulator.tsx`
 - **Issue:** The Digital Twin displays subscription prices in Indian Rupees (`₹499` / `₹599`) while projecting liability in US Dollars (`$320,000`).
@@ -107,6 +116,7 @@ Defects and hardening items are prioritized into four standard enterprise tiers:
 - **Risk / Effort:** Low / 0.5 hours.
 
 #### DEF-10: Cold-Start User Notification for Render Free Tier
+
 - **Severity:** P3 (Low)
 - **Component:** `frontend/src/components/LoginPage.tsx`
 - **Issue:** If the Render free tier backend has spun down due to 15 minutes of inactivity, the very first login request takes ~30 seconds to wake the service.
