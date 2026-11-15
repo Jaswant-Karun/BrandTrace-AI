@@ -1,15 +1,22 @@
 import pytest
 from fastapi.testclient import TestClient
 from brandtrace.main import app
-from brandtrace.core.security import create_jwt_token, UserRole
+from brandtrace.core.security import create_access_token, UserRole
 
 client = TestClient(app)
 
 def get_auth_headers(role: UserRole = UserRole.ADMIN, user_id: str = "USR-SARAH-01", org_id: str = "ORG-AURELLE"):
-    token = create_jwt_token(user_id=user_id, role=role, org_id=org_id)
+    token = create_access_token({
+        "sub": user_id,
+        "email": f"{user_id.lower()}@aurelle.com",
+        "role": role.value if hasattr(role, 'value') else role,
+        "org_id": org_id,
+        "workspace_id": "aurelle-tech",
+        "name": "Sarah Chen"
+    })
     return {
         "Authorization": f"Bearer {token}",
-        "X-Client-ID": f"phase9-test-{role.value}"
+        "X-Client-ID": f"phase9-test-{role.value if hasattr(role, 'value') else role}"
     }
 
 def test_phase9_module1_approved_fact_registration_and_listing():
