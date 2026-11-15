@@ -328,44 +328,94 @@ export const CreatorFactsLedger: React.FC<CreatorFactsLedgerProps> = ({
           ))}
         </div>
 
-        {/* Fact Cards 2-Column Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredFacts.map((fact) => (
-            <div
-              key={fact.id}
-              className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 space-y-3 hover:border-neutral-700 transition-colors shadow-lg flex flex-col justify-between"
-            >
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs font-bold text-neutral-300">
-                    {fact.code}
-                  </span>
-                  <span className="px-2 py-0.5 rounded text-[9.5px] font-mono font-bold bg-neutral-900 border border-neutral-800 text-neutral-400">
-                    PUBLIC
-                  </span>
+        {/* Fact Cards: Responsive Expandable Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4">
+          {filteredFacts.map((fact) => {
+            const isExpanded = expandedFactId === fact.id;
+            return (
+              <div
+                key={fact.id}
+                className="bg-neutral-950 border border-neutral-800 rounded-2xl p-4 sm:p-5 space-y-3 hover:border-neutral-700 transition-colors shadow-lg flex flex-col justify-between"
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono text-xs font-bold text-neutral-300">
+                      {fact.code}
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-2 py-0.5 rounded text-[9.5px] font-mono font-bold bg-neutral-900 border border-neutral-800 text-neutral-400">
+                        {fact.category || 'PUBLIC'}
+                      </span>
+                      <button
+                        onClick={() => setExpandedFactId(isExpanded ? null : fact.id)}
+                        className="text-neutral-500 hover:text-white p-1 rounded transition-colors cursor-pointer"
+                        title={isExpanded ? 'Collapse' : 'Expand details'}
+                      >
+                        {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <h4 className="text-sm font-sans font-bold text-white leading-snug break-words">
+                    {fact.title}
+                  </h4>
+
+                  <div className="text-[11px] font-mono text-neutral-500 leading-relaxed break-words">
+                    {fact.meta}
+                  </div>
                 </div>
 
-                <h4 className="text-sm font-sans font-bold text-white leading-snug">
-                  {fact.title}
-                </h4>
+                {/* Expandable Governance & Evidence Details on Mobile */}
+                <AnimatePresence>
+                  {isExpanded && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="pt-2 border-t border-neutral-800/80 space-y-2 text-xs font-mono"
+                    >
+                      <div className="p-2.5 rounded-xl bg-neutral-900/90 border border-neutral-800 text-[11px] space-y-1">
+                        <div className="text-neutral-400 text-[10px] uppercase font-semibold flex items-center gap-1 text-emerald-400">
+                          <ShieldCheck className="w-3.5 h-3.5" />
+                          <span>Certified Evidence Reference</span>
+                        </div>
+                        <div className="text-neutral-200">
+                          Evidence protocol certified by Brand & Regulatory Compliance.
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
-                <div className="text-[11px] font-mono text-neutral-500 leading-relaxed">
-                  {fact.meta}
-                </div>
+                {fact.approvedWording && (
+                  <div className="pt-2.5 border-t border-neutral-900 space-y-1.5">
+                    <div className="flex items-center justify-between text-[10px] font-mono text-indigo-400">
+                      <span>{fact.approvedWording.code}</span>
+                      <button
+                        onClick={() => handleCopyWording(fact.code, fact.approvedWording!.text)}
+                        className="flex items-center gap-1 text-neutral-400 hover:text-white cursor-pointer px-1.5 py-0.5 rounded bg-neutral-900 border border-neutral-800"
+                      >
+                        {copiedCode === fact.code ? (
+                          <>
+                            <Check className="w-3 h-3 text-emerald-400" />
+                            <span className="text-emerald-400 text-[9px]">Copied</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3" />
+                            <span className="text-[9px]">Copy phrase</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    <div className="text-xs font-mono text-neutral-300 italic break-words bg-neutral-900/60 p-2 rounded-lg border border-neutral-800/60">
+                      {fact.approvedWording.text}
+                    </div>
+                  </div>
+                )}
               </div>
-
-              {fact.approvedWording && (
-                <div className="pt-2 border-t border-neutral-900 space-y-1">
-                  <div className="text-[10px] font-mono text-indigo-400">
-                    {fact.approvedWording.code}
-                  </div>
-                  <div className="text-xs font-mono text-neutral-300 italic">
-                    {fact.approvedWording.text}
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
