@@ -130,11 +130,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onChange={(e) => setSelectedBrandId(e.target.value)}
               className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 font-medium focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 cursor-pointer shadow-2xs"
             >
-              {brands.map((b) => (
-                <option key={b.brand_id} value={b.brand_id}>
-                  {b.brand_name}
-                </option>
-              ))}
+              {brands.length > 0 ? (
+                brands.map((b) => (
+                  <option key={b.brand_id} value={b.brand_id}>
+                    {b.brand_name}
+                  </option>
+                ))
+              ) : (
+                <>
+                  <option value="aurelle-tech">Aurelle Technologies Inc.</option>
+                  <option value="apex-dynamics">Apex Dynamics</option>
+                  <option value="novus-health">Novus Health Solutions</option>
+                </>
+              )}
             </select>
             <div className="text-[10px] text-slate-500 mt-1 truncate">
               {currentBrand?.industry || 'Clean Mobility & Tech'}
