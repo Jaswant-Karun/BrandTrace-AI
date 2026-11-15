@@ -117,9 +117,13 @@ export const App: React.FC = () => {
       decision: result.governance_decision === 'APPROVED_FOR_RELEASE' ? 'APPROVED' : 'REVIEWED'
     };
 
+    const token = localStorage.getItem('brandtrace_jwt_token');
     const res = await fetch('/api/releases/sign', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      },
       body: JSON.stringify(payload)
     });
 

@@ -37,10 +37,14 @@ export const ApprovalCenterView: React.FC<ApprovalCenterViewProps> = ({ brandId 
   const handleResolve = async () => {
     if (!selectedTask) return;
     setIsResolving(true);
+    const token = localStorage.getItem('brandtrace_jwt_token');
     try {
       const res = await fetch(`/api/tasks/${selectedTask.task_id}/resolve`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({
           reviewer_name: reviewerName,
           decision: 'APPROVED',
