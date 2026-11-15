@@ -183,10 +183,29 @@ export const MultimodalInspectionView: React.FC<MultimodalInspectionViewProps> =
     <div className="space-y-6">
       {/* Standardized Enterprise Page Header */}
       <PageHeader
-        title="Multimodal & Creative Inspection"
-        description="Inspect multi-format marketing collateral (PDF, DOCX, TXT, MD, images), verify logo safe-zone clearances, and enforce WCAG AA accessibility contrast."
-        category="Creative Assurance"
-        workspaceName={brandId}
+        title="Multimodal Inspection"
+        description="Inspect uploaded visual assets, packaging, and creative collateral against design rules and contrast guidelines."
+        category="Intelligence"
+        workspaceName={brandId === 'aurelle-tech' ? 'Aurelle Technologies Inc.' : brandId}
+        breadcrumbs={[
+          { label: 'BrandTrace' },
+          { label: 'Intelligence' },
+          { label: 'Multimodal Inspection', active: true }
+        ]}
+        helpContext={{
+          summary: "Multimodal inspection parses uploaded marketing documents and analyzes visual design tokens to enforce accessibility, legal disclaimer legibility, and brand lockups.",
+          terms: [
+            { term: "WCAG 2.1 AA Contrast", definition: "Mandates minimum 4.5:1 text-to-background contrast ratio for statutory legibility." },
+            { term: "Mandatory Disclaimer Size", definition: "Enforces 8.0pt statutory minimum type size under FTC Dot Com Disclosures Standard." },
+            { term: "Logo Safe Zone", definition: "Guarantees 24px minimum clear-space padding surrounding master brand logos." },
+            { term: "File Whitelist", definition: "Permits PDF, DOCX, TXT, MD, PNG, JPG, and MP4/MOV up to 25MB with malware extension screening." }
+          ]
+        }}
+        primaryAction={{
+          label: "View Campaign Intelligence",
+          onClick: () => onNavigate && onNavigate('campaigns'),
+          icon: <Sparkles className="w-3.5 h-3.5" />
+        }}
       />
 
       {/* Tab Switcher & Modes */}
@@ -643,6 +662,16 @@ export const MultimodalInspectionView: React.FC<MultimodalInspectionViewProps> =
           </div>
         </div>
       )}
+
+      {/* Workflow Banner: Next Step in Governance Journey */}
+      <WorkflowBanner
+        currentStage="Multimodal Inspection"
+        nextStageTitle="Campaign Intelligence"
+        nextStageDescription="Track how inspected assets, social ads, and banners are organized into active marketing campaigns across your enterprise."
+        nextStageActionLabel="Go to Campaign Intelligence"
+        onNavigateNext={() => onNavigate && onNavigate('campaigns')}
+        governanceHint="Visual tokens and disclaimer legibility compliance records are linked to the asset's permanent audit record."
+      />
     </div>
   );
 };

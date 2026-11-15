@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { ShieldCheck, Scale } from 'lucide-react';
 import { PageHeader } from './ui/PageHeader';
+import { WorkflowBanner } from './ui/WorkflowBanner';
+import { Flame } from 'lucide-react';
 
 interface RiskIntelligenceViewProps {
   brandId: string;
+  onNavigate?: (tab: any) => void;
 }
 
-export const RiskIntelligenceView: React.FC<RiskIntelligenceViewProps> = ({ brandId }) => {
+export const RiskIntelligenceView: React.FC<RiskIntelligenceViewProps> = ({ brandId, onNavigate }) => {
   const [riskData, setRiskData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -28,10 +31,28 @@ export const RiskIntelligenceView: React.FC<RiskIntelligenceViewProps> = ({ bran
     <div className="space-y-6">
       {/* Standardized Enterprise Page Header */}
       <PageHeader
-        title="Enterprise Risk Intelligence & Taxonomy"
-        description="Categorized statutory liabilities, FTC claim substantiation doctrine, FDA wellness standards, and institutional risk rankings."
-        category="Risk Taxonomy"
-        workspaceName={brandId}
+        title="Risk Intelligence"
+        description="Monitor enterprise brand compliance risks, prohibited claim taxonomies, and statutory exposure."
+        category="Intelligence"
+        workspaceName={brandId === 'aurelle-tech' ? 'Aurelle Technologies Inc.' : brandId}
+        breadcrumbs={[
+          { label: 'BrandTrace' },
+          { label: 'Intelligence' },
+          { label: 'Risk Intelligence', active: true }
+        ]}
+        helpContext={{
+          summary: "Risk Intelligence catalogs active exposure vectors across environmental marketing, comparative advertising, and medical device classification, informing multi-agent inspection policies.",
+          terms: [
+            { term: "FTC Green Guides (16 CFR §260)", definition: "Strictly bans unverified carbon neutral and 100% eco-friendly assertions." },
+            { term: "FDA Fair Balance (21 CFR §202.1)", definition: "Mandates equal prominence of risk disclosures alongside clinical efficacy statements." },
+            { term: "NHTSA SGO 2021-01", definition: "Prohibits marketing SAE Level 2 driver assistance systems as 'fully autonomous' or 'hands-free without looking'." }
+          ]
+        }}
+        primaryAction={{
+          label: "Simulate Policy Mutation",
+          onClick: () => onNavigate && onNavigate('impact-simulator'),
+          icon: <Flame className="w-3.5 h-3.5 text-amber-400" />
+        }}
       >
         <div className="flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200 text-xs font-mono text-emerald-800">
           <ShieldCheck className="w-4 h-4 text-emerald-600" />
@@ -110,6 +131,16 @@ export const RiskIntelligenceView: React.FC<RiskIntelligenceViewProps> = ({ bran
           </div>
         </div>
       )}
+
+      {/* Workflow Banner: Next Step in Governance Journey */}
+      <WorkflowBanner
+        currentStage="Risk Intelligence"
+        nextStageTitle="Change Impact Simulator"
+        nextStageDescription="Test how mutating risk rules or changing product pricing ripples across dependent assets in an isolated virtual DAG sandbox."
+        nextStageActionLabel="Go to Change Impact Simulator"
+        onNavigateNext={() => onNavigate && onNavigate('impact-simulator')}
+        governanceHint="Policy conflicts and regulatory contradictions are intercepted before any changes are committed."
+      />
     </div>
   );
 };

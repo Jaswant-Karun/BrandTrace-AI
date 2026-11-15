@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import {
   ShieldCheck, ArrowRight, TrendingUp,
-  Lock, Sparkles, Layers,
-  BookOpen, GitFork, Flame, CheckSquare, CheckCircle2,
-  Clock, AlertTriangle, RefreshCw
+  Lock, Sparkles, CheckCircle2,
+  BookOpen, GitFork, Flame, CheckSquare,
+  Clock
 } from 'lucide-react';
 import { NavigationTab } from './Sidebar';
-import { useAuth } from '../context/AuthContext';
 import { PageHeader } from './ui/PageHeader';
 import { WorkflowBanner } from './ui/WorkflowBanner';
 import { Badge } from './ui/Badge';
@@ -23,25 +22,20 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   onNavigate,
   onStartTour
 }) => {
-  const { user } = useAuth();
   const [analytics, setAnalytics] = useState<any>(null);
   const [releases, setReleases] = useState<any[]>([]);
   const [tasks, setTasks] = useState<any[]>([]);
   const [facts, setFacts] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
-  const [risks, setRisks] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const loadDashboardData = async () => {
-    setIsLoading(true);
     try {
-      const [analyticsRes, releasesRes, tasksRes, factsRes, eventsRes, risksRes] = await Promise.all([
+      const [analyticsRes, releasesRes, tasksRes, factsRes, eventsRes] = await Promise.all([
         fetch(`/api/analytics/governance?brand_id=${brandId}`).then((r) => r.ok ? r.json() : null),
         fetch(`/api/releases?brand_id=${brandId}`).then((r) => r.ok ? r.json() : []),
         fetch(`/api/tasks`).then((r) => r.ok ? r.json() : []),
         fetch(`/api/facts?brand_id=${brandId}`).then((r) => r.ok ? r.json() : []),
         fetch(`/api/collaboration/events?limit=5`).then((r) => r.ok ? r.json() : []),
-        fetch(`/api/risks/taxonomy?brand_id=${brandId}`).then((r) => r.ok ? r.json() : null),
       ]);
 
       setAnalytics(analyticsRes);
@@ -49,11 +43,8 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       setTasks(tasksRes || []);
       setFacts(factsRes || []);
       setEvents(eventsRes || []);
-      setRisks(risksRes);
     } catch (err) {
       console.error('Failed to load dashboard data:', err);
-    } finally {
-      setIsLoading(false);
     }
   };
 

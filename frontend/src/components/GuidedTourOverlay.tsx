@@ -1,6 +1,8 @@
 import React from 'react';
-import { ArrowRight, ArrowLeft, X } from 'lucide-react';
+import { ArrowRight, ArrowLeft, X, Sparkles, CheckCircle2 } from 'lucide-react';
 import { NavigationTab } from './Sidebar';
+import { Button } from './ui/Button';
+import { Badge } from './ui/Badge';
 
 export interface TourStep {
   tab: NavigationTab;
@@ -9,72 +11,81 @@ export interface TourStep {
   description: string;
   actionText: string;
   badge: string;
+  highlightTip?: string;
 }
 
 const TOUR_STEPS: TourStep[] = [
   {
     tab: 'command-center',
-    title: 'Executive Command Center',
+    title: '1. Welcome to BrandTrace AI',
     category: 'Overview',
-    description: 'High-level operational control plane aggregating real-time compliance health, governed touchpoints, sealed releases, and quick actions.',
-    actionText: 'Next: Explore Knowledge Base',
-    badge: 'Step 1 of 8'
+    description: 'Welcome to BrandTrace AI — the autonomous brand intelligence & governance control plane. Every brand decision connected. Every risk traceable. Every release accountable.',
+    actionText: 'Next: Product Promise in Plain Language',
+    badge: 'Step 1 of 8',
+    highlightTip: 'Your governance workspace at a glance: real-time compliance index, sealed release counts, and pending approvals.'
+  },
+  {
+    tab: 'command-center',
+    title: '2. Product Promise in Plain Language',
+    category: 'Core Value',
+    description: 'Know what your brand allows. Detect what your content risks. Understand the impact of changes. Approve with evidence. Preserve an auditable record.',
+    actionText: 'Next: Meet Aurelle Workspace',
+    badge: 'Step 2 of 8',
+    highlightTip: 'Eliminates siloed brand books, accidental price leaks, greenwashing lawsuits, and unverified marketing claims.'
+  },
+  {
+    tab: 'command-center',
+    title: '3. Introduce the AURELLE Demo Workspace',
+    category: 'Showcase Workspace',
+    description: 'Aurelle Technologies Inc. is pre-loaded as your live demonstration workspace. It features next-generation spatial computing hardware, proprietary audio patents, and subscription pricing.',
+    actionText: 'Next: View Approved Brand Facts',
+    badge: 'Step 3 of 8',
+    highlightTip: 'You can switch between Aurelle Technologies, Apex Dynamics, and Novus Health Solutions in the sidebar.'
   },
   {
     tab: 'knowledge-base',
-    title: 'Brand Knowledge Base & Truth-Set',
-    category: 'Certified Truth-Set',
-    description: 'The single source of truth for your brand. Contains approved facts (such as the Aurelle Cloud Studio price at ₹499), guidelines, and verified citations.',
-    actionText: 'Next: Test Content Studio',
-    badge: 'Step 2 of 8'
+    title: '4. Where Approved Brand Facts Are Stored',
+    category: 'Brand Knowledge',
+    description: 'Manage the approved facts, rules and guidelines that your organisation uses. Notice FACT-AUR-PRC-01: Aurelle Cloud Studio is officially certified at ₹499/mo.',
+    actionText: 'Next: Inspect Content Sample',
+    badge: 'Step 4 of 8',
+    highlightTip: 'Every marketing claim evaluated by BrandTrace is grounded against these immutable truth nodes.'
   },
   {
     tab: 'content-studio',
-    title: 'Content Studio & Multi-Agent Inspection',
-    category: 'Intelligence & Verification',
-    description: 'Inspects marketing copy, social ads, and decks in real time using 4 autonomous agents. Identifies unsupported claims and provides token-level rewrites.',
-    actionText: 'Next: View Dependency Graph',
-    badge: 'Step 3 of 8'
+    title: '5. Inspect Marketing Content in Real-Time',
+    category: 'Content Intelligence',
+    description: 'Check content against your approved brand knowledge. Select a preset scenario and run 3 concurrent agent pipelines (Voice, Claim, Regulatory) in under 800ms.',
+    actionText: 'Next: Review Findings & Citations',
+    badge: 'Step 5 of 8',
+    highlightTip: 'Paste any draft copy or select the Aurelle ₹499 ad preset to execute immediate multi-agent scanning.'
   },
   {
-    tab: 'bdig',
-    title: 'Brand Dependency Intelligence Graph (BDIG)',
-    category: 'Knowledge Graph',
-    description: 'Interactive MongoDB-backed graph mapping how brand guidelines, approved facts, campaigns, and content assets are structurally interconnected.',
-    actionText: 'Next: Simulate Change Impact',
-    badge: 'Step 4 of 8'
+    tab: 'content-studio',
+    title: '6. Review Evidence-Linked Findings & Rewrites',
+    category: 'Explainable AI',
+    description: 'Inspect token-level defect highlights with exact statutory citations (FTC 16 CFR §260.4, FDA §870, Lanham Act). Apply 1-click reverse-offset remediation without syntax errors.',
+    actionText: 'Next: Change Impact Simulator',
+    badge: 'Step 6 of 8',
+    highlightTip: 'Reverse-offset replacement swaps text from right to left, preserving character indices and surrounding brand voice.'
   },
   {
     tab: 'impact-simulator',
-    title: 'Change Impact Simulator (Digital Twin)',
+    title: '7. The Change Impact Simulator (Digital Twin)',
     category: 'Predictive Governance',
-    description: 'Preview the blast radius of proposed brand mutations (e.g. ₹499 → ₹599) across live campaigns and assets without modifying production records.',
-    actionText: 'Next: Check Risk Intelligence',
-    badge: 'Step 5 of 8'
-  },
-  {
-    tab: 'risks',
-    title: 'Enterprise Risk Intelligence & Taxonomy',
-    category: 'Regulatory Assurance',
-    description: 'Categorizes institutional risk exposure across statutory frameworks: FTC claim substantiation, FDA medical claims, Lanham Act trademarks, and WCAG.',
-    actionText: 'Next: Review Approval Center',
-    badge: 'Step 6 of 8'
-  },
-  {
-    tab: 'approvals',
-    title: 'Governance Approval Center',
-    category: 'Human-in-the-Loop',
-    description: 'Enforces human authorization on revision tasks generated by fact mutations and automated scans. Reviewers inspect evidence and approve releases.',
-    actionText: 'Next: Inspect Audit Ledger',
-    badge: 'Step 7 of 8'
+    description: 'Preview which content may be affected before changing approved brand knowledge. Simulate mutating Cloud Studio price from ₹499 to ₹599 in an isolated virtual DAG before production commit.',
+    actionText: 'Next: Approval & Audit Ledger',
+    badge: 'Step 7 of 8',
+    highlightTip: 'Simulating ₹499 ➔ ₹599 identifies 4 affected touchpoints and $320,000 in unbudgeted exposure before human sign-off.'
   },
   {
     tab: 'audit-trust',
-    title: 'Trust & Audit Ledger',
-    category: 'Cryptographic Assurance',
-    description: 'Immutable record of approved releases with SHA-256 cryptographic proof digests. Use the interactive 5-state verifier to test for tampering or revocation.',
-    actionText: 'Finish Guided Tour',
-    badge: 'Step 8 of 8'
+    title: '8. Human Approval & Cryptographic Trust Ledger',
+    category: 'Assurance & Ledger',
+    description: 'Conduct authorized human-in-the-loop sign-off in the Approval Center. Releases are sealed with deterministic SHA-256 Merkle digests and verified across 5 integrity states.',
+    actionText: 'Finish Onboarding Tour',
+    badge: 'Step 8 of 8',
+    highlightTip: 'Test the 5-state integrity verifier on AST-AUR-01 to see authentic, modified, superseded, or revoked states.'
   }
 ];
 
@@ -101,46 +112,50 @@ export const GuidedTourOverlay: React.FC<GuidedTourOverlayProps> = ({
     if (isLast) {
       onClose();
     } else {
-      const nextIndex = currentStepIndex + 1;
-      onStepChange(nextIndex, TOUR_STEPS[nextIndex].tab);
+      const nextIdx = currentStepIndex + 1;
+      onStepChange(nextIdx, TOUR_STEPS[nextIdx].tab);
     }
   };
 
   const handlePrev = () => {
     if (!isFirst) {
-      const prevIndex = currentStepIndex - 1;
-      onStepChange(prevIndex, TOUR_STEPS[prevIndex].tab);
+      const prevIdx = currentStepIndex - 1;
+      onStepChange(prevIdx, TOUR_STEPS[prevIdx].tab);
     }
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 max-w-md w-full animate-in fade-in slide-in-from-bottom-4 duration-200">
-      <div className="bg-white border-2 border-slate-900 rounded-2xl p-6 shadow-2xl space-y-4">
-        {/* Top Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+    <div className="fixed inset-0 z-50 pointer-events-none flex flex-col justify-end p-4 sm:p-6 md:justify-center md:items-center">
+      {/* Light Backdrop */}
+      <div
+        className="fixed inset-0 bg-slate-900/30 backdrop-blur-2xs pointer-events-auto"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      {/* Floating Guided Tour Card */}
+      <div className="relative pointer-events-auto w-full max-w-xl bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl space-y-4 z-10 animate-in fade-in zoom-in-95 duration-150">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-900 text-white px-2 py-0.5 rounded">
-              Interactive Guided Tour
+            <Badge variant="brand" size="sm">
+              {step.badge}
+            </Badge>
+            <span className="text-[11px] font-mono font-medium text-slate-500">
+              {step.category}
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-mono text-slate-500 font-semibold">{step.badge}</span>
-            <button
-              onClick={onClose}
-              className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-              title="Close Tour"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
+
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+            title="Skip and close onboarding tour"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
-        {/* Content */}
         <div className="space-y-1.5">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-            {step.category}
-          </span>
           <h3 className="text-base font-bold text-slate-900 tracking-tight">
             {step.title}
           </h3>
@@ -149,32 +164,57 @@ export const GuidedTourOverlay: React.FC<GuidedTourOverlayProps> = ({
           </p>
         </div>
 
-        {/* Progress Bar */}
-        <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-          <div
-            className="bg-slate-900 h-full transition-all duration-300 rounded-full"
-            style={{ width: `${((currentStepIndex + 1) / TOUR_STEPS.length) * 100}%` }}
-          />
+        {step.highlightTip && (
+          <div className="p-3 rounded-xl bg-sky-50/70 border border-sky-200 text-xs text-sky-950 flex items-start gap-2">
+            <Sparkles className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
+            <span className="leading-snug">{step.highlightTip}</span>
+          </div>
+        )}
+
+        {/* Navigation Step Indicators */}
+        <div className="flex items-center justify-center gap-1.5 py-1">
+          {TOUR_STEPS.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => onStepChange(i, TOUR_STEPS[i].tab)}
+              className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                i === currentStepIndex ? 'w-6 bg-slate-900' : 'w-2 bg-slate-200 hover:bg-slate-300'
+              }`}
+              title={`Jump to step ${i + 1}`}
+            />
+          ))}
         </div>
 
-        {/* Navigation Buttons */}
-        <div className="flex items-center justify-between pt-1">
+        <div className="flex items-center justify-between pt-2 border-t border-slate-100">
           <button
-            onClick={handlePrev}
-            disabled={isFirst}
-            className="px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 disabled:opacity-30 disabled:hover:text-slate-600 transition-colors flex items-center gap-1 cursor-pointer disabled:cursor-not-allowed"
+            onClick={onClose}
+            className="text-xs font-medium text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Previous</span>
+            Skip Tour
           </button>
 
-          <button
-            onClick={handleNext}
-            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
-          >
-            <span>{isLast ? 'Complete Tour' : step.actionText}</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
+          <div className="flex items-center gap-2">
+            {!isFirst && (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handlePrev}
+                icon={<ArrowLeft className="w-3.5 h-3.5" />}
+              >
+                Back
+              </Button>
+            )}
+
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleNext}
+              icon={isLast ? <CheckCircle2 className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
+              iconPosition="right"
+            >
+              {step.actionText}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
