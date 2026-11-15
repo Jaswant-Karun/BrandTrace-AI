@@ -285,6 +285,8 @@ class BrandDependencyIntelligenceEngine:
             return False, f"Task {task_id} not found.", None
 
         task = self.revision_tasks[task_id]
+        if task.status in ["APPROVED_SEALED", "REJECTED"]:
+            return False, f"Task {task_id} is already resolved with status {task.status}.", task
         t_now = int(time.time())
         t_iso = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(t_now))
 
