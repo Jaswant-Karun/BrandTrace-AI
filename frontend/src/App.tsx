@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
+import { DependencyIntelligenceStudio } from './components/DependencyIntelligenceStudio';
 import { AssetInspector } from './components/AssetInspector';
 import { KnowledgeGraphView } from './components/KnowledgeGraphView';
 import { BlastRadiusSimulator } from './components/BlastRadiusSimulator';
 import { ReleaseLedgerView } from './components/ReleaseLedgerView';
 import { DatabaseStatusModal } from './components/DatabaseStatusModal';
 import { BrandProfile, DatabaseStatus, VerificationResult } from './types';
-import { ShieldCheck, Network, Activity, Layers } from 'lucide-react';
+import { ShieldCheck, Network, Activity, Layers, GitFork } from 'lucide-react';
 
 export const App: React.FC = () => {
-  const [currentTab, setCurrentTab] = useState<string>('inspector');
+  const [currentTab, setCurrentTab] = useState<string>('bdig');
   const [brands, setBrands] = useState<BrandProfile[]>([]);
   const [selectedBrandId, setSelectedBrandId] = useState<string>('apex-dynamics');
   const [dbStatus, setDbStatus] = useState<DatabaseStatus | null>(null);
@@ -148,6 +149,10 @@ export const App: React.FC = () => {
         </div>
 
         {/* Tab Views */}
+        {currentTab === 'bdig' && (
+          <DependencyIntelligenceStudio brandId={selectedBrandId} />
+        )}
+
         {currentTab === 'inspector' && (
           <AssetInspector
             brandId={selectedBrandId}
