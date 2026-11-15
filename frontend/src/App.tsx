@@ -56,7 +56,7 @@ const ViewLoadingFallback: React.FC = () => (
 );
 
 export const App: React.FC = () => {
-  const { user, currentWorkspace, setWorkspace } = useAuth();
+  const { currentWorkspace, setWorkspace } = useAuth();
 
   const [viewMode, setViewMode] = useState<
     | 'landing'
@@ -156,71 +156,12 @@ export const App: React.FC = () => {
     }
   };
 
-  // Immediate role-based redirection upon successful authentication
-  const handleLoginSuccess = (authenticatedUser?: UserPersona) => {
+  // User Requirement: When user logs in, the next view MUST go to the Landing Page only
+  const handleLoginSuccess = (_authenticatedUser?: UserPersona) => {
     setJustLoggedIn(true);
-    const currentUser = authenticatedUser || user;
-    if (!currentUser) {
-      setViewMode('landing');
-      if (typeof window !== 'undefined') {
-        window.history.pushState({}, '', '/');
-      }
-      return;
-    }
-
-    const role = currentUser.role;
-    const email = (currentUser.email || '').toLowerCase();
-    const name = (currentUser.name || '').toLowerCase();
-
-    // 1. Outside Agency Creator routing (e.g., sana@aurelle.com)
-    if (email.includes('sana') || email.includes('agency') || name.includes('agency')) {
-      setViewMode('agency-dashboard');
-      if (typeof window !== 'undefined') {
-        window.history.pushState({ view: 'agency-dashboard' }, '', '/dashboard/agency');
-      }
-      return;
-    }
-
-    // 2. Creator routing
-    if (role === 'CREATOR') {
-      setViewMode('creator-dashboard');
-      if (typeof window !== 'undefined') {
-        window.history.pushState({ view: 'creator-dashboard' }, '', '/creator/check');
-      }
-      return;
-    }
-
-    // 3. Reviewer routing
-    if (role === 'REVIEWER') {
-      setViewMode('reviewer-dashboard');
-      if (typeof window !== 'undefined') {
-        window.history.pushState({ view: 'reviewer-dashboard' }, '', '/dashboard/reviewer');
-      }
-      return;
-    }
-
-    // 4. Compliance Reviewer routing
-    if (role === 'COMPLIANCE_REVIEWER') {
-      setViewMode('compliance-dashboard');
-      if (typeof window !== 'undefined') {
-        window.history.pushState({ view: 'compliance-dashboard' }, '', '/dashboard/compliance');
-      }
-      return;
-    }
-
-    // 5. Brand Owner / Brand Manager / Admin routing
-    if (role === 'BRAND_MANAGER' || role === 'ADMIN') {
-      setViewMode('brand-owner-dashboard');
-      if (typeof window !== 'undefined') {
-        window.history.pushState({ view: 'brand-owner-dashboard' }, '', '/dashboard/brand-owner');
-      }
-      return;
-    }
-
-    // Fallback: Landing Page
     setViewMode('landing');
     if (typeof window !== 'undefined') {
-      window.history.pushState({}, '', '/');
+      window.history.pushState({ view: 'landing' }, '', '/');
     }
   };
 
