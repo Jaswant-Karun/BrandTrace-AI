@@ -5,7 +5,7 @@ import {
   CheckCircle2, ChevronRight,
   Network, RotateCcw,
   FileText, Globe, Cpu,
-  AlertCircle, X, Menu,
+  X, Menu,
   Hash, Sliders
 } from 'lucide-react';
 import { ThemeToggle } from './ui/ThemeToggle';
@@ -287,7 +287,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-start pt-1 sm:pt-2">
             
             {/* Left Column: Bold Editorial Typography & CTA */}
-            <div className="lg:col-span-7 space-y-6 text-left">
+            <div className="lg:col-span-5 space-y-6 text-left">
               
               <div className="space-y-3 select-none">
                 
@@ -433,117 +433,199 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             </div>
 
-            {/* Right Column: Visual Product Inspection Mockup Card (Inspired by reference) */}
-            <div className="lg:col-span-5 relative">
-              {/* Plumb Bob Motif hanging along the left edge of the card, matching Plumbline reference composition */}
+            {/* Right Column: Visual Book Document & Floating Issues with Animated Seal (Exact Image 1 Design) */}
+            <div className="lg:col-span-7 relative">
+              {/* Plumb Bob Motif hanging along the left edge */}
               <div className="hidden lg:block absolute -top-8 -left-5 pointer-events-none select-none z-20">
-                <PlumbBob stringLength={150} />
+                <PlumbBob stringLength={140} />
               </div>
 
-              <div className="relative rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden p-5 sm:p-6 space-y-4">
+              {/* Composition Container with subtle dark blueprint / glow background */}
+              <div className="relative p-2.5 sm:p-5 rounded-3xl bg-slate-900/60 dark:bg-slate-950/70 border border-slate-800/80 shadow-2xl backdrop-blur-md overflow-visible">
                 
-                {/* Header bar of visual card */}
-                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
-                      Live Gate Inspection
-                    </span>
-                  </div>
-                  <span className="text-[10px] font-mono text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded">
-                    Latency: 182ms
-                  </span>
-                </div>
+                {/* Background ambient lighting */}
+                <div className="absolute top-1/4 right-1/4 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute bottom-10 left-10 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
-                {/* Realistic Product Packaging Inspection Header */}
-                <div className="flex items-center gap-3 p-2.5 bg-gradient-to-r from-emerald-50/70 via-slate-50 to-indigo-50/40 dark:from-emerald-950/30 dark:via-slate-800/60 dark:to-indigo-950/30 rounded-xl border border-slate-200 dark:border-slate-700/80">
-                  <img
-                    src="/images/product_aurelle_serum.jpg"
-                    alt="Aurelle Cellular Renewal Serum Packaging"
-                    className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shrink-0 shadow-xs"
-                  />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-700 dark:text-emerald-400 font-bold truncate">
-                        Aurelle Active SKU · Multimodal Gate
-                      </span>
-                    </div>
-                    <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
-                      Cellular Renewal Serum · 50ml
-                    </h4>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400 font-mono truncate">
-                      Grounded Claim: FACT-014 (32% reduction / 8 wks)
-                    </p>
-                  </div>
-                </div>
+                <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-5 items-start">
+                  
+                  {/* Left Sheet: Main UI Book Document Sheet */}
+                  <div className="md:col-span-7 bg-white text-slate-900 rounded-2xl p-5 sm:p-6 shadow-2xl border border-slate-100 relative overflow-hidden flex flex-col justify-between min-h-[350px]">
+                    
+                    {/* Orange Vertical Accent Margin Line (as shown in reference image) */}
+                    <div className="absolute top-5 left-0 w-1 sm:w-1.5 h-10 bg-amber-500 rounded-r" />
 
-                {/* Simulated Marketing Asset Card with strike-throughs & verified replacements */}
-                <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-4 space-y-3">
-                  <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-mono">
-                    <span>ASSET: AST-AUR-01</span>
-                    <span>CHANNEL: SOCIAL &amp; WEB ADS</span>
-                  </div>
-
-                  <div className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed font-sans space-y-2">
-                    <p>
-                      "Experience the revolutionary{' '}
-                      <span className="line-through decoration-rose-500 decoration-2 text-rose-700 dark:text-rose-400 font-semibold bg-rose-50 dark:bg-rose-950/40 px-1 rounded">
-                        Horizun Watch
-                      </span>{' '}
-                      with{' '}
-                      <span className="underline decoration-indigo-500 font-semibold text-indigo-900 dark:text-indigo-300">
-                        QuantumAcoustics™
-                      </span>{' '}
-                      spatial sound streaming."
-                    </p>
-
-                    <p>
-                      "Cloud Studio subscription is{' '}
-                      <span className="font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-1 rounded">
-                        ₹499/mo
-                      </span>{' '}
-                      with verified{' '}
-                      <span className="font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-1 rounded">
-                        72-hour battery life
-                      </span>."
-                    </p>
-                  </div>
-
-                  {/* Findings Breakdown Badges */}
-                  <div className="pt-2 border-t border-slate-200/60 dark:border-slate-700/60 space-y-2">
-                    <div className="flex items-start gap-2 text-[11px] text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/50 p-2 rounded-lg border border-rose-200 dark:border-rose-900/50">
-                      <AlertCircle className="w-3.5 h-3.5 text-rose-600 shrink-0 mt-0.5" />
-                      <span>
-                        <strong>VOICE REVISION:</strong> Correct typographical error <code className="font-mono">Horizun</code> &rarr; <code className="font-mono font-bold">Horizon</code>.
-                      </span>
-                    </div>
-
-                    <div className="flex items-start gap-2 text-[11px] text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 p-2 rounded-lg border border-emerald-200 dark:border-emerald-900/50">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                      <span>
-                        <strong>SUBSTANTIATED:</strong> Price ₹499/mo verified against master fact <code className="font-mono font-bold">FACT-AUR-PRC-01</code>.
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Cryptographic Seal Proof Bar */}
-                <div className="flex items-center justify-between p-3 bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/60 rounded-xl text-xs">
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-indigo-700 dark:text-indigo-400 shrink-0" />
                     <div>
-                      <span className="font-mono font-bold text-indigo-950 dark:text-indigo-200 text-[11px] block">
-                        BT-SEAL-8F3A2B1C
-                      </span>
-                      <span className="text-[10px] text-slate-500 dark:text-slate-400">
-                        Tamper-Evident Cryptographic Seal
-                      </span>
+                      {/* Top Metadata Row */}
+                      <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-slate-100 text-xs pl-2">
+                        <span className="font-sans font-semibold text-slate-600 tracking-tight text-[11px] sm:text-xs">
+                          Diwali savings post · Instagram
+                        </span>
+                        <span className="font-sans font-semibold text-slate-400 text-[11px] sm:text-xs">
+                          3 of 12 issues shown
+                        </span>
+                      </div>
+
+                      {/* Editorial Body Copy with Numbered Badges & Underlines matching reference book design */}
+                      <div className="pt-4 pl-2 font-serif text-base sm:text-[17px] text-slate-900 leading-[1.8] sm:leading-[1.85] selection:bg-amber-100">
+                        <p>
+                          Diwali just got brighter. Velora Money is{' '}
+                          <span className="relative inline">
+                            <span className="underline decoration-[#e11d48] decoration-2 underline-offset-4 font-normal">
+                              the best in India
+                            </span>
+                            <span className="inline-flex items-center justify-center w-4 h-4 ml-1 -mt-2 text-[10px] font-sans font-bold text-white bg-[#e11d48] rounded-full shadow-xs">
+                              1
+                            </span>
+                          </span>{' '}
+                          for savings. Our Velora Pro plan is now just{' '}
+                          <span className="relative inline">
+                            <span className="underline decoration-[#e11d48] decoration-2 underline-offset-4 font-normal">
+                              ₹399
+                            </span>
+                            <span className="inline-flex items-center justify-center w-4 h-4 ml-1 -mt-2 text-[10px] font-sans font-bold text-white bg-[#e11d48] rounded-full shadow-xs">
+                              2
+                            </span>
+                          </span>{' '}
+                          a month.{' '}
+                          <span className="relative inline">
+                            <span className="underline decoration-[#d97706] decoration-2 underline-offset-4 font-normal">
+                              Act now, this offer won't last
+                            </span>
+                            <span className="inline-flex items-center justify-center w-4 h-4 ml-1 -mt-2 text-[10px] font-sans font-bold text-white bg-[#d97706] rounded-full shadow-xs">
+                              3
+                            </span>
+                          </span>
+                          .
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Document footer meta */}
+                    <div className="pt-4 pl-2 mt-4 border-t border-slate-100 flex items-center justify-between text-[10px] font-mono text-slate-400">
+                      <span>DOC-VER-2026</span>
+                      <span>VLM VERIFIED</span>
                     </div>
                   </div>
-                  <span className="px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500 text-white rounded-full">
-                    APPROVED
-                  </span>
+
+                  {/* Right Side: 3 Stacked Floating Issue Cards */}
+                  <div className="md:col-span-5 space-y-3 relative">
+                    
+                    {/* Dotted connecting line behind cards */}
+                    <div className="hidden md:block absolute -left-3 top-8 bottom-8 border-l border-dashed border-slate-700/60 pointer-events-none" />
+
+                    {/* Issue Card 1 */}
+                    <div className="bg-white rounded-2xl p-3.5 sm:p-4 shadow-xl border border-slate-100 relative">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-[#e11d48] text-white font-bold text-xs flex items-center justify-center shrink-0">
+                          1
+                        </span>
+                        <h4 className="font-bold text-slate-900 text-xs sm:text-sm font-sans tracking-tight">
+                          Unproven superlative
+                        </h4>
+                      </div>
+                      <div className="text-[11px] text-slate-500 font-sans pl-7 mt-0.5">
+                        R-03 · rule engine
+                      </div>
+                      <div className="pl-7 flex items-center gap-2 flex-wrap pt-2">
+                        <span className="px-2 py-0.5 rounded bg-rose-50 text-rose-600 line-through text-[11px] font-mono font-medium">
+                          the best in India
+                        </span>
+                        <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[11px] font-mono font-bold">
+                          trusted
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Issue Card 2 */}
+                    <div className="bg-white rounded-2xl p-3.5 sm:p-4 shadow-xl border border-slate-100 relative">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-[#e11d48] text-white font-bold text-xs flex items-center justify-center shrink-0">
+                          2
+                        </span>
+                        <h4 className="font-bold text-slate-900 text-xs sm:text-sm font-sans tracking-tight">
+                          Wrong price
+                        </h4>
+                      </div>
+                      <div className="text-[11px] text-slate-500 font-sans pl-7 mt-0.5">
+                        F-01 says ₹499 · pricing sheet
+                      </div>
+                      <div className="pl-7 flex items-center gap-2 flex-wrap pt-2">
+                        <span className="px-2 py-0.5 rounded bg-rose-50 text-rose-600 line-through text-[11px] font-mono font-medium">
+                          ₹399
+                        </span>
+                        <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[11px] font-mono font-bold">
+                          ₹499
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Issue Card 3 */}
+                    <div className="bg-white rounded-2xl p-3.5 sm:p-4 shadow-xl border border-slate-100 relative">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-[#d97706] text-white font-bold text-xs flex items-center justify-center shrink-0">
+                          3
+                        </span>
+                        <h4 className="font-bold text-slate-900 text-xs sm:text-sm font-sans tracking-tight">
+                          Pressure tactic
+                        </h4>
+                      </div>
+                      <div className="text-[11px] text-slate-500 font-sans pl-7 mt-0.5">
+                        R-12 · AI review
+                      </div>
+                      <div className="pl-7 flex items-center gap-2 flex-wrap pt-2">
+                        <span className="px-2 py-0.5 rounded bg-rose-50 text-rose-600 line-through text-[11px] font-mono font-medium">
+                          Act now, this offer won't last
+                        </span>
+                        <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[11px] font-mono font-bold">
+                          The offer runs until Sunday
+                        </span>
+                      </div>
+                    </div>
+
+                  </div>
+
+                </div>
+
+                {/* Animated Circular Stamp Seal ("APPROVED VLM-SEALED") */}
+                {/* Positioned overlapping between the main document sheet and card 3 */}
+                <div className="relative md:absolute md:bottom-2 md:left-[52%] lg:left-[55%] -translate-x-1/2 mt-4 md:mt-0 flex justify-center z-30 pointer-events-none">
+                  <motion.div
+                    key={`stamp-seal-${motionStep}`}
+                    initial={{ scale: shouldAnimate ? 2.5 : 1, opacity: shouldAnimate ? 0 : 1, rotate: shouldAnimate ? -28 : -14 }}
+                    animate={{ scale: 1, opacity: 1, rotate: -14 }}
+                    transition={{
+                      delay: shouldAnimate ? 1.6 : 0,
+                      duration: 0.45,
+                      type: 'spring',
+                      damping: 12,
+                      stiffness: 240
+                    }}
+                    className="relative flex items-center justify-center select-none"
+                  >
+                    {/* Concentric Double Rings matching Image 1 */}
+                    <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-2 border-emerald-500/90 bg-[#06281e]/95 backdrop-blur-md shadow-[0_0_35px_rgba(16,185,129,0.4)] flex items-center justify-center p-1.5">
+                      <div className="w-full h-full rounded-full border border-dashed border-emerald-400/80 flex flex-col items-center justify-center text-center p-2">
+                        <span className="text-xs sm:text-sm font-black tracking-widest text-emerald-300 uppercase font-sans">
+                          APPROVED
+                        </span>
+                        <div className="w-12 h-[1px] bg-emerald-500/60 my-0.5" />
+                        <span className="text-[9px] sm:text-[10px] font-mono font-extrabold tracking-widest text-emerald-400">
+                          VLM-SEALED
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Shockwave Impact Ring upon sealing */}
+                    {shouldAnimate && (
+                      <motion.span
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: [0.9, 1.45], opacity: [0.8, 0] }}
+                        transition={{ delay: 1.65, duration: 0.6, ease: 'easeOut' }}
+                        className="absolute inset-0 rounded-full border-2 border-emerald-400 pointer-events-none"
+                      />
+                    )}
+                  </motion.div>
                 </div>
 
               </div>
