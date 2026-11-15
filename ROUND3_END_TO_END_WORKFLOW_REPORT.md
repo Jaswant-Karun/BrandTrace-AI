@@ -56,7 +56,7 @@ Marketing and creative teams submit content drafts across omni-channel formats w
 * **Capabilities Verified:**
   * **Metadata Capture:** Content title, body copy, marketing channel (Social, Landing Page, Ad Copy, Press Release, Packaging), and campaign association (e.g., `CMP-AUR-01`).
   * **File Attachment Support:** Multi-format file ingestion supporting PDF, DOCX, TXT, MD, PNG, and JPG.
-  * **Defensive Validation:** 
+  * **Defensive Validation:**
     * Empty or whitespace-only submissions rejected immediately (HTTP 400).
     * Oversized payloads (>50,000 characters or >25MB file uploads) blocked.
     * Client-side and server-side duplicate submission idempotency checks.
