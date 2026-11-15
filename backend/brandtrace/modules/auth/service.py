@@ -95,6 +95,15 @@ PRESET_USERS: Dict[str, Dict] = {
         "workspace_id": "aurelle-tech",
         "password_hash": hash_password("brandtrace2026")
     },
+    "asha@aurelle.com": {
+        "user_id": "USR-AUR-ASHA",
+        "email": "asha@aurelle.com",
+        "name": "Creator Asha, In-House Writer",
+        "role": UserRole.CREATOR,
+        "org_id": "ORG-AURELLE",
+        "workspace_id": "aurelle-tech",
+        "password_hash": hash_password("brandtrace2026")
+    },
     "reviewer@aurelle.com": {
         "user_id": "USR-AUR-REV",
         "email": "reviewer@aurelle.com",

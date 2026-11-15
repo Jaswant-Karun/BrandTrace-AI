@@ -17,6 +17,11 @@ const PublicVerificationView = lazy(() =>
   import('./components/PublicVerificationView').then((m) => ({ default: m.PublicVerificationView }))
 );
 
+// Lazy-load dedicated Creator Dashboard
+const CreatorDashboard = lazy(() =>
+  import('./components/creator/CreatorDashboard').then((m) => ({ default: m.CreatorDashboard }))
+);
+
 const ViewLoadingFallback: React.FC = () => (
   <div className="flex flex-col items-center justify-center py-24 space-y-3 bg-white dark:bg-slate-950 transition-colors duration-200 min-h-screen">
     <div className="w-8 h-8 rounded-full border-2 border-slate-200 dark:border-slate-800 border-t-blue-600 dark:border-t-blue-400 animate-spin" />
@@ -29,9 +34,12 @@ const ViewLoadingFallback: React.FC = () => (
 export const App: React.FC = () => {
   const { currentWorkspace, setWorkspace } = useAuth();
 
-  const [viewMode, setViewMode] = useState<'landing' | 'login' | 'verify'>(() => {
+  const [viewMode, setViewMode] = useState<'landing' | 'login' | 'verify' | 'creator-dashboard'>(() => {
     if (typeof window !== 'undefined') {
+      const pathname = window.location.pathname;
+      if (pathname === '/dashboard/creator' || pathname.startsWith('/dashboard/creator')) return 'creator-dashboard';
       const params = new URLSearchParams(window.location.search);
+      if (params.get('view') === 'creator' || params.get('view') === 'creator-dashboard') return 'creator-dashboard';
       if (params.get('view') === 'verify' || window.location.hash === '#verify') return 'verify';
       if (params.get('view') === 'login') return 'login';
       return 'landing';
@@ -76,6 +84,30 @@ export const App: React.FC = () => {
   const [isTourOpen, setIsTourOpen] = useState<boolean>(false);
   const [tourStepIndex, setTourStepIndex] = useState<number>(0);
   const [isReseeding, setIsReseeding] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const pathname = window.location.pathname;
+      if (pathname === '/dashboard/creator' || pathname.startsWith('/dashboard/creator')) {
+        setViewMode('creator-dashboard');
+      } else if (pathname === '/login') {
+        setViewMode('login');
+      } else if (pathname === '/verify' || window.location.hash === '#verify') {
+        setViewMode('verify');
+      } else {
+        setViewMode('landing');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const handleOpenCreatorDashboard = () => {
+    setViewMode('creator-dashboard');
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ view: 'creator-dashboard' }, '', '/dashboard/creator');
+    }
+  };
 
   useEffect(() => {
     if (currentWorkspace && currentWorkspace !== selectedBrandId) {
@@ -188,6 +220,23 @@ export const App: React.FC = () => {
     );
   }
 
+  // DEDICATED INDEPENDENT CREATOR DASHBOARD VIEW
+  if (viewMode === 'creator-dashboard') {
+    return (
+      <Suspense fallback={<ViewLoadingFallback />}>
+        <CreatorDashboard
+          brandName={currentBrand?.brand_name || 'Aurelle Skin'}
+          onBackToLanding={() => {
+            setViewMode('landing');
+            if (typeof window !== 'undefined') {
+              window.history.pushState({}, '', '/');
+            }
+          }}
+        />
+      </Suspense>
+    );
+  }
+
   // PRIMARY VIEW: Unified Product-First Website
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans selection:bg-slate-900 selection:text-white dark:selection:bg-blue-600 dark:selection:text-white overflow-x-hidden transition-colors duration-200">
@@ -211,6 +260,7 @@ export const App: React.FC = () => {
         initialSubTab={activeSubTab}
         onVerify={() => setViewMode('verify')}
         onSignIn={() => setViewMode('login')}
+        onOpenCreatorDashboard={handleOpenCreatorDashboard}
         onSignRelease={handleSignRelease}
         onReseed={handleReseed}
         isReseeding={isReseeding}

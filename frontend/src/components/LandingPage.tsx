@@ -7,7 +7,8 @@ import {
   Globe,
   X, Menu,
   Hash, Sliders, BookOpen, Sparkles, ShieldAlert,
-  Heart, MessageCircle, Send, Bookmark
+  Heart, MessageCircle, Send, Bookmark,
+  PenTool, Building2, ClipboardCheck, Megaphone
 } from 'lucide-react';
 
 import { PlumbBob } from './ui/PlumbBob';
@@ -32,6 +33,7 @@ interface LandingPageProps {
   initialSubTab?: string;
   onReseed?: () => void;
   isReseeding?: boolean;
+  onOpenCreatorDashboard?: () => void;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ 
@@ -50,7 +52,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onSignRelease,
   initialSubTab,
   onReseed: _onReseed = () => {},
-  isReseeding: _isReseeding = false
+  isReseeding: _isReseeding = false,
+  onOpenCreatorDashboard
 }) => {
   const { user, isAuthenticated, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -1630,23 +1633,27 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:pl-6 xl:pl-8 lg:pr-6 xl:pr-8 space-y-12">
           
           <div className="text-center max-w-3xl mx-auto space-y-3">
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-purple-400">
-              EXPERIENCE THE PLATFORM BY ROLE
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              One Unified Governance Engine. Tailored For Every Stakeholder.
+            <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white font-sans uppercase">
+              PICK A ROLE, NO SIGN UP.
             </h2>
-            <p className="text-xs sm:text-sm text-neutral-400">
-              Select any role to experience contextual guardrails, automated fact-checking, and role-based workflows.
+            <p className="text-xs sm:text-sm text-neutral-400 font-sans">
+              Five demo accounts for Aurelle Skin, a fictional brand. Each one opens where its work is.
             </p>
           </div>
 
-          {/* 5 Persona Cards Row (Directly matching Reference Image 5) */}
+          {/* 5 Persona Cards Row (Directly matching Reference Image 1) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             
             {/* Card 1: CREATOR */}
             <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4">
               <div className="space-y-3">
+                <div className="w-9 h-9 rounded-xl bg-indigo-600/30 border border-indigo-500/50 flex items-center justify-center text-indigo-400">
+                  <PenTool className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black font-sans text-white uppercase tracking-wider">CREATOR</h3>
+                  <div className="text-[10px] font-mono text-neutral-400 uppercase">ASHA · IN-HOUSE WRITER</div>
+                </div>
                 <p className="text-xs text-neutral-300 leading-relaxed font-sans min-h-[50px]">
                   Check a draft privately, accept cited fixes and send it for review.
                 </p>
@@ -1655,8 +1662,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
               </div>
               <button
-                onClick={() => handleSelectCapability('content-intelligence', 'inspector')}
-                className="w-full py-2.5 px-3 rounded-xl bg-white text-neutral-900 hover:bg-neutral-200 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
+                onClick={onOpenCreatorDashboard || (() => handleSelectCapability('content-intelligence', 'inspector'))}
+                className="w-full py-2.5 px-3 rounded-xl bg-[#544df2] hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider cursor-pointer shadow-md transition-colors"
               >
                 TRY AS CREATOR
               </button>
@@ -1665,6 +1672,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Card 2: AGENCY */}
             <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4">
               <div className="space-y-3">
+                <div className="w-9 h-9 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400">
+                  <Building2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black font-sans text-white uppercase tracking-wider">AGENCY</h3>
+                  <div className="text-[10px] font-mono text-neutral-400 uppercase">SANA · OUTSIDE AGENCY</div>
+                </div>
                 <p className="text-xs text-neutral-300 leading-relaxed font-sans min-h-[50px]">
                   Check her own drafts. Confidential facts stay hidden from her.
                 </p>
@@ -1674,7 +1688,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
               <button
                 onClick={() => handleSelectCapability('content-intelligence', 'inspector')}
-                className="w-full py-2.5 px-3 rounded-xl bg-white text-neutral-900 hover:bg-neutral-200 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
+                className="w-full py-2.5 px-3 rounded-xl bg-[#f0ede6] hover:bg-white text-neutral-900 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
               >
                 TRY AS AGENCY
               </button>
@@ -1683,6 +1697,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Card 3: REVIEWER */}
             <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4">
               <div className="space-y-3">
+                <div className="w-9 h-9 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400">
+                  <CheckCircle2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black font-sans text-white uppercase tracking-wider">REVIEWER</h3>
+                  <div className="text-[10px] font-mono text-neutral-400 uppercase">MEERA · CONTENT REVIEWER</div>
+                </div>
                 <p className="text-xs text-neutral-300 leading-relaxed font-sans min-h-[50px]">
                   Work through the queue: agree or disagree with each finding, then approve.
                 </p>
@@ -1692,7 +1713,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
               <button
                 onClick={() => handleSelectCapability('governance-approval', 'approvals')}
-                className="w-full py-2.5 px-3 rounded-xl bg-white text-neutral-900 hover:bg-neutral-200 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
+                className="w-full py-2.5 px-3 rounded-xl bg-[#f0ede6] hover:bg-white text-neutral-900 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
               >
                 TRY AS REVIEWER
               </button>
@@ -1701,6 +1722,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Card 4: COMPLIANCE */}
             <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4">
               <div className="space-y-3">
+                <div className="w-9 h-9 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400">
+                  <ClipboardCheck className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black font-sans text-white uppercase tracking-wider">COMPLIANCE</h3>
+                  <div className="text-[10px] font-mono text-neutral-400 uppercase">ARJUN · COMPLIANCE</div>
+                </div>
                 <p className="text-xs text-neutral-300 leading-relaxed font-sans min-h-[50px]">
                   Decide claims and confidential findings, and give the compliance sign-off.
                 </p>
@@ -1710,7 +1738,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
               <button
                 onClick={() => handleSelectCapability('governance-approval', 'approvals')}
-                className="w-full py-2.5 px-3 rounded-xl bg-white text-neutral-900 hover:bg-neutral-200 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
+                className="w-full py-2.5 px-3 rounded-xl bg-[#f0ede6] hover:bg-white text-neutral-900 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
               >
                 TRY AS COMPLIANCE
               </button>
@@ -1719,6 +1747,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Card 5: BRAND OWNER */}
             <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4">
               <div className="space-y-3">
+                <div className="w-9 h-9 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400">
+                  <Megaphone className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black font-sans text-white uppercase tracking-wider">BRAND OWNER</h3>
+                  <div className="text-[10px] font-mono text-neutral-400 uppercase">KABIR · BRAND OWNER</div>
+                </div>
                 <p className="text-xs text-neutral-300 leading-relaxed font-sans min-h-[50px]">
                   Own the rulebook and see which rules people find unclear.
                 </p>
@@ -1728,7 +1763,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
               <button
                 onClick={() => handleSelectCapability('brand-knowledge', 'guidelines')}
-                className="w-full py-2.5 px-3 rounded-xl bg-white text-neutral-900 hover:bg-neutral-200 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
+                className="w-full py-2.5 px-3 rounded-xl bg-[#f0ede6] hover:bg-white text-neutral-900 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
               >
                 TRY AS BRAND OWNER
               </button>
