@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Flame, ArrowRight, Network, Layers, GitCompare, ShieldAlert, 
-  CheckCircle2, XCircle, AlertTriangle, Lock
+  CheckCircle2, XCircle, AlertTriangle, Lock, Sparkles, Clock, Users, Shield, Check
 } from 'lucide-react';
 import { BlastRadiusResponse } from '../types';
 
@@ -13,13 +13,15 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
   const [activeTab, setActiveTab] = useState<'change_simulator' | 'policy_cascade'>('change_simulator');
 
   // Change Impact Simulation State
-  const [selectedPresetId, setSelectedPresetId] = useState<string>('FACT-PRC-01');
+  const [selectedPresetId, setSelectedPresetId] = useState<string>('FACT-AUR-PRC-01');
   const [recordType, setRecordType] = useState<string>('PRICE');
-  const [recordLabel, setRecordLabel] = useState<string>('Apex Connect Telematics Monthly Subscription');
+  const [recordLabel, setRecordLabel] = useState<string>('Aurelle Cloud Studio Monthly Subscription');
   const [oldValue, setOldValue] = useState<string>('₹499');
   const [proposedValue, setProposedValue] = useState<string>('₹599');
-  const [rationale, setRationale] = useState<string>('Global 5G bandwidth upgrade & satellite fallback network incorporation.');
-  const [proposedBy, setProposedBy] = useState<string>('Commercial Operations Lead');
+  const [rationale, setRationale] = useState<string>(
+    'Spatial audio rendering infrastructure scaling and global master commercial indexing.'
+  );
+  const [proposedBy, setProposedBy] = useState<string>('Julian Vance, VP Brand Governance');
 
   const [isSimulating, setIsSimulating] = useState<boolean>(false);
   const [simulationReport, setSimulationReport] = useState<any>(null);
@@ -35,47 +37,47 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
   const [isCascadeLoading, setIsCascadeLoading] = useState<boolean>(false);
   const [blastResult, setBlastResult] = useState<BlastRadiusResponse | null>(null);
 
-  // Quick Preset Scenarios for Change Impact Simulation
+  // 5 Signature Simulation Scenarios (Fact, Policy, Terminology, Claim Restriction, Guideline)
   const SIMULATION_PRESETS = [
     {
-      id: 'FACT-PRC-01',
+      id: 'FACT-AUR-PRC-01',
       type: 'PRICE',
-      label: 'Apex Connect Telematics Monthly Subscription',
+      label: 'Aurelle Cloud Studio Subscription',
       oldVal: '₹499',
       newVal: '₹599',
-      rationale: 'Global 5G bandwidth upgrade & satellite fallback network incorporation across all models.'
+      rationale: 'Spatial audio rendering infrastructure scaling & master commercial tier indexing across all models.'
     },
     {
-      id: 'FACT-SPEC-01',
-      type: 'SPECIFICATION',
-      label: 'Supercharger Peak Inverter Output',
-      oldVal: '350kW',
-      newVal: '400kW',
-      rationale: 'Thermal management upgrade in Gen-4 liquid-cooled charging architecture.'
-    },
-    {
-      id: 'AC-01',
+      id: 'PIL-AUR-01',
       type: 'CLAIM',
-      label: 'EPA-Estimated Driving Range',
-      oldVal: '520 miles',
-      newVal: '540 miles',
-      rationale: 'EPA recertification with Gen-3 silicon-carbide motor inverters (Cert #EV-APX-982-R1).'
+      label: 'Aurelle Pulse Durability Claim Restriction',
+      oldVal: '100% Unbreakable and Indestructible',
+      newVal: 'Engineered with Grade 5 Aerospace Titanium',
+      rationale: 'FTC Substantiation Doctrine prohibits representing consumer electronic hardware as completely indestructible.'
     },
     {
-      id: 'PC-01',
-      type: 'CLAIM',
-      label: 'Environmental Sustainability Positioning',
-      oldVal: '100% Eco-Friendly Zero-Carbon',
-      newVal: 'Certified Carbon-Neutral Production Lifecycle',
-      rationale: 'FTC 16 CFR §260 & EU Directive 2024/825 enforcement prohibits unverified broad green claims.'
+      id: 'GL-AUR-06',
+      type: 'TYPOGRAPHY',
+      label: 'Regional Font Policy Conflict',
+      oldVal: 'Editorial Serif',
+      newVal: 'Helvetica Neue',
+      rationale: 'Regional European branch preference for grotesque sans-serif over master luxury serif.'
     },
     {
       id: 'PC-02',
       type: 'TERMINOLOGY',
-      label: 'Driver Assistance Terminology',
+      label: 'Autonomous Driving Terminology',
       oldVal: 'Hands-Free Autonomous Driving',
       newVal: 'Driver-Supervised Level 2 Highway Assist',
-      rationale: 'NHTSA Standing General Order 2021-01 alignment; explicit driver attention mandated.'
+      rationale: 'NHTSA Standing General Order 2021-01 alignment; explicit driver attention and supervision mandated.'
+    },
+    {
+      id: 'PC-01',
+      type: 'CLAIM',
+      label: 'Environmental Greenwashing Restriction',
+      oldVal: '100% Eco-Friendly Zero-Carbon',
+      newVal: '85% Certified Recycled Aluminum Lifecycle',
+      rationale: 'FTC 16 CFR §260 & EU Directive 2024/825 enforcement prohibits unverified broad environmental benefit assertions.'
     }
   ];
 
@@ -102,7 +104,7 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          brand_id: brandId,
+          brand_id: brandId || 'aurelle-tech',
           target_record_id: selectedPresetId,
           target_record_type: recordType,
           record_label: recordLabel,
@@ -134,33 +136,33 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          brand_id: brandId,
+          brand_id: brandId || 'aurelle-tech',
           simulation_id: simulationReport.simulation_id,
           decision: decision,
-          authorized_reviewer: 'Chief Brand Governance Officer'
+          authorized_reviewer: proposedBy
         })
       });
 
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.detail || 'Commit failed');
-      }
-
+      if (!res.ok) throw new Error('Commit failed');
       const data = await res.json();
-      setSimulationReport(data.report);
+
       setCommitMessage({
         status: 'success',
-        text: `Change ${decision.toLowerCase()}! Cryptographic release seal: ${data.report.audit_hash || 'BT-SEAL-VERIFIED'}`
+        text: data.message
       });
+
+      if (data.report) {
+        setSimulationReport(data.report);
+      }
     } catch (e: any) {
       console.error(e);
-      setCommitMessage({ status: 'error', text: e.message || 'Commit decision failed' });
+      setCommitMessage({ status: 'error', text: e.message || 'Failed to commit change' });
     } finally {
       setIsCommitting(false);
     }
   };
 
-  const handlePolicySimulate = async () => {
+  const handleRunCascade = async () => {
     setIsCascadeLoading(true);
     setBlastResult(null);
 
@@ -169,43 +171,36 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          brand_id: brandId,
+          brand_id: brandId || 'aurelle-tech',
           mutated_node_id: mutatedNodeId,
           mutation_type: mutationType,
           mutation_notes: notes
         })
       });
-      if (!res.ok) throw new Error('Simulation failed');
+
+      if (!res.ok) throw new Error('Blast radius simulation failed');
       const data: BlastRadiusResponse = await res.json();
       setBlastResult(data);
-    } catch (err) {
-      console.error(err);
+    } catch (e: any) {
+      console.error(e);
     } finally {
       setIsCascadeLoading(false);
     }
   };
 
-  const POLICY_OPTIONS = [
-    { id: 'PC-01', label: 'PC-01: Zero-Carbon / 100% Eco-Friendly (FTC & EU Green Claims)' },
-    { id: 'AC-01', label: 'AC-01: 520 miles EPA-estimated range (Certificate #EV-APX-982)' },
-    { id: 'PC-02', label: 'PC-02: Fully Autonomous / Hands-Free Driving (NHTSA SGO 2021-01)' },
-    { id: 'TM-01', label: 'TM-01: QuantumCell™ Trademark Guideline' },
-    { id: 'REG-01', label: 'REG-01: FTC Green Guides 16 CFR §260' },
-  ];
-
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-[#0B0F19] border border-slate-800/80 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4">
+      {/* Top Banner & Header */}
+      <div className="bg-[#0B0F19] border border-slate-800/80 rounded-2xl p-5 shadow-2xl flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Flame className="w-5 h-5 text-amber-400" />
             <h2 className="text-sm font-bold text-white uppercase tracking-wider">
-              Change Impact Simulator &amp; Blast Radius Engine
+              Brand Governance Digital Twin &amp; Simulation Engine
             </h2>
           </div>
           <p className="text-xs text-slate-400">
-            Propose amendments to product prices, technical specifications, claims, and guidelines. Traverses the Brand Dependency Intelligence Graph to calculate blast radius and enforce human commit gates.
+            Simulate prospective product fact, brand policy, terminology, claim, and guideline changes. Detect policy contradictions, predict before-and-after compliance impact, and calculate human review workload without altering live approved brand truth.
           </p>
         </div>
 
@@ -220,7 +215,7 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
             }`}
           >
             <GitCompare className="w-3.5 h-3.5" />
-            Change Impact Simulator (Propose &amp; Commit)
+            Digital Twin Simulator (Propose &amp; Commit)
           </button>
           <button
             onClick={() => setActiveTab('policy_cascade')}
@@ -231,7 +226,7 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
             }`}
           >
             <Network className="w-3.5 h-3.5" />
-            Policy Mutation Cascade
+            DAG Mutation Blast Radius
           </button>
         </div>
       </div>
@@ -243,7 +238,7 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
             {/* Quick Scenario Picker */}
             <div className="bg-[#0B0F19] border border-slate-800/80 rounded-2xl p-4 shadow-xl">
               <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2">
-                Quick Benchmark Scenarios
+                5 Differentiating Hackathon Simulation Scenarios
               </label>
               <div className="space-y-1.5">
                 {SIMULATION_PRESETS.map((p) => (
@@ -274,7 +269,7 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
             <div className="bg-[#0B0F19] border border-slate-800/80 rounded-2xl p-5 shadow-xl space-y-4">
               <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
                 <GitCompare className="w-4 h-4 text-amber-400" />
-                Proposed Amendment Specification
+                Proposed Amendment Parameters
               </h3>
 
               <div className="grid grid-cols-2 gap-3">
@@ -294,12 +289,12 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
                     onChange={(e) => setRecordType(e.target.value)}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
                   >
-                    <option value="PRICE">PRICE</option>
+                    <option value="PRICE">PRODUCT PRICE</option>
                     <option value="SPECIFICATION">SPECIFICATION</option>
-                    <option value="CLAIM">CLAIM</option>
-                    <option value="TERMINOLOGY">TERMINOLOGY</option>
-                    <option value="GUIDELINE">GUIDELINE</option>
-                    <option value="LOGO">LOGO</option>
+                    <option value="CLAIM">PROMOTIONAL CLAIM</option>
+                    <option value="TERMINOLOGY">TERMINOLOGY RULE</option>
+                    <option value="TYPOGRAPHY">BRAND TYPOGRAPHY</option>
+                    <option value="GUIDELINE">BRAND GUIDELINE</option>
                   </select>
                 </div>
               </div>
@@ -326,7 +321,7 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-emerald-400 font-medium block mb-1">Proposed New Value</label>
+                  <label className="text-xs text-emerald-400 font-medium block mb-1">Proposed Value</label>
                   <input
                     type="text"
                     value={proposedValue}
@@ -337,7 +332,7 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
               </div>
 
               <div>
-                <label className="text-xs text-slate-400 font-medium block mb-1">Change Rationale</label>
+                <label className="text-xs text-slate-400 font-medium block mb-1">Governance Rationale</label>
                 <textarea
                   rows={2}
                   value={rationale}
@@ -347,7 +342,7 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
               </div>
 
               <div>
-                <label className="text-xs text-slate-400 font-medium block mb-1">Proposed By</label>
+                <label className="text-xs text-slate-400 font-medium block mb-1">Proposed By (Authorized Actor)</label>
                 <input
                   type="text"
                   value={proposedBy}
@@ -364,19 +359,19 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
                 {isSimulating ? (
                   <>
                     <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Simulating Graph Traversal...
+                    Simulating Digital Twin...
                   </>
                 ) : (
                   <>
                     <Flame className="w-3.5 h-3.5" />
-                    Simulate Change Impact
+                    Run Digital Twin Simulation
                   </>
                 )}
               </button>
             </div>
           </div>
 
-          {/* Right Column: Visual Impact Report (7 Cols) */}
+          {/* Right Column: Visual Impact Report & Twin Analytics (7 Cols) */}
           <div className="lg:col-span-7 space-y-4">
             {commitMessage && (
               <div className={`p-4 rounded-2xl border text-xs flex items-center gap-2 ${
@@ -394,7 +389,20 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
             )}
 
             {simulationReport ? (
-              <div className="space-y-4">
+              <div className="space-y-4 animate-fadeIn">
+                {/* Visual Demarcation Watermark */}
+                <div className="bg-amber-500/15 border border-amber-500/30 rounded-2xl p-3 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
+                    <span className="font-bold text-amber-200 uppercase tracking-wider text-[11px]">
+                      Digital Twin Simulation Preview — Live Brand Truth Is Unaltered
+                    </span>
+                  </div>
+                  <span className="font-mono text-[10px] bg-amber-950/60 text-amber-300 px-2 py-0.5 rounded border border-amber-800/40">
+                    STATUS: {simulationReport.status}
+                  </span>
+                </div>
+
                 {/* Telemetry Bar */}
                 <div className="bg-[#0B0F19] border border-slate-800/80 rounded-2xl p-5 shadow-xl">
                   <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-4">
@@ -406,21 +414,20 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
                         <span className="text-xs font-bold text-white">{simulationReport.record_label}</span>
                       </div>
                       <div className="text-xs text-slate-400 mt-1">
-                        Status: <strong className="text-amber-300 font-mono">{simulationReport.status}</strong>
+                        Proposed: <span className="text-red-400 line-through font-mono">{simulationReport.old_value}</span>{' '}
+                        ➔ <span className="text-emerald-400 font-bold font-mono">{simulationReport.proposed_value}</span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <div className="text-2xl font-black font-mono text-red-400">
-                          {simulationReport.overall_risk_score.toFixed(0)}/100
-                        </div>
-                        <div className="text-[10px] uppercase font-bold text-slate-400">Risk Tier: {simulationReport.risk_tier}</div>
+                    <div className="text-right">
+                      <div className="text-2xl font-black font-mono text-red-400">
+                        {simulationReport.overall_risk_score.toFixed(0)}/100
                       </div>
+                      <div className="text-[10px] uppercase font-bold text-slate-400">Risk Tier: {simulationReport.risk_tier}</div>
                     </div>
                   </div>
 
-                  {/* Dependency Breakdown Metrics */}
+                  {/* Dependency Breakdown */}
                   <div className="grid grid-cols-3 gap-3">
                     <div className="bg-slate-950 p-3 rounded-xl border border-slate-800/80">
                       <div className="text-lg font-bold font-mono text-cyan-400">
@@ -429,7 +436,7 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
                       <div className="text-[10px] font-bold uppercase text-slate-400">
                         Direct Graph Dependencies
                       </div>
-                      <div className="text-[10px] text-slate-500 mt-0.5">Explicit DAG Edges</div>
+                      <div className="text-[10px] text-slate-500 mt-0.5">Connected DAG Assets</div>
                     </div>
 
                     <div className="bg-slate-950 p-3 rounded-xl border border-slate-800/80">
@@ -439,7 +446,7 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
                       <div className="text-[10px] font-bold uppercase text-slate-400">
                         Inferred Lexical Mentions
                       </div>
-                      <div className="text-[10px] text-slate-500 mt-0.5">Discovered via Content AST</div>
+                      <div className="text-[10px] text-slate-500 mt-0.5">Found via Content Scan</div>
                     </div>
 
                     <div className="bg-slate-950 p-3 rounded-xl border border-slate-800/80">
@@ -449,19 +456,124 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
                       <div className="text-[10px] font-bold uppercase text-slate-400">
                         Outdated Campaigns
                       </div>
-                      <div className="text-[10px] text-slate-500 mt-0.5">Requires Revision Flighting</div>
+                      <div className="text-[10px] text-slate-500 mt-0.5">Requires Revision Task</div>
                     </div>
                   </div>
                 </div>
+
+                {/* POLICY CONFLICT DETECTION CARD */}
+                {simulationReport.policy_conflicts && simulationReport.policy_conflicts.length > 0 && (
+                  <div className="bg-red-950/20 border border-red-500/40 rounded-2xl p-5 shadow-xl space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4 text-red-400" />
+                        <h4 className="text-xs font-bold text-red-300 uppercase tracking-wider">
+                          Policy Conflict Detection ({simulationReport.policy_conflicts.length} Contradiction Detected)
+                        </h4>
+                      </div>
+                      <span className="text-[10px] font-mono font-bold bg-red-500/20 text-red-300 px-2 py-0.5 rounded border border-red-500/30">
+                        REQUIRES RESOLUTION
+                      </span>
+                    </div>
+
+                    <div className="space-y-2.5">
+                      {simulationReport.policy_conflicts.map((c: any, i: number) => (
+                        <div key={i} className="bg-slate-950/80 p-3 rounded-xl border border-red-900/50 space-y-1.5 text-xs">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-white">{c.title}</span>
+                            <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-red-950 text-red-400 border border-red-800/40">
+                              {c.conflict_type}
+                            </span>
+                          </div>
+                          <p className="text-slate-300 text-[11px] leading-relaxed">
+                            {c.explanation}
+                          </p>
+                          <div className="bg-slate-900 p-2 rounded-lg border border-slate-800 text-[11px] text-slate-300">
+                            <strong className="text-amber-400">Recommended Resolution:</strong> {c.recommended_resolution}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* BEFORE-AND-AFTER INSPECTION RESULTS */}
+                {simulationReport.before_after_summary && (
+                  <div className="bg-[#0B0F19] border border-slate-800/80 rounded-2xl p-5 shadow-xl space-y-3">
+                    <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-cyan-400" />
+                      Before-and-After Inspection Impact Analysis
+                    </h4>
+
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
+                        <div className="text-xs text-slate-400 mb-1">Baseline Score</div>
+                        <div className="text-xl font-bold font-mono text-emerald-400">
+                          {simulationReport.before_after_summary.baseline_compliance_score}%
+                        </div>
+                        <div className="text-[10px] text-slate-500 mt-1">Pre-amendment state</div>
+                      </div>
+
+                      <div className="bg-slate-950 p-3 rounded-xl border border-red-900/40 text-center">
+                        <div className="text-xs text-red-400 mb-1">If Left Unaddressed</div>
+                        <div className="text-xl font-bold font-mono text-red-400">
+                          {simulationReport.before_after_summary.simulated_score_if_unaddressed}%
+                        </div>
+                        <div className="text-[10px] text-red-400/80 mt-1">Severe compliance drop</div>
+                      </div>
+
+                      <div className="bg-slate-950 p-3 rounded-xl border border-emerald-900/40 text-center">
+                        <div className="text-xs text-emerald-400 mb-1">After Revision Sign-off</div>
+                        <div className="text-xl font-bold font-mono text-cyan-300">
+                          {simulationReport.before_after_summary.simulated_score_if_remediated}%
+                        </div>
+                        <div className="text-[10px] text-slate-500 mt-1">Remediated release grade</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* ESTIMATED REVIEW WORKLOAD & DECISIONS */}
+                {simulationReport.workload_estimate && (
+                  <div className="bg-[#0B0F19] border border-slate-800/80 rounded-2xl p-5 shadow-xl space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-purple-400" />
+                        Estimated Governance Review Workload
+                      </h4>
+                      <span className="text-xs font-mono text-purple-300 bg-purple-950/60 px-2 py-0.5 rounded border border-purple-800/40">
+                        ~{simulationReport.workload_estimate.estimated_review_hours}h Review Time
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                        <div className="text-[11px] text-slate-400 mb-1">Human Decisions Required</div>
+                        <div className="text-lg font-bold font-mono text-white">
+                          {simulationReport.workload_estimate.required_human_decisions_count} Decision Sign-offs
+                        </div>
+                        <div className="text-[10px] text-slate-500 mt-0.5">Touchpoints + policy conflicts</div>
+                      </div>
+
+                      <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                        <div className="text-[11px] text-slate-400 mb-1">Projected Lead Time</div>
+                        <div className="text-lg font-bold font-mono text-white">
+                          ~{simulationReport.workload_estimate.estimated_lead_time_days} Working Days
+                        </div>
+                        <div className="text-[10px] text-slate-500 mt-0.5">Across departmental routing queues</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Affected Touchpoints Table */}
                 <div className="bg-[#0B0F19] border border-slate-800/80 rounded-2xl p-5 shadow-xl space-y-3">
                   <div className="flex items-center justify-between">
                     <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-                      Affected Brand Touchpoints &amp; Human Actions Required
+                      Affected Brand Touchpoints ({simulationReport.affected_touchpoints.length})
                     </h4>
                     <span className="text-[11px] text-slate-400 font-mono">
-                      {simulationReport.affected_touchpoints.length} Touchpoint(s)
+                      Previewing Remediations
                     </span>
                   </div>
 
@@ -474,12 +586,8 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
                             <span className="text-[10px] font-mono text-slate-400 bg-slate-900 px-1.5 py-0.5 rounded">
                               {t.asset_id}
                             </span>
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
-                              t.relationship_kind === 'DIRECT_GRAPH_DEPENDENCY'
-                                ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20'
-                                : 'bg-purple-500/10 text-purple-400 border-purple-500/20'
-                            }`}>
-                              {t.relationship_kind}
+                            <span className="text-[10px] font-bold text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded border border-amber-500/30">
+                              SIMULATED PREVIEW
                             </span>
                           </div>
                           <span className="text-[10px] font-mono text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
@@ -487,7 +595,7 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
                           </span>
                         </div>
 
-                        {/* Content Before & After Remediated Preview */}
+                        {/* Content Before & After Preview */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px]">
                           <div className="bg-red-950/10 border border-red-500/20 p-2.5 rounded-lg space-y-1">
                             <div className="text-[10px] font-bold uppercase text-red-400">Current Copy (Outdated)</div>
@@ -503,232 +611,205 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
                           </div>
                         </div>
 
-                        <div className="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800/80 text-xs text-slate-300 flex items-start gap-2">
-                          <AlertTriangle className="w-3.5 h-3.5 text-amber-400 flex-shrink-0 mt-0.5" />
-                          <div>
-                            <span className="text-slate-400 font-medium">Required Action: </span>
-                            {t.required_human_action}
-                          </div>
+                        <div className="text-[11px] text-slate-400 bg-slate-900/60 p-2 rounded-lg border border-slate-800/60 flex items-center justify-between">
+                          <span><strong>Action:</strong> {t.required_human_action}</span>
+                          <span className="font-mono text-[10px] text-cyan-400">Campaign: {t.campaign_name}</span>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Manager Commitment Decision Gate */}
-                <div className="bg-[#0B0F19] border border-amber-500/30 rounded-2xl p-5 shadow-xl space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                {/* Authorized Human Approval / Commit Gate */}
+                <div className="bg-[#0B0F19] border border-amber-500/30 rounded-2xl p-5 shadow-2xl flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
                       <Lock className="w-4 h-4 text-amber-400" />
-                      <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-                        Authorized Manager Approval Gate (Zero Silent Overwrites)
-                      </h4>
-                    </div>
-                    <span className="text-[10px] font-mono bg-slate-900 text-slate-400 px-2 py-0.5 rounded">
-                      Role: BRAND_MANAGER or ADMIN
-                    </span>
+                      Authorized Human Commit Gate
+                    </h4>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Formal human authorization seals this amendment into MongoDB Atlas, updates the DAG, and spawns revision tasks.
+                    </p>
                   </div>
 
-                  <p className="text-xs text-slate-400">
-                    Live assets will NOT be modified until an authorized manager executes explicit sign-off. Committing will promote the approved version to active in the Brand Knowledge Graph and register tamper-evident revision tasks.
-                  </p>
-
-                  <div className="flex items-center gap-3 pt-2">
-                    <button
-                      onClick={() => handleCommitChange('APPROVED')}
-                      disabled={isCommitting || simulationReport.status === 'APPROVED_ACTIVE'}
-                      className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20"
-                    >
-                      <CheckCircle2 className="w-4 h-4" />
-                      {simulationReport.status === 'APPROVED_ACTIVE'
-                        ? 'Amendment Approved & Active in Graph'
-                        : 'Approve & Commit to Knowledge Graph'}
-                    </button>
+                  <div className="flex items-center gap-3">
                     <button
                       onClick={() => handleCommitChange('REJECTED')}
-                      disabled={isCommitting || simulationReport.status === 'REJECTED'}
-                      className="px-4 py-2.5 rounded-xl bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 font-bold text-xs uppercase tracking-wider transition-all disabled:opacity-50 flex items-center gap-2"
+                      disabled={isCommitting || simulationReport.status !== 'PROPOSED_PENDING_APPROVAL'}
+                      className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold text-xs uppercase tracking-wider border border-slate-700 disabled:opacity-40"
                     >
-                      <XCircle className="w-4 h-4" />
-                      Reject Revision
+                      Reject Proposal
+                    </button>
+                    <button
+                      onClick={() => handleCommitChange('APPROVED')}
+                      disabled={isCommitting || simulationReport.status !== 'PROPOSED_PENDING_APPROVAL'}
+                      className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-emerald-600/20 flex items-center gap-2 disabled:opacity-40"
+                    >
+                      {isCommitting ? (
+                        <>
+                          <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          Sealing Change...
+                        </>
+                      ) : (
+                        <>
+                          <Check className="w-4 h-4" />
+                          Authorize &amp; Commit to Graph
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="bg-[#0B0F19] border border-slate-800/80 rounded-2xl p-12 text-center space-y-3">
-                <GitCompare className="w-10 h-10 text-slate-600 mx-auto" />
-                <div className="text-sm font-bold text-white">No Simulation Loaded</div>
-                <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                  Select a target record or benchmark scenario on the left and click <strong>Simulate Change Impact</strong> to execute live graph traversal.
+              <div className="bg-[#0B0F19] border border-slate-800/80 rounded-2xl p-12 text-center shadow-xl space-y-3">
+                <div className="w-12 h-12 bg-amber-500/10 rounded-2xl border border-amber-500/20 flex items-center justify-center mx-auto text-amber-400">
+                  <Flame className="w-6 h-6" />
+                </div>
+                <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+                  No Digital Twin Simulation Active
+                </h3>
+                <p className="text-xs text-slate-400 max-w-md mx-auto">
+                  Select one of the 5 benchmark scenarios or configure custom parameters on the left to simulate cross-channel blast radius, policy conflicts, and workload estimates.
                 </p>
               </div>
             )}
           </div>
         </div>
       ) : (
-        /* Policy Mutation Blast Radius Mode */
+        /* Policy Mutation Cascade Tab */
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left Column: Simulation Controls (5 Cols) */}
-          <div className="lg:col-span-5 space-y-4">
-            <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                <Layers className="w-4 h-4 text-cyan-400" />
-                Policy Mutation Parameter
-              </h3>
+          <div className="lg:col-span-5 bg-[#0B0F19] border border-slate-800/80 rounded-2xl p-5 shadow-xl space-y-4">
+            <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <Network className="w-4 h-4 text-amber-400" />
+              DAG Policy Cascade Configuration
+            </h3>
 
-              <div>
-                <label className="text-xs text-slate-400 font-medium block mb-1">Target Policy / Claim Node</label>
-                <select
-                  value={mutatedNodeId}
-                  onChange={(e) => setMutatedNodeId(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500"
-                >
-                  {POLICY_OPTIONS.map((opt) => (
-                    <option key={opt.id} value={opt.id}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="text-xs text-slate-400 font-medium block mb-1">Mutation Type</label>
-                <select
-                  value={mutationType}
-                  onChange={(e) => setMutationType(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500"
-                >
-                  <option value="REGULATORY_AMENDMENT">Regulatory Amendment (FTC / EU / NHTSA)</option>
-                  <option value="POLICY_REVISION">Brand Guideline Revocation</option>
-                  <option value="EXPIRATION">Claim Evidence Expiration</option>
-                  <option value="RESTRICTION_TIGHTENING">Channel Distribution Ban</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="text-xs text-slate-400 font-medium block mb-1">Amendment Detail / Context</label>
-                <textarea
-                  rows={3}
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-cyan-500 resize-none font-mono"
-                />
-              </div>
-
-              <button
-                onClick={handlePolicySimulate}
-                disabled={isCascadeLoading}
-                className="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs uppercase tracking-wider transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-amber-600/20"
+            <div>
+              <label className="text-xs text-slate-400 font-medium block mb-1">Target Policy / Claim Node</label>
+              <select
+                value={mutatedNodeId}
+                onChange={(e) => setMutatedNodeId(e.target.value)}
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white font-mono"
               >
-                {isCascadeLoading ? (
-                  <>
-                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Traversing Graph Topologically...
-                  </>
-                ) : (
-                  <>
-                    <Flame className="w-3.5 h-3.5" />
-                    Calculate Cascading Blast Radius
-                  </>
-                )}
-              </button>
+                <option value="PC-01">PC-01: FTC Greenwashing Superlative Ban</option>
+                <option value="PC-02">PC-02: NHTSA Automated Driving Hands-Free Directive</option>
+                <option value="FACT-AUR-PRC-01">FACT-AUR-PRC-01: Aurelle Cloud Studio Price Point</option>
+                <option value="GL-AUR-01">GL-AUR-01: Aurelle Logo Margin Safe-Zone (20px)</option>
+                <option value="AC-01">AC-01: EPA 520 Miles Range Certification</option>
+              </select>
             </div>
+
+            <div>
+              <label className="text-xs text-slate-400 font-medium block mb-1">Mutation Type</label>
+              <select
+                value={mutationType}
+                onChange={(e) => setMutationType(e.target.value)}
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
+              >
+                <option value="REGULATORY_AMENDMENT">REGULATORY_AMENDMENT</option>
+                <option value="PRICING_POLICY_CHANGE">PRICING_POLICY_CHANGE</option>
+                <option value="SPECIFICATION_UPDATE">SPECIFICATION_UPDATE</option>
+                <option value="BRAND_GUIDELINE_REVISION">BRAND_GUIDELINE_REVISION</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="text-xs text-slate-400 font-medium block mb-1">Regulatory Context / Operational Notes</label>
+              <textarea
+                rows={3}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white resize-none"
+              />
+            </div>
+
+            <button
+              onClick={handleRunCascade}
+              disabled={isCascadeLoading}
+              className="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs uppercase tracking-wider transition-all disabled:opacity-50 shadow-lg shadow-amber-600/20 flex items-center justify-center gap-2"
+            >
+              {isCascadeLoading ? (
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Calculating DAG Cascade...
+                </>
+              ) : (
+                <>
+                  <Network className="w-3.5 h-3.5" />
+                  Traverse Blast Radius
+                </>
+              )}
+            </button>
           </div>
 
-          {/* Right Column: Cascading Results (7 Cols) */}
           <div className="lg:col-span-7 space-y-4">
             {blastResult ? (
-              <div className="space-y-4">
-                {/* Blast Radius Metrics */}
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl">
-                    <div className="text-2xl font-black text-red-400 font-mono">
+              <div className="bg-[#0B0F19] border border-slate-800/80 rounded-2xl p-5 shadow-xl space-y-4 animate-fadeIn">
+                <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                  <div>
+                    <span className="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                      {blastResult.mutated_node_id}
+                    </span>
+                    <div className="text-xs text-slate-400 mt-1">
+                      Type: <strong>{blastResult.mutation_type}</strong>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-black font-mono text-red-400">
+                      {blastResult.overall_risk_score.toFixed(0)}/100
+                    </div>
+                    <div className="text-[10px] font-bold uppercase text-slate-400">
+                      Tier: {blastResult.impact_tier}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                    <div className="text-[11px] text-slate-400 mb-0.5">Affected Assets Count</div>
+                    <div className="text-xl font-bold font-mono text-cyan-400">
                       {blastResult.total_affected_assets}
                     </div>
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-1">
-                      Directly Impacted Assets
-                    </div>
                   </div>
-
-                  <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl">
-                    <div className="text-2xl font-black text-amber-400 font-mono">
+                  <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                    <div className="text-[11px] text-slate-400 mb-0.5">Affected Campaigns Count</div>
+                    <div className="text-xl font-bold font-mono text-amber-400">
                       {blastResult.total_affected_campaigns}
                     </div>
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-1">
-                      Campaigns at Risk
-                    </div>
-                  </div>
-
-                  <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl">
-                    <div className="text-2xl font-black text-cyan-400 font-mono">
-                      ${((blastResult.total_affected_assets * 28500) / 1000).toFixed(0)}k
-                    </div>
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-1">
-                      Estimated Media Flight at Risk
-                    </div>
                   </div>
                 </div>
 
-                {/* Immediate Action Notice */}
-                <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-4 text-xs space-y-1">
-                  <div className="flex items-center gap-2 font-bold text-red-400">
-                    <ShieldAlert className="w-4 h-4" />
-                    Topological Blast Radius Traversal Verified
+                <div className="space-y-2">
+                  <div className="text-xs font-bold text-white uppercase tracking-wider">
+                    Downstream Graph Targets
                   </div>
-                  <p className="text-slate-300">
-                    Traversed DAG depth of 3 hops. All downstream content assets referencing node{' '}
-                    <span className="font-mono text-cyan-300">{blastResult.mutated_node_id}</span> are flagged as{' '}
-                    <span className="font-bold text-red-300">REVISION_REQUIRED</span>.
-                  </p>
-                </div>
-
-                {/* Impacted Assets List */}
-                <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-3">
-                  <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center justify-between">
-                    <span>Downstream Content Dependencies</span>
-                    <span className="text-slate-400 font-mono font-normal">
-                      {blastResult.affected_targets.length} assets
-                    </span>
-                  </h4>
-
-                  <div className="space-y-2">
-                    {blastResult.affected_targets.map((target, idx) => (
-                      <div
-                        key={idx}
-                        className="bg-slate-950 p-3 rounded-xl border border-slate-800/80 flex items-center justify-between gap-3 text-xs"
-                      >
-                        <div className="space-y-0.5">
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-white">{target.asset_name}</span>
-                            <span className="text-[10px] font-mono text-slate-400 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">
-                              {target.asset_id}
-                            </span>
-                            <span className="text-[10px] font-mono text-cyan-400">{target.channel}</span>
+                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                    {blastResult.affected_targets.map((tgt: any, idx: number) => (
+                      <div key={idx} className="bg-slate-950 p-3 rounded-xl border border-slate-800/80 text-xs flex items-center justify-between">
+                        <div>
+                          <div className="font-semibold text-white">{tgt.asset_name}</div>
+                          <div className="text-[11px] font-mono text-slate-400">
+                            Path: {tgt.traversal_path?.join(' ➔ ') || tgt.asset_id}
                           </div>
-                          <p className="text-slate-400 text-[11px] truncate max-w-md">{target.remediation_required}</p>
                         </div>
-
-                        <div className="text-right flex-shrink-0">
-                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30 font-bold block mb-1">
-                            {target.exposure_level}
-                          </span>
-                          <span className="text-[10px] text-slate-400 flex items-center gap-1 justify-end font-mono">
-                            Hops: {target.traversal_path.length - 1}
-                            <ArrowRight className="w-2.5 h-2.5" />
-                          </span>
-                        </div>
+                        <span className="text-[10px] font-mono uppercase bg-red-950/60 text-red-300 px-2 py-0.5 rounded border border-red-800/40">
+                          {tgt.severity}
+                        </span>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-12 text-center space-y-3">
-                <Network className="w-10 h-10 text-slate-600 mx-auto" />
-                <div className="text-sm font-bold text-white">No Policy Simulation Active</div>
+              <div className="bg-[#0B0F19] border border-slate-800/80 rounded-2xl p-12 text-center shadow-xl space-y-3">
+                <div className="w-12 h-12 bg-slate-900 rounded-2xl border border-slate-800 flex items-center justify-center mx-auto text-slate-400">
+                  <Network className="w-6 h-6" />
+                </div>
+                <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+                  Select a Policy to Simulate Graph Traversal
+                </h3>
                 <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                  Select a policy on the left and run simulation to trace downstream marketing dependencies across print, digital, and social channels.
+                  Click 'Traverse Blast Radius' to trace direct and indirect downstream impacts across all enterprise touchpoints.
                 </p>
               </div>
             )}

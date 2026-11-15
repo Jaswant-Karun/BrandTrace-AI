@@ -4,6 +4,7 @@ import { Sidebar, NavigationTab } from './components/Sidebar';
 import { LandingPage } from './components/LandingPage';
 import { CommandCenter } from './components/CommandCenter';
 import { DependencyIntelligenceStudio } from './components/DependencyIntelligenceStudio';
+import { KnowledgeGraphView } from './components/KnowledgeGraphView';
 import { AssetInspector } from './components/AssetInspector';
 import { BlastRadiusSimulator } from './components/BlastRadiusSimulator';
 import { MultimodalInspectionView } from './components/MultimodalInspectionView';
@@ -32,6 +33,7 @@ export const App: React.FC = () => {
   const [isDbModalOpen, setIsDbModalOpen] = useState<boolean>(false);
   const [isDemoModalOpen, setIsDemoModalOpen] = useState<boolean>(false);
   const [isReseeding, setIsReseeding] = useState<boolean>(false);
+  const [bdigSubTab, setBdigSubTab] = useState<'canvas' | 'workflow'>('canvas');
 
   useEffect(() => {
     if (currentWorkspace && currentWorkspace !== selectedBrandId) {
@@ -230,7 +232,42 @@ export const App: React.FC = () => {
               )}
 
               {currentTab === 'bdig' && (
-                <DependencyIntelligenceStudio brandId={selectedBrandId} />
+                <div className="space-y-4">
+                  {/* BDIG Sub-Navigation */}
+                  <div className="flex items-center justify-between bg-slate-900/60 p-1.5 rounded-2xl border border-slate-800">
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => setBdigSubTab('canvas')}
+                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+                          bdigSubTab === 'canvas'
+                            ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm shadow-cyan-500/20'
+                            : 'text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        Interactive Knowledge Graph Canvas
+                      </button>
+                      <button
+                        onClick={() => setBdigSubTab('workflow')}
+                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+                          bdigSubTab === 'workflow'
+                            ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40 shadow-sm shadow-rose-500/20'
+                            : 'text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        Fact Mutation &amp; Revision Workflow
+                      </button>
+                    </div>
+                    <span className="text-[11px] font-mono text-slate-400 pr-3 hidden sm:inline">
+                      Live MongoDB Graph Ontology
+                    </span>
+                  </div>
+
+                  {bdigSubTab === 'canvas' ? (
+                    <KnowledgeGraphView brandId={selectedBrandId} />
+                  ) : (
+                    <DependencyIntelligenceStudio brandId={selectedBrandId} />
+                  )}
+                </div>
               )}
 
               {currentTab === 'content-studio' && (
