@@ -29,6 +29,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSecurityIndex, setActiveSecurityIndex] = useState<number | null>(null);
   const [activeCapabilityId, setActiveCapabilityId] = useState<string | null>(null);
+  const [activeStepIndex, setActiveStepIndex] = useState<number>(3);
 
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false);
@@ -485,23 +486,59 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
 
         {/* ----------------------------------------------------------------- */}
-        {/* LIVE GOVERNANCE RULE TICKER (Homage to reference ticker)          */}
+        {/* LIVE GOVERNANCE RULE TICKER (Prominent & Larger per Image 2)      */}
         {/* ----------------------------------------------------------------- */}
-        <div className="mt-14 border-y border-slate-200 dark:border-slate-800 bg-slate-900 text-slate-100 py-3 overflow-hidden select-none">
-          <div className="animate-ticker text-xs font-mono tracking-wider uppercase font-semibold flex items-center gap-10">
-            <span className="text-amber-400">◆ "MUMBAI FLEET LAUNCH" EMBARGOED UNTIL DECEMBER (FACT-033)</span>
-            <span className="text-emerald-400">◆ 800V CHARGING OPERATES STRICTLY BELOW 65°C THERMAL STANDARD</span>
-            <span className="text-rose-400">◆ FDA 21 CFR §870: NON-DIAGNOSTIC WELLNESS DISCLOSURE REQUIRED</span>
-            <span className="text-cyan-400">◆ QUANTUMACOUSTICS MUST CARRY ™ TRADEMARK SYMBOL (LANHAM §43a)</span>
-            <span className="text-amber-400">◆ CLOUD STUDIO SUBSCRIPTION PRICE IS ₹499/MO (FACT-AUR-PRC-01)</span>
-            <span className="text-rose-400">◆ BANNED SUPERLATIVE: "WORLD'S FIRST AUTONOMOUS" FLAGGED BY NHTSA GATE</span>
-            {/* Duplicate for infinite loop */}
-            <span className="text-amber-400">◆ "MUMBAI FLEET LAUNCH" EMBARGOED UNTIL DECEMBER (FACT-033)</span>
-            <span className="text-emerald-400">◆ 800V CHARGING OPERATES STRICTLY BELOW 65°C THERMAL STANDARD</span>
-            <span className="text-rose-400">◆ FDA 21 CFR §870: NON-DIAGNOSTIC WELLNESS DISCLOSURE REQUIRED</span>
-            <span className="text-cyan-400">◆ QUANTUMACOUSTICS MUST CARRY ™ TRADEMARK SYMBOL (LANHAM §43a)</span>
-            <span className="text-amber-400">◆ CLOUD STUDIO SUBSCRIPTION PRICE IS ₹499/MO (FACT-AUR-PRC-01)</span>
-            <span className="text-rose-400">◆ BANNED SUPERLATIVE: "WORLD'S FIRST AUTONOMOUS" FLAGGED BY NHTSA GATE</span>
+        <div className="mt-14 border-y border-slate-700/80 bg-[#070b14] text-slate-100 py-5 sm:py-6 overflow-hidden select-none shadow-xl">
+          <div className="animate-ticker text-sm sm:text-base lg:text-lg font-mono tracking-wider uppercase font-bold flex items-center gap-12 sm:gap-16">
+            <span className="text-amber-400 flex items-center gap-2">
+              <span className="text-base sm:text-xl text-amber-500">◆</span>
+              "MUMBAI FLEET LAUNCH" EMBARGOED UNTIL DECEMBER (FACT-033)
+            </span>
+            <span className="text-emerald-400 flex items-center gap-2">
+              <span className="text-base sm:text-xl text-emerald-500">◆</span>
+              800V CHARGING OPERATES STRICTLY BELOW 65°C THERMAL STANDARD
+            </span>
+            <span className="text-rose-400 flex items-center gap-2">
+              <span className="text-base sm:text-xl text-rose-500">◆</span>
+              FDA 21 CFR §870: NON-DIAGNOSTIC WELLNESS DISCLOSURE REQUIRED
+            </span>
+            <span className="text-cyan-400 flex items-center gap-2">
+              <span className="text-base sm:text-xl text-cyan-500">◆</span>
+              QUANTUMACOUSTICS MUST CARRY ™ TRADEMARK SYMBOL (LANHAM §43a)
+            </span>
+            <span className="text-amber-400 flex items-center gap-2">
+              <span className="text-base sm:text-xl text-amber-500">◆</span>
+              CLOUD STUDIO SUBSCRIPTION PRICE IS ₹499/MO (FACT-AUR-PRC-01)
+            </span>
+            <span className="text-rose-400 flex items-center gap-2">
+              <span className="text-base sm:text-xl text-rose-500">◆</span>
+              BANNED SUPERLATIVE: "WORLD'S FIRST AUTONOMOUS" FLAGGED BY NHTSA GATE
+            </span>
+            {/* Duplicate for infinite seamless loop */}
+            <span className="text-amber-400 flex items-center gap-2">
+              <span className="text-base sm:text-xl text-amber-500">◆</span>
+              "MUMBAI FLEET LAUNCH" EMBARGOED UNTIL DECEMBER (FACT-033)
+            </span>
+            <span className="text-emerald-400 flex items-center gap-2">
+              <span className="text-base sm:text-xl text-emerald-500">◆</span>
+              800V CHARGING OPERATES STRICTLY BELOW 65°C THERMAL STANDARD
+            </span>
+            <span className="text-rose-400 flex items-center gap-2">
+              <span className="text-base sm:text-xl text-rose-500">◆</span>
+              FDA 21 CFR §870: NON-DIAGNOSTIC WELLNESS DISCLOSURE REQUIRED
+            </span>
+            <span className="text-cyan-400 flex items-center gap-2">
+              <span className="text-base sm:text-xl text-cyan-500">◆</span>
+              QUANTUMACOUSTICS MUST CARRY ™ TRADEMARK SYMBOL (LANHAM §43a)
+            </span>
+            <span className="text-amber-400 flex items-center gap-2">
+              <span className="text-base sm:text-xl text-amber-500">◆</span>
+              CLOUD STUDIO SUBSCRIPTION PRICE IS ₹499/MO (FACT-AUR-PRC-01)
+            </span>
+            <span className="text-rose-400 flex items-center gap-2">
+              <span className="text-base sm:text-xl text-rose-500">◆</span>
+              BANNED SUPERLATIVE: "WORLD'S FIRST AUTONOMOUS" FLAGGED BY NHTSA GATE
+            </span>
           </div>
         </div>
 
@@ -894,57 +931,82 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </p>
         </div>
 
-        {/* 6-Step Grid (Matching Reference Image 4) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          
+        {/* Continuous 6-Step Bento Grid Matching Reference Image 1 */}
+        <div 
+          className="rounded-2xl sm:rounded-3xl border border-neutral-800 bg-[#0e0e11] overflow-hidden shadow-2xl grid grid-cols-1 md:grid-cols-3 select-none"
+          onMouseLeave={() => setActiveStepIndex(3)}
+        >
           {[
             {
               step: 'STEP 1 OF 6',
               title: 'PASTE OR UPLOAD',
-              desc: 'A draft copy, a DOCX, a PDF or an image. Multi-format ingestion validates file signatures and extracts clean text.'
+              desc: 'A draft, a DOCX, a PDF or an image. Text inside images is read too.',
+              borderClasses: 'border-b border-neutral-800/90 md:border-r'
             },
             {
               step: 'STEP 2 OF 6',
               title: 'RULES RUN FIRST',
-              desc: 'Your banned phrases, required labels, product names, contrast, and trademark symbols are validated by code.'
+              desc: 'Your banned phrases, required labels, product names, contrast and alt text, checked by code.',
+              borderClasses: 'border-b border-neutral-800/90 md:border-r'
             },
             {
               step: 'STEP 3 OF 6',
               title: 'CLAIMS MEET THE FACTS',
-              desc: 'Every commercial claim is matched to your active fact ledger: supported, contradicted, expired or unsupported.'
+              desc: 'Every claim is matched to your fact ledger: supported, contradicted, expired or unsupported.',
+              borderClasses: 'border-b border-neutral-800/90'
             },
             {
               step: 'STEP 4 OF 6',
               title: 'EVIDENCE OR SILENCE',
-              desc: 'A finding only surfaces if it names a real rule or fact citation and quotes your exact words with character offsets.'
+              desc: 'A finding only shows if it names a real rule or fact and quotes your exact words.',
+              borderClasses: 'border-b md:border-b-0 border-neutral-800/90 md:border-r'
             },
             {
               step: 'STEP 5 OF 6',
               title: 'FIXED WITHOUT INVENTING',
-              desc: 'Claims are fixed only with approved master wording; your call to action, creative tone, and brand voice are kept intact.'
+              desc: 'Claims are fixed only with approved wording; your call to action and key phrases are kept.',
+              borderClasses: 'border-b md:border-b-0 border-neutral-800/90 md:border-r'
             },
             {
               step: 'STEP 6 OF 6',
-              title: 'REVIEWED AND SEALED',
-              desc: 'Reviewers decide, approvals are routed, and every authorized release receives a tamper-evident SHA-256 seal.'
+              title: 'REVIEWED AND RECORDED',
+              desc: 'Reviewers decide, approvals are routed, and every step lands in a tamper-evident log.',
+              borderClasses: ''
             }
-          ].map((item, i) => (
-            <div 
-              key={i} 
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-3 shadow-xs hover:border-indigo-400 dark:hover:border-indigo-600 transition-all"
-            >
-              <span className="text-[10px] font-mono font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase block">
-                {item.step}
-              </span>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
-                {item.title}
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                {item.desc}
-              </p>
-            </div>
-          ))}
-
+          ].map((item, i) => {
+            const isStepActive = activeStepIndex === i;
+            return (
+              <div 
+                key={i} 
+                tabIndex={0}
+                role="article"
+                aria-label={`${item.step}: ${item.title}`}
+                onMouseEnter={() => setActiveStepIndex(i)}
+                onFocus={() => setActiveStepIndex(i)}
+                className={`p-7 sm:p-9 lg:p-10 flex flex-col justify-start space-y-3.5 transition-all duration-200 ease-out cursor-pointer outline-none ${item.borderClasses} ${
+                  isStepActive
+                    ? 'bg-[#f4f2ea] text-neutral-900 shadow-inner'
+                    : 'bg-[#121215] text-white hover:bg-[#18181c]'
+                }`}
+              >
+                <span className={`text-[11px] sm:text-xs font-mono font-semibold tracking-wider uppercase block transition-colors duration-200 ${
+                  isStepActive ? 'text-neutral-500' : 'text-neutral-400'
+                }`}>
+                  {item.step}
+                </span>
+                <h3 className={`text-lg sm:text-xl font-extrabold tracking-tight uppercase leading-snug transition-colors duration-200 ${
+                  isStepActive ? 'text-neutral-950 font-sans' : 'text-white font-sans'
+                }`}>
+                  {item.title}
+                </h3>
+                <p className={`text-xs sm:text-sm leading-relaxed font-sans transition-colors duration-200 ${
+                  isStepActive ? 'text-neutral-700' : 'text-neutral-300'
+                }`}>
+                  {item.desc}
+                </p>
+              </div>
+            );
+          })}
         </div>
 
       </section>

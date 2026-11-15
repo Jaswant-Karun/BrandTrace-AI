@@ -19,13 +19,14 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       if (urlTheme === 'light' || urlTheme === 'dark') {
         return urlTheme;
       }
-      const savedTheme = localStorage.getItem('brandtrace_theme') as Theme;
-      if (savedTheme === 'light' || savedTheme === 'dark') {
-        return savedTheme;
+      // Temporary session check: Light mode is session-only (temporary)
+      const sessionTheme = sessionStorage.getItem('brandtrace_theme') as Theme;
+      if (sessionTheme === 'light' || sessionTheme === 'dark') {
+        return sessionTheme;
       }
     }
-    // Mandatory: First-time visitors always get Light Mode by default
-    return 'light';
+    // Permanent baseline: Dark Mode is the permanent default for BrandTrace AI
+    return 'dark';
   });
 
   useEffect(() => {
@@ -37,7 +38,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       root.classList.remove('dark');
       root.style.colorScheme = 'light';
     }
-    localStorage.setItem('brandtrace_theme', theme);
+    // Store in sessionStorage so Light mode is temporary for this session only; Dark mode is permanent
+    sessionStorage.setItem('brandtrace_theme', theme);
+    localStorage.setItem('brandtrace_theme', 'dark');
   }, [theme]);
 
   const toggleTheme = () => {
