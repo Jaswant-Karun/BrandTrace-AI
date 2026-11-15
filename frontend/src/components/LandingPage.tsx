@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ShieldCheck, GitFork, ArrowRight, Lock, 
-  Sparkles, CheckCircle2, ChevronRight,
-  Network, LineChart,
+  CheckCircle2, ChevronRight,
+  Network,
   FileText, Globe, Cpu,
   Check, AlertCircle, X, Menu,
-  Hash, Scale, Clock, Sliders
+  Hash, Clock, Sliders
 } from 'lucide-react';
 import { ThemeToggle } from './ui/ThemeToggle';
 import { PlumbBob } from './ui/PlumbBob';
@@ -104,24 +104,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <ThemeToggle />
             </div>
 
-            {/* If Authenticated: Show Account Indicator & Continue to Dashboard CTA */}
+            {/* If Authenticated: Show Account Indicator & Sign Out */}
             {isAuthenticated ? (
               <div className="flex items-center gap-2 shrink-0">
                 <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs shrink-0 whitespace-nowrap">
                   <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-                  <span className="font-semibold text-slate-800 dark:text-slate-200 max-w-[100px] truncate">
+                  <span className="font-semibold text-slate-800 dark:text-slate-200 max-w-[120px] truncate">
                     {user?.name?.split(',')[0] || 'Alex Mercer'}
                   </span>
                   <span className="text-[10px] text-slate-400 font-mono hidden 2xl:inline">({user?.role?.replace('_', ' ') || 'MANAGER'})</span>
                 </div>
-
-                <button
-                  onClick={() => onEnterApp('command-center')}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md hover:shadow-lg transition-all cursor-pointer ring-2 ring-indigo-500/20 shrink-0 whitespace-nowrap"
-                >
-                  <span>Continue to Dashboard</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
 
                 <button
                   onClick={() => {
@@ -391,6 +383,29 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <span className="text-[10px] font-mono text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded">
                     Latency: 182ms
                   </span>
+                </div>
+
+                {/* Realistic Product Packaging Inspection Header */}
+                <div className="flex items-center gap-3 p-2.5 bg-gradient-to-r from-emerald-50/70 via-slate-50 to-indigo-50/40 dark:from-emerald-950/30 dark:via-slate-800/60 dark:to-indigo-950/30 rounded-xl border border-slate-200 dark:border-slate-700/80">
+                  <img
+                    src="/images/product_aurelle_serum.jpg"
+                    alt="Aurelle Cellular Renewal Serum Packaging"
+                    className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shrink-0 shadow-xs"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-700 dark:text-emerald-400 font-bold truncate">
+                        Aurelle Active SKU · Multimodal Gate
+                      </span>
+                    </div>
+                    <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
+                      Cellular Renewal Serum · 50ml
+                    </h4>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 font-mono truncate">
+                      Grounded Claim: FACT-014 (32% reduction / 8 wks)
+                    </p>
+                  </div>
                 </div>
 
                 {/* Simulated Marketing Asset Card with strike-throughs & verified replacements */}
@@ -666,234 +681,155 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* ------------------------------------------------------------------- */}
-      {/* SECTION 3 — PRODUCT VISUAL GALLERY (6 Core Visual Pillars)          */}
+      {/* SECTION 3 — CORE CAPABILITIES (Unified, Aligned & Realistic Visuals) */}
       {/* ------------------------------------------------------------------- */}
-      <section id="platform" className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+      <section id="platform" className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16 relative">
+        {/* Anchor for features nav link */}
+        <div id="features" className="absolute -top-24 left-0 pointer-events-none" />
         
         <div className="text-center max-w-3xl mx-auto space-y-4">
-          <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-            End-to-End Control Plane
-          </span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300">
+            <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+            <span>Autonomous Brand Intelligence &amp; Governance</span>
+          </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            Six Connected Pillars of Modern Governance
+            Six Enterprise Capabilities. Grounded In Real Evidence.
           </h2>
           <p className="text-base text-slate-600 dark:text-slate-300">
-            From raw document ingestion to multi-agent inspection, impact simulation, and public verification.
+            From raw packaging inspection and brand fact curation to multi-agent risk gating, Digital Twin simulation, and cryptographic audit proofs.
           </p>
         </div>
 
-        {/* Gallery Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          
-          {/* Pillar 1: Brand Intelligence Dashboard */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4 hover:border-indigo-400 dark:hover:border-indigo-600 transition-all shadow-xs group">
-            <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">
-              <LineChart className="w-5 h-5" />
-            </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 transition-colors">
-              1. Brand Intelligence Dashboard
-            </h3>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Real-time enterprise command center tracking portfolio compliance (94.2%), active campaigns, statutory risk distribution, and live database health telemetry.
-            </p>
-            <div className="pt-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
-              <span>View Executive Telemetry</span>
-              <ChevronRight className="w-3.5 h-3.5" />
-            </div>
-          </div>
-
-          {/* Pillar 2: AI Content Risk Analysis */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4 hover:border-indigo-400 dark:hover:border-indigo-600 transition-all shadow-xs group">
-            <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold">
-              <Cpu className="w-5 h-5" />
-            </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 transition-colors">
-              2. AI Content Risk Analysis
-            </h3>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Concurrent 3-agent orchestration (Voice, Claims, Regulatory) delivering monotonic response times under 800ms with character-level risk spans.
-            </p>
-            <div className="pt-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
-              <span>Inspect Multi-Agent Gate</span>
-              <ChevronRight className="w-3.5 h-3.5" />
-            </div>
-          </div>
-
-          {/* Pillar 3: Brand Knowledge Management */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4 hover:border-indigo-400 dark:hover:border-indigo-600 transition-all shadow-xs group">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
-              <FileText className="w-5 h-5" />
-            </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 transition-colors">
-              3. Brand Knowledge Studio
-            </h3>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Centralized studio for custom guidelines, PDF/DOCX uploads, SSRF-protected website imports, and automated immutable document versioning.
-            </p>
-            <div className="pt-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
-              <span>Manage Brand Documents</span>
-              <ChevronRight className="w-3.5 h-3.5" />
-            </div>
-          </div>
-
-          {/* Pillar 4: Brand Governance Digital Twin */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4 hover:border-indigo-400 dark:hover:border-indigo-600 transition-all shadow-xs group">
-            <div className="w-10 h-10 rounded-xl bg-cyan-50 dark:bg-cyan-950 text-cyan-600 dark:text-cyan-400 flex items-center justify-center font-bold">
-              <Network className="w-5 h-5" />
-            </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 transition-colors">
-              4. Brand Governance Digital Twin
-            </h3>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Non-destructive virtual sandbox simulating commercial fact changes (e.g. ₹499 &rarr; ₹599) across upstream guidelines and downstream campaigns.
-            </p>
-            <div className="pt-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
-              <span>Explore Virtual Sandbox</span>
-              <ChevronRight className="w-3.5 h-3.5" />
-            </div>
-          </div>
-
-          {/* Pillar 5: Cascading Blast Radius Simulation */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4 hover:border-indigo-400 dark:hover:border-indigo-600 transition-all shadow-xs group">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
-              <Sliders className="w-5 h-5" />
-            </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 transition-colors">
-              5. Cascading Blast Radius
-            </h3>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Quantifies organization-wide financial exposure ($320,000) and departmental review workload (12.5 hours) before authorized human commit.
-            </p>
-            <div className="pt-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
-              <span>View Blast Radius Simulator</span>
-              <ChevronRight className="w-3.5 h-3.5" />
-            </div>
-          </div>
-
-          {/* Pillar 6: Public Content Verification */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4 hover:border-indigo-400 dark:hover:border-indigo-600 transition-all shadow-xs group">
-            <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400 flex items-center justify-center font-bold">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 transition-colors">
-              6. Public Verification Portal
-            </h3>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Zero-knowledge public verification portal allowing external consumers to verify seals, text, and image hashes without corporate credentials.
-            </p>
-            <div className="pt-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
-              <span>Open Public Verifier</span>
-              <ChevronRight className="w-3.5 h-3.5" />
-            </div>
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* ------------------------------------------------------------------- */}
-      {/* SECTION 5 — PLATFORM FEATURES (10 Enterprise Cards)                 */}
-      {/* ------------------------------------------------------------------- */}
-      <section id="features" className="py-16 sm:py-24 bg-slate-50 dark:bg-slate-900/60 border-y border-slate-200 dark:border-slate-800 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-          
-          <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-              Technical Capabilities
-            </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-              Ten Verified Governance Capabilities
-            </h2>
-            <p className="text-base text-slate-600 dark:text-slate-300">
-              Engineered with zero mock data in production routes, backed by MongoDB Atlas and 163 automated test suites.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            
-            {[
-              {
-                title: 'Brand Knowledge Management',
-                desc: 'Upload PDFs, DOCX, TXT files or import web pages with automatic text indexing and version history.',
-                icon: FileText,
-                badge: 'STUDIO'
-              },
-              {
-                title: 'AI Content Intelligence',
-                desc: 'Concurrent 3-agent orchestration returning non-destructive character spans in <800ms.',
-                icon: Cpu,
-                badge: 'PRE-RELEASE'
-              },
-              {
-                title: 'Brand Voice Analysis',
-                desc: 'Audits tone, banned superlatives, vocabulary guidelines, and stylistic consistency.',
-                icon: Sparkles,
-                badge: 'VOICE AGENT'
-              },
-              {
-                title: 'Claim Substantiation',
-                desc: 'Grounds price, technical, and battery claims against active approved MongoDB facts.',
-                icon: CheckCircle2,
-                badge: 'FACT RAG'
-              },
-              {
-                title: 'Regulatory Compliance',
-                desc: 'Evaluates legal standards including FTC 16 CFR §260.4, FDA 21 CFR §870, and Lanham Act §43(a).',
-                icon: Scale,
-                badge: 'STATUTORY'
-              },
-              {
-                title: 'Governance Digital Twin',
-                desc: 'Simulates the organizational consequences of a commercial change in a virtual sandbox.',
-                icon: Network,
-                badge: 'INNOVATION'
-              },
-              {
-                title: 'Cascading Blast Radius',
-                desc: 'Traverses directed dependencies to quantify affected ads, landing pages, and dollar exposure.',
-                icon: GitFork,
-                badge: 'SIMULATOR'
-              },
-              {
-                title: 'Human Approval Gate',
-                desc: 'Zero autonomous publishing. Explicit review queue with role-based sign-off and audit notes.',
-                icon: Lock,
-                badge: 'HUMAN GATE'
-              },
-              {
-                title: 'Cryptographic Ledger',
-                desc: 'SHA-256 chained block digest sealing linking content, reviewer identity, and timestamp.',
-                icon: Hash,
-                badge: 'LEDGER'
-              },
-              {
-                title: 'Public Verification Portal',
-                desc: 'Zero-auth verification portal classifying assets as APPROVED, OUTDATED, MODIFIED, or UNKNOWN.',
-                icon: ShieldCheck,
-                badge: 'PUBLIC'
-              }
-            ].map((feature, i) => (
-              <div 
-                key={i} 
-                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 space-y-2.5 flex flex-col justify-between hover:border-slate-400 dark:hover:border-slate-600 transition-colors shadow-2xs"
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <feature.icon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                    <span className="text-[10px] font-mono font-bold text-slate-400 uppercase">{feature.badge}</span>
+        {/* Aligned 6-Card Grid with Realistic Photography Headers */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
+          {[
+            {
+              id: 'brand-knowledge',
+              title: 'Brand Knowledge Base',
+              subtitle: 'Ground Truth Engine',
+              desc: 'Centralized repository for brand guidelines, scientific claims, ingredient dossiers, and statutory constraints. Automatically indexes uploaded PDFs, DOCX, and regulatory rules into immutable, versioned truth nodes.',
+              image: '/images/product_truth_bottle.jpg',
+              badge: 'GROUND TRUTH REPOSITORY',
+              metric: '100% Deterministic Fact Matching',
+              icon: FileText,
+              tab: 'brand-knowledge'
+            },
+            {
+              id: 'content-intelligence',
+              title: 'Content Intelligence Studio',
+              subtitle: '<800ms Multi-Agent Scan',
+              desc: 'Concurrent 3-agent orchestration (Voice & Lexicon, Claim Verification, Statutory Compliance). Audits pre-release copy, ads, and scripts with exact character-level risk spans in under 800ms.',
+              image: '/images/analytics_dashboard.jpg',
+              badge: 'CONCURRENT MULTI-AGENT SLA',
+              metric: '<800ms Monotonic Response SLA',
+              icon: Cpu,
+              tab: 'ai-content-studio'
+            },
+            {
+              id: 'vision-packaging',
+              title: 'Multimodal Vision & Inspection',
+              subtitle: 'Aurelle Packaging & OCR',
+              desc: 'Physical cosmetic packaging and digital ad creative inspection. Performs sub-millimeter typography extraction and verifies clinical trial claims against master scientific study facts.',
+              image: '/images/product_aurelle_serum.jpg',
+              badge: 'PACKAGING OCR & AD VISION',
+              metric: 'Sub-millimeter Visual OCR Accuracy',
+              icon: ShieldCheck,
+              tab: 'ai-content-studio'
+            },
+            {
+              id: 'digital-twin-cap',
+              title: 'Brand Governance Digital Twin',
+              subtitle: 'Dependency & Blast Radius',
+              desc: 'Non-destructive virtual sandbox simulating the cascading impact of commercial fact or price updates before commit. Traverses directed dependency graphs across campaigns, guidelines, and published assets.',
+              image: '/images/digital_twin_network.jpg',
+              badge: 'ORGANIZATIONAL SIMULATOR',
+              metric: 'Directed NetworkX Graph Traversal',
+              icon: Network,
+              tab: 'impact-simulator'
+            },
+            {
+              id: 'cryptographic-ledger',
+              title: 'Cryptographic Trust & Audit Ledger',
+              subtitle: 'SHA-256 Tamper-Evident Blocks',
+              desc: 'Every authorized release is permanently cryptographically sealed with SHA-256 chained block digest proofs. Binds author identity, reviewer sign-off, timestamp, and content hash into an immutable audit trail.',
+              image: '/images/cryptographic_ledger.jpg',
+              badge: 'TAMPER-EVIDENT MERKLE BLOCKS',
+              metric: 'SHA-256 Chained Block Proofs',
+              icon: Hash,
+              tab: 'trust-ledger'
+            },
+            {
+              id: 'approval-center',
+              title: 'Approval Center & Human Gate',
+              subtitle: 'Zero Autonomous Publishing',
+              desc: 'Strict human-in-the-loop governance with zero autonomous publishing. Multi-tier review queue with role-based sign-offs, audit trails, and instant status verification (APPROVED, OUTDATED, MODIFIED).',
+              image: '/images/campaign_approval.jpg',
+              badge: 'HUMAN-IN-THE-LOOP CONTROL',
+              metric: 'Zero Autonomous Publishing Gate',
+              icon: Lock,
+              tab: 'approval-center'
+            }
+          ].map((cap) => (
+            <div 
+              key={cap.id}
+              className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col justify-between hover:border-indigo-400 dark:hover:border-indigo-600 transition-all shadow-xs hover:shadow-md group"
+            >
+              <div>
+                {/* Realistic Photographic Header with Aspect Ratio & Badges */}
+                <div className="h-52 w-full overflow-hidden relative bg-slate-100 dark:bg-slate-800">
+                  <img
+                    src={cap.image}
+                    alt={cap.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/25 to-transparent pointer-events-none" />
+                  
+                  {/* Floating Badges */}
+                  <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider bg-slate-900/80 backdrop-blur-md text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30">
+                      {cap.badge}
+                    </span>
+                    <div className="w-8 h-8 rounded-lg bg-slate-900/80 backdrop-blur-md flex items-center justify-center text-white border border-white/20 shadow-xs">
+                      <cap.icon className="w-4 h-4 text-indigo-400" />
+                    </div>
                   </div>
-                  <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">
-                    {feature.title}
-                  </h4>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                    {feature.desc}
+
+                  <div className="absolute bottom-3 left-4 right-4 pointer-events-none">
+                    <span className="text-[11px] font-mono font-semibold text-slate-300 block">
+                      {cap.subtitle}
+                    </span>
+                    <h3 className="text-base sm:text-lg font-bold text-white tracking-tight truncate">
+                      {cap.title}
+                    </h3>
+                  </div>
+                </div>
+
+                {/* Card Body Description */}
+                <div className="p-6 space-y-3">
+                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed min-h-[58px]">
+                    {cap.desc}
                   </p>
                 </div>
               </div>
-            ))}
 
-          </div>
+              {/* Card Footer with Metrics & Action Button */}
+              <div className="px-6 pb-5 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between mt-auto bg-slate-50/50 dark:bg-slate-900/50">
+                <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 truncate max-w-[170px]" title={cap.metric}>
+                  {cap.metric}
+                </span>
+                <button
+                  onClick={() => onEnterApp(cap.tab)}
+                  className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors cursor-pointer shrink-0"
+                >
+                  <span>Explore</span>
+                  <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
+
       </section>
 
       {/* ------------------------------------------------------------------- */}
@@ -1043,6 +979,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Right: Graph Canvas Simulation Preview Card */}
             <div className="lg:col-span-6 bg-slate-800/90 border border-slate-700 rounded-2xl p-6 space-y-4 shadow-2xl">
+              {/* Realistic Neural Dependency Mesh Header */}
+              <div className="h-32 w-full rounded-xl overflow-hidden relative border border-slate-700">
+                <img
+                  src="/images/digital_twin_network.jpg"
+                  alt="Digital Twin Neural Dependency Mesh"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
+                <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-xs font-mono">
+                  <span className="text-cyan-300 font-bold flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                    Live Neural Dependency Mesh
+                  </span>
+                  <span className="text-slate-300 text-[10px]">4 Downstream Nodes Flagged</span>
+                </div>
+              </div>
+
               <div className="flex items-center justify-between border-b border-slate-700 pb-3">
                 <div className="flex items-center gap-2">
                   <GitFork className="w-4 h-4 text-cyan-400" />
