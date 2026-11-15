@@ -4,6 +4,7 @@ import {
   AlertOctagon, RefreshCw, XCircle, Shield, FileCheck
 } from 'lucide-react';
 import { ReleaseLedgerEntry } from '../types';
+import { PageHeader } from './ui/PageHeader';
 
 interface AuditTrustCenterViewProps {
   brandId: string;
@@ -221,28 +222,18 @@ export const AuditTrustCenterView: React.FC<AuditTrustCenterViewProps> = ({ bran
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 flex flex-wrap items-center justify-between gap-4 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <Lock className="w-5 h-5 text-slate-800" />
-            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-              Multimodal Governance &amp; Verified Release History
-            </h2>
-          </div>
-          <p className="text-xs text-slate-500 max-w-2xl">
-            Cryptographic SHA-256 release ledger with Merkle-style block chaining. Every asset approval captures content hashes, approved versioning, source citations, and reviewer identity. Never automatically publishes without explicit human authorization.
-          </p>
-        </div>
-
-        <button
-          onClick={handleExportAudit}
-          className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-xs transition-all cursor-pointer"
-        >
-          <Download className="w-3.5 h-3.5" />
-          Export Audit Manifest JSON
-        </button>
-      </div>
+      {/* Standardized Enterprise Page Header */}
+      <PageHeader
+        title="Trust & Audit Ledger"
+        description="Immutable record of approved releases with SHA-256 cryptographic proof digests. Use the interactive 5-state verifier to test for tampering or revocation."
+        category="Cryptographic Assurance"
+        workspaceName={brandId || 'aurelle-tech'}
+        primaryAction={{
+          label: "Export Audit Manifest JSON",
+          onClick: handleExportAudit,
+          icon: <Download className="w-3.5 h-3.5" />
+        }}
+      />
 
       {actionSuccessMsg && (
         <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-xs text-emerald-800 flex items-center justify-between shadow-xs">

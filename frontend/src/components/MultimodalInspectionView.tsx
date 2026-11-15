@@ -3,6 +3,7 @@ import {
   Eye, AlertTriangle, CheckCircle2, Sliders, UploadCloud, 
   FileText, Image as ImageIcon, Video, ShieldCheck, Check, Sparkles, AlertOctagon, HelpCircle
 } from 'lucide-react';
+import { PageHeader } from './ui/PageHeader';
 
 interface MultimodalInspectionViewProps {
   brandId: string;
