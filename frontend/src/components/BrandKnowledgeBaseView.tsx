@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { 
   BookOpen, Search, Plus, ExternalLink, Edit2, Flame, Calendar, Tag,
-  FileText, Upload, Globe, Trash2, History, CheckCircle2, Clock, 
+  FileText, Upload, Globe, Trash2, History, CheckCircle2,
   AlertTriangle, FileUp, Layers, Lock, ShieldCheck, ChevronDown, 
-  ChevronUp, AlertCircle, RefreshCw, X, Check
+  ChevronUp, RefreshCw, Check
 } from 'lucide-react';
 import { apiClient } from '../services/apiClient';
 import { PageHeader } from './ui/PageHeader';
-import { WorkflowBanner } from './ui/WorkflowBanner';
 import { EmptyState } from './ui/EmptyState';
 import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
@@ -612,7 +611,7 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
           >
             <FileText className="w-3.5 h-3.5 text-indigo-600" />
             <span>Brand Documents Studio</span>
-            <Badge variant="brand" size="xs">{documents.length}</Badge>
+            <Badge variant="brand" size="sm">{documents.length}</Badge>
           </button>
 
           <button
@@ -625,7 +624,7 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
           >
             <Layers className="w-3.5 h-3.5 text-slate-600" />
             <span>Certified Graph Nodes</span>
-            <Badge variant="neutral" size="xs">{allNodes.length}</Badge>
+            <Badge variant="neutral" size="sm">{allNodes.length}</Badge>
           </button>
         </div>
 

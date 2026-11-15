@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   CheckCircle2, RefreshCw, AlertTriangle, HelpCircle, 
-  Upload, FileText, Hash, ShieldCheck, ArrowLeft,
+  Upload, FileText, Hash, ArrowLeft,
   Search, Lock, Check, AlertCircle, Copy
 } from 'lucide-react';
 import { apiClient } from '../services/apiClient';
@@ -175,6 +175,7 @@ export const PublicVerificationView: React.FC<PublicVerificationViewProps> = ({
                   <option value="Velora Money">Velora Money</option>
                   <option value="Apex Dynamics">Apex Dynamics</option>
                   <option value="Aurelle Technologies">Aurelle Technologies</option>
+                  <option value="Aurelle Technologies Inc.">Aurelle Technologies Inc.</option>
                   <option value="Novus Health Solutions">Novus Health</option>
                 </select>
               </div>

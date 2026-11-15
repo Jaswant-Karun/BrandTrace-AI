@@ -42,11 +42,24 @@ export const App: React.FC = () => {
   const { currentWorkspace, setWorkspace, isAuthenticated } = useAuth();
   
   const [viewMode, setViewMode] = useState<'landing' | 'login' | 'app' | 'verify'>(() => {
-    // If token exists, enter app directly; otherwise show login
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('view') === 'verify' || window.location.hash === '#verify') return 'verify';
+      if (params.get('view') === 'landing') return 'landing';
+      if (params.get('view') === 'login') return 'login';
+      if (params.get('view') === 'app' || params.get('demo') === 'true') return 'app';
+    }
     return localStorage.getItem('brandtrace_jwt_token') ? 'app' : 'login';
   });
 
-  const [currentTab, setCurrentTab] = useState<NavigationTab>('command-center');
+  const [currentTab, setCurrentTab] = useState<NavigationTab>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab') as NavigationTab;
+      if (tabParam) return tabParam;
+    }
+    return 'command-center';
+  });
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
   const [brands, setBrands] = useState<BrandProfile[]>([]);
   const [selectedBrandId, setSelectedBrandId] = useState<string>(currentWorkspace || 'aurelle-tech');
@@ -394,6 +407,13 @@ export const App: React.FC = () => {
 
                 {currentTab === 'audit-trust' && (
                   <AuditTrustCenterView brandId={selectedBrandId} onNavigate={setCurrentTab} />
+                )}
+
+                {currentTab === 'public-verification' && (
+                  <PublicVerificationView
+                    initialBrand={currentBrand?.brand_name || 'Velora Money'}
+                    onBack={() => setCurrentTab('command-center')}
+                  />
                 )}
 
                 {currentTab === 'settings' && (

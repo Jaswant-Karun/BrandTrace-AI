@@ -35,10 +35,25 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [token, setToken] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('demo') === 'true') {
+        const demoToken = 'demo_authenticated_token';
+        localStorage.setItem('brandtrace_jwt_token', demoToken);
+        localStorage.setItem('brandtrace_user_profile', JSON.stringify(DEMO_AURELLE_PERSONA));
+        return demoToken;
+      }
+    }
     return localStorage.getItem('brandtrace_jwt_token');
   });
 
   const [user, setUser] = useState<UserPersona | null>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('demo') === 'true') {
+        return DEMO_AURELLE_PERSONA;
+      }
+    }
     const savedUser = localStorage.getItem('brandtrace_user_profile');
     if (savedUser) {
       try {
