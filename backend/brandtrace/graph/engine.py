@@ -242,3 +242,4 @@ class BrandKnowledgeGraph:
             affected_targets=targets,
             summary_rationale=summary
         )
+

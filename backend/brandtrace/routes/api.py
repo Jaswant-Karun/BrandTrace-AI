@@ -191,3 +191,4 @@ async def seed_database():
         "message": f"Successfully seeded {len(loaded_brands)} enterprise brand profiles into MongoDB & Graph Engine.",
         "brands": loaded_brands
     }
+
