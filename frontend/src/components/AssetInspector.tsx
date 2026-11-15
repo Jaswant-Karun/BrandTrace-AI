@@ -114,10 +114,14 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
     setSelectedSpan(null);
     setSignedSuccess(null);
 
+    const token = localStorage.getItem('brandtrace_jwt_token');
     try {
       const response = await fetch('/api/verify', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({
           brand_id: brandId,
           content: content,

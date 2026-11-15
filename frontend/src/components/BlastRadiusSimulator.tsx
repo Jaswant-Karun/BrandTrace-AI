@@ -100,10 +100,14 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
     setSimulationReport(null);
     setCommitMessage(null);
 
+    const token = localStorage.getItem('brandtrace_jwt_token');
     try {
       const res = await fetch('/api/simulator/propose', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({
           brand_id: brandId || 'aurelle-tech',
           target_record_id: selectedPresetId,
@@ -132,10 +136,14 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
     setIsCommitting(true);
     setCommitMessage(null);
 
+    const token = localStorage.getItem('brandtrace_jwt_token');
     try {
       const res = await fetch('/api/simulator/commit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({
           brand_id: brandId || 'aurelle-tech',
           simulation_id: simulationReport.simulation_id,
