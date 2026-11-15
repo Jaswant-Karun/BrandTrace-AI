@@ -32,4 +32,32 @@ class Settings(BaseModel):
     audit_ledger_path: str = os.getenv("AUDIT_LEDGER_PATH", "./data/release_ledger.json")
     enable_cascading_blast_radius: bool = True
 
+    # CORS Configuration
+    allowed_origins_raw: str = os.getenv(
+        "ALLOWED_ORIGINS",
+        "https://brand-trace-ai-dun.vercel.app,https://brandtrace-ai.vercel.app,http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173,http://127.0.0.1:8000"
+    )
+
+    def get_allowed_origins(self) -> list[str]:
+        raw = os.getenv("ALLOWED_ORIGINS", self.allowed_origins_raw)
+        origins = [o.strip() for o in raw.split(",") if o.strip()]
+        if self.environment == "production":
+            # Disallow wildcard in production when credentials are enabled
+            filtered = [o for o in origins if o != "*"]
+            if not filtered:
+                raise RuntimeError(
+                    "Production startup failure: ALLOWED_ORIGINS cannot be empty or solely wildcard ('*') when credentials are enabled. Please configure explicit domains."
+                )
+            return filtered
+        
+        # Development defaults include standard local development addresses
+        dev_defaults = [
+            "http://localhost:5173", "http://localhost:3000",
+            "http://127.0.0.1:5173", "http://127.0.0.1:8000"
+        ]
+        for dev_origin in dev_defaults:
+            if dev_origin not in origins:
+                origins.append(dev_origin)
+        return origins
+
 settings = Settings()

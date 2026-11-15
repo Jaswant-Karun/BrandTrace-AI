@@ -15,6 +15,39 @@ SECRET_KEY = os.getenv("JWT_SECRET_KEY", "brandtrace-enterprise-governance-secre
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 # 24 hours
 
+DEFAULT_INSECURE_SECRETS = {
+    "brandtrace-enterprise-governance-secret-key-2026-audit",
+    "secret",
+    "secretkey",
+    "changeme",
+    "password",
+    "your-secret-key",
+    "ENTER_SECURE_KEY",
+}
+
+def validate_jwt_secret_for_environment(environment: str, secret: Optional[str] = None) -> None:
+    """
+    Validates JWT_SECRET_KEY during application startup.
+    When environment == 'production':
+      - Requires a non-empty secret of at least 32 characters.
+      - Rejects known default/example secrets.
+      - Raises RuntimeError without printing or exposing the secret.
+    Preserves default secret in development/testing mode.
+    """
+    if environment.lower() in ["production", "prod"]:
+        effective_secret = secret if secret is not None else os.getenv("JWT_SECRET_KEY")
+        if not effective_secret or not effective_secret.strip():
+            raise RuntimeError(
+                "Production startup failure: Missing or empty JWT_SECRET_KEY. "
+                "A secure, high-entropy secret key is required in production."
+            )
+        clean_secret = effective_secret.strip()
+        if clean_secret in DEFAULT_INSECURE_SECRETS or len(clean_secret) < 32:
+            raise RuntimeError(
+                "Production startup failure: Insecure or default JWT_SECRET_KEY detected. "
+                "Please configure a unique, high-entropy secret of at least 32 characters in your production environment variables."
+            )
+
 class UserRole(str, Enum):
     ADMIN = "ADMIN"
     BRAND_MANAGER = "BRAND_MANAGER"

@@ -24,6 +24,11 @@ from brandtrace.core.middleware import (
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Startup: Security Configuration Validation
+    from brandtrace.core.security import validate_jwt_secret_for_environment
+    validate_jwt_secret_for_environment(settings.environment)
+    settings.get_allowed_origins()
+
     # Startup: Connect to MongoDB Atlas & Auto-Seed
     await mongo_manager.connect()
     try:
@@ -51,7 +56,7 @@ app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RateLimitMiddleware, requests_per_minute=120)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.get_allowed_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
