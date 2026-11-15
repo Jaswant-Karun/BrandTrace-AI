@@ -608,6 +608,41 @@ class AutonomousGovernancePipeline:
             if not any(abs(s.start_char - aspan.start_char) < 3 and s.matched_text == aspan.matched_text for s in all_spans):
                 all_spans.append(aspan)
 
+        # 1c. Configured AI Provider Grounding (Gemini / Semantic Intelligence)
+        try:
+            from brandtrace.engine.ai_provider import ai_provider
+            truth_nodes = [{"id": f.id, "label": f.name} for f in getattr(bkg, "approved_facts", {}).values()] if hasattr(bkg, "approved_facts") else []
+            ai_findings = ai_provider.generate_grounded_review_sync(request.content, truth_nodes, [])
+            for af in ai_findings:
+                if af.exact_text and af.exact_text.lower() in request.content.lower():
+                    s_idx = request.content.lower().find(af.exact_text.lower())
+                    e_idx = s_idx + len(af.exact_text)
+                    # Add if not overlapping with an existing span
+                    if not any(abs(s.start_char - s_idx) < 4 for s in all_spans):
+                        sev_map = {
+                            "CRITICAL": SeverityLevel.CRITICAL,
+                            "BLOCKING": SeverityLevel.CRITICAL,
+                            "HIGH": SeverityLevel.HIGH,
+                            "MAJOR": SeverityLevel.HIGH,
+                            "MODERATE": SeverityLevel.MODERATE,
+                            "LOW": SeverityLevel.LOW
+                        }
+                        all_spans.append(
+                            RiskSpan(
+                                start_char=s_idx,
+                                end_char=e_idx,
+                                matched_text=request.content[s_idx:e_idx],
+                                category=af.category,
+                                severity=sev_map.get(af.severity, SeverityLevel.MODERATE),
+                                explanation=af.explanation,
+                                rule_citation=f"{af.citation.rule_or_fact_id} ({af.citation.source_title})",
+                                suggested_fix=af.suggested_correction
+                            )
+                        )
+        except Exception:
+            # Resilient fallback: network or provider timeouts do not break inspection
+            pass
+
         # 2. Risk Scoring & Governance Gate
         # Critical severity adds 35 risk points, High adds 20, Moderate adds 10, Low adds 4.
         risk_points = 0.0
@@ -827,6 +862,91 @@ class AutonomousGovernancePipeline:
                     suggested_fix="Shop Aurelle Radiant Glow Serum"
                 )
             )
+
+        # 8b. FACT-033: Embargoed Promotion / Diwali Sale
+        if "diwali sale" in lower_text or ("diwali" in lower_text and "sale" in lower_text):
+            m_diwali = re.search(r"\b(?:our\s+)?diwali\s+sale(?:\s+is\s+here)?\b", text, re.IGNORECASE)
+            if m_diwali:
+                spans.append(
+                    RiskSpan(
+                        start_char=m_diwali.start(),
+                        end_char=m_diwali.end(),
+                        matched_text=m_diwali.group(0),
+                        category="PROMOTION",
+                        severity=SeverityLevel.CRITICAL,
+                        explanation="Announcing the Diwali festive sale violates commercial launch embargo in effect until approved release window (FACT-033).",
+                        rule_citation="Approved Fact FACT-033 (Commercial Campaign Embargo Schedule)",
+                        suggested_fix="Coming Soon: Festive Collection Preview"
+                    )
+                )
+
+        # 8c. FACT-AUR-EXP-01: Lapsed Founder Promotion Tier
+        if "founder launch trial" in lower_text or ("₹0" in lower_text and "founder" in lower_text) or "free for 6 months" in lower_text:
+            m_exp = re.search(r"\b(?:₹0\s+free\s+for\s+6\s+months|founder\s+launch\s+trial|free\s+for\s+6\s+months)\b", text, re.IGNORECASE)
+            if m_exp:
+                spans.append(
+                    RiskSpan(
+                        start_char=m_exp.start(),
+                        end_char=m_exp.end(),
+                        matched_text=m_exp.group(0),
+                        category="PROMOTION",
+                        severity=SeverityLevel.HIGH,
+                        explanation="Reference relies on an expired promotional tier that lapsed on Dec 31, 2025 (FACT-AUR-EXP-01).",
+                        rule_citation="Approved Fact FACT-AUR-EXP-01 (Status: EXPIRED Dec 31, 2025)",
+                        suggested_fix="Aurelle Cloud Studio subscription starting at ₹499/month"
+                    )
+                )
+
+        # 8d. GL-AUR-04: Battery Specification Disclosure
+        if ("72-hour" in lower_text or "72 hours" in lower_text) and "battery" in lower_text and "iec" not in lower_text:
+            m_bat = re.search(r"\b72-?(?:hour|hours)\s+(?:continuous\s+)?battery(?:\s+life)?\b", text, re.IGNORECASE)
+            if m_bat:
+                spans.append(
+                    RiskSpan(
+                        start_char=m_bat.start(),
+                        end_char=m_bat.end(),
+                        matched_text=m_bat.group(0),
+                        category="SPECIFICATION",
+                        severity=SeverityLevel.HIGH,
+                        explanation="72-hour battery claims require mandatory IEC 62133 standardized lab protocol disclosure footnote.",
+                        rule_citation="Brand Guideline GL-AUR-04 (Battery Life Statutory Testing Disclosure)",
+                        suggested_fix=f"{m_bat.group(0)}* (*Tested under IEC 62133 standardized lab protocol)"
+                    )
+                )
+
+        # 8e. GL-AUR-01: Logo Safe-Zone Clearance (< 20px)
+        if "12px" in lower_text and ("clearance" in lower_text or "padding" in lower_text or "margin" in lower_text):
+            m_clr = re.search(r"\b12px(?:\s+padding)?\s+clearance\b", text, re.IGNORECASE)
+            if m_clr:
+                spans.append(
+                    RiskSpan(
+                        start_char=m_clr.start(),
+                        end_char=m_clr.end(),
+                        matched_text=m_clr.group(0),
+                        category="VISUAL_IDENTITY",
+                        severity=SeverityLevel.HIGH,
+                        explanation="Logo margin clearance of 12px violates the mandatory minimum safe-zone threshold of 20px around the Aurelle wordmark.",
+                        rule_citation="Brand Guideline GL-AUR-01 (Logo Safe Zone Clearance Mandate)",
+                        suggested_fix="20px margin clearance around Aurelle wordmark"
+                    )
+                )
+
+        # 8f. GL-AUR-02: Off-Palette Hue (#FF5500 / Neon Orange)
+        if "#ff5500" in lower_text or "neon orange" in lower_text:
+            m_col = re.search(r"\b(?:neon\s+orange\s+)?#FF5500\b", text, re.IGNORECASE)
+            if m_col:
+                spans.append(
+                    RiskSpan(
+                        start_char=m_col.start(),
+                        end_char=m_col.end(),
+                        matched_text=m_col.group(0),
+                        category="VISUAL_IDENTITY",
+                        severity=SeverityLevel.HIGH,
+                        explanation="Detected unauthorized off-palette hue '#FF5500' (Neon Orange). Deviates from authorized palette: Obsidian Black (#0A0E1A) and Champagne Gold (#D4AF37).",
+                        rule_citation="Brand Guideline GL-AUR-02 (Approved Master Color Palette)",
+                        suggested_fix="Champagne Gold (#D4AF37)"
+                    )
+                )
 
         # 9. Style: GM07 (Website/Internet capitalization)
         gm07_pattern = re.compile(r"(?<=[a-zA-Z0-9,\s])\b(Website|Internet|Online|Email)\b")

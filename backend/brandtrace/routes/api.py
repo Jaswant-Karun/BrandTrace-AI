@@ -194,6 +194,11 @@ async def verify_asset(request: VerificationRequest):
     await mongo_manager.save_verification(result.model_dump())
     return result
 
+@router.get("/verifications")
+async def list_verification_history(brand_id: Optional[str] = Query(None), limit: int = Query(20)):
+    """Returns chronological content inspection & verification history."""
+    return await mongo_manager.list_verifications(brand_id=brand_id, limit=limit)
+
 # 5. Cascading Blast Radius Analysis
 @router.post("/blast-radius", response_model=BlastRadiusResponse)
 async def simulate_blast_radius(request: BlastRadiusRequest):
