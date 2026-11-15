@@ -387,10 +387,56 @@ async def create_brand_guideline(req: CreateGuidelineRequest):
     """
     Registers a new brand guideline, restricted terminology, or required phrase into MongoDB Atlas.
     """
-    guideline_id = req.guideline_id or f"GL-{req.workspace_id[:3].upper()}-{int(time.time() * 1000) % 100000:05d}"
+    if not req.title or not req.title.strip():
+        raise HTTPException(status_code=400, detail="Guideline title cannot be empty or whitespace.")
+    if not req.rule_statement or not req.rule_statement.strip():
+        raise HTTPException(status_code=400, detail="Rule statement cannot be empty or whitespace.")
+
+    def _validate_date(d_str: Optional[str], label: str):
+        if not d_str:
+            return
+        try:
+            cleaned = d_str.strip()
+            if len(cleaned) == 10:
+                datetime.date.fromisoformat(cleaned)
+            else:
+                datetime.datetime.fromisoformat(cleaned)
+        except Exception:
+            raise HTTPException(status_code=400, detail=f"Invalid format for '{label}': '{d_str}'. Expected YYYY-MM-DD format.")
+
+    _validate_date(req.effective_date, "effective_date")
+    _validate_date(req.expiry_date, "expiry_date")
+    if req.effective_date and req.expiry_date and req.expiry_date < req.effective_date:
+        raise HTTPException(status_code=400, detail="Expiry date cannot be prior to effective date.")
+
+    from brandtrace.data.seed_data import BRAND_SEEDS
     org_id = req.org_id or ("ORG-AURELLE" if "aurelle" in req.workspace_id else "ORG-APEX")
     now_int = int(time.time())
     now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
+
+    # Idempotent duplicate check
+    if req.workspace_id in BRAND_SEEDS:
+        for node in BRAND_SEEDS[req.workspace_id].nodes:
+            if node.label.strip().lower() == req.title.strip().lower() and node.type == NodeType.GUIDELINE:
+                if (node.description or "").strip() == req.rule_statement.strip():
+                    return GuidelineResponse(
+                        guideline_id=node.id,
+                        workspace_id=req.workspace_id,
+                        org_id=org_id,
+                        title=node.label,
+                        category=node.properties.get("category", req.category),
+                        rule_statement=node.description or "",
+                        severity=node.properties.get("severity", req.severity),
+                        effective_date=str(req.effective_date or now_iso),
+                        expiry_date=req.expiry_date,
+                        restricted_terms=node.properties.get("restricted_terms", []),
+                        required_phrases=node.properties.get("required_phrases", []),
+                        source_citation=node.properties.get("citation", ""),
+                        status="ACTIVE"
+                    )
+                raise HTTPException(status_code=409, detail=f"A guideline with title '{req.title}' already exists in workspace '{req.workspace_id}'.")
+
+    guideline_id = req.guideline_id or f"GL-{req.workspace_id[:3].upper()}-{int(time.time() * 1000) % 100000:05d}"
     
     # 1. Save to MongoDB Atlas Repository
     guideline_doc = BrandGuidelineDoc(
