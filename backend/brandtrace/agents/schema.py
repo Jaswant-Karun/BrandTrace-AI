@@ -28,6 +28,8 @@ class VerificationRequest(BaseModel):
     asset_title: Optional[str] = None
     channel: str = "Digital"
     target_jurisdiction: str = "US"
+    key_phrases: Optional[str] = None
+    call_to_action: Optional[str] = None
 
 class VerificationResult(BaseModel):
     verification_id: str
@@ -47,4 +49,7 @@ class VerificationResult(BaseModel):
     agents_count: int = 3
     timestamp: int
     timestamp_iso: str
+    sentence_findings: Optional[List[Dict[str, Any]]] = None
+    summary_counts: Optional[Dict[str, int]] = None
+    verdict_badge: Optional[str] = None
 

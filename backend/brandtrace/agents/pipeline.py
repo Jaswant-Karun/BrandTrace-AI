@@ -1,7 +1,7 @@
 import re
 import time
 import uuid
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional, Any
 from brandtrace.graph.engine import BrandKnowledgeGraph
 from brandtrace.graph.schema import SeverityLevel, NodeType
 from brandtrace.core.security import generate_release_proof
@@ -597,6 +597,17 @@ class AutonomousGovernancePipeline:
         all_spans.extend(claim_report.risk_spans)
         all_spans.extend(legal_report.risk_spans)
 
+        # 1b. Brand & Aurelle Rulebook Grounding (Facts & Specific Rules)
+        aurelle_spans = self._analyze_aurelle_specifics(
+            request.content,
+            key_phrases=getattr(request, "key_phrases", None),
+            cta=getattr(request, "call_to_action", None)
+        )
+        # Avoid duplicate spans covering identical text
+        for aspan in aurelle_spans:
+            if not any(abs(s.start_char - aspan.start_char) < 3 and s.matched_text == aspan.matched_text for s in all_spans):
+                all_spans.append(aspan)
+
         # 2. Risk Scoring & Governance Gate
         # Critical severity adds 35 risk points, High adds 20, Moderate adds 10, Low adds 4.
         risk_points = 0.0
@@ -625,7 +636,24 @@ class AutonomousGovernancePipeline:
         # 3. Generate Remediation
         remediated_text, remediation_rationale = self.generate_remediation(request.content, all_spans)
 
-        # 4. Generate Cryptographic Release Proof
+        # 4. Generate Sentence-Level Findings & Verdict
+        sentence_findings = self._build_sentence_findings(request.content, all_spans)
+        summary_counts = {
+            "blocking": len([f for f in sentence_findings if f["severity"] == "BLOCKING"]),
+            "major": len([f for f in sentence_findings if f["severity"] == "MAJOR"]),
+            "minor": len([f for f in sentence_findings if f["severity"] == "MINOR"]),
+            "needs_human": len([f for f in sentence_findings if f.get("needs_human_review") or f["severity"] == "NEEDS_HUMAN"]),
+            "advisory": len([f for f in sentence_findings if f["severity"] == "ADVISORY"])
+        }
+
+        if summary_counts["blocking"] > 0:
+            verdict_badge = "CORRECTIONS REQUIRED"
+        elif summary_counts["needs_human"] > 0 or summary_counts["major"] > 0:
+            verdict_badge = "HUMAN REVIEW REQUIRED"
+        else:
+            verdict_badge = "READY FOR REVIEW"
+
+        # 5. Generate Cryptographic Release Proof
         proof = generate_release_proof(
             asset_id=request.asset_id or verification_id,
             asset_content=request.content,
@@ -661,8 +689,283 @@ class AutonomousGovernancePipeline:
             latency_ms=latency_ms,
             agents_count=3,
             timestamp=t0,
-            timestamp_iso=t0_iso
+            timestamp_iso=t0_iso,
+            sentence_findings=sentence_findings,
+            summary_counts=summary_counts,
+            verdict_badge=verdict_badge
         )
+
+    def _analyze_aurelle_specifics(self, text: str, key_phrases: Optional[str] = None, cta: Optional[str] = None) -> List[RiskSpan]:
+        spans: List[RiskSpan] = []
+        lower_text = text.lower()
+
+        # 1. FACT-014: Dark spots study benchmark & timeline exaggeration
+        dark_spots_pattern = re.compile(r"\b(?:fade\s+dark\s+spots\s+)?(?:by\s+)?60%(?:\s+in\s+just\s+2\s+weeks|\s+in\s+2\s+weeks)?\b", re.IGNORECASE)
+        for m in dark_spots_pattern.finditer(text):
+            spans.append(
+                RiskSpan(
+                    start_char=m.start(),
+                    end_char=m.end(),
+                    matched_text=m.group(0),
+                    category="CLAIM",
+                    severity=SeverityLevel.CRITICAL,
+                    explanation="Clinical evidence confirms 32% reduction in 8 weeks under protocol AUR-LAB-014, not 60% in 2 weeks.",
+                    rule_citation="FACT-014 (Clinical Hydration & Barrier Benchmark)",
+                    suggested_fix="fade dark spots by 32% in 8 weeks (FACT-014)"
+                )
+            )
+
+        # 2. Healed skin barrier / cure claim
+        barrier_pattern = re.compile(r"\b(?:my\s+)?skin\s+barrier\s+is\s+completely\s+healed\b", re.IGNORECASE)
+        for m in barrier_pattern.finditer(text):
+            spans.append(
+                RiskSpan(
+                    start_char=m.start(),
+                    end_char=m.end(),
+                    matched_text=m.group(0),
+                    category="CLAIM",
+                    severity=SeverityLevel.HIGH,
+                    explanation="Cosmetics cannot claim permanent physiological healing of dermal barriers under CDSCO & FDA guidelines.",
+                    rule_citation="Approved Claim AC-AUR-03 / CDSCO Drugs & Cosmetics Act",
+                    suggested_fix="skin barrier function is visibly supported"
+                )
+            )
+
+        # 3. Medical / Disease Treatment (e.g. Eczema)
+        eczema_pattern = re.compile(r"\btreatment\s+for\s+eczema(?:(?:\s+and\s+dry)?,\s+itchy\s+skin)?\b", re.IGNORECASE)
+        for m in eczema_pattern.finditer(text):
+            spans.append(
+                RiskSpan(
+                    start_char=m.start(),
+                    end_char=m.end(),
+                    matched_text=m.group(0),
+                    category="REGULATORY",
+                    severity=SeverityLevel.CRITICAL,
+                    explanation="Claiming a cosmetic product is a 'treatment for eczema' classifies the product as an unapproved new drug under CDSCO and FDA regulations.",
+                    rule_citation="FDA 21 CFR §202 / CDSCO Drugs & Cosmetics Act",
+                    suggested_fix="suitable for eczema-prone, dry skin"
+                )
+            )
+
+        # 4. Greenwashing: "100% natural, zero toxins" or "completely eco-friendly"
+        green_pattern = re.compile(r"\b(?:100%\s+natural(?:,\s+completely\s+eco-friendly)?|100%\s+natural,\s+zero\s+toxins|zero\s+toxins)\b", re.IGNORECASE)
+        for m in green_pattern.finditer(text):
+            spans.append(
+                RiskSpan(
+                    start_char=m.start(),
+                    end_char=m.end(),
+                    matched_text=m.group(0),
+                    category="REGULATORY",
+                    severity=SeverityLevel.CRITICAL,
+                    explanation="Absolute unquantified '100% natural' and 'zero toxins' claims are prohibited without lifecycle analysis documentation.",
+                    rule_citation="REG-01 / FTC Green Guides 16 CFR §260.4 & ASCI Guidelines",
+                    suggested_fix="formulated with 94% naturally derived ingredients"
+                )
+            )
+
+        # 5. Doctor approved / Guaranteed glass skin
+        guarantee_pattern = re.compile(r"\b(?:guaranteed\s+glass\s+skin\s+in\s+7\s+days|doctor\s+approved\s+and\s+guaranteed\s+results)\b", re.IGNORECASE)
+        for m in guarantee_pattern.finditer(text):
+            spans.append(
+                RiskSpan(
+                    start_char=m.start(),
+                    end_char=m.end(),
+                    matched_text=m.group(0),
+                    category="VOICE",
+                    severity=SeverityLevel.HIGH,
+                    explanation="Absolute guarantee of cosmetic efficacy is deceptive and violates ASCI Chapter 1 truthfulness mandates.",
+                    rule_citation="Brand Guideline GL-AUR-03 (Prohibited Absolute Guarantees)",
+                    suggested_fix="dermatologist tested for radiant-looking skin"
+                )
+            )
+
+        # 6. Pricing fact check: ₹499 vs ₹899
+        price_pattern = re.compile(r"\b₹499\b", re.IGNORECASE)
+        for m in price_pattern.finditer(text):
+            spans.append(
+                RiskSpan(
+                    start_char=m.start(),
+                    end_char=m.end(),
+                    matched_text=m.group(0),
+                    category="CLAIM",
+                    severity=SeverityLevel.CRITICAL,
+                    explanation="Authorized retail price for Aurelle Vitamin C Brightening Serum is ₹899 for 30 ml (FACT-006).",
+                    rule_citation="Approved Fact FACT-006 (Aurelle Skin Pricing Master Schedule)",
+                    suggested_fix="₹899"
+                )
+            )
+
+        # 7. DL-01: Discounts & Offers need "T&Cs apply"
+        if ("50% off" in lower_text or "buy one get one" in lower_text or "festive offer" in lower_text) and "t&c" not in lower_text and "terms apply" not in lower_text:
+            m_offer = re.search(r"\b(?:50%\s+off|buy\s+one\s+get\s+one(?:\s+50%\s+off)?)\b", text, re.IGNORECASE)
+            if m_offer:
+                spans.append(
+                    RiskSpan(
+                        start_char=m_offer.start(),
+                        end_char=m_offer.end(),
+                        matched_text=m_offer.group(0),
+                        category="REGULATORY",
+                        severity=SeverityLevel.HIGH,
+                        explanation="Commercial promotions, discounts, and offers require mandatory 'T&Cs apply' disclosure.",
+                        rule_citation="Brand Rule DL-01 (Promotions & Offers Mandatory Disclosure)",
+                        suggested_fix=f"{m_offer.group(0)} (T&Cs apply)"
+                    )
+                )
+
+        # 8. CIA-02: Calls to action name product, not "link in bio" or "click here"
+        cta_bad_pattern = re.compile(r"\b(?:check\s+link\s+in\s+bio(?:\s+to\s+shop)?|link\s+in\s+bio|click\s+here)\b", re.IGNORECASE)
+        for m in cta_bad_pattern.finditer(text):
+            spans.append(
+                RiskSpan(
+                    start_char=m.start(),
+                    end_char=m.end(),
+                    matched_text=m.group(0),
+                    category="VOICE",
+                    severity=SeverityLevel.LOW,
+                    explanation="Calls to action must name the product specifically rather than generic 'click here' or 'link in bio'.",
+                    rule_citation="Brand Rule CIA-02 (Brand Book §5.1 Calls to action)",
+                    suggested_fix="Shop Aurelle Radiant Glow Serum"
+                )
+            )
+
+        # 9. Style: GM07 (Website/Internet capitalization)
+        gm07_pattern = re.compile(r"(?<=[a-zA-Z0-9,\s])\b(Website|Internet|Online|Email)\b")
+        for m in gm07_pattern.finditer(text):
+            spans.append(
+                RiskSpan(
+                    start_char=m.start(),
+                    end_char=m.end(),
+                    matched_text=m.group(1),
+                    category="VOICE",
+                    severity=SeverityLevel.LOW,
+                    explanation="Don't capitalise website, internet, online or email mid-sentence.",
+                    rule_citation="Brand Rule GM07 (Style: lowercase online terms)",
+                    suggested_fix=m.group(1).lower()
+                )
+            )
+
+        # 10. Missing mandatory key phrases (if specified by Creator)
+        if key_phrases:
+            req_phrases = [p.strip() for p in key_phrases.split(",") if p.strip()]
+            for p in req_phrases:
+                if p.lower() not in lower_text:
+                    spans.append(
+                        RiskSpan(
+                            start_char=0,
+                            end_char=min(len(text), 15),
+                            matched_text=text[:min(len(text), 15)],
+                            category="VOICE",
+                            severity=SeverityLevel.MODERATE,
+                            explanation=f"Missing required key phrase '{p}' specified in post requirements.",
+                            rule_citation="Content Brief Directive: Mandatory Key Phrases",
+                            suggested_fix=f"{text[:min(len(text), 15)]} [{p}]"
+                        )
+                    )
+
+        # 11. Missing Call to Action (if specified by Creator)
+        if cta and cta.strip():
+            if cta.strip().lower() not in lower_text:
+                spans.append(
+                    RiskSpan(
+                        start_char=max(0, len(text) - 10),
+                        end_char=len(text),
+                        matched_text=text[max(0, len(text) - 10):],
+                        category="VOICE",
+                        severity=SeverityLevel.MODERATE,
+                        explanation=f"Missing required call to action '{cta.strip()}'.",
+                        rule_citation="Content Brief Directive: Required Call to Action",
+                        suggested_fix=f"{text[max(0, len(text) - 10):]} {cta.strip()}"
+                    )
+                )
+
+        return spans
+
+    def _build_sentence_findings(self, content: str, all_spans: List[RiskSpan]) -> List[Dict[str, Any]]:
+        sentence_matches = list(re.finditer(r'[^.!?\n]+(?:[.!?\n]|$)', content))
+        if not sentence_matches:
+            sentence_matches = [re.match(r'.*', content)]
+
+        sentence_findings = []
+        finding_idx = 1
+
+        for span in all_spans:
+            enclosing_sentence = ""
+            for sm in sentence_matches:
+                if sm and sm.start() <= span.start_char <= sm.end():
+                    enclosing_sentence = sm.group(0).strip()
+                    break
+            if not enclosing_sentence:
+                enclosing_sentence = content[max(0, span.start_char - 40):min(len(content), span.end_char + 40)].strip()
+
+            if span.severity == SeverityLevel.CRITICAL:
+                sev_str = "BLOCKING"
+            elif span.severity == SeverityLevel.HIGH:
+                sev_str = "MAJOR"
+            elif span.severity == SeverityLevel.MODERATE:
+                sev_str = "MINOR"
+            else:
+                sev_str = "ADVISORY"
+
+            needs_human = "medical" in span.category.lower() or "human" in span.explanation.lower() or span.severity == SeverityLevel.CRITICAL
+
+            rule_id = "RULE-01"
+            if "FACT-" in span.rule_citation:
+                m_rule = re.search(r"FACT-[A-Za-z0-9-]+", span.rule_citation)
+                if m_rule:
+                    rule_id = m_rule.group(0)
+            elif "REG-" in span.rule_citation:
+                m_rule = re.search(r"REG-[A-Za-z0-9-]+", span.rule_citation)
+                if m_rule:
+                    rule_id = m_rule.group(0)
+            elif "GL-" in span.rule_citation:
+                m_rule = re.search(r"GL-[A-Za-z0-9-]+", span.rule_citation)
+                if m_rule:
+                    rule_id = m_rule.group(0)
+            elif "DL-" in span.rule_citation:
+                m_rule = re.search(r"DL-[A-Za-z0-9-]+", span.rule_citation)
+                if m_rule:
+                    rule_id = m_rule.group(0)
+            elif "CIA-" in span.rule_citation:
+                m_rule = re.search(r"CIA-[A-Za-z0-9-]+", span.rule_citation)
+                if m_rule:
+                    rule_id = m_rule.group(0)
+            elif "GM" in span.rule_citation:
+                m_rule = re.search(r"GM[0-9]+", span.rule_citation)
+                if m_rule:
+                    rule_id = m_rule.group(0)
+            elif "TM-" in span.rule_citation:
+                m_rule = re.search(r"TM-[A-Za-z0-9-]+", span.rule_citation)
+                if m_rule:
+                    rule_id = m_rule.group(0)
+
+            suggested_sentence = enclosing_sentence
+            if span.suggested_fix and span.matched_text and span.matched_text in enclosing_sentence:
+                suggested_sentence = enclosing_sentence.replace(span.matched_text, span.suggested_fix, 1)
+
+            finding_item = {
+                "id": f"f-{finding_idx}",
+                "number": finding_idx,
+                "sentence_text": enclosing_sentence,
+                "flagged_text": span.matched_text,
+                "category": span.category,
+                "severity": sev_str,
+                "rule_id": rule_id,
+                "rule_title": span.rule_citation.split("(")[0].strip() if "(" in span.rule_citation else span.rule_citation,
+                "explanation": span.explanation,
+                "suggested_fix": span.suggested_fix or "",
+                "suggested_sentence": suggested_sentence,
+                "evidence_ref": span.rule_citation,
+                "needs_human_review": needs_human,
+                "decision": "UNDECIDED",
+                "overrule_reason": "",
+                "resolved": False,
+                "start_char": span.start_char,
+                "end_char": span.end_char
+            }
+            sentence_findings.append(finding_item)
+            finding_idx += 1
+
+        return sentence_findings
 
     # Alias for API uniformity
     analyze_asset = verify_asset

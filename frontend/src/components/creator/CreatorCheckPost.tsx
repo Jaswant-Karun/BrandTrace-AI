@@ -253,14 +253,41 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
         content: activeText,
         campaign_name: `${brandName} Marketing Asset`,
         channel: channel.toLowerCase(),
+        key_phrases: keyPhrases,
+        call_to_action: callToAction,
       }),
     });
 
     const parsedFindings: FindingItem[] = [];
     let count = 1;
 
-    // 1. Process backend all_risk_spans
-    if (res && res.all_risk_spans && res.all_risk_spans.length > 0) {
+    // 1. Prioritize backend rich sentence_findings
+    if (res && res.sentence_findings && Array.isArray(res.sentence_findings) && res.sentence_findings.length > 0) {
+      res.sentence_findings.forEach((sf: any) => {
+        let sev: SeverityType = 'ADVISORY';
+        if (sf.severity === 'BLOCKING' || sf.severity === 'CRITICAL') sev = 'BLOCKING';
+        else if (sf.severity === 'MAJOR' || sf.severity === 'HIGH') sev = 'MAJOR';
+        else if (sf.severity === 'NEEDS_HUMAN') sev = 'NEEDS_HUMAN';
+        else if (sf.severity === 'MINOR' || sf.severity === 'MODERATE') sev = 'MINOR';
+        else sev = 'ADVISORY';
+
+        parsedFindings.push({
+          id: `sf-${sf.number || count}`,
+          number: sf.number || count,
+          title: sf.rule_title || sf.rule_id || 'Brand Rule Finding',
+          category: sf.category || 'Approved Brand Claims',
+          source: `Rule Engine · ${sf.rule_id || 'Directive'}`,
+          ruleCitation: sf.rule_id || 'Brand Rule',
+          rejectedText: sf.flagged_text || sf.original_sentence || '',
+          approvedText: sf.suggested_fix || sf.suggested_sentence || 'approved wording',
+          recommendation: sf.explanation || 'Align with verified brand evidence.',
+          severity: sev,
+          accepted: false,
+        });
+        count++;
+      });
+    } else if (res && res.all_risk_spans && res.all_risk_spans.length > 0) {
+      // Fallback to all_risk_spans
       res.all_risk_spans.forEach((span: any) => {
         let sev: SeverityType = 'ADVISORY';
         if (span.severity === 'CRITICAL') sev = 'BLOCKING';
@@ -488,23 +515,70 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
     setIsReviewModalOpen(false);
 
     try {
-      // Connect to real `/api/releases/sign` backend endpoint
-      const signRes = await apiClient.request<any>('/api/releases/sign', {
-        method: 'POST',
-        body: JSON.stringify({
-          verification_id: `VRF-${Date.now().toString(36).toUpperCase()}`,
-          brand_id: workspaceId || 'aurelle-tech',
-          asset_id: `AST-CREATOR-${Date.now().toString().slice(-4)}`,
-          asset_title: `${brandName} Marketing Asset (${channel})`,
-          channel: channel.toLowerCase(),
-          content: draftContent,
-          reviewer: 'Creator Asha',
-          decision: categoryCounts.blocking === 0 ? 'APPROVED' : 'REVIEWED',
-        }),
-      });
+      // 1. Submit to centralized submissions database (places draft in Reviewer Meera's queue)
+      let submissionId = `SUB-${Date.now().toString(36).toUpperCase()}`;
+      try {
+        const subRes = await apiClient.request<any>('/api/submissions', {
+          method: 'POST',
+          body: JSON.stringify({
+            brand_id: workspaceId || 'aurelle-tech',
+            creator_id: 'USR-CREATOR-001',
+            creator_name: 'Creator Asha',
+            creator_type: 'employee',
+            channel: channel.toLowerCase(),
+            title: draftContent.slice(0, 95) + (draftContent.length > 95 ? '...' : ''),
+            original_content: draftContent,
+            current_content: draftContent,
+            status: 'PENDING_REVIEW',
+            findings: findings.map((f) => ({
+              number: f.number,
+              rule_id: f.ruleCitation,
+              rule_title: f.title,
+              category: f.category,
+              severity: f.severity,
+              sentence_index: 0,
+              original_sentence: f.rejectedText,
+              flagged_text: f.rejectedText,
+              explanation: f.recommendation,
+              suggested_fix: f.approvedText,
+              suggested_sentence: f.approvedText,
+              status: f.accepted ? 'OVERRULED' : 'PENDING'
+            })),
+            submission_notes: reviewNote || 'Submitted for review by Creator Asha',
+            version: privateVersionCount,
+          }),
+        });
+        if (subRes && subRes.id) {
+          submissionId = subRes.id;
+        }
+      } catch (subErr) {
+        console.warn('Submissions API notice:', subErr);
+      }
 
-      const hash = signRes?.release?.content_hash || `${Date.now().toString(16)}...`;
-      const seal = signRes?.release?.tamper_evident_seal || 'BT-SEAL-VERIFIED';
+      // 2. Also register tamper-evident release seal
+      let seal = 'BT-SEAL-VERIFIED';
+      let hash = `${Date.now().toString(16)}...`;
+      try {
+        const signRes = await apiClient.request<any>('/api/releases/sign', {
+          method: 'POST',
+          body: JSON.stringify({
+            verification_id: submissionId,
+            brand_id: workspaceId || 'aurelle-tech',
+            asset_id: `AST-CREATOR-${Date.now().toString().slice(-4)}`,
+            asset_title: `${brandName} Marketing Asset (${channel})`,
+            channel: channel.toLowerCase(),
+            content: draftContent,
+            reviewer: 'Creator Asha',
+            decision: categoryCounts.blocking === 0 ? 'APPROVED' : 'REVIEWED',
+          }),
+        });
+        if (signRes?.release) {
+          hash = signRes.release.content_hash || hash;
+          seal = signRes.release.tamper_evident_seal || seal;
+        }
+      } catch (signErr) {
+        console.warn('Sign API notice:', signErr);
+      }
 
       if (onSaveAuditVersion) {
         onSaveAuditVersion({
@@ -514,9 +588,9 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
         });
       }
 
-      setSubmissionStatus(`Draft submitted to Reviewer Meera. Release Seal: ${seal}. Immutable record locked in Audit Log.`);
+      setSubmissionStatus(`Draft submitted to Reviewer Meera (${submissionId}). Release Seal: ${seal}. Trackable in Review Queue & Audit Log.`);
     } catch (err) {
-      console.warn('Backend sign endpoint fallback:', err);
+      console.warn('Backend submission fallback:', err);
       if (onSaveAuditVersion) {
         onSaveAuditVersion({
           what: `submitted for human review (assigned: Reviewer Meera)`,

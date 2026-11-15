@@ -18,6 +18,8 @@ from brandtrace.modules.demo.router import router as demo_router
 from brandtrace.modules.security.router import router as security_router
 # Phase 3 Public Verification Router
 from brandtrace.modules.public_verification.router import router as public_verification_router
+# Phase 2 & 3 Submissions & Workflow Lifecycle Router
+from brandtrace.modules.submissions.router import router as submissions_router
 from brandtrace.core.middleware import (
     RateLimitMiddleware, SecurityHeadersMiddleware, ErrorSanitizationMiddleware
 )
@@ -75,6 +77,7 @@ app.include_router(approvals_router, prefix="/api")
 app.include_router(demo_router, prefix="/api")
 app.include_router(security_router, prefix="/api")
 app.include_router(public_verification_router, prefix="/api")
+app.include_router(submissions_router, prefix="/api")
 
 @app.api_route("/health", methods=["GET", "HEAD"])
 async def health_check():
