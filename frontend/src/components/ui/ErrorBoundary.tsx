@@ -60,7 +60,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </Button>
             {this.props.onReset && (
               <Button variant="primary" size="sm" onClick={this.props.onReset} icon={<Home className="w-3.5 h-3.5" />}>
-                Return to Command Center
+                Return to Home
               </Button>
             )}
           </div>

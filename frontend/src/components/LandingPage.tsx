@@ -13,7 +13,6 @@ import {
 
 import { PlumbBob } from './ui/PlumbBob';
 import { useAuth } from '../context/AuthContext';
-import { ContextualWorkspace, WorkspaceCategory } from './ContextualWorkspace';
 import { BrandProfile, VerificationResult, DatabaseStatus } from '../types';
 
 interface LandingPageProps {
@@ -26,11 +25,7 @@ interface LandingPageProps {
   selectedBrandId?: string;
   setSelectedBrandId?: (id: string) => void;
   dbStatus?: DatabaseStatus | null;
-  activeWorkspaceCategory?: WorkspaceCategory | null;
-  onSelectWorkspaceCategory?: (category: WorkspaceCategory, subTab?: string) => void;
-  onCloseWorkspace?: () => void;
   onSignRelease?: (result: VerificationResult, reviewerName: string) => Promise<void>;
-  initialSubTab?: string;
   onReseed?: () => void;
   isReseeding?: boolean;
   onOpenCreatorDashboard?: () => void;
@@ -45,15 +40,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onSignIn = () => { },
   brandName: _brandName = 'Apex Dynamics',
   animateEntrance,
-  brands = [],
-  selectedBrandId = 'aurelle-tech',
-  setSelectedBrandId = () => { },
+  brands: _brands = [],
+  selectedBrandId: _selectedBrandId = 'aurelle-tech',
+  setSelectedBrandId: _setSelectedBrandId = () => { },
   dbStatus: _dbStatus = null,
-  activeWorkspaceCategory = null,
-  onSelectWorkspaceCategory,
-  onCloseWorkspace,
-  onSignRelease,
-  initialSubTab,
+  onSignRelease: _onSignRelease,
   onReseed: _onReseed = () => { },
   isReseeding: _isReseeding = false,
   onOpenCreatorDashboard,
@@ -97,18 +88,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       clearTimeout(t3);
     };
   }, [shouldAnimate]);
-
-  const handleSelectCapability = (catId: WorkspaceCategory, targetSubTab?: string) => {
-    if (onSelectWorkspaceCategory) {
-      onSelectWorkspaceCategory(catId, targetSubTab);
-    }
-    setTimeout(() => {
-      const el = document.getElementById('workspace');
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 120);
-  };
 
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false);
@@ -155,15 +134,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <button onClick={() => scrollToSection('roles')} className="hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer">
               Roles
             </button>
-            {activeWorkspaceCategory && (
-              <button
-                onClick={() => scrollToSection('workspace')}
-                className="text-blue-600 dark:text-blue-400 font-bold transition-colors cursor-pointer flex items-center gap-1.5 bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/80 px-2.5 py-1 rounded-full animate-pulse"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400" />
-                <span>Active Workspace</span>
-              </button>
-            )}
             <button onClick={() => scrollToSection('how-it-works')} className="hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer">
               How It Works
             </button>
@@ -253,12 +223,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="flex flex-col space-y-2 text-sm font-medium text-slate-700 dark:text-slate-200">
                 <button onClick={() => scrollToSection('overview')} className="text-left py-1.5 hover:text-blue-600">Overview</button>
                 <button onClick={() => scrollToSection('roles')} className="text-left py-1.5 hover:text-blue-600">Roles</button>
-                {activeWorkspaceCategory && (
-                  <button onClick={() => scrollToSection('workspace')} className="text-left py-1.5 text-blue-600 dark:text-blue-400 font-bold flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-                    <span>Active Workspace</span>
-                  </button>
-                )}
                 <button onClick={() => scrollToSection('how-it-works')} className="text-left py-1.5 hover:text-blue-600">How It Works</button>
                 <button onClick={() => scrollToSection('digital-twin')} className="text-left py-1.5 hover:text-blue-600">Digital Twin</button>
                 <button onClick={() => scrollToSection('security')} className="text-left py-1.5 hover:text-blue-600">Trust &amp; Security</button>
@@ -272,10 +236,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 {isAuthenticated ? (
                   <>
                     <button
-                      onClick={() => handleSelectCapability('content-intelligence', 'inspector')}
-                      className="w-full py-2.5 text-xs font-bold rounded-lg bg-blue-600 text-white text-center shadow-xs flex items-center justify-center gap-2"
+                      onClick={() => scrollToSection('roles')}
+                      className="w-full py-2.5 text-xs font-bold rounded-lg bg-indigo-600 text-white text-center shadow-xs flex items-center justify-center gap-2"
                     >
-                      <span>Open Product Workspace</span>
+                      <span>Try as Role</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                     <button
@@ -291,16 +255,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 ) : (
                   <div className="flex gap-2">
                     <button
-                      onClick={onSignIn || (() => handleSelectCapability('content-intelligence', 'inspector'))}
+                      onClick={onSignIn}
                       className="flex-1 py-2 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-center"
                     >
                       Sign In
                     </button>
                     <button
-                      onClick={onSignIn || (() => handleSelectCapability('content-intelligence', 'inspector'))}
-                      className="flex-1 py-2 text-xs font-bold rounded-lg bg-blue-600 text-white text-center shadow-xs"
+                      onClick={() => scrollToSection('roles')}
+                      className="flex-1 py-2 text-xs font-bold rounded-lg bg-indigo-600 text-white text-center shadow-xs"
                     >
-                      Get Started
+                      Pick a Role
                     </button>
                   </div>
                 )}
@@ -461,18 +425,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               {/* Action Buttons */}
               <div className="pt-2 flex flex-wrap items-center gap-3">
                 <button
-                  onClick={() => handleSelectCapability('content-intelligence', 'inspector')}
-                  className="px-6 py-3.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer ring-2 ring-blue-500/20"
-                >
-                  <span>Open Product Workspace</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-
-                <button
                   onClick={() => scrollToSection('roles')}
-                  className="px-5 py-3.5 rounded-xl text-sm font-semibold text-neutral-200 bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-6 py-3.5 rounded-xl text-sm font-bold text-white bg-[#544df2] hover:bg-indigo-500 shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer ring-2 ring-indigo-500/20"
                 >
-                  <span>Explore Roles</span>
+                  <span>Pick a Role</span>
+                  <ArrowRight className="w-4 h-4" />
                 </button>
 
                 <button
@@ -1014,33 +971,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* ------------------------------------------------------------------- */}
-      {/* SECTION 5 — ON-DEMAND CONTEXTUAL PRODUCT WORKSPACE                  */}
-      {/* ------------------------------------------------------------------- */}
-      <AnimatePresence>
-        {activeWorkspaceCategory && (
-          <motion.div
-            key="contextual-workspace-container"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.35, ease: 'easeInOut' }}
-          >
-            <ContextualWorkspace
-              activeCategory={activeWorkspaceCategory}
-              onClose={() => {
-                if (onCloseWorkspace) onCloseWorkspace();
-              }}
-              selectedBrandId={selectedBrandId}
-              setSelectedBrandId={setSelectedBrandId}
-              brands={brands}
-              onSignRelease={onSignRelease}
-              initialSubTab={initialSubTab}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ------------------------------------------------------------------- */}
       {/* SECTION 6 — HOW IT WORKS (Homage to reference 6-step cards)         */}
       {/* ------------------------------------------------------------------- */}
       <section id="how-it-works" className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
@@ -1196,10 +1126,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
               <div className="pt-2">
                 <button
-                  onClick={() => handleSelectCapability('impact-simulation', 'simulator')}
+                  onClick={() => scrollToSection('roles')}
                   className="px-5 py-3 rounded-xl text-xs font-bold text-neutral-900 bg-white hover:bg-neutral-100 transition-colors flex items-center gap-2 cursor-pointer shadow-md"
                 >
-                  <span>Launch Change Impact Simulator</span>
+                  <span>Explore in Role Workspaces</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -1577,7 +1507,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Check Your First Post Underlined Link */}
             <div className="pt-2 flex items-center justify-center">
               <button
-                onClick={() => handleSelectCapability('content-intelligence', 'inspector')}
+                onClick={() => onNavigateRole ? onNavigateRole('creator') : onOpenCreatorDashboard ? onOpenCreatorDashboard() : scrollToSection('roles')}
                 className="text-lg sm:text-xl font-bold uppercase tracking-wider text-white underline decoration-white decoration-2 underline-offset-8 hover:text-indigo-300 hover:decoration-indigo-300 transition-colors cursor-pointer"
               >
                 CHECK YOUR FIRST POST

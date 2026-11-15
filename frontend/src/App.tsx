@@ -10,7 +10,6 @@ import { InstallAppModal } from './components/InstallAppModal';
 import { usePWA } from './hooks/usePWA';
 import { useAuth } from './context/AuthContext';
 import { BrandProfile, DatabaseStatus, VerificationResult } from './types';
-import { WorkspaceCategory } from './components/ContextualWorkspace';
 
 // Lazy-load Public Verification View for zero-bundle penalty
 const PublicVerificationView = lazy(() =>
@@ -71,25 +70,6 @@ export const App: React.FC = () => {
 
   // Track if user just transitioned from the sign-in page to play entrance motion once
   const [justLoggedIn, setJustLoggedIn] = useState<boolean>(false);
-
-  // Active Contextual Workspace Category in Section 5
-  const [activeWorkspaceCategory, setActiveWorkspaceCategory] = useState<WorkspaceCategory | null>(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const catParam = params.get('category') as WorkspaceCategory;
-      if (catParam) return catParam;
-      const tabParam = params.get('tab');
-      if (tabParam === 'bdig' || tabParam === 'knowledge-base' || tabParam === 'knowledge-graph') return 'brand-knowledge';
-      if (tabParam === 'content-studio' || tabParam === 'multimodal' || tabParam === 'inspector') return 'content-intelligence';
-      if (tabParam === 'risks' || tabParam === 'campaigns') return 'risk-intelligence';
-      if (tabParam === 'impact-simulator' || tabParam === 'blast-radius') return 'impact-simulation';
-      if (tabParam === 'approvals' || tabParam === 'analytics') return 'governance-approval';
-      if (tabParam === 'audit-trust' || tabParam === 'ledger') return 'trust-verification';
-    }
-    return null;
-  });
-
-  const [activeSubTab, setActiveSubTab] = useState<string | undefined>(undefined);
 
   const [brands, setBrands] = useState<BrandProfile[]>([]);
   const [selectedBrandId, setSelectedBrandId] = useState<string>(currentWorkspace || 'aurelle-tech');
@@ -223,16 +203,6 @@ export const App: React.FC = () => {
     });
 
     if (!res.ok) throw new Error('Failed to sign release');
-  };
-
-  const handleSelectWorkspaceCategory = (category: WorkspaceCategory, subTab?: string) => {
-    setActiveWorkspaceCategory(category);
-    if (subTab) setActiveSubTab(subTab);
-  };
-
-  const handleCloseWorkspace = () => {
-    setActiveWorkspaceCategory(null);
-    setActiveSubTab(undefined);
   };
 
   const currentBrand = brands.find((b) => b.brand_id === selectedBrandId);
@@ -371,10 +341,6 @@ export const App: React.FC = () => {
           setWorkspace(id);
         }}
         dbStatus={dbStatus}
-        activeWorkspaceCategory={activeWorkspaceCategory}
-        onSelectWorkspaceCategory={handleSelectWorkspaceCategory}
-        onCloseWorkspace={handleCloseWorkspace}
-        initialSubTab={activeSubTab}
         onVerify={() => setViewMode('verify')}
         onSignIn={() => setViewMode('login')}
         onOpenCreatorDashboard={handleOpenCreatorDashboard}
@@ -387,23 +353,7 @@ export const App: React.FC = () => {
             setViewMode('verify');
             return;
           }
-          if (targetTab === 'impact-simulator') {
-            handleSelectWorkspaceCategory('impact-simulation', 'simulator');
-          } else if (targetTab === 'approvals') {
-            handleSelectWorkspaceCategory('governance-approval', 'approvals');
-          } else if (targetTab === 'brand-knowledge' || targetTab === 'knowledge-base') {
-            handleSelectWorkspaceCategory('brand-knowledge', 'guidelines');
-          } else if (targetTab === 'ai-content-studio' || targetTab === 'content-studio') {
-            handleSelectWorkspaceCategory('content-intelligence', 'inspector');
-          } else if (targetTab === 'trust-ledger' || targetTab === 'audit-trust') {
-            handleSelectWorkspaceCategory('trust-verification', 'ledger');
-          } else {
-            handleSelectWorkspaceCategory('content-intelligence', 'inspector');
-          }
-          setTimeout(() => {
-            const el = document.getElementById('workspace');
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }, 100);
+          handleOpenCreatorDashboard();
         }}
       />
 
@@ -427,25 +377,9 @@ export const App: React.FC = () => {
       <DemoWalkthroughModal
         isOpen={isDemoModalOpen}
         onClose={() => setIsDemoModalOpen(false)}
-        onNavigateToView={(viewName) => {
+        onNavigateToView={() => {
           setIsDemoModalOpen(false);
-          if (viewName.includes('Graph')) {
-            handleSelectWorkspaceCategory('brand-knowledge', 'graph');
-          } else if (viewName.includes('Simulator')) {
-            handleSelectWorkspaceCategory('impact-simulation', 'simulator');
-          } else if (viewName.includes('Approval')) {
-            handleSelectWorkspaceCategory('governance-approval', 'approvals');
-          } else if (viewName.includes('Audit')) {
-            handleSelectWorkspaceCategory('trust-verification', 'ledger');
-          } else if (viewName.includes('Knowledge')) {
-            handleSelectWorkspaceCategory('brand-knowledge', 'guidelines');
-          } else {
-            handleSelectWorkspaceCategory('content-intelligence', 'inspector');
-          }
-          setTimeout(() => {
-            const el = document.getElementById('workspace');
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }, 100);
+          handleOpenCreatorDashboard();
         }}
       />
 
@@ -460,11 +394,7 @@ export const App: React.FC = () => {
         }}
         onLaunchDemoScenario={() => {
           setIsWelcomeModalOpen(false);
-          handleSelectWorkspaceCategory('impact-simulation', 'simulator');
-          setTimeout(() => {
-            const el = document.getElementById('workspace');
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }, 100);
+          handleOpenCreatorDashboard();
         }}
       />
 
