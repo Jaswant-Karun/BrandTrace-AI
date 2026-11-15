@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   ShieldCheck, GitFork, ArrowRight, Lock,
   CheckCircle2,
@@ -51,6 +51,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onNavigateRole
 }) => {
   const { user, isAuthenticated, logout } = useAuth();
+  const shouldReduceMotion = useReducedMotion();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSecurityIndex, setActiveSecurityIndex] = useState<number | null>(null);
   const [activeStepIndex, setActiveStepIndex] = useState<number>(3);
@@ -62,12 +63,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
   // Motion choreography state for hero headline:
   // Default is 3 (text fully shown as permanent).
-  // If arriving from sign in page, starts at 0 and runs once to 3, then stays permanent.
-  const [motionStep, setMotionStep] = useState<number>(shouldAnimate ? 0 : 3);
+  // If arriving from sign in page and motion not reduced, starts at 0 and runs once to 3, then stays permanent.
+  const [motionStep, setMotionStep] = useState<number>(shouldAnimate && !shouldReduceMotion ? 0 : 3);
 
   useEffect(() => {
-    // If not arriving fresh from sign-in, keep text fully shown as permanent
-    if (!shouldAnimate) {
+    // If not arriving fresh from sign-in or if user prefers reduced motion, keep text fully shown as permanent
+    if (!shouldAnimate || shouldReduceMotion) {
       setMotionStep(3);
       return;
     }
@@ -87,7 +88,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       clearTimeout(t2);
       clearTimeout(t3);
     };
-  }, [shouldAnimate]);
+  }, [shouldAnimate, shouldReduceMotion]);
 
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false);
@@ -98,7 +99,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col font-sans selection:bg-indigo-600 selection:text-white transition-colors duration-200">
+    <div className="min-h-screen bg-black text-white flex flex-col font-sans selection:bg-indigo-600 selection:text-white transition-colors duration-200 overflow-x-hidden">
 
       {/* ------------------------------------------------------------------- */}
       {/* SECTION 1 — TOP NAVIGATION                                          */}
@@ -737,7 +738,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="flex flex-col lg:flex-row items-center lg:items-start justify-center gap-8 lg:gap-8 xl:gap-10">
 
             {/* Card 1: INSTAGRAM POST (BIG & TALL on Left) */}
-            <div className="w-full max-w-[420px] lg:max-w-[440px] shrink-0 bg-[#fbf9f5] text-slate-900 rounded-2xl border border-neutral-800 shadow-2xl overflow-hidden flex flex-col justify-between">
+            <motion.div
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: 0.5, delay: shouldReduceMotion ? 0 : 0.1 }}
+              className="w-full max-w-full sm:max-w-[420px] lg:max-w-[440px] shrink-0 bg-[#fbf9f5] text-slate-900 rounded-2xl border border-neutral-800 shadow-2xl overflow-hidden flex flex-col justify-between"
+            >
               <div>
                 {/* Header with dots */}
                 <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-200/80 text-[11px] font-mono text-neutral-400 bg-white">
@@ -829,10 +836,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <strong className="text-rose-300 uppercase">BLOCKS 60% in 2 weeks:</strong> the evidence says 32% in 8 (FACT-014)
                 </span>
               </div>
-            </div>
+            </motion.div>
 
             {/* Card 2: WEB BANNER (COMPACT / STAGGERED / MEDIUM - Floating Higher) */}
-            <div className="w-full max-w-[340px] lg:max-w-[360px] shrink-0 bg-[#fbf9f5] text-slate-900 rounded-2xl border border-neutral-800 shadow-2xl overflow-hidden flex flex-col justify-between self-start lg:-translate-y-4">
+            <motion.div
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: 0.5, delay: shouldReduceMotion ? 0 : 0.2 }}
+              className="w-full max-w-full sm:max-w-[340px] lg:max-w-[360px] shrink-0 bg-[#fbf9f5] text-slate-900 rounded-2xl border border-neutral-800 shadow-2xl overflow-hidden flex flex-col justify-between self-start lg:-translate-y-4"
+            >
               <div>
                 {/* Header */}
                 <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-200/80 text-[11px] font-mono text-neutral-400 bg-white">
@@ -892,10 +905,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <strong className="text-rose-300 uppercase">BLOCKS "Glow in 2 weeks":</strong> evidence covers 8 weeks, not 2 (FACT-014)
                 </span>
               </div>
-            </div>
+            </motion.div>
 
             {/* Card 3: EMAIL (WIDE / STAGGERED on Right - Floating Slightly Lower) */}
-            <div className="w-full max-w-[400px] lg:max-w-[420px] shrink-0 bg-[#fbf9f5] text-slate-900 rounded-2xl border border-neutral-800 shadow-2xl overflow-hidden flex flex-col justify-between self-start lg:translate-y-6">
+            <motion.div
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: 0.5, delay: shouldReduceMotion ? 0 : 0.3 }}
+              className="w-full max-w-full sm:max-w-[400px] lg:max-w-[420px] shrink-0 bg-[#fbf9f5] text-slate-900 rounded-2xl border border-neutral-800 shadow-2xl overflow-hidden flex flex-col justify-between self-start lg:translate-y-6"
+            >
               <div>
                 {/* Header */}
                 <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-200/80 text-[11px] font-mono text-neutral-400 bg-white">
@@ -976,7 +995,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <strong className="text-rose-300 uppercase">BLOCKS</strong> Announces the Diwali sale while it's still embargoed (FACT-033)
                 </span>
               </div>
-            </div>
+            </motion.div>
 
           </div>
         </div>
@@ -1044,14 +1063,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           ].map((item, i) => {
             const isStepActive = activeStepIndex === i;
             return (
-              <div
+              <motion.div
                 key={i}
                 tabIndex={0}
                 role="article"
                 aria-label={`${item.step}: ${item.title}`}
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.15 }}
+                transition={{ duration: 0.4, delay: shouldReduceMotion ? 0 : i * 0.08 }}
                 onMouseEnter={() => setActiveStepIndex(i)}
                 onFocus={() => setActiveStepIndex(i)}
-                className={`p-7 sm:p-9 lg:p-10 flex flex-col justify-start space-y-3.5 transition-all duration-200 ease-out cursor-pointer outline-none ${item.borderClasses} ${isStepActive
+                className={`p-7 sm:p-9 lg:p-10 flex flex-col justify-start space-y-3.5 transition-all duration-200 ease-out cursor-pointer outline-none active:scale-[0.99] ${item.borderClasses} ${isStepActive
                   ? 'bg-[#f4f2ea] text-neutral-900 shadow-inner'
                   : 'bg-[#121215] text-white hover:bg-[#18181c]'
                   }`}
@@ -1068,7 +1091,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   }`}>
                   {item.desc}
                 </p>
-              </div>
+              </motion.div>
             );
           })}
         </div>
@@ -1293,12 +1316,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               },
               {
                 id: 'automated-tests',
-                title: '177 Automated Tests Passing',
+                title: '222 Automated Tests Passing',
                 icon: CheckCircle2,
                 defaultIconColor: 'bg-emerald-950 text-emerald-400',
                 desc: (
                   <>
-                    100% verified pytest test suite covering multi-agent coordination, graph blast radius traversal, salted SHA-256 authentication, SSRF protection, and cryptographic verification.
+                    100% verified pytest test suite covering multi-agent coordination, graph blast radius traversal, salted SHA-256 authentication, SSRF protection, cryptographic verification, and 5-role governance workflows.
                   </>
                 )
               }
@@ -1306,11 +1329,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               const isActive = activeSecurityIndex === index;
               const Icon = feature.icon;
               return (
-                <div
+                <motion.div
                   key={feature.id}
                   tabIndex={0}
                   role="article"
                   aria-label={feature.title}
+                  initial={shouldReduceMotion ? false : { opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.15 }}
+                  transition={{ duration: 0.4, delay: shouldReduceMotion ? 0 : index * 0.08 }}
                   onMouseEnter={() => setActiveSecurityIndex(index)}
                   onMouseLeave={() => {
                     if (activeSecurityIndex === index) {
@@ -1324,7 +1351,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     }
                   }}
                   onTouchStart={() => setActiveSecurityIndex(index)}
-                  className={`p-6 rounded-2xl space-y-3 cursor-pointer outline-none transition-all duration-200 ease-out select-none ${isActive
+                  className={`p-6 rounded-2xl space-y-3 cursor-pointer outline-none transition-all duration-200 ease-out select-none active:scale-[0.98] ${isActive
                     ? 'bg-blue-950/20 border-2 border-[#2563EB] shadow-lg shadow-blue-500/15 -translate-y-1 ring-2 ring-[#2563EB]/20'
                     : 'bg-neutral-950 border border-neutral-800 text-white shadow-xs hover:border-neutral-700 translate-y-0'
                     }`}
@@ -1349,7 +1376,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <p className="text-xs text-neutral-400 leading-relaxed">
                     {feature.desc}
                   </p>
-                </div>
+                </motion.div>
               );
             })}
           </div>
