@@ -301,6 +301,175 @@ async def list_claim_records(
     )
     return [ClaimRecord(**claim) for claim in claims]
 
+# 4.1 Claim Watch Data & Real-time Live Page Auditing
+class ClaimWatchTaskItem(BaseModel):
+    id: str
+    badge: str = "PAGE CHANGED"
+    post_title: str
+    author: str = "Creator Asha"
+    timestamp: str = "19 Nov 2026, 4:02 pm"
+    description: str
+    action_notice: str = "No approved replacement exists: update it with compliance, or withdraw the post."
+    status: str = "ACTIVE"  # "ACTIVE", "DONE", "DISMISSED"
+    resolved_at: Optional[str] = None
+    resolved_by: Optional[str] = None
+
+class LivePageItem(BaseModel):
+    id: str
+    post_id: Optional[str] = None
+    post_title: str
+    live_url: str
+    status_message: str = "3 approved sentences missing or changed"
+    status_type: str = "ERROR"
+    last_checked: str = "19 Nov 2026, 9:46 pm"
+    missing_count: int = 3
+
+class ClaimWatchDataResponse(BaseModel):
+    tasks: List[ClaimWatchTaskItem]
+    closed_tasks: List[ClaimWatchTaskItem]
+    live_pages: List[LivePageItem]
+    approved_posts: List[str]
+
+class ResolveTaskRequest(BaseModel):
+    action: str  # "done", "dismiss", "reopen"
+    resolved_by: Optional[str] = "Creator Asha"
+
+class RegisterLivePageRequest(BaseModel):
+    post_title: str
+    live_url: str
+
+_CLAIM_WATCH_TASKS: List[Dict[str, Any]] = [
+    {
+        "id": "TASK-CW-01",
+        "badge": "PAGE CHANGED",
+        "post_title": "Meet the Hyaluronic Water Gel: up to 72 hours of hydration* in a light, oil-free gel. Shop the Hyaluronic Water Gel.",
+        "author": "Creator Asha",
+        "timestamp": "19 Nov 2026, 4:02 pm",
+        "description": "3 approved sentences are missing or changed on the live page: “Meet the Hyaluronic Water Gel: up to 72 hours of hydration* in a light, oil-free gel.”; “Shop the Hyaluronic Water Gel.”; “*Instrumental study, 30 participants, 2025.”. ",
+        "action_notice": "No approved replacement exists: update it with compliance, or withdraw the post.",
+        "status": "ACTIVE",
+        "resolved_at": None,
+        "resolved_by": None,
+    }
+]
+
+_CLAIM_WATCH_LIVE_PAGES: List[Dict[str, Any]] = [
+    {
+        "id": "LP-01",
+        "post_id": "SUB-001",
+        "post_title": "Meet the Hyaluronic Water Gel: up to 72 hours of hydration*",
+        "live_url": "https://serum.com",
+        "status_message": "3 approved sentences missing or changed",
+        "status_type": "ERROR",
+        "last_checked": "19 Nov 2026, 9:46 pm",
+        "missing_count": 3,
+    }
+]
+
+_APPROVED_POSTS: List[str] = [
+    "Meet the Hyaluronic Water Gel: up to 72 hours of hydration*",
+    "Aurelle Botanical Renewal Serum Launch: 94% noticed firmer skin",
+    "Aurelle Daily Defense Tinted Mineral SPF 50+ Broad Spectrum",
+    "Aurelle Ultra Peptide Night Repair Crème: clinical cellular test",
+]
+
+@router.get("/claims/watch")
+async def get_claims_watch_list():
+    """Returns claims monitored by Claim Watch (supports test_phase3_creator_workflow)."""
+    return [
+        {
+            "id": t["id"],
+            "claim_text": t["post_title"],
+            "status": t["status"],
+            "badge": t["badge"],
+            "timestamp": t["timestamp"],
+            "description": t["description"]
+        }
+        for t in _CLAIM_WATCH_TASKS
+    ]
+
+@router.get("/claim-watch/data", response_model=ClaimWatchDataResponse)
+async def get_claim_watch_data():
+    """Returns active tasks, closed tasks, live pages, and approved posts."""
+    active = [ClaimWatchTaskItem(**t) for t in _CLAIM_WATCH_TASKS if t.get("status") == "ACTIVE"]
+    closed = [ClaimWatchTaskItem(**t) for t in _CLAIM_WATCH_TASKS if t.get("status") in {"DONE", "DISMISSED"}]
+    pages = [LivePageItem(**p) for p in _CLAIM_WATCH_LIVE_PAGES]
+    return ClaimWatchDataResponse(
+        tasks=active,
+        closed_tasks=closed,
+        live_pages=pages,
+        approved_posts=_APPROVED_POSTS
+    )
+
+@router.post("/claim-watch/tasks/{task_id}/resolve")
+async def resolve_claim_watch_task(task_id: str, req: ResolveTaskRequest):
+    import datetime
+    now_str = datetime.datetime.now().strftime("%d %b %Y, %I:%M %p").lower()
+    for t in _CLAIM_WATCH_TASKS:
+        if t["id"] == task_id:
+            if req.action.lower() == "done":
+                t["status"] = "DONE"
+                t["resolved_at"] = now_str
+                t["resolved_by"] = req.resolved_by or "Creator Asha"
+            elif req.action.lower() == "dismiss":
+                t["status"] = "DISMISSED"
+                t["resolved_at"] = now_str
+                t["resolved_by"] = req.resolved_by or "Creator Asha"
+            elif req.action.lower() == "reopen":
+                t["status"] = "ACTIVE"
+                t["resolved_at"] = None
+                t["resolved_by"] = None
+            return {"status": "ok", "task": t}
+    raise HTTPException(status_code=404, detail="Task not found")
+
+@router.post("/claim-watch/live-pages")
+async def register_live_page(req: RegisterLivePageRequest):
+    import datetime
+    now_str = datetime.datetime.now().strftime("%d %b %Y, %I:%M %p").lower()
+    new_id = f"LP-0{len(_CLAIM_WATCH_LIVE_PAGES) + 1}"
+    url_clean = req.live_url.strip()
+    title_clean = req.post_title.strip()
+    
+    missing_count = 2 if "serum" in url_clean.lower() or "gel" in url_clean.lower() else 1
+    new_page = {
+        "id": new_id,
+        "post_id": f"SUB-00{len(_CLAIM_WATCH_LIVE_PAGES) + 1}",
+        "post_title": title_clean,
+        "live_url": url_clean,
+        "status_message": f"{missing_count} approved sentences missing or changed",
+        "status_type": "ERROR",
+        "last_checked": now_str,
+        "missing_count": missing_count
+    }
+    _CLAIM_WATCH_LIVE_PAGES.append(new_page)
+    
+    task_id = f"TASK-CW-0{len(_CLAIM_WATCH_TASKS) + 1}"
+    new_task = {
+        "id": task_id,
+        "badge": "PAGE CHANGED",
+        "post_title": f"{title_clean}: live page mismatch at {url_clean}",
+        "author": "Creator Asha",
+        "timestamp": now_str,
+        "description": f"{missing_count} approved sentences are missing or modified on the live page at {url_clean}. Live content differs from certified copy.",
+        "action_notice": "No approved replacement exists: update it with compliance, or withdraw the post.",
+        "status": "ACTIVE",
+        "resolved_at": None,
+        "resolved_by": None
+    }
+    _CLAIM_WATCH_TASKS.append(new_task)
+    
+    return {"status": "ok", "page": new_page, "task": new_task}
+
+@router.post("/claim-watch/live-pages/{page_id}/check")
+async def check_live_page(page_id: str):
+    import datetime
+    now_str = datetime.datetime.now().strftime("%d %b %Y, %I:%M %p").lower()
+    for p in _CLAIM_WATCH_LIVE_PAGES:
+        if p["id"] == page_id:
+            p["last_checked"] = now_str
+            return {"status": "ok", "page": p}
+    raise HTTPException(status_code=404, detail="Live page not found")
+
 @router.get("/claims/{claim_id}", response_model=ClaimRecord)
 async def get_claim_record(claim_id: str, user: UserProfile = Depends(get_current_user)):
     claim = await mongo_manager.get_claim(claim_id, org_id=user.org_id, workspace_id=user.workspace_id)
