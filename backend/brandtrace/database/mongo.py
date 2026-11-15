@@ -16,6 +16,8 @@ class MongoManager:
     _memory_edges: Dict[str, List[Dict[str, Any]]] = {}
     _memory_verifications: List[Dict[str, Any]] = []
     _memory_releases: List[Dict[str, Any]] = []
+    _memory_tasks: Dict[str, Dict[str, Any]] = {}
+    _memory_versions: Dict[str, List[Dict[str, Any]]] = {}
 
     async def connect(self):
         """Attempts connection to MongoDB. Falls back gracefully to memory store if unavailable."""
@@ -165,6 +167,40 @@ class MongoManager:
         if brand_id:
             items = [v for v in items if v.get("brand_id") == brand_id]
         return sorted(items, key=lambda x: x.get("timestamp", 0), reverse=True)
+
+    # BDIG Revision Tasks & Version History
+    async def save_task(self, task_doc: Dict[str, Any]):
+        task_id = task_doc["task_id"]
+        if self.is_connected and self.db is not None:
+            await self.db.revision_tasks.update_one(
+                {"task_id": task_id},
+                {"$set": task_doc},
+                upsert=True
+            )
+        self._memory_tasks[task_id] = task_doc
+
+    async def list_tasks(self, brand_id: Optional[str] = None) -> List[Dict[str, Any]]:
+        if self.is_connected and self.db is not None:
+            query = {"brand_id": brand_id} if brand_id else {}
+            cursor = self.db.revision_tasks.find(query, {"_id": 0}).sort("created_at", -1)
+            return await cursor.to_list(length=100)
+        items = list(self._memory_tasks.values())
+        if brand_id:
+            items = [t for t in items if t.get("brand_id") == brand_id]
+        return sorted(items, key=lambda x: x.get("created_at", 0), reverse=True)
+
+    async def save_version(self, asset_id: str, version_doc: Dict[str, Any]):
+        if self.is_connected and self.db is not None:
+            await self.db.asset_versions.insert_one(dict(version_doc))
+        if asset_id not in self._memory_versions:
+            self._memory_versions[asset_id] = []
+        self._memory_versions[asset_id].append(version_doc)
+
+    async def get_version_history(self, asset_id: str) -> List[Dict[str, Any]]:
+        if self.is_connected and self.db is not None:
+            cursor = self.db.asset_versions.find({"asset_id": asset_id}, {"_id": 0}).sort("timestamp", 1)
+            return await cursor.to_list(length=50)
+        return self._memory_versions.get(asset_id, [])
 
 mongo_manager = MongoManager()
 
