@@ -15,6 +15,8 @@ import { GovernanceAnalyticsView } from './components/GovernanceAnalyticsView';
 import { AuditTrustCenterView } from './components/AuditTrustCenterView';
 import { SettingsView } from './components/SettingsView';
 import { DatabaseStatusModal } from './components/DatabaseStatusModal';
+import { AuthHeader } from './components/AuthHeader';
+import { useAuth } from './context/AuthContext';
 import { BrandProfile, DatabaseStatus, VerificationResult } from './types';
 import { ExternalLink, Database, RefreshCw } from 'lucide-react';
 
