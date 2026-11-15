@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { apiClient } from '../services/apiClient';
 
 export interface UserPersona {
@@ -15,12 +15,13 @@ interface AuthContextType {
   isAuthenticated: boolean;
   currentOrg: string;
   currentWorkspace: string;
-  login: (email: string, password?: string) => Promise<void>;
-  register: (data: { name: string; email: string; password: string; role?: any; workspace_id?: string }) => Promise<void>;
+  login: (email: string, password?: string) => Promise<UserPersona>;
+  register: (data: { name: string; email: string; password: string; role?: any; workspace_id?: string }) => Promise<UserPersona>;
   logout: () => void;
   switchPersona: (persona: UserPersona) => Promise<void>;
   setWorkspace: (workspaceId: string) => void;
   personas: UserPersona[];
+  loadPersonasIfNeeded: () => Promise<UserPersona[]>;
 }
 
 export const DEMO_AURELLE_PERSONA: UserPersona = {
@@ -82,14 +83,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [personas, setPersonas] = useState<UserPersona[]>([]);
 
-  useEffect(() => {
-    // Load available personas from backend
-    apiClient.auth.personas()
-      .then((data) => setPersonas(data))
-      .catch((e) => console.log('Persona fetch note:', e));
-  }, []);
+  // Deferred persona loading: does NOT block the critical login path
+  const loadPersonasIfNeeded = useCallback(async (): Promise<UserPersona[]> => {
+    if (personas.length > 0) return personas;
+    try {
+      const data = await apiClient.auth.personas();
+      setPersonas(data);
+      return data;
+    } catch (e) {
+      console.log('Persona fetch note:', e);
+      return [];
+    }
+  }, [personas]);
 
-  const login = async (email: string, password?: string) => {
+  // Non-blocking idle pre-fetch: only when browser is completely idle and not on login view
+  useEffect(() => {
+    const isLoginView = typeof window !== 'undefined' && (
+      window.location.pathname === '/login' ||
+      new URLSearchParams(window.location.search).get('view') === 'login'
+    );
+    if (isLoginView) return; // Never waste network bandwidth on the login screen
+
+    const timer = setTimeout(() => {
+      if ('requestIdleCallback' in window) {
+        (window as any).requestIdleCallback(() => {
+          loadPersonasIfNeeded();
+        });
+      } else {
+        loadPersonasIfNeeded();
+      }
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [loadPersonasIfNeeded]);
+
+  const login = async (email: string, password?: string): Promise<UserPersona> => {
     try {
       const cleanEmail = email.toLowerCase().trim();
       const defaultPassword = cleanEmail === 'demo@brandtrace.ai'
@@ -107,13 +135,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(res.user);
       setCurrentOrg(res.user.org_id);
       setCurrentWorkspace(res.user.workspace_id);
+      return res.user;
     } catch (err) {
       console.error('Login failed:', err);
       throw err;
     }
   };
 
-  const register = async (data: { name: string; email: string; password: string; role?: any; workspace_id?: string }) => {
+  const register = async (data: { name: string; email: string; password: string; role?: any; workspace_id?: string }): Promise<UserPersona> => {
     try {
       const cleanEmail = data.email.toLowerCase().trim();
       const res = await apiClient.auth.register({
@@ -130,6 +159,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(res.user);
       setCurrentOrg(res.user.org_id);
       setCurrentWorkspace(res.user.workspace_id);
+      return res.user;
     } catch (err) {
       console.error('Registration failed:', err);
       throw err;
@@ -177,7 +207,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         logout,
         switchPersona,
         setWorkspace,
-        personas
+        personas,
+        loadPersonasIfNeeded
       }}
     >
       {children}

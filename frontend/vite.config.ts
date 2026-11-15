@@ -17,6 +17,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
+          'vendor-react': ['react', 'react-dom'],
           'vendor-xyflow': ['@xyflow/react'],
           'vendor-motion': ['framer-motion'],
           'vendor-icons': ['lucide-react'],
@@ -26,4 +27,3 @@ export default defineConfig({
     chunkSizeWarningLimit: 600,
   },
 });
-

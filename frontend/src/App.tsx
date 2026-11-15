@@ -1,15 +1,18 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
-import { LandingPage } from './components/LandingPage';
-import { LoginPage } from './components/LoginPage';
-import { DatabaseStatusModal } from './components/DatabaseStatusModal';
-import { DemoWalkthroughModal } from './components/DemoWalkthroughModal';
-import { WelcomeModal } from './components/WelcomeModal';
-import { GuidedTourOverlay } from './components/GuidedTourOverlay';
 import { OfflineBanner } from './components/OfflineBanner';
-import { InstallAppModal } from './components/InstallAppModal';
 import { usePWA } from './hooks/usePWA';
-import { useAuth } from './context/AuthContext';
+import { useAuth, UserPersona } from './context/AuthContext';
 import { BrandProfile, DatabaseStatus, VerificationResult } from './types';
+
+// Lazy-load Login Page so users on landing or dashboards don't pay any bundle penalty
+const LoginPage = lazy(() =>
+  import('./components/LoginPage').then((m) => ({ default: m.LoginPage }))
+);
+
+// Lazy-load Landing Page so login view does not bundle 1,300+ lines of marketing UI
+const LandingPage = lazy(() =>
+  import('./components/LandingPage').then((m) => ({ default: m.LandingPage }))
+);
 
 // Lazy-load Public Verification View for zero-bundle penalty
 const PublicVerificationView = lazy(() =>
@@ -26,6 +29,23 @@ const RoleDashboardStage = lazy(() =>
   import('./components/creator/RoleDashboardStage').then((m) => ({ default: m.RoleDashboardStage }))
 );
 
+// Lazy-load On-Demand Modals (only loaded when triggered by user interaction)
+const DatabaseStatusModal = lazy(() =>
+  import('./components/DatabaseStatusModal').then((m) => ({ default: m.DatabaseStatusModal }))
+);
+const DemoWalkthroughModal = lazy(() =>
+  import('./components/DemoWalkthroughModal').then((m) => ({ default: m.DemoWalkthroughModal }))
+);
+const WelcomeModal = lazy(() =>
+  import('./components/WelcomeModal').then((m) => ({ default: m.WelcomeModal }))
+);
+const GuidedTourOverlay = lazy(() =>
+  import('./components/GuidedTourOverlay').then((m) => ({ default: m.GuidedTourOverlay }))
+);
+const InstallAppModal = lazy(() =>
+  import('./components/InstallAppModal').then((m) => ({ default: m.InstallAppModal }))
+);
+
 const ViewLoadingFallback: React.FC = () => (
   <div className="flex flex-col items-center justify-center py-24 space-y-3 bg-black transition-colors duration-200 min-h-screen">
     <div className="w-8 h-8 rounded-full border-2 border-neutral-800 border-t-indigo-500 animate-spin" />
@@ -36,7 +56,7 @@ const ViewLoadingFallback: React.FC = () => (
 );
 
 export const App: React.FC = () => {
-  const { currentWorkspace, setWorkspace } = useAuth();
+  const { user, currentWorkspace, setWorkspace } = useAuth();
 
   const [viewMode, setViewMode] = useState<
     | 'landing'
@@ -50,19 +70,20 @@ export const App: React.FC = () => {
   >(() => {
     if (typeof window !== 'undefined') {
       const pathname = window.location.pathname;
+      if (pathname === '/login') return 'login';
       if (pathname === '/creator/check' || pathname.startsWith('/creator') || pathname === '/dashboard/creator' || pathname.startsWith('/dashboard/creator')) return 'creator-dashboard';
       if (pathname === '/dashboard/agency' || pathname.startsWith('/dashboard/agency')) return 'agency-dashboard';
       if (pathname === '/dashboard/reviewer' || pathname.startsWith('/dashboard/reviewer')) return 'reviewer-dashboard';
       if (pathname === '/dashboard/compliance' || pathname.startsWith('/dashboard/compliance')) return 'compliance-dashboard';
       if (pathname === '/dashboard/brand-owner' || pathname.startsWith('/dashboard/brand-owner')) return 'brand-owner-dashboard';
       const params = new URLSearchParams(window.location.search);
+      if (params.get('view') === 'login') return 'login';
       if (params.get('view') === 'creator' || params.get('view') === 'creator-dashboard') return 'creator-dashboard';
       if (params.get('view') === 'agency' || params.get('view') === 'agency-dashboard') return 'agency-dashboard';
       if (params.get('view') === 'reviewer' || params.get('view') === 'reviewer-dashboard') return 'reviewer-dashboard';
       if (params.get('view') === 'compliance' || params.get('view') === 'compliance-dashboard') return 'compliance-dashboard';
       if (params.get('view') === 'brand-owner' || params.get('view') === 'brand-owner-dashboard') return 'brand-owner-dashboard';
       if (params.get('view') === 'verify' || window.location.hash === '#verify') return 'verify';
-      if (params.get('view') === 'login') return 'login';
       return 'landing';
     }
     return 'landing';
@@ -90,7 +111,9 @@ export const App: React.FC = () => {
   useEffect(() => {
     const handlePopState = () => {
       const pathname = window.location.pathname;
-      if (pathname === '/creator/check' || pathname.startsWith('/creator') || pathname === '/dashboard/creator' || pathname.startsWith('/dashboard/creator')) {
+      if (pathname === '/login') {
+        setViewMode('login');
+      } else if (pathname === '/creator/check' || pathname.startsWith('/creator') || pathname === '/dashboard/creator' || pathname.startsWith('/dashboard/creator')) {
         setViewMode('creator-dashboard');
       } else if (pathname === '/dashboard/agency' || pathname.startsWith('/dashboard/agency')) {
         setViewMode('agency-dashboard');
@@ -100,8 +123,6 @@ export const App: React.FC = () => {
         setViewMode('compliance-dashboard');
       } else if (pathname === '/dashboard/brand-owner' || pathname.startsWith('/dashboard/brand-owner')) {
         setViewMode('brand-owner-dashboard');
-      } else if (pathname === '/login') {
-        setViewMode('login');
       } else if (pathname === '/verify' || window.location.hash === '#verify') {
         setViewMode('verify');
       } else {
@@ -135,13 +156,81 @@ export const App: React.FC = () => {
     }
   };
 
+  // Immediate role-based redirection upon successful authentication
+  const handleLoginSuccess = (authenticatedUser?: UserPersona) => {
+    setJustLoggedIn(true);
+    const currentUser = authenticatedUser || user;
+    if (!currentUser) {
+      setViewMode('landing');
+      if (typeof window !== 'undefined') {
+        window.history.pushState({}, '', '/');
+      }
+      return;
+    }
+
+    const role = currentUser.role;
+    const email = (currentUser.email || '').toLowerCase();
+    const name = (currentUser.name || '').toLowerCase();
+
+    // 1. Outside Agency Creator routing (e.g., sana@aurelle.com)
+    if (email.includes('sana') || email.includes('agency') || name.includes('agency')) {
+      setViewMode('agency-dashboard');
+      if (typeof window !== 'undefined') {
+        window.history.pushState({ view: 'agency-dashboard' }, '', '/dashboard/agency');
+      }
+      return;
+    }
+
+    // 2. Creator routing
+    if (role === 'CREATOR') {
+      setViewMode('creator-dashboard');
+      if (typeof window !== 'undefined') {
+        window.history.pushState({ view: 'creator-dashboard' }, '', '/creator/check');
+      }
+      return;
+    }
+
+    // 3. Reviewer routing
+    if (role === 'REVIEWER') {
+      setViewMode('reviewer-dashboard');
+      if (typeof window !== 'undefined') {
+        window.history.pushState({ view: 'reviewer-dashboard' }, '', '/dashboard/reviewer');
+      }
+      return;
+    }
+
+    // 4. Compliance Reviewer routing
+    if (role === 'COMPLIANCE_REVIEWER') {
+      setViewMode('compliance-dashboard');
+      if (typeof window !== 'undefined') {
+        window.history.pushState({ view: 'compliance-dashboard' }, '', '/dashboard/compliance');
+      }
+      return;
+    }
+
+    // 5. Brand Owner / Brand Manager / Admin routing
+    if (role === 'BRAND_MANAGER' || role === 'ADMIN') {
+      setViewMode('brand-owner-dashboard');
+      if (typeof window !== 'undefined') {
+        window.history.pushState({ view: 'brand-owner-dashboard' }, '', '/dashboard/brand-owner');
+      }
+      return;
+    }
+
+    // Fallback: Landing Page
+    setViewMode('landing');
+    if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', '/');
+    }
+  };
+
   useEffect(() => {
     if (currentWorkspace && currentWorkspace !== selectedBrandId) {
       setSelectedBrandId(currentWorkspace);
     }
-  }, [currentWorkspace]);
+  }, [currentWorkspace, selectedBrandId]);
 
-  // Load brands and DB telemetry
+  // Load brands and DB telemetry ONLY when not on the login or verification page
   const loadInitialData = async () => {
     try {
       const [brandsRes, statusRes] = await Promise.all([
@@ -166,8 +255,10 @@ export const App: React.FC = () => {
   };
 
   useEffect(() => {
+    // Critical performance optimization: Never delay login screen by loading unrelated metadata
+    if (viewMode === 'login' || viewMode === 'verify') return;
     loadInitialData();
-  }, []);
+  }, [viewMode]);
 
   const handleReseed = async () => {
     setIsReseeding(true);
@@ -208,35 +299,36 @@ export const App: React.FC = () => {
 
   const currentBrand = brands.find((b) => b.brand_id === selectedBrandId);
 
-  // If user requests Public Verification Portal (Zero authentication required)
+  // 1. PUBLIC ZERO-AUTHENTICATION VERIFICATION VIEW
   if (viewMode === 'verify') {
     return (
       <Suspense fallback={<ViewLoadingFallback />}>
         <PublicVerificationView
           initialBrand={currentBrand?.brand_name || 'Aurelle Technologies'}
-          onBack={() => setViewMode('landing')}
+          onBack={() => {
+            setViewMode('landing');
+            if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
+          }}
         />
       </Suspense>
     );
   }
 
-  // If user requests Sign In / Register Page
+  // 2. ULTRA-FAST LOGIN & REGISTRATION VIEW
   if (viewMode === 'login') {
     return (
       <LoginPage
-        onSuccess={() => {
-          setJustLoggedIn(true);
-          setViewMode('landing');
-        }}
+        onSuccess={handleLoginSuccess}
         onOpenLanding={() => {
           setJustLoggedIn(false);
           setViewMode('landing');
+          if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
         }}
       />
     );
   }
 
-  // DEDICATED INDEPENDENT CREATOR DASHBOARD VIEW
+  // 3. DEDICATED INDEPENDENT CREATOR DASHBOARD VIEW
   if (viewMode === 'creator-dashboard') {
     return (
       <Suspense fallback={<ViewLoadingFallback />}>
@@ -244,16 +336,14 @@ export const App: React.FC = () => {
           brandName={currentBrand?.brand_name || 'Aurelle Skin'}
           onBackToLanding={() => {
             setViewMode('landing');
-            if (typeof window !== 'undefined') {
-              window.history.pushState({}, '', '/');
-            }
+            if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
           }}
         />
       </Suspense>
     );
   }
 
-  // DEDICATED INDEPENDENT AGENCY DASHBOARD VIEW
+  // 4. DEDICATED INDEPENDENT AGENCY DASHBOARD VIEW
   if (viewMode === 'agency-dashboard') {
     return (
       <Suspense fallback={<ViewLoadingFallback />}>
@@ -262,16 +352,14 @@ export const App: React.FC = () => {
           brandName={currentBrand?.brand_name || 'Aurelle Skin'}
           onBackToLanding={() => {
             setViewMode('landing');
-            if (typeof window !== 'undefined') {
-              window.history.pushState({}, '', '/');
-            }
+            if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
           }}
         />
       </Suspense>
     );
   }
 
-  // DEDICATED INDEPENDENT REVIEWER DASHBOARD VIEW
+  // 5. DEDICATED INDEPENDENT REVIEWER DASHBOARD VIEW
   if (viewMode === 'reviewer-dashboard') {
     return (
       <Suspense fallback={<ViewLoadingFallback />}>
@@ -280,16 +368,14 @@ export const App: React.FC = () => {
           brandName={currentBrand?.brand_name || 'Aurelle Skin'}
           onBackToLanding={() => {
             setViewMode('landing');
-            if (typeof window !== 'undefined') {
-              window.history.pushState({}, '', '/');
-            }
+            if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
           }}
         />
       </Suspense>
     );
   }
 
-  // DEDICATED INDEPENDENT COMPLIANCE DASHBOARD VIEW
+  // 6. DEDICATED INDEPENDENT COMPLIANCE DASHBOARD VIEW
   if (viewMode === 'compliance-dashboard') {
     return (
       <Suspense fallback={<ViewLoadingFallback />}>
@@ -298,16 +384,14 @@ export const App: React.FC = () => {
           brandName={currentBrand?.brand_name || 'Aurelle Skin'}
           onBackToLanding={() => {
             setViewMode('landing');
-            if (typeof window !== 'undefined') {
-              window.history.pushState({}, '', '/');
-            }
+            if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
           }}
         />
       </Suspense>
     );
   }
 
-  // DEDICATED INDEPENDENT BRAND OWNER DASHBOARD VIEW
+  // 7. DEDICATED INDEPENDENT BRAND OWNER DASHBOARD VIEW
   if (viewMode === 'brand-owner-dashboard') {
     return (
       <Suspense fallback={<ViewLoadingFallback />}>
@@ -316,98 +400,125 @@ export const App: React.FC = () => {
           brandName={currentBrand?.brand_name || 'Aurelle Skin'}
           onBackToLanding={() => {
             setViewMode('landing');
-            if (typeof window !== 'undefined') {
-              window.history.pushState({}, '', '/');
-            }
+            if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
           }}
         />
       </Suspense>
     );
   }
 
-  // PRIMARY VIEW: Unified Product-First Website
+  // PRIMARY VIEW: Unified Product-First Website (Lazy Loaded)
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans selection:bg-slate-900 selection:text-white dark:selection:bg-blue-600 dark:selection:text-white overflow-x-hidden transition-colors duration-200">
       {/* Offline Status Guardrail Banner */}
       <OfflineBanner isOnline={isOnline} />
 
       {/* Main Unified Product-First Landing Page Experience */}
-      <LandingPage
-        brandName={currentBrand?.brand_name || 'Aurelle Technologies'}
-        animateEntrance={justLoggedIn}
-        brands={brands}
-        selectedBrandId={selectedBrandId}
-        setSelectedBrandId={(id) => {
-          setSelectedBrandId(id);
-          setWorkspace(id);
-        }}
-        dbStatus={dbStatus}
-        onVerify={() => setViewMode('verify')}
-        onSignIn={() => setViewMode('login')}
-        onOpenCreatorDashboard={handleOpenCreatorDashboard}
-        onNavigateRole={handleNavigateRole}
-        onSignRelease={handleSignRelease}
-        onReseed={handleReseed}
-        isReseeding={isReseeding}
-        onEnterApp={(targetTab) => {
-          if (targetTab === 'public-verification') {
+      <Suspense fallback={<ViewLoadingFallback />}>
+        <LandingPage
+          brandName={currentBrand?.brand_name || 'Aurelle Technologies'}
+          animateEntrance={justLoggedIn}
+          brands={brands}
+          selectedBrandId={selectedBrandId}
+          setSelectedBrandId={(id) => {
+            setSelectedBrandId(id);
+            setWorkspace(id);
+          }}
+          dbStatus={dbStatus}
+          onVerify={() => {
             setViewMode('verify');
-            return;
-          }
-          handleOpenCreatorDashboard();
-        }}
-      />
+            if (typeof window !== 'undefined') window.history.pushState({ view: 'verify' }, '', '/verify');
+          }}
+          onSignIn={() => {
+            setViewMode('login');
+            if (typeof window !== 'undefined') window.history.pushState({ view: 'login' }, '', '/login');
+          }}
+          onOpenCreatorDashboard={handleOpenCreatorDashboard}
+          onNavigateRole={handleNavigateRole}
+          onSignRelease={handleSignRelease}
+          onReseed={handleReseed}
+          isReseeding={isReseeding}
+          onEnterApp={(targetTab) => {
+            if (targetTab === 'public-verification') {
+              setViewMode('verify');
+              if (typeof window !== 'undefined') window.history.pushState({ view: 'verify' }, '', '/verify');
+              return;
+            }
+            handleOpenCreatorDashboard();
+          }}
+        />
+      </Suspense>
 
-      {/* Progressive Web App Install Modal */}
-      <InstallAppModal
-        isOpen={isInstallModalOpen}
-        onClose={() => setIsInstallModalOpen(false)}
-        isInstallable={isInstallable}
-        isInstalled={isInstalled}
-        onPromptInstall={promptInstall}
-      />
+      {/* Progressive Web App Install Modal (Lazy) */}
+      <Suspense fallback={null}>
+        {isInstallModalOpen && (
+          <InstallAppModal
+            isOpen={isInstallModalOpen}
+            onClose={() => setIsInstallModalOpen(false)}
+            isInstallable={isInstallable}
+            isInstalled={isInstalled}
+            onPromptInstall={promptInstall}
+          />
+        )}
+      </Suspense>
 
-      {/* Database Telemetry Modal */}
-      <DatabaseStatusModal
-        isOpen={isDbModalOpen}
-        onClose={() => setIsDbModalOpen(false)}
-        status={dbStatus}
-      />
+      {/* Database Telemetry Modal (Lazy) */}
+      <Suspense fallback={null}>
+        {isDbModalOpen && (
+          <DatabaseStatusModal
+            isOpen={isDbModalOpen}
+            onClose={() => setIsDbModalOpen(false)}
+            status={dbStatus}
+          />
+        )}
+      </Suspense>
 
-      {/* AURELLE Demo Walkthrough Modal */}
-      <DemoWalkthroughModal
-        isOpen={isDemoModalOpen}
-        onClose={() => setIsDemoModalOpen(false)}
-        onNavigateToView={() => {
-          setIsDemoModalOpen(false);
-          handleOpenCreatorDashboard();
-        }}
-      />
+      {/* AURELLE Demo Walkthrough Modal (Lazy) */}
+      <Suspense fallback={null}>
+        {isDemoModalOpen && (
+          <DemoWalkthroughModal
+            isOpen={isDemoModalOpen}
+            onClose={() => setIsDemoModalOpen(false)}
+            onNavigateToView={() => {
+              setIsDemoModalOpen(false);
+              handleOpenCreatorDashboard();
+            }}
+          />
+        )}
+      </Suspense>
 
-      {/* Welcome Onboarding Modal */}
-      <WelcomeModal
-        isOpen={isWelcomeModalOpen}
-        onClose={() => setIsWelcomeModalOpen(false)}
-        onStartTour={() => {
-          setIsWelcomeModalOpen(false);
-          setIsTourOpen(true);
-          setTourStepIndex(0);
-        }}
-        onLaunchDemoScenario={() => {
-          setIsWelcomeModalOpen(false);
-          handleOpenCreatorDashboard();
-        }}
-      />
+      {/* Welcome Onboarding Modal (Lazy) */}
+      <Suspense fallback={null}>
+        {isWelcomeModalOpen && (
+          <WelcomeModal
+            isOpen={isWelcomeModalOpen}
+            onClose={() => setIsWelcomeModalOpen(false)}
+            onStartTour={() => {
+              setIsWelcomeModalOpen(false);
+              setIsTourOpen(true);
+              setTourStepIndex(0);
+            }}
+            onLaunchDemoScenario={() => {
+              setIsWelcomeModalOpen(false);
+              handleOpenCreatorDashboard();
+            }}
+          />
+        )}
+      </Suspense>
 
-      {/* Interactive Guided Tour Overlay */}
-      <GuidedTourOverlay
-        isOpen={isTourOpen}
-        currentStepIndex={tourStepIndex}
-        onStepChange={(idx, _tab) => {
-          setTourStepIndex(idx);
-        }}
-        onClose={() => setIsTourOpen(false)}
-      />
+      {/* Interactive Guided Tour Overlay (Lazy) */}
+      <Suspense fallback={null}>
+        {isTourOpen && (
+          <GuidedTourOverlay
+            isOpen={isTourOpen}
+            currentStepIndex={tourStepIndex}
+            onStepChange={(idx, _tab) => {
+              setTourStepIndex(idx);
+            }}
+            onClose={() => setIsTourOpen(false)}
+          />
+        )}
+      </Suspense>
     </div>
   );
 };

@@ -42,13 +42,20 @@ export const DemoWalkthroughModal: React.FC<DemoWalkthroughModalProps> = ({
   onClose,
   onNavigateToView
 }) => {
-  const { user, personas, switchPersona } = useAuth();
+  const { user, personas, switchPersona, loadPersonasIfNeeded } = useAuth();
   const [activeTab, setActiveTab] = useState<'lifecycle' | 'cases'>('lifecycle');
   
   // Scenario state
   const [scenarioState, setScenarioState] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [executingStep, setExecutingStep] = useState<number | null>(null);
+
+  // Lazy-load personas only when the modal is actually opened
+  useEffect(() => {
+    if (isOpen) {
+      loadPersonasIfNeeded();
+    }
+  }, [isOpen, loadPersonasIfNeeded]);
 
   // Cases state
   const [cases, setCases] = useState<DemoCase[]>([]);

@@ -110,6 +110,13 @@ class MongoManager:
             # 1. Organizations
             await self.db.organizations.create_index([("org_id", ASCENDING)], unique=True)
             
+            # Users index for rapid authentication lookups
+            try:
+                await self.db.users.create_index([("email", ASCENDING)], unique=True)
+                await self.db.users.create_index([("organisation_id", ASCENDING), ("user_id", ASCENDING)])
+            except Exception as ue:
+                logger.debug(f"User index note: {ue}")
+
             # 2. Workspaces
             await self.db.workspaces.create_index([("org_id", ASCENDING), ("workspace_id", ASCENDING)], unique=True)
 
