@@ -63,6 +63,35 @@ class TaskResolutionRequest(BaseModel):
     final_content: Optional[str] = None
     resolution_notes: Optional[str] = None
 
+class FactCreatePayload(BaseModel):
+    brand_id: str = "aurelle-tech"
+    name: str
+    category: str = "PRICE"
+    current_value: str
+    unit: Optional[str] = ""
+    description: str = ""
+    source_citation: str = ""
+    department_owner: str = "Brand Governance Committee"
+    source_date: Optional[str] = None
+    expiry_date: Optional[str] = None
+    evidence_reference: Optional[str] = None
+    restricted_terms: Optional[List[str]] = None
+    required_phrases: Optional[List[str]] = None
+
+class FactUpdatePayload(BaseModel):
+    name: Optional[str] = None
+    category: Optional[str] = None
+    current_value: Optional[str] = None
+    unit: Optional[str] = None
+    description: Optional[str] = None
+    source_citation: Optional[str] = None
+    department_owner: Optional[str] = None
+    source_date: Optional[str] = None
+    expiry_date: Optional[str] = None
+    evidence_reference: Optional[str] = None
+    restricted_terms: Optional[List[str]] = None
+    required_phrases: Optional[List[str]] = None
+
 class MultimodalInspectionRequest(BaseModel):
     brand_id: str
     asset_title: str
@@ -300,6 +329,198 @@ async def list_approved_facts(brand_id: Optional[str] = Query(None)):
     if brand_id:
         facts = [f for f in facts if f.brand_id == brand_id]
     return [f.model_dump() for f in facts]
+
+@router.post("/facts")
+async def create_approved_fact(req: FactCreatePayload):
+    """Registers a new approved fact in memory and MongoDB Atlas."""
+    from brandtrace.graph.schema import ApprovedFact, NodeType, Node as GraphNode
+    from brandtrace.database.schemas import ApprovedFactDoc
+    import datetime
+    
+    fact_id = f"FACT-{req.brand_id[:3].upper()}-{int(time.time() * 1000) % 100000:05d}"
+    now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    now_int = int(time.time())
+    org_id = "ORG-AURELLE" if "aurelle" in req.brand_id else "ORG-APEX"
+    
+    # Save to MongoDB
+    fact_doc = ApprovedFactDoc(
+        fact_id=fact_id,
+        organisation_id=org_id,
+        workspace_id=req.brand_id,
+        name=req.name,
+        category=req.category,
+        current_value=req.current_value,
+        unit=req.unit or "",
+        description=req.description,
+        source_citation=req.source_citation,
+        department_owner=req.department_owner,
+        last_verified=now_iso,
+        source_date=req.source_date,
+        expiry_date=req.expiry_date,
+        evidence_reference=req.evidence_reference,
+        restricted_terms=req.restricted_terms,
+        required_phrases=req.required_phrases,
+        created_at=now_int,
+        updated_at=now_int
+    )
+    await mongo_manager.repo.add_approved_fact(fact_doc)
+    
+    # Save to catalog
+    fact_obj = ApprovedFact(
+        id=fact_id,
+        brand_id=req.brand_id,
+        name=req.name,
+        category=req.category,
+        current_value=req.current_value,
+        unit=req.unit or "",
+        description=req.description,
+        source_citation=req.source_citation,
+        department_owner=req.department_owner,
+        last_verified=now_iso
+    )
+    APPROVED_FACTS_CATALOG[fact_id] = fact_obj
+    
+    # Save to Graph
+    if req.brand_id in BRAND_SEEDS:
+        node = GraphNode(
+            id=fact_id,
+            label=f"{req.name}: {req.current_value}",
+            type=NodeType.APPROVED_FACT,
+            description=req.description,
+            properties={
+                "current_value": req.current_value,
+                "citation": req.source_citation,
+                "department_owner": req.department_owner,
+                "source_date": req.source_date,
+                "expiry_date": req.expiry_date,
+                "evidence_reference": req.evidence_reference
+            }
+        )
+        BRAND_SEEDS[req.brand_id].nodes.append(node)
+        
+    return fact_obj.model_dump()
+
+@router.put("/facts/{fact_id}")
+async def update_approved_fact(fact_id: str, req: FactUpdatePayload, brand_id: Optional[str] = Query(None)):
+    """Edits an approved fact with server-side validation and persistence."""
+    from brandtrace.graph.schema import ApprovedFact, NodeType, Node as GraphNode
+    from brandtrace.database.schemas import ApprovedFactDoc
+    import datetime
+    
+    b_id = brand_id or "aurelle-tech"
+    org_id = "ORG-AURELLE" if "aurelle" in b_id else "ORG-APEX"
+    now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    now_int = int(time.time())
+    
+    existing = APPROVED_FACTS_CATALOG.get(fact_id)
+    if not existing:
+        raise HTTPException(status_code=404, detail=f"Fact '{fact_id}' not found.")
+        
+    updated_name = req.name if req.name is not None else existing.name
+    updated_val = req.current_value if req.current_value is not None else existing.current_value
+    updated_cat = req.category if req.category is not None else existing.category
+    updated_unit = req.unit if req.unit is not None else existing.unit
+    updated_desc = req.description if req.description is not None else existing.description
+    updated_cite = req.source_citation if req.source_citation is not None else existing.source_citation
+    updated_dept = req.department_owner if req.department_owner is not None else existing.department_owner
+    
+    # Update in Mongo
+    fact_doc = ApprovedFactDoc(
+        fact_id=fact_id,
+        organisation_id=org_id,
+        workspace_id=existing.brand_id,
+        name=updated_name,
+        category=updated_cat,
+        current_value=updated_val,
+        unit=updated_unit or "",
+        description=updated_desc,
+        source_citation=updated_cite,
+        department_owner=updated_dept,
+        last_verified=now_iso,
+        source_date=req.source_date,
+        expiry_date=req.expiry_date,
+        evidence_reference=req.evidence_reference,
+        restricted_terms=req.restricted_terms,
+        required_phrases=req.required_phrases,
+        created_at=now_int,
+        updated_at=now_int
+    )
+    await mongo_manager.repo.add_approved_fact(fact_doc)
+    
+    # Update in catalog
+    existing.name = updated_name
+    existing.category = updated_cat
+    existing.current_value = updated_val
+    existing.unit = updated_unit or ""
+    existing.description = updated_desc
+    existing.source_citation = updated_cite
+    existing.department_owner = updated_dept
+    existing.last_verified = now_iso
+    
+    # Update in graph
+    if existing.brand_id in BRAND_SEEDS:
+        for node in BRAND_SEEDS[existing.brand_id].nodes:
+            if node.id == fact_id:
+                node.label = f"{updated_name}: {updated_val}"
+                node.description = updated_desc
+                node.properties["current_value"] = updated_val
+                node.properties["citation"] = updated_cite
+                node.properties["department_owner"] = updated_dept
+                node.properties["source_date"] = req.source_date
+                node.properties["expiry_date"] = req.expiry_date
+                node.properties["evidence_reference"] = req.evidence_reference
+                break
+                
+    # Record audit event
+    if mongo_manager.is_connected and mongo_manager.db is not None:
+        try:
+            await mongo_manager.db.audit_events.insert_one({
+                "event_id": f"EVT-FACT-UPD-{int(time.time()*1000)%100000}",
+                "action_type": "FACT_UPDATED",
+                "resource_id": fact_id,
+                "user_identity": "Chief Governance Officer",
+                "timestamp": now_int
+            })
+        except Exception:
+            pass
+            
+    return existing.model_dump()
+
+class GuidelineCreatePayload(BaseModel):
+    brand_id: str = "aurelle-tech"
+    title: str
+    category: str = "VOICE"
+    rule_statement: str
+    severity: str = "HIGH"
+    effective_date: Optional[str] = None
+    expiry_date: Optional[str] = None
+    restricted_terms: Optional[List[str]] = None
+    required_phrases: Optional[List[str]] = None
+    source_citation: Optional[str] = None
+
+@router.get("/guidelines")
+async def list_brand_guidelines_api(brand_id: Optional[str] = Query(None)):
+    """List brand guidelines and policy guardrails."""
+    from brandtrace.modules.knowledge_base.router import list_brand_guidelines
+    return await list_brand_guidelines(workspace_id=brand_id)
+
+@router.post("/guidelines")
+async def create_brand_guideline_api(req: GuidelineCreatePayload):
+    """Registers a brand guideline in MongoDB Atlas and BKG graph."""
+    from brandtrace.modules.knowledge_base.router import create_brand_guideline
+    from brandtrace.modules.knowledge_base.models import CreateGuidelineRequest
+    return await create_brand_guideline(CreateGuidelineRequest(
+        workspace_id=req.brand_id,
+        title=req.title,
+        category=req.category,
+        rule_statement=req.rule_statement,
+        severity=req.severity,
+        effective_date=req.effective_date,
+        expiry_date=req.expiry_date,
+        restricted_terms=req.restricted_terms,
+        required_phrases=req.required_phrases,
+        source_citation=req.source_citation
+    ))
 
 @router.post("/facts/mutate", response_model=DependencyIntelligenceResult)
 async def mutate_approved_fact(req: FactMutationRequest):
