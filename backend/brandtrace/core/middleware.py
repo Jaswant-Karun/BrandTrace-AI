@@ -2,7 +2,7 @@ import time
 import uuid
 import logging
 from collections import defaultdict
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response, JSONResponse
@@ -28,7 +28,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         """Used in automated test suites to verify rate limiter triggering with small burst."""
         self.test_custom_limits[client_key] = limit
 
-    def clear_client_history(self, client_key: Optional_key = None):
+    def clear_client_history(self, client_key: Optional[str] = None):
         if client_key:
             self.client_request_history.pop(client_key, None)
             self.test_custom_limits.pop(client_key, None)
