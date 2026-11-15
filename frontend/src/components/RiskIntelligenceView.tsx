@@ -38,7 +38,6 @@ export const RiskIntelligenceView: React.FC<RiskIntelligenceViewProps> = ({ bran
           Posture: <span className="font-bold">Defended (Low Liability)</span>
         </div>
       </PageHeader>
-      </div>
 
       {isLoading ? (
         <div className="p-12 text-center text-xs text-slate-500 bg-white border border-slate-200 rounded-xl shadow-xs">
