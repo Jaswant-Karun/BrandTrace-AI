@@ -113,13 +113,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans selection:bg-slate-900 selection:text-white dark:selection:bg-indigo-600 dark:selection:text-white transition-colors duration-200">
+    <div className="min-h-screen bg-black text-white flex flex-col font-sans selection:bg-indigo-600 selection:text-white transition-colors duration-200">
       
       {/* ------------------------------------------------------------------- */}
       {/* SECTION 1 — TOP NAVIGATION                                          */}
       {/* ------------------------------------------------------------------- */}
-      <nav className="sticky top-0 z-50 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md transition-colors duration-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3 sm:gap-4">
+      <nav className="sticky top-0 z-50 border-b border-white/10 bg-black/90 backdrop-blur-md transition-colors duration-200">
+        <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:pl-6 xl:pl-8 lg:pr-6 xl:pr-8 h-16 flex items-center justify-between gap-3 sm:gap-4">
           
           {/* Left: Brand Identity (Guaranteed single-line with shrink-0 & whitespace-nowrap) */}
           <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
@@ -310,41 +310,43 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ------------------------------------------------------------------- */}
       {/* SECTION 2 — HERO SECTION (Matching Reference Visual Design & Motion) */}
       {/* ------------------------------------------------------------------- */}
-      <section id="overview" className="relative pt-3 sm:pt-6 pb-14 sm:pb-20 overflow-hidden">
-        {/* Subtle background ambient gradients */}
+      <section id="overview" className="relative pt-4 sm:pt-8 pb-16 sm:pb-24 bg-black text-white overflow-hidden">
+        {/* Subtle dark ambient glows */}
         <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
-          <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-gradient-to-b from-indigo-100/50 via-purple-50/20 to-transparent dark:from-indigo-950/30 dark:via-purple-950/10 dark:to-transparent rounded-full blur-3xl" />
+          <div className="absolute -top-32 left-1/4 w-[700px] h-[450px] bg-indigo-950/20 rounded-full blur-[120px]" />
+          <div className="absolute top-1/3 right-10 w-[600px] h-[450px] bg-emerald-950/15 rounded-full blur-[140px]" />
         </div>
 
         {/* Subtle topographic contour wave lines matching reference images */}
         <svg
-          className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.05] dark:opacity-[0.14] stroke-slate-500 dark:stroke-slate-400"
+          className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.22] stroke-neutral-700"
           viewBox="0 0 1440 800"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <path d="M-50 140 C 250 260, 650 60, 1500 200" strokeWidth="1.5" />
-          <path d="M-50 240 C 300 360, 750 140, 1500 300" strokeWidth="1.5" />
-          <path d="M-50 340 C 350 460, 850 220, 1500 400" strokeWidth="1.5" />
-          <path d="M-50 440 C 400 560, 950 300, 1500 500" strokeWidth="1.5" />
-          <path d="M-50 540 C 450 660, 1050 380, 1500 600" strokeWidth="1.5" />
+          <path d="M-50 140 C 250 260, 650 60, 1500 200" strokeWidth="1.2" />
+          <path d="M-50 240 C 300 360, 750 140, 1500 300" strokeWidth="1.2" />
+          <path d="M-50 340 C 350 460, 850 220, 1500 400" strokeWidth="1.2" />
+          <path d="M-50 440 C 400 560, 950 300, 1500 500" strokeWidth="1.2" />
+          <path d="M-50 540 C 450 660, 1050 380, 1500 600" strokeWidth="1.2" />
+          <path d="M-50 640 C 500 760, 1150 460, 1500 700" strokeWidth="1.2" />
         </svg>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:pl-6 xl:pl-8 lg:pr-6 xl:pr-8 relative z-10">
           
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-start pt-1 sm:pt-2">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 xl:gap-12 items-start pt-1 sm:pt-2">
             
             {/* Left Column: Bold Editorial Typography & CTA */}
-            <div className="lg:col-span-5 space-y-6 text-left">
+            <div className="lg:col-span-6 xl:col-span-6 space-y-6 text-left pl-0">
               
               <div className="space-y-3 select-none">
                 
                 {/* Meta Tag & Brand Context Pill */}
                 <div className="flex items-center gap-2.5 flex-wrap">
-                  <span className="text-xs font-mono font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 block">
+                  <span className="text-xs sm:text-sm font-mono font-bold uppercase tracking-widest text-neutral-400 block">
                     BEFORE IT'S PUBLISHED
                   </span>
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-0.5 rounded-full">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-300 bg-neutral-900 border border-neutral-700 px-2.5 py-0.5 rounded-full">
                     AURELLE SKIN
                   </span>
                   <button
@@ -354,7 +356,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                       setTimeout(() => setMotionStep(2), 1700);
                       setTimeout(() => setMotionStep(3), 2600);
                     }}
-                    className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 px-2 py-0.5 rounded-full transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold text-indigo-400 hover:text-indigo-300 bg-indigo-950/60 border border-indigo-800/80 px-2 py-0.5 rounded-full transition-colors cursor-pointer"
                     title="Replay Motion Sequence"
                   >
                     <RotateCcw className="w-2.5 h-2.5" />
@@ -363,9 +365,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 
                 {/* Typography Headline: Animated Motion Sequence */}
-                <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 dark:text-white leading-[1.02] uppercase font-sans">
+                <h1 className="text-5xl sm:text-7xl lg:text-8xl xl:text-[90px] 2xl:text-[98px] font-black tracking-tight text-white leading-[0.93] uppercase font-sans">
                   {/* Step 1: EVERY CLAIM (always displayed first) */}
-                  <span className="block">EVERY CLAIM</span>
+                  <span className="block whitespace-nowrap">EVERY CLAIM</span>
 
                   {/* Step 2: CLINICALLY and PROVEN appear on separate lines, then struck through */}
                   <AnimatePresence>
@@ -376,19 +378,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                         animate={{ opacity: 1, height: 'auto', y: 0 }}
                         exit={{ opacity: 0, height: 0, y: -8 }}
                         transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                        className="overflow-hidden space-y-0.5 sm:space-y-1 py-0.5"
+                        className="overflow-hidden space-y-1 py-0.5"
                       >
                         {/* Line 2: CLINICALLY with coral strikethrough */}
                         <div className="leading-none">
                           <span className="relative inline-block leading-none">
-                            <span className="text-[#ff6358] dark:text-[#ff6b6b] font-black">
+                            <span className="text-[#ff6358] font-black whitespace-nowrap">
                               CLINICALLY
                             </span>
                             <motion.span 
                               initial={{ scaleX: 0 }}
                               animate={{ scaleX: motionStep >= 2 ? 1 : 0 }}
                               transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                              className="absolute top-1/2 left-0 right-0 h-[4px] sm:h-[6px] lg:h-[7px] bg-[#ff6358] dark:bg-[#ff6b6b] -translate-y-1/2 origin-left rounded-full pointer-events-none" 
+                              className="absolute top-1/2 left-0 right-0 h-[6px] sm:h-[8px] lg:h-[10px] xl:h-[11px] bg-[#ff6358] -translate-y-1/2 origin-left rounded-full pointer-events-none" 
                             />
                           </span>
                         </div>
@@ -396,14 +398,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                         {/* Line 3: PROVEN with coral strikethrough */}
                         <div className="leading-none">
                           <span className="relative inline-block leading-none">
-                            <span className="text-[#ff6358] dark:text-[#ff6b6b] font-black">
+                            <span className="text-[#ff6358] font-black whitespace-nowrap">
                               PROVEN
                             </span>
                             <motion.span 
                               initial={{ scaleX: 0 }}
                               animate={{ scaleX: motionStep >= 2 ? 1 : 0 }}
                               transition={{ duration: 0.45, delay: motionStep >= 2 ? 0.12 : 0, ease: [0.16, 1, 0.3, 1] }}
-                              className="absolute top-1/2 left-0 right-0 h-[4px] sm:h-[6px] lg:h-[7px] bg-[#ff6358] dark:bg-[#ff6b6b] -translate-y-1/2 origin-left rounded-full pointer-events-none" 
+                              className="absolute top-1/2 left-0 right-0 h-[6px] sm:h-[8px] lg:h-[10px] xl:h-[11px] bg-[#ff6358] -translate-y-1/2 origin-left rounded-full pointer-events-none" 
                             />
                           </span>
                         </div>
@@ -411,7 +413,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     )}
                   </AnimatePresence>
 
-                  {/* Step 3: Green color font - noticeably smaller than parent headline */}
+                  {/* Step 3: Green color font - lightly smaller than parent headline */}
                   <AnimatePresence>
                     {motionStep >= 3 && (
                       <motion.div
@@ -420,12 +422,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                         animate={{ opacity: 1, height: 'auto', y: 0 }}
                         exit={{ opacity: 0, height: 0, y: 8 }}
                         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                        className="overflow-hidden text-[#10b981] dark:text-[#34d399] py-0.5 text-lg sm:text-2xl lg:text-3xl font-extrabold leading-tight tracking-tight"
+                        className="overflow-hidden text-[#10b981] py-1 text-4xl sm:text-6xl lg:text-7xl xl:text-[76px] 2xl:text-[82px] font-black leading-[0.95] tracking-tight"
                       >
-                        <span className="block my-0.5">
+                        <span className="block whitespace-nowrap">
                           SHOWN TO VISIBLY
                         </span>
-                        <span className="block my-0.5">
+                        <span className="block whitespace-nowrap">
                           REDUCE*
                         </span>
                       </motion.div>
@@ -433,7 +435,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   </AnimatePresence>
 
                   {/* Step 1 & Anchor: CHECKED. (always displayed first with EVERY CLAIM) */}
-                  <div className="block text-slate-900 dark:text-white pt-1">
+                  <div className="block text-white pt-1 whitespace-nowrap">
                     CHECKED.
                   </div>
                 </h1>
@@ -443,13 +445,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <motion.p 
                 animate={{ opacity: motionStep >= 3 ? 1 : 0, y: motionStep >= 3 ? 0 : 4 }}
                 transition={{ duration: 0.4 }}
-                className="text-[11px] sm:text-xs font-mono text-slate-500 dark:text-slate-400 pt-1"
+                className="text-xs sm:text-sm font-mono text-neutral-400 pt-2"
               >
                 *FACT-014 · 32% fewer visible dark spots in 8 weeks · in-house study, 48 participants
               </motion.p>
 
               {/* Subtitle Statement */}
-              <p className="text-base sm:text-lg font-bold text-slate-800 dark:text-slate-200 uppercase tracking-tight max-w-xl leading-snug">
+              <p className="text-sm sm:text-base font-bold text-white/80 uppercase tracking-tight max-w-xl leading-snug">
                 CHECK MARKETING CONTENT AGAINST YOUR BRAND'S OWN RULES AND FACTS, BEFORE IT'S PUBLISHED.
               </p>
 
@@ -465,16 +467,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
                 <button
                   onClick={() => scrollToSection('features')}
-                  className="px-5 py-3.5 rounded-xl text-sm font-semibold text-slate-800 dark:text-slate-200 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-5 py-3.5 rounded-xl text-sm font-semibold text-neutral-200 bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <span>Explore Capabilities</span>
                 </button>
 
                 <button
                   onClick={onVerify || (() => onEnterApp && onEnterApp('public-verification'))}
-                  className="px-5 py-3.5 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 hover:text-blue-600 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all flex items-center gap-2 cursor-pointer shadow-2xs"
+                  className="px-5 py-3.5 rounded-xl text-sm font-semibold text-neutral-300 hover:text-white bg-neutral-950 hover:bg-neutral-900 border border-neutral-800 transition-all flex items-center gap-2 cursor-pointer shadow-2xs"
                 >
-                  <ShieldCheck className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  <ShieldCheck className="w-4 h-4 text-blue-400" />
                   <span>Public Verification</span>
                 </button>
               </div>
@@ -482,14 +484,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Right Column: Visual Book Document & Floating Issues with Animated Seal (Compact Editorial Book Design) */}
-            <div className="lg:col-span-7 relative pb-16 sm:pb-20">
+            <div className="lg:col-span-6 xl:col-span-6 relative pb-16 sm:pb-20 flex justify-end">
               {/* Plumb Bob Motif hanging along the left edge */}
               <div className="hidden lg:block absolute -top-8 -left-5 pointer-events-none select-none z-20">
                 <PlumbBob stringLength={140} />
               </div>
 
               {/* Composition Container with subtle dark blueprint / glow background */}
-              <div className="relative max-w-[560px] lg:max-w-[610px] ml-auto p-2.5 sm:p-3 pb-0 rounded-2xl sm:rounded-3xl bg-slate-900/60 dark:bg-slate-950/70 border border-slate-800/80 shadow-2xl backdrop-blur-md overflow-visible">
+              <div className="relative w-full max-w-[560px] lg:max-w-[620px] ml-auto p-2.5 sm:p-3 pb-0 rounded-2xl sm:rounded-3xl bg-neutral-950/80 border border-neutral-800 shadow-2xl backdrop-blur-md overflow-visible">
                 
                 {/* Background ambient lighting */}
                 <div className="absolute top-1/4 right-1/4 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
