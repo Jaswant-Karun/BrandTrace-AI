@@ -88,8 +88,9 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
 
   // Map backend role to the correct API role param
   const getApiRole = (): string => {
+    // If the component was explicitly given a role (e.g. 'creator' or 'agency'), honor it
+    if (role) return role;
     const backendRole = user?.role || '';
-    if (role === 'agency') return 'agency';
     if (backendRole === 'REVIEWER') return 'reviewer';
     if (backendRole === 'COMPLIANCE_REVIEWER') return 'compliance';
     if (backendRole === 'BRAND_MANAGER' || backendRole === 'ADMIN') return 'brand-owner';
@@ -104,7 +105,11 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
       const params = new URLSearchParams({ role: apiRole });
       const brandId = user?.workspace_id || 'aurelle-tech';
       params.set('brand_id', brandId);
-      if ((apiRole === 'creator' || apiRole === 'agency') && effectiveUserId) {
+
+      // Only restrict by creator_id if the user is strictly logged in as a Creator.
+      // Brand Owners, Admins, or Reviewers exploring the Creator Studio can see all submissions for the brand.
+      const isActualCreator = user?.role === 'CREATOR';
+      if (isActualCreator && effectiveUserId) {
         params.set('creator_id', effectiveUserId);
       }
       if (searchQuery.trim()) {
@@ -115,8 +120,8 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
     } catch (error: any) {
       if (error?.status === 403) {
         setLoadError('Your account role does not have access to this submission workspace. Please sign in with a Creator account.');
-      } else if (error?.status === 0) {
-        setLoadError('Backend is unreachable. Please check your connection or try again shortly.');
+      } else if (error?.status === 0 || error?.status === 503) {
+        setLoadError(error?.message || 'Backend is unreachable. Please verify that the backend server is running on http://127.0.0.1:8000.');
       } else {
         setLoadError(error?.message || 'Unable to load submissions. Please try refreshing.');
       }

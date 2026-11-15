@@ -6,7 +6,7 @@
    4. Offline fallback page is served on network disconnection.
 */
 
-const CACHE_NAME = 'brandtrace-static-v2';
+const CACHE_NAME = 'brandtrace-static-v3';
 const PRECACHE_ASSETS = [
   '/',
   '/offline.html',
@@ -41,29 +41,19 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // 1. Non-GET requests (Mutations, Approvals, Submissions, Reseed) -> NETWORK ONLY
+  // 1. Bypass Service Worker completely on localhost / 127.0.0.1 development
+  if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
+    return;
+  }
+
+  // 2. Non-GET requests (Mutations, Approvals, Submissions, Reseed) -> NETWORK ONLY
   if (request.method !== 'GET') {
     return; // Pass through directly to browser network layer
   }
 
-  // 2. Private API Endpoints (/api/*) -> NETWORK ONLY (Never cache sensitive brand facts or tokens)
+  // 3. Private API Endpoints (/api/*) -> NETWORK ONLY (Never cache sensitive brand facts or tokens; pass to browser network layer)
   if (url.pathname.startsWith('/api/')) {
-    event.respondWith(
-      fetch(request).catch(() => {
-        return new Response(
-          JSON.stringify({
-            status: 'offline',
-            error: 'NetworkUnavailable',
-            detail: 'BrandTrace AI server is unreachable. Live brand governance requires an active connection.'
-          }),
-          {
-            status: 503,
-            headers: { 'Content-Type': 'application/json' }
-          }
-        );
-      })
-    );
-    return;
+    return; // Pass through directly to browser network layer without synthetic hijacking
   }
 
   // 3. Page Navigation (HTML) -> Network First with Offline Page Fallback

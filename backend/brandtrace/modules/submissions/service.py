@@ -704,7 +704,14 @@ class SubmissionsService:
     ) -> List[Dict[str, Any]]:
         query: Dict[str, Any] = {}
         if creator_id and role == "creator":
-            query["creator_id"] = creator_id
+            creator_aliases = [creator_id]
+            if creator_id in ("asha@aurelle.com", "creator@aurelle.com", "USR-AUR-ASHA", "USR-AUR-CRT"):
+                creator_aliases = ["asha@aurelle.com", "creator@aurelle.com", "USR-AUR-ASHA", "USR-AUR-CRT"]
+            elif creator_id in ("sana@aurelle.com", "agency@aurelle.com", "USR-AUR-SANA", "USR-AGENCY-001"):
+                creator_aliases = ["sana@aurelle.com", "agency@aurelle.com", "USR-AUR-SANA", "USR-AGENCY-001"]
+            elif creator_id in ("demo@brandtrace.ai", "USR-AUR-ALEX", "alex.mercer@aurelle.com"):
+                creator_aliases = ["demo@brandtrace.ai", "USR-AUR-ALEX", "alex.mercer@aurelle.com"]
+            query["creator_id"] = {"$in": creator_aliases} if len(creator_aliases) > 1 else creator_id
         if status and status.upper() != "ALL":
             s_upper = status.upper()
             if s_upper in ["CHANGES_REQUESTED", "CHANGES"]:
@@ -765,7 +772,14 @@ class SubmissionsService:
 
         subs = list(_SUBMISSIONS_STORE.values())
         if creator_id and role == "creator":
-            subs = [s for s in subs if s.get("creator_id") == creator_id]
+            creator_aliases = {creator_id}
+            if creator_id in ("asha@aurelle.com", "creator@aurelle.com", "USR-AUR-ASHA", "USR-AUR-CRT"):
+                creator_aliases.update(["asha@aurelle.com", "creator@aurelle.com", "USR-AUR-ASHA", "USR-AUR-CRT"])
+            elif creator_id in ("sana@aurelle.com", "agency@aurelle.com", "USR-AUR-SANA", "USR-AGENCY-001"):
+                creator_aliases.update(["sana@aurelle.com", "agency@aurelle.com", "USR-AUR-SANA", "USR-AGENCY-001"])
+            elif creator_id in ("demo@brandtrace.ai", "USR-AUR-ALEX", "alex.mercer@aurelle.com"):
+                creator_aliases.update(["demo@brandtrace.ai", "USR-AUR-ALEX", "alex.mercer@aurelle.com"])
+            subs = [s for s in subs if s.get("creator_id") in creator_aliases]
         if status and status.upper() != "ALL":
             s_upper = status.upper()
             if s_upper in ["CHANGES_REQUESTED", "CHANGES"]:

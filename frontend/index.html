@@ -25,17 +25,26 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
-      // Register Service Worker in supporting environments
-      if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-        window.addEventListener('load', function() {
-          navigator.serviceWorker.register('/sw.js')
-            .then(function(reg) {
-              console.log('[BrandTrace PWA] Service Worker registered with scope:', reg.scope);
-            })
-            .catch(function(err) {
-              console.warn('[BrandTrace PWA] Service Worker registration failed:', err);
-            });
-        });
+      // Manage Service Worker lifecycle safely
+      if ('serviceWorker' in navigator) {
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          // In local development, unregister lingering service workers to prevent API proxy hijacking
+          navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for (var reg of registrations) {
+              reg.unregister();
+            }
+          });
+        } else if (window.location.protocol === 'https:') {
+          window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw.js')
+              .then(function(reg) {
+                console.log('[BrandTrace PWA] Service Worker registered with scope:', reg.scope);
+              })
+              .catch(function(err) {
+                console.warn('[BrandTrace PWA] Service Worker registration failed:', err);
+              });
+          });
+        }
       }
     </script>
   </body>
