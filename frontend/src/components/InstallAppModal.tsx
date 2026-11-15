@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   Download, Monitor, ShieldCheck, CheckCircle2,
-  ExternalLink, Chrome, Sparkles, Check
+  Globe, Sparkles, Check
 } from 'lucide-react';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
@@ -118,7 +118,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
         ) : isInstallable ? (
           <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
             <div className="flex items-center gap-2 font-semibold text-slate-900">
-              <Chrome className="w-4 h-4 text-slate-700" />
+              <Globe className="w-4 h-4 text-slate-700" />
               <span>1-Click Browser Installation Supported</span>
             </div>
             <p className="text-[11px] text-slate-600 leading-relaxed">
