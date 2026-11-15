@@ -8,6 +8,7 @@
 [![Frontend Build](https://img.shields.io/badge/Frontend%20Build-0%20Errors-cyan?style=for-the-badge&logo=typescript)](frontend)
 [![Database](https://img.shields.io/badge/Database-MongoDB%20Atlas-green?style=for-the-badge&logo=mongodb)](docs/DATABASE_SCHEMA.md)
 [![PWA Ready](https://img.shields.io/badge/PWA-Installable%20Offline%20Ready-blue?style=for-the-badge&logo=pwa)](DEPLOYMENT.md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 [![Live Frontend](https://img.shields.io/badge/Live%20App-Vercel-black?style=for-the-badge&logo=vercel)](https://brand-trace-ai-dun.vercel.app/)
 [![Live Backend](https://img.shields.io/badge/Live%20API-Render-46E3B7?style=for-the-badge&logo=render)](https://brandtrace-backend.onrender.com/health)
 
@@ -212,7 +213,7 @@ backend\.venv\Scripts\pytest backend\tests -v -q --tb=short
 
 **Results:**
 ```text
-============================= 163 passed in 8.02s =============================
+============================= 242 passed in 15.40s =============================
 ```
 
 To run the frontend TypeScript and production build verification:
@@ -229,3 +230,9 @@ npm run build
 2. **Optical Character Recognition (OCR):** Image verification matches byte-level SHA-256 hashes against approved releases. Optical character reading from images requires system-level Tesseract binaries; if unavailable in cloud container environments, the portal relies on exact file hashing.
 3. **Internal Cryptographic Ledger:** The release ledger uses an internal SHA-256 chained block digest mechanism. It does not write to an external public blockchain, avoiding excessive transaction fees, network latency, and carbon emissions while maintaining strict tamper-evidence within the enterprise governance boundary.
 4. **Human Oversight Obligation:** BrandTrace AI is designed as a human-in-the-loop control plane. AI findings, risk scores, and blast radius calculations are advisory tools for compliance officers and brand managers; no release is published without explicit human authorization.
+
+---
+
+## 10. License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
