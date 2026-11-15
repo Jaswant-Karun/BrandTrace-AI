@@ -255,7 +255,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           
           {/* Top Hanging Plumb Bob Motif with Natural Physics & Scroll Shake Motion */}
           <div className="flex justify-end pr-8 sm:pr-16 lg:pr-24 -mt-6 sm:-mt-8 mb-2 pointer-events-none select-none z-20">
-            <PlumbBob stringLength={110} />
+            <PlumbBob stringLength={190} />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
