@@ -123,6 +123,25 @@ class ApiClient {
       this.request<any[]>(`/api/content/files${orgId ? `?org_id=${orgId}` : ''}`),
   };
 
+  public demo = {
+    getScenarioStatus: () => this.request<any>('/api/demo/scenario-status'),
+    executeStep: (stepNumber: number, actorRole?: string, actorName?: string) =>
+      this.request<any>('/api/demo/execute-step', {
+        method: 'POST',
+        body: JSON.stringify({ step_number: stepNumber, actor_role: actorRole, actor_name: actorName })
+      }),
+    reset: () =>
+      this.request<any>('/api/demo/reset', {
+        method: 'POST'
+      }),
+    listCases: () => this.request<any[]>('/api/demo/cases'),
+    runCase: (caseId: string, customContent?: string) =>
+      this.request<any>(`/api/demo/run-case/${caseId}`, {
+        method: 'POST',
+        body: JSON.stringify({ case_id: caseId, custom_content: customContent })
+      }),
+  };
+
   public health = {
     check: () => this.request<any>('/health'),
   };
