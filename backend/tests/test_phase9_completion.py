@@ -89,13 +89,15 @@ def test_phase9_module_endpoints_audit():
     # 5. Multimodal Creative Inspection
     mm_res = client.post("/api/multimodal/inspect", json={
         "brand_id": "aurelle-tech",
-        "modality": "IMAGE",
-        "visual_elements": {
-            "primary_color": "#D4AF37",
-            "logo_clearance_px": 24,
-            "has_alt_text": True
-        },
-        "extracted_text": "Aurelle Horizon Watch ₹499"
+        "asset_title": "Aurelle Horizon Watch Launch Banner",
+        "channel": "DIGITAL_OUT_OF_HOME",
+        "primary_color_hex": "#0A0E1A",
+        "accent_color_hex": "#D4AF37",
+        "background_color_hex": "#070B14",
+        "text_color_hex": "#F8FAFC",
+        "logo_padding_px": 24,
+        "min_logo_clearance_px": 20,
+        "disclaimer_font_size_pt": 9.5
     }, headers=headers)
     assert mm_res.status_code == 200
 
@@ -104,7 +106,7 @@ def test_phase9_module_endpoints_audit():
     assert camp_res.status_code == 200
 
     # 7. Risk Intelligence
-    risk_res = client.get("/api/risks?brand_id=aurelle-tech", headers=headers)
+    risk_res = client.get("/api/risks/taxonomy?brand_id=aurelle-tech", headers=headers)
     assert risk_res.status_code == 200
 
     # 8. Approval Center Tasks
