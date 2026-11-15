@@ -9,7 +9,11 @@ class Settings(BaseModel):
     host: str = os.getenv("HOST", "0.0.0.0")
     debug: bool = os.getenv("DEBUG", "true").lower() == "true"
     
-    # LLM Settings
+    # MongoDB Configuration
+    mongodb_uri: str = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
+    mongodb_db_name: str = os.getenv("MONGODB_DB_NAME", "brandtrace")
+    
+    # AI Provider Configuration (falls back to deterministic neural engine)
     llm_provider: str = os.getenv("LLM_PROVIDER", "mock")
     gemini_api_key: Optional[str] = os.getenv("GEMINI_API_KEY", None)
     openai_api_key: Optional[str] = os.getenv("OPENAI_API_KEY", None)
