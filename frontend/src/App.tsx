@@ -1,26 +1,35 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sidebar, NavigationTab } from './components/Sidebar';
 import { LandingPage } from './components/LandingPage';
 import { CommandCenter } from './components/CommandCenter';
-import { DependencyIntelligenceStudio } from './components/DependencyIntelligenceStudio';
-import { KnowledgeGraphView } from './components/KnowledgeGraphView';
-import { AssetInspector } from './components/AssetInspector';
-import { BlastRadiusSimulator } from './components/BlastRadiusSimulator';
-import { MultimodalInspectionView } from './components/MultimodalInspectionView';
-import { CampaignIntelligenceView } from './components/CampaignIntelligenceView';
-import { RiskIntelligenceView } from './components/RiskIntelligenceView';
-import { ApprovalCenterView } from './components/ApprovalCenterView';
-import { BrandKnowledgeBaseView } from './components/BrandKnowledgeBaseView';
-import { GovernanceAnalyticsView } from './components/GovernanceAnalyticsView';
-import { AuditTrustCenterView } from './components/AuditTrustCenterView';
-import { SettingsView } from './components/SettingsView';
 import { DatabaseStatusModal } from './components/DatabaseStatusModal';
 import { DemoWalkthroughModal } from './components/DemoWalkthroughModal';
 import { AuthHeader } from './components/AuthHeader';
 import { useAuth } from './context/AuthContext';
 import { BrandProfile, DatabaseStatus, VerificationResult } from './types';
 import { ExternalLink, Database, RefreshCw, Sparkles } from 'lucide-react';
+
+// Code-split heavy views via React.lazy for optimized initial bundle loading
+const KnowledgeGraphView = lazy(() => import('./components/KnowledgeGraphView').then(m => ({ default: m.KnowledgeGraphView })));
+const DependencyIntelligenceStudio = lazy(() => import('./components/DependencyIntelligenceStudio').then(m => ({ default: m.DependencyIntelligenceStudio })));
+const AssetInspector = lazy(() => import('./components/AssetInspector').then(m => ({ default: m.AssetInspector })));
+const BlastRadiusSimulator = lazy(() => import('./components/BlastRadiusSimulator').then(m => ({ default: m.BlastRadiusSimulator })));
+const MultimodalInspectionView = lazy(() => import('./components/MultimodalInspectionView').then(m => ({ default: m.MultimodalInspectionView })));
+const CampaignIntelligenceView = lazy(() => import('./components/CampaignIntelligenceView').then(m => ({ default: m.CampaignIntelligenceView })));
+const RiskIntelligenceView = lazy(() => import('./components/RiskIntelligenceView').then(m => ({ default: m.RiskIntelligenceView })));
+const ApprovalCenterView = lazy(() => import('./components/ApprovalCenterView').then(m => ({ default: m.ApprovalCenterView })));
+const BrandKnowledgeBaseView = lazy(() => import('./components/BrandKnowledgeBaseView').then(m => ({ default: m.BrandKnowledgeBaseView })));
+const GovernanceAnalyticsView = lazy(() => import('./components/GovernanceAnalyticsView').then(m => ({ default: m.GovernanceAnalyticsView })));
+const AuditTrustCenterView = lazy(() => import('./components/AuditTrustCenterView').then(m => ({ default: m.AuditTrustCenterView })));
+const SettingsView = lazy(() => import('./components/SettingsView').then(m => ({ default: m.SettingsView })));
+
+const ViewLoadingFallback: React.FC = () => (
+  <div className="flex flex-col items-center justify-center py-24 space-y-3">
+    <div className="w-8 h-8 rounded-full border-2 border-cyan-500/20 border-t-cyan-400 animate-spin" />
+    <span className="text-xs font-mono text-slate-400 tracking-wide">Loading module workspace...</span>
+  </div>
+);
 
 export const App: React.FC = () => {
   const [viewMode, setViewMode] = useState<'landing' | 'app'>('app');
@@ -227,93 +236,95 @@ export const App: React.FC = () => {
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.22, ease: 'easeOut' }}
             >
-              {currentTab === 'command-center' && (
-                <CommandCenter brandId={selectedBrandId} onNavigate={setCurrentTab} />
-              )}
+              <Suspense fallback={<ViewLoadingFallback />}>
+                {currentTab === 'command-center' && (
+                  <CommandCenter brandId={selectedBrandId} onNavigate={setCurrentTab} />
+                )}
 
-              {currentTab === 'bdig' && (
-                <div className="space-y-4">
-                  {/* BDIG Sub-Navigation */}
-                  <div className="flex items-center justify-between bg-slate-900/60 p-1.5 rounded-2xl border border-slate-800">
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        onClick={() => setBdigSubTab('canvas')}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
-                          bdigSubTab === 'canvas'
-                            ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm shadow-cyan-500/20'
-                            : 'text-slate-400 hover:text-white'
-                        }`}
-                      >
-                        Interactive Knowledge Graph Canvas
-                      </button>
-                      <button
-                        onClick={() => setBdigSubTab('workflow')}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
-                          bdigSubTab === 'workflow'
-                            ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40 shadow-sm shadow-rose-500/20'
-                            : 'text-slate-400 hover:text-white'
-                        }`}
-                      >
-                        Fact Mutation &amp; Revision Workflow
-                      </button>
+                {currentTab === 'bdig' && (
+                  <div className="space-y-4">
+                    {/* BDIG Sub-Navigation */}
+                    <div className="flex items-center justify-between bg-slate-900/60 p-1.5 rounded-2xl border border-slate-800">
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => setBdigSubTab('canvas')}
+                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+                            bdigSubTab === 'canvas'
+                              ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm shadow-cyan-500/20'
+                              : 'text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          Interactive Knowledge Graph Canvas
+                        </button>
+                        <button
+                          onClick={() => setBdigSubTab('workflow')}
+                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+                            bdigSubTab === 'workflow'
+                              ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40 shadow-sm shadow-rose-500/20'
+                              : 'text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          Fact Mutation &amp; Revision Workflow
+                        </button>
+                      </div>
+                      <span className="text-[11px] font-mono text-slate-400 pr-3 hidden sm:inline">
+                        Live MongoDB Graph Ontology
+                      </span>
                     </div>
-                    <span className="text-[11px] font-mono text-slate-400 pr-3 hidden sm:inline">
-                      Live MongoDB Graph Ontology
-                    </span>
+
+                    {bdigSubTab === 'canvas' ? (
+                      <KnowledgeGraphView brandId={selectedBrandId} />
+                    ) : (
+                      <DependencyIntelligenceStudio brandId={selectedBrandId} />
+                    )}
                   </div>
+                )}
 
-                  {bdigSubTab === 'canvas' ? (
-                    <KnowledgeGraphView brandId={selectedBrandId} />
-                  ) : (
-                    <DependencyIntelligenceStudio brandId={selectedBrandId} />
-                  )}
-                </div>
-              )}
+                {currentTab === 'content-studio' && (
+                  <AssetInspector brandId={selectedBrandId} onSignRelease={handleSignRelease} />
+                )}
 
-              {currentTab === 'content-studio' && (
-                <AssetInspector brandId={selectedBrandId} onSignRelease={handleSignRelease} />
-              )}
+                {currentTab === 'impact-simulator' && (
+                  <BlastRadiusSimulator brandId={selectedBrandId} />
+                )}
 
-              {currentTab === 'impact-simulator' && (
-                <BlastRadiusSimulator brandId={selectedBrandId} />
-              )}
+                {currentTab === 'multimodal' && (
+                  <MultimodalInspectionView brandId={selectedBrandId} />
+                )}
 
-              {currentTab === 'multimodal' && (
-                <MultimodalInspectionView brandId={selectedBrandId} />
-              )}
+                {currentTab === 'campaigns' && (
+                  <CampaignIntelligenceView brandId={selectedBrandId} />
+                )}
 
-              {currentTab === 'campaigns' && (
-                <CampaignIntelligenceView brandId={selectedBrandId} />
-              )}
+                {currentTab === 'risks' && (
+                  <RiskIntelligenceView brandId={selectedBrandId} />
+                )}
 
-              {currentTab === 'risks' && (
-                <RiskIntelligenceView brandId={selectedBrandId} />
-              )}
+                {currentTab === 'approvals' && (
+                  <ApprovalCenterView brandId={selectedBrandId} />
+                )}
 
-              {currentTab === 'approvals' && (
-                <ApprovalCenterView brandId={selectedBrandId} />
-              )}
+                {currentTab === 'knowledge-base' && (
+                  <BrandKnowledgeBaseView brandId={selectedBrandId} />
+                )}
 
-              {currentTab === 'knowledge-base' && (
-                <BrandKnowledgeBaseView brandId={selectedBrandId} />
-              )}
+                {currentTab === 'analytics' && (
+                  <GovernanceAnalyticsView brandId={selectedBrandId} />
+                )}
 
-              {currentTab === 'analytics' && (
-                <GovernanceAnalyticsView brandId={selectedBrandId} />
-              )}
+                {currentTab === 'audit-trust' && (
+                  <AuditTrustCenterView brandId={selectedBrandId} />
+                )}
 
-              {currentTab === 'audit-trust' && (
-                <AuditTrustCenterView brandId={selectedBrandId} />
-              )}
-
-              {currentTab === 'settings' && (
-                <SettingsView
-                  brand={currentBrand}
-                  dbStatus={dbStatus}
-                  onReseed={handleReseed}
-                  isReseeding={isReseeding}
-                />
-              )}
+                {currentTab === 'settings' && (
+                  <SettingsView
+                    brand={currentBrand}
+                    dbStatus={dbStatus}
+                    onReseed={handleReseed}
+                    isReseeding={isReseeding}
+                  />
+                )}
+              </Suspense>
             </motion.div>
           </AnimatePresence>
         </main>
