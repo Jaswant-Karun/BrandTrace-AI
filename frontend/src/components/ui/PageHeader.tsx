@@ -47,8 +47,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs mb-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
+    <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-xs mb-4 sm:mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
         <div className="space-y-1.5 max-w-3xl">
           {breadcrumbs && breadcrumbs.length > 0 ? (
             <div className="mb-2">
@@ -76,7 +76,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                 {icon}
               </div>
             )}
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+            <h1 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
               {title}
             </h1>
           </div>
@@ -86,7 +86,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+        <div className="w-full sm:w-auto flex flex-wrap items-center gap-2 pt-1 sm:pt-0 shrink-0">
           {helpContext && (
             <button
               onClick={() => setIsHelpOpen(!isHelpOpen)}
@@ -106,7 +106,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
           {secondaryAction && (
             <button
               onClick={secondaryAction.onClick}
-              className="px-3.5 py-2 text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              className="px-3 py-2 text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
             >
               {secondaryAction.icon}
               <span>{secondaryAction.label}</span>
@@ -116,7 +116,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
           {primaryAction && (
             <button
               onClick={primaryAction.onClick}
-              className={`px-4 py-2 text-xs font-semibold rounded-lg transition-colors flex items-center gap-2 cursor-pointer shadow-xs ${
+              className={`px-3.5 sm:px-4 py-2 text-xs font-semibold rounded-lg transition-colors flex items-center gap-2 cursor-pointer shadow-xs ${
                 primaryAction.variant === 'emerald'
                   ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
                   : primaryAction.variant === 'secondary'
@@ -135,7 +135,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 
       {/* Expandable Contextual Help Drawer */}
       {helpContext && isHelpOpen && (
-        <div className="mt-4 pt-4 border-t border-slate-100 bg-sky-50/40 -mx-5 -mb-5 p-5 rounded-b-xl border-x-0 border-b-0 space-y-3">
+        <div className="mt-4 pt-4 border-t border-slate-100 bg-sky-50/40 -mx-4 -mb-4 p-4 sm:-mx-6 sm:-mb-6 sm:p-6 rounded-b-xl border-x-0 border-b-0 space-y-3">
           <div className="flex items-start gap-2.5">
             <BookOpen className="w-4 h-4 text-sky-700 mt-0.5 shrink-0" />
             <div className="space-y-1">

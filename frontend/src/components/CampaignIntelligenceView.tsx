@@ -85,7 +85,7 @@ export const CampaignIntelligenceView: React.FC<CampaignIntelligenceViewProps> =
               </div>
 
               {/* Metrics */}
-              <div className="grid grid-cols-3 gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs">
                 <div>
                   <div className="text-[10px] text-slate-500 uppercase font-semibold">Budget</div>
                   <div className="font-bold text-slate-900 font-mono flex items-center mt-0.5">
@@ -133,7 +133,7 @@ export const CampaignIntelligenceView: React.FC<CampaignIntelligenceViewProps> =
                         key={ast.id}
                         className="p-2 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between text-xs"
                       >
-                        <span className="font-medium text-slate-800 truncate max-w-[240px]">{ast.label}</span>
+                        <span className="font-medium text-slate-800 truncate max-w-[160px] sm:max-w-[240px]">{ast.label}</span>
                         <span className="text-[9px] font-mono uppercase text-slate-700 bg-white px-1.5 py-0.5 rounded border border-slate-200">
                           {ast.type}
                         </span>

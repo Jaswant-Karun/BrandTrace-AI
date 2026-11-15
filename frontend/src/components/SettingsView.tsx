@@ -56,7 +56,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ brand, dbStatus, onR
       />
 
       {/* Brand Profile Details */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
+      <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-xs space-y-4">
         <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
           <Shield className="w-4 h-4 text-slate-700" />
           <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
@@ -64,7 +64,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ brand, dbStatus, onR
           </h3>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 text-xs font-sans">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs font-sans">
           <div>
             <label className="text-slate-600 font-semibold block mb-1">Brand Name</label>
             <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 font-bold text-slate-900">
@@ -82,7 +82,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ brand, dbStatus, onR
       </div>
 
       {/* AI Reasoning Engine */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
+      <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-xs space-y-4">
         <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
           <Cpu className="w-4 h-4 text-slate-700" />
           <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
@@ -113,8 +113,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ brand, dbStatus, onR
       </div>
 
       {/* Database Substrate */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
-        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+      <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
           <div className="flex items-center gap-2">
             <Database className="w-4 h-4 text-slate-700" />
             <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
@@ -125,7 +125,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ brand, dbStatus, onR
           <button
             onClick={onReseed}
             disabled={isReseeding}
-            className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+            className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs w-full sm:w-auto"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isReseeding ? 'animate-spin text-slate-900' : ''}`} />
             {isReseeding ? 'Re-seeding...' : 'Re-seed Graph Data'}
@@ -145,7 +145,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ brand, dbStatus, onR
           </div>
           <div className="flex items-center justify-between">
             <span className="text-slate-500">Host Target:</span>
-            <span className="text-slate-700 truncate max-w-[280px]">
+            <span className="text-slate-700 truncate max-w-[140px] xs:max-w-[180px] sm:max-w-[280px]">
               {dbStatus?.uri || 'mongodb://localhost:27017'}
             </span>
           </div>
@@ -153,7 +153,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ brand, dbStatus, onR
       </div>
 
       {/* Webhook Notifications */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
+      <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-xs space-y-4">
         <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
           <Bell className="w-4 h-4 text-slate-700" />
           <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
@@ -172,11 +172,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ brand, dbStatus, onR
             />
           </div>
 
-          <div className="flex items-center justify-between pt-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2">
             <span className="text-slate-500">Auto-dispatch alerts for Critical FTC / Regulatory flags</span>
             <button
               onClick={handleSave}
-              className="px-5 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+              className="px-5 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs w-full sm:w-auto"
             >
               {saveSuccess ? (
                 <>
@@ -191,15 +191,15 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ brand, dbStatus, onR
       </div>
 
       {/* Progressive Web App & Chrome Ecosystem Runtime Status */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
-        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+      <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
           <div className="flex items-center gap-2">
             <Monitor className="w-4 h-4 text-slate-700" />
             <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
               Browser Runtime &amp; PWA Distribution
             </h3>
           </div>
-          <span className="text-[10px] font-mono font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded">
+          <span className="text-[10px] font-mono font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded w-fit">
             PWA Standalone Ready
           </span>
         </div>
@@ -235,13 +235,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ brand, dbStatus, onR
         </div>
 
         {isInstallable && !isInstalled && (
-          <div className="pt-2 flex items-center justify-between">
+          <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <span className="text-xs text-slate-600">
               Install BrandTrace AI as an independent desktop window with taskbar and dock launch.
             </span>
             <button
               onClick={() => promptInstall()}
-              className="px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+              className="px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs w-full sm:w-auto"
             >
               <Download className="w-3.5 h-3.5 text-emerald-400" />
               <span>Install Desktop App</span>

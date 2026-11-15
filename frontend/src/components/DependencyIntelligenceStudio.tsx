@@ -240,7 +240,7 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
             </div>
 
             {/* Old Value vs New Value */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="text-xs text-slate-600 font-medium block mb-1">Current Approved</label>
                 <input
@@ -356,7 +356,7 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
                 </div>
 
                 {/* 3 Metric Pills */}
-                <div className="grid grid-cols-3 gap-3 pt-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 pt-2">
                   <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
                     <div className="flex items-center justify-between text-slate-500 mb-1">
                       <span className="text-[10px] font-bold uppercase">Affected Assets</span>
@@ -416,7 +416,7 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
 
       {/* Actionable Revision Tasks & Reviewer Routing Center */}
       {result && (
-        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
+        <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-xs space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-4 pb-3 border-b border-slate-100">
             <div>
               <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
@@ -429,10 +429,10 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
             </div>
 
             {/* Status Filter */}
-            <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg border border-slate-200">
+            <div className="flex flex-wrap items-center gap-1.5 bg-slate-100 p-1 rounded-lg border border-slate-200 w-full sm:w-auto">
               <button
                 onClick={() => setTaskFilter('ALL')}
-                className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${
+                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex-1 sm:flex-none text-center ${
                   taskFilter === 'ALL' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -440,7 +440,7 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
               </button>
               <button
                 onClick={() => setTaskFilter('PENDING_REVIEW')}
-                className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${
+                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex-1 sm:flex-none text-center ${
                   taskFilter === 'PENDING_REVIEW'
                     ? 'bg-white text-amber-800 shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
@@ -450,7 +450,7 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
               </button>
               <button
                 onClick={() => setTaskFilter('APPROVED_SEALED')}
-                className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${
+                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex-1 sm:flex-none text-center ${
                   taskFilter === 'APPROVED_SEALED'
                     ? 'bg-white text-emerald-800 shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
@@ -463,7 +463,7 @@ export const DependencyIntelligenceStudio: React.FC<DependencyIntelligenceStudio
 
           {/* Tasks Table */}
           <div className="overflow-x-auto border border-slate-200 rounded-lg">
-            <table className="w-full text-left text-xs">
+            <table className="w-full min-w-[620px] text-left text-xs">
               <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase font-semibold text-[10px] tracking-wider">
                 <tr>
                   <th className="py-3 px-4">Task & Resource</th>

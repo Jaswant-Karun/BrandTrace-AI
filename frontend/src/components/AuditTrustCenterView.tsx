@@ -451,14 +451,14 @@ export const AuditTrustCenterView: React.FC<AuditTrustCenterViewProps> = ({ bran
             </div>
           </div>
 
-          <div className="relative">
+          <div className="relative w-full sm:w-64">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Filter by title, seal, reviewer..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-slate-400 w-64 shadow-xs"
+              className="bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-slate-400 w-full shadow-xs"
             />
           </div>
         </div>
@@ -467,7 +467,7 @@ export const AuditTrustCenterView: React.FC<AuditTrustCenterViewProps> = ({ bran
           <div className="p-8 text-center text-xs text-slate-500">Loading immutable records...</div>
         ) : ledgerView === 'EVENTS' ? (
           <div className="overflow-x-auto border border-slate-200 rounded-lg">
-            <table className="w-full text-left text-xs">
+            <table className="w-full min-w-[640px] text-left text-xs">
               <thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold border-b border-slate-200">
                 <tr>
                   <th className="p-3">Event ID</th>
@@ -500,7 +500,7 @@ export const AuditTrustCenterView: React.FC<AuditTrustCenterViewProps> = ({ bran
           <div className="p-8 text-center text-xs text-slate-500">No release records found.</div>
         ) : (
           <div className="overflow-x-auto border border-slate-200 rounded-lg">
-            <table className="w-full text-left text-xs">
+            <table className="w-full min-w-[680px] text-left text-xs">
               <thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold border-b border-slate-200">
                 <tr>
                   <th className="p-3">Content ID &amp; Version</th>

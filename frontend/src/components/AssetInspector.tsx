@@ -466,8 +466,8 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
       />
 
       {/* Top Banner / Presets */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
-        <div className="flex items-center justify-between mb-3">
+      <div className="bg-white border border-slate-200 rounded-xl p-3.5 sm:p-4 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2 mb-3">
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-slate-800" />
             <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
@@ -476,12 +476,12 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
           </div>
           <span className="text-[11px] text-slate-500">Select pre-configured benchmark assets to evaluate AI engines</span>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2">
           {PRESETS.map((p, i) => (
             <button
               key={i}
               onClick={() => applyPreset(p)}
-              className="text-xs bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-slate-300 text-slate-700 hover:text-slate-900 px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium"
+              className="text-xs bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-slate-300 text-slate-700 hover:text-slate-900 px-2.5 sm:px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium"
             >
               {p.title}
             </button>
@@ -575,11 +575,11 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
               </div>
 
               {/* Dual Action Buttons */}
-              <div className="grid grid-cols-2 gap-2 pt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                 <button
                   onClick={handleVerify}
                   disabled={isVerifying || !content.trim()}
-                  className="w-full py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-all disabled:opacity-50 cursor-pointer"
+                  className="w-full py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-all disabled:opacity-50 cursor-pointer min-h-[40px]"
                 >
                   {isVerifying ? (
                     <>
@@ -597,7 +597,7 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
                 <button
                   onClick={handleRunExplainableReview}
                   disabled={isExplainableLoading || !content.trim()}
-                  className="w-full py-2.5 rounded-lg bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer shadow-xs"
+                  className="w-full py-2.5 rounded-lg bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer shadow-xs min-h-[40px]"
                 >
                   {isExplainableLoading ? (
                     <>
@@ -619,18 +619,19 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
         {/* Right Column: Multi-Agent Analysis & Results (7 Cols) */}
         <div className="lg:col-span-7 space-y-4">
           {/* Sub-Tab Header */}
-          <div className="bg-white border border-slate-200 rounded-xl p-1.5 flex items-center justify-between shadow-xs">
-            <div className="flex items-center gap-1">
+          <div className="bg-white border border-slate-200 rounded-xl p-1.5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-1 shadow-xs">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1 w-full sm:w-auto">
               <button
                 onClick={() => setInspectorMode('multi_agent')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 min-h-[36px] ${
                   inspectorMode === 'multi_agent'
                     ? 'bg-slate-100 text-slate-900 border border-slate-200 shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <ShieldCheck className="w-3.5 h-3.5" />
-                Multi-Agent Governance Pipeline
+                <span className="hidden sm:inline">Multi-Agent Governance Pipeline</span>
+                <span className="sm:hidden">Multi-Agent Pipeline</span>
               </button>
               <button
                 onClick={() => {
@@ -639,14 +640,15 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
                     handleRunExplainableReview();
                   }
                 }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 min-h-[36px] ${
                   inspectorMode === 'explainable_claims'
                     ? 'bg-slate-100 text-slate-900 border border-slate-200 shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <Cpu className="w-3.5 h-3.5" />
-                Explainable Claim RAG Classifier
+                <span className="hidden sm:inline">Explainable Claim RAG Classifier</span>
+                <span className="sm:hidden">Explainable Claim RAG</span>
               </button>
             </div>
           </div>
@@ -1074,20 +1076,22 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
         subtitle="Detailed compliance inspection diagnosis, statutory evidence citation, and audit resolution."
         maxWidth="lg"
         footer={
-          <div className="flex flex-wrap items-center justify-between w-full gap-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between w-full gap-2">
             <Button
               variant="outline"
               size="xs"
               onClick={() => onNavigate && onNavigate('knowledge-base')}
               icon={<ExternalLink className="w-3.5 h-3.5" />}
+              className="w-full sm:w-auto justify-center"
             >
               View in Knowledge Base
             </Button>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2 w-full sm:w-auto">
               <Button
                 variant="secondary"
                 size="xs"
                 onClick={() => setIsFindingModalOpen(false)}
+                className="flex-1 sm:flex-none justify-center"
               >
                 Close
               </Button>
@@ -1097,6 +1101,7 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
                   size="xs"
                   onClick={() => handleApplySingleCorrection(detailedFinding.excerpt, detailedFinding.suggestedCorrection)}
                   icon={<Sparkles className="w-3.5 h-3.5" />}
+                  className="flex-1 sm:flex-none justify-center"
                 >
                   Apply Correction
                 </Button>
@@ -1106,6 +1111,7 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
                 size="xs"
                 onClick={handleCreateRevisionTaskFromFinding}
                 icon={<MessageSquare className="w-3.5 h-3.5" />}
+                className="w-full sm:w-auto justify-center"
               >
                 Route to Approvals
               </Button>

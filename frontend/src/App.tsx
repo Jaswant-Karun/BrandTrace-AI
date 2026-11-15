@@ -167,7 +167,6 @@ export const App: React.FC = () => {
       <LoginPage
         onSuccess={() => {
           setViewMode('app');
-          setIsWelcomeModalOpen(true);
         }}
         onOpenLanding={() => setViewMode('landing')}
       />
@@ -193,7 +192,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 flex flex-col font-sans selection:bg-slate-900 selection:text-white">
+    <div className="min-h-screen bg-white text-slate-900 flex flex-col font-sans selection:bg-slate-900 selection:text-white overflow-x-hidden">
       {/* Offline Status Security Guardrail Banner */}
       <OfflineBanner isOnline={isOnline} />
 
@@ -231,20 +230,20 @@ export const App: React.FC = () => {
           />
 
           {/* Top Control Bar */}
-          <header className="border-b border-slate-200 bg-white px-4 sm:px-6 py-2.5 flex items-center justify-between sticky top-0 z-20">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
-              <span>BrandTrace</span>
-              <span className="text-slate-300">/</span>
-              <span className="text-slate-900 font-semibold">{getTabTitle(currentTab)}</span>
+          <header className="border-b border-slate-200 bg-white px-3 sm:px-6 py-2 sm:py-2.5 flex items-center justify-between sticky top-0 z-20">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-slate-500 font-medium truncate">
+              <span className="hidden xs:inline">BrandTrace</span>
+              <span className="text-slate-300 hidden xs:inline">/</span>
+              <span className="text-slate-900 font-semibold truncate">{getTabTitle(currentTab)}</span>
             </div>
             <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-slate-300" />
-            <span className="hidden sm:inline-block text-[11px] text-slate-600 font-mono bg-slate-50 border border-slate-200 px-2 py-0.5 rounded">
+            <span className="hidden md:inline-block text-[11px] text-slate-600 font-mono bg-slate-50 border border-slate-200 px-2 py-0.5 rounded truncate max-w-[180px]">
               {currentBrand ? currentBrand.brand_name : 'Aurelle Technologies'}
             </span>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             {/* Global Search Bar */}
             <div className="relative hidden md:block">
               <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
@@ -259,7 +258,7 @@ export const App: React.FC = () => {
             {/* View Public Landing Page Button */}
             <button
               onClick={() => setViewMode('landing')}
-              className="text-xs text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              className="text-xs text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-50 px-2 sm:px-2.5 py-1.5 rounded-lg border border-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
               title="View Public Overview Landing Page"
             >
               <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
@@ -271,7 +270,7 @@ export const App: React.FC = () => {
               onClick={handleReseed}
               disabled={isReseeding}
               title="Re-seed MongoDB and Graph Data"
-              className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors shadow-2xs"
+              className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isReseeding ? 'animate-spin text-slate-900' : ''}`} />
             </button>
@@ -279,7 +278,7 @@ export const App: React.FC = () => {
         </header>
 
         {/* Viewport Canvas with Framer Motion */}
-        <main className="flex-1 p-6 overflow-y-auto max-w-7xl w-full mx-auto bg-white">
+        <main className="flex-1 p-3.5 sm:p-5 md:p-6 overflow-y-auto max-w-7xl w-full mx-auto bg-white">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentTab}
@@ -300,30 +299,30 @@ export const App: React.FC = () => {
                 {currentTab === 'bdig' && (
                   <div className="space-y-4">
                     {/* BDIG Sub-Navigation */}
-                    <div className="flex items-center justify-between bg-slate-50 p-1 rounded-xl border border-slate-200">
-                      <div className="flex items-center gap-1">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between bg-slate-50 p-1 rounded-xl border border-slate-200 gap-1.5">
+                      <div className="flex items-center gap-1 overflow-x-auto w-full sm:w-auto">
                         <button
                           onClick={() => setBdigSubTab('canvas')}
-                          className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 ${
+                          className={`flex-1 sm:flex-initial px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer ${
                             bdigSubTab === 'canvas'
                               ? 'bg-white text-slate-900 border border-slate-200 shadow-2xs font-semibold'
                               : 'text-slate-600 hover:text-slate-900'
                           }`}
                         >
-                          Interactive Knowledge Graph Canvas
+                          Interactive Knowledge Graph
                         </button>
                         <button
                           onClick={() => setBdigSubTab('workflow')}
-                          className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 ${
+                          className={`flex-1 sm:flex-initial px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer ${
                             bdigSubTab === 'workflow'
                               ? 'bg-white text-slate-900 border border-slate-200 shadow-2xs font-semibold'
                               : 'text-slate-600 hover:text-slate-900'
                           }`}
                         >
-                          Fact Mutation &amp; Revision Workflow
+                          Mutation Workflow
                         </button>
                       </div>
-                      <span className="text-[11px] font-mono text-slate-500 pr-3 hidden sm:inline">
+                      <span className="text-[11px] font-mono text-slate-500 pr-3 hidden md:inline">
                         Live MongoDB Graph Ontology
                       </span>
                     </div>

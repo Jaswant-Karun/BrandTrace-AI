@@ -134,8 +134,8 @@ export const GuidedTourOverlay: React.FC<GuidedTourOverlayProps> = ({
       />
 
       {/* Floating Guided Tour Card */}
-      <div className="relative pointer-events-auto w-full max-w-xl bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl space-y-4 z-10 animate-in fade-in zoom-in-95 duration-150">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+      <div className="relative pointer-events-auto w-full max-w-xl bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-2xl space-y-3 sm:space-y-4 z-10 animate-in fade-in zoom-in-95 duration-150">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-2.5 sm:pb-3">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <Badge variant="brand" size="sm">
@@ -155,8 +155,8 @@ export const GuidedTourOverlay: React.FC<GuidedTourOverlayProps> = ({
           </button>
         </div>
 
-        <div className="space-y-1.5">
-          <h3 className="text-base font-bold text-slate-900 tracking-tight">
+        <div className="space-y-1 sm:space-y-1.5">
+          <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">
             {step.title}
           </h3>
           <p className="text-xs text-slate-600 leading-relaxed">
@@ -165,7 +165,7 @@ export const GuidedTourOverlay: React.FC<GuidedTourOverlayProps> = ({
         </div>
 
         {step.highlightTip && (
-          <div className="p-3 rounded-xl bg-sky-50/70 border border-sky-200 text-xs text-sky-950 flex items-start gap-2">
+          <div className="p-2.5 sm:p-3 rounded-xl bg-sky-50/70 border border-sky-200 text-xs text-sky-950 flex items-start gap-2">
             <Sparkles className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
             <span className="leading-snug">{step.highlightTip}</span>
           </div>
@@ -212,7 +212,8 @@ export const GuidedTourOverlay: React.FC<GuidedTourOverlayProps> = ({
               icon={isLast ? <CheckCircle2 className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
               iconPosition="right"
             >
-              {step.actionText}
+              <span className="sm:hidden">{isLast ? 'Finish' : 'Next'}</span>
+              <span className="hidden sm:inline">{step.actionText}</span>
             </Button>
           </div>
         </div>

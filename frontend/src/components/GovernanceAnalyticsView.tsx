@@ -124,12 +124,12 @@ export const GovernanceAnalyticsView: React.FC<GovernanceAnalyticsViewProps> = (
             </div>
 
             {/* Weekly Velocity Trend (6 Cols) */}
-            <div className="lg:col-span-6 bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
+            <div className="lg:col-span-6 bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-xs space-y-4">
               <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider pb-2 border-b border-slate-100">
                 Weekly Release Velocity &amp; Remediations
               </h3>
 
-              <div className="grid grid-cols-5 gap-2 pt-4">
+              <div className="grid grid-cols-5 gap-1 sm:gap-2 pt-4">
                 {analytics?.weekly_velocity_trend.map((w: any, idx: number) => (
                   <div key={idx} className="text-center space-y-2">
                     <div className="h-32 flex flex-col justify-end items-center gap-1">
@@ -144,13 +144,13 @@ export const GovernanceAnalyticsView: React.FC<GovernanceAnalyticsViewProps> = (
                         title={`Remediated: ${w.remediated}`}
                       />
                     </div>
-                    <div className="text-[10px] font-mono text-slate-500">{w.week}</div>
-                    <div className="text-[10px] font-bold text-slate-900 font-mono">{w.approved} pass</div>
+                    <div className="text-[9px] sm:text-[10px] font-mono text-slate-500 truncate">{w.week}</div>
+                    <div className="text-[9px] sm:text-[10px] font-bold text-slate-900 font-mono truncate">{w.approved} pass</div>
                   </div>
                 ))}
               </div>
 
-              <div className="flex items-center justify-center gap-6 pt-2 text-[11px] text-slate-500 font-sans border-t border-slate-100">
+              <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 pt-2 text-[10px] sm:text-[11px] text-slate-500 font-sans border-t border-slate-100">
                 <span className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded bg-slate-900" /> Total Releases
                 </span>

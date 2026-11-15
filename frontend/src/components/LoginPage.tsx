@@ -198,7 +198,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onOpenLanding }
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 w-full items-start">
           
           {/* Left Column: Tabbed Sign In / Register Card (7 Cols) */}
-          <div className="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-7 sm:p-8 shadow-xs space-y-6">
+          <div className="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-4 sm:p-7 md:p-8 shadow-xs space-y-5 sm:space-y-6">
             
             {/* Attractive White Tab Switcher */}
             <div className="flex items-center justify-between border-b border-slate-100 pb-5">
@@ -319,7 +319,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onOpenLanding }
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between text-xs text-slate-600 pt-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-600 pt-1 gap-2">
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
@@ -336,7 +336,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onOpenLanding }
                         setLoginEmail('demo@brandtrace.ai');
                         setLoginPassword('DemoAurelle2026!');
                       }}
-                      className="text-slate-800 hover:text-black font-medium underline text-[11px] cursor-pointer"
+                      className="text-slate-800 hover:text-black font-medium underline text-[11px] cursor-pointer text-left sm:text-right"
                     >
                       Fill Demo Credentials
                     </button>
@@ -552,8 +552,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onOpenLanding }
           {/* Right Column: Recommended Evaluation Showcase & Personas (5 Cols) */}
           <div className="lg:col-span-5 space-y-4">
             
-            {/* Primary Demo Card: Dedicated Judge Evaluation Experience */}
-            <div className="bg-white border-2 border-slate-900 rounded-2xl p-6 shadow-xs space-y-4 relative overflow-hidden">
+            {/* Primary Demo Card: Public Evaluation Experience */}
+            <div className="bg-white border-2 border-slate-900 rounded-2xl p-4 sm:p-6 shadow-xs space-y-3 sm:space-y-4 relative overflow-hidden">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-900 text-white px-2 py-0.5 rounded flex items-center gap-1.5">
                   <Sparkles className="w-3 h-3 text-amber-300" />
@@ -628,7 +628,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onOpenLanding }
                 </div>
               </div>
 
-              {/* What the Judge Can Test */}
+              {/* What You Can Test */}
               <div className="space-y-1.5">
                 <span className="text-[11px] font-semibold text-slate-800 uppercase tracking-wider block">
                   What You Can Test:

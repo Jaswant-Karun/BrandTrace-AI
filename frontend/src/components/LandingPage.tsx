@@ -13,9 +13,9 @@ interface LandingPageProps {
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
   return (
-    <div className="min-h-screen bg-white text-slate-900 flex flex-col font-sans selection:bg-slate-900 selection:text-white">
+    <div className="min-h-screen bg-white text-slate-900 flex flex-col font-sans selection:bg-slate-900 selection:text-white overflow-x-hidden">
       {/* Top Navbar */}
-      <nav className="border-b border-slate-200 bg-white/95 backdrop-blur-md px-8 py-4 flex items-center justify-between sticky top-0 z-50 shadow-xs">
+      <nav className="border-b border-slate-200 bg-white/95 backdrop-blur-md px-4 sm:px-8 py-3 sm:py-4 flex items-center justify-between sticky top-0 z-50 shadow-xs">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center shadow-xs">
             <ShieldCheck className="w-5 h-5 text-white stroke-[2.2]" />
@@ -50,7 +50,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-20 pb-16 px-6 max-w-6xl mx-auto w-full text-center">
+      <section className="relative pt-12 sm:pt-20 pb-12 sm:pb-16 px-4 sm:px-6 max-w-6xl mx-auto w-full text-center">
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
@@ -66,7 +66,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.12] max-w-4xl mx-auto mb-6"
+          className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.12] max-w-4xl mx-auto mb-6"
         >
           The Autonomous Brand Intelligence &amp; Governance Control Plane
         </motion.h1>
@@ -75,7 +75,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto font-normal leading-relaxed mb-10"
+          className="text-base sm:text-xl text-slate-600 max-w-2xl mx-auto font-normal leading-relaxed mb-8 sm:mb-10"
         >
           Every brand decision connected. Every risk traceable. Every release accountable.
         </motion.p>
@@ -84,11 +84,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="flex flex-wrap items-center justify-center gap-3 mb-16"
+          className="flex flex-wrap items-center justify-center gap-3 mb-12 sm:mb-16"
         >
           <button
             onClick={() => onEnterApp('bdig')}
-            className="px-6 py-3 rounded-lg bg-slate-900 text-white font-semibold text-sm hover:bg-slate-800 flex items-center gap-2 shadow-xs transition-all cursor-pointer"
+            className="w-full sm:w-auto px-6 py-3 rounded-lg bg-slate-900 text-white font-semibold text-sm hover:bg-slate-800 flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
           >
             <GitFork className="w-4 h-4 text-white" />
             Explore Dependency Graph
@@ -96,7 +96,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
 
           <button
             onClick={() => onEnterApp('content-studio')}
-            className="px-6 py-3 rounded-lg bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 font-semibold text-sm flex items-center gap-2 transition-all cursor-pointer shadow-xs"
+            className="w-full sm:w-auto px-6 py-3 rounded-lg bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 font-semibold text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
           >
             <Sparkles className="w-4 h-4 text-slate-700" />
             Test Content Studio
@@ -108,7 +108,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="bg-white border border-slate-200 rounded-2xl p-6 text-left shadow-lg max-w-4xl mx-auto"
+          className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 text-left shadow-lg max-w-4xl mx-auto"
         >
           <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
             <div className="flex items-center gap-2.5">
@@ -208,8 +208,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
       </section>
 
       {/* Workflow Demonstration (₹499 -> ₹599) */}
-      <section id="bdig" className="py-20 px-6 max-w-6xl mx-auto w-full border-t border-slate-200">
-        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-8 lg:p-12">
+      <section id="bdig" className="py-12 sm:py-20 px-4 sm:px-6 max-w-6xl mx-auto w-full border-t border-slate-200">
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-8 lg:p-12">
           <div className="max-w-2xl mb-10 space-y-2">
             <span className="text-xs font-bold text-slate-700 uppercase tracking-widest">Live Case Study</span>
             <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">

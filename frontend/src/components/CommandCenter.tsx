@@ -10,7 +10,6 @@ import { PageHeader } from './ui/PageHeader';
 import { WorkflowBanner } from './ui/WorkflowBanner';
 import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
-import { JudgeJourneyPanel } from './JudgeJourneyPanel';
 
 interface CommandCenterProps {
   brandId: string;
@@ -133,23 +132,16 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             variant="secondary"
             size="sm"
             onClick={onStartTour}
-            icon={<Sparkles className="w-3.5 h-3.5 text-amber-500" />}
+            icon={<Sparkles className="w-3.5 h-3.5 text-slate-700" />}
           >
-            Guided Tour
+            Quick Tour
           </Button>
         )}
       </PageHeader>
 
-      {/* Dedicated Guided Judge Evaluation Journey (8 Steps & Safe Reset) */}
-      <JudgeJourneyPanel
-        brandId={brandId}
-        onNavigate={onNavigate}
-        onRefreshData={loadDashboardData}
-      />
-
       {/* 1. Governance Posture & Quantitative Telemetry Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="p-4 sm:p-5 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-2">
           <div className="flex items-center justify-between text-slate-500">
             <span className="text-[10px] font-semibold uppercase tracking-wider">Certified Truth Nodes</span>
             <BookOpen className="w-4 h-4 text-slate-700" />
@@ -160,7 +152,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           <p className="text-[11px] text-slate-500">Approved pricing, specs &amp; claims</p>
         </div>
 
-        <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-2">
+        <div className="p-4 sm:p-5 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-2">
           <div className="flex items-center justify-between text-slate-500">
             <span className="text-[10px] font-semibold uppercase tracking-wider">Sealed Releases</span>
             <Lock className="w-4 h-4 text-slate-700" />
@@ -171,7 +163,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           <p className="text-[11px] text-slate-500">Immutable SHA-256 ledger blocks</p>
         </div>
 
-        <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-2">
+        <div className="p-4 sm:p-5 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-2">
           <div className="flex items-center justify-between text-slate-500">
             <span className="text-[10px] font-semibold uppercase tracking-wider">Compliance Index</span>
             <TrendingUp className="w-4 h-4 text-emerald-600" />
@@ -182,7 +174,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           <p className="text-[11px] text-slate-500">{analytics?.prevented_violations_count || 56} prevented violations</p>
         </div>
 
-        <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-2">
+        <div className="p-4 sm:p-5 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-2">
           <div className="flex items-center justify-between text-slate-500">
             <span className="text-[10px] font-semibold uppercase tracking-wider">Pending Approvals</span>
             <Clock className="w-4 h-4 text-amber-600" />
@@ -195,7 +187,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       </div>
 
       {/* 2. Visual "How BrandTrace Operates" Journey Stepper */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-3">
+      <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-2xs space-y-3">
         <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
           <div className="flex items-center gap-2">
             <Badge variant="brand" size="sm">Product Journey</Badge>
@@ -208,18 +200,18 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           </span>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-2.5">
           {LIFECYCLE_STEPS.map((step, idx) => (
             <button
               key={step.tab}
               onClick={() => onNavigate(step.tab)}
-              className="p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-xl text-left transition-all group cursor-pointer shadow-2xs space-y-1"
+              className="p-2.5 sm:p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-xl text-left transition-all group cursor-pointer shadow-2xs space-y-1"
             >
               <div className="flex items-center justify-between text-slate-500 group-hover:text-slate-900">
                 <span className="text-slate-700">{step.icon}</span>
                 <span className="text-[10px] font-mono font-semibold">0{idx + 1}</span>
               </div>
-              <div className="text-xs font-semibold text-slate-900 leading-tight">
+              <div className="text-[11px] sm:text-xs font-semibold text-slate-900 leading-tight">
                 {step.label}
               </div>
               <div className="text-[10px] text-slate-500 truncate">
@@ -231,9 +223,9 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       </div>
 
       {/* 3. Operational Split Grid: Pending Approvals & Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
         {/* Left: Pending Approvals & Tasks (7 Cols) */}
-        <div className="lg:col-span-7 bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-4">
+        <div className="lg:col-span-7 bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-2xs space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2">
               <CheckSquare className="w-4 h-4 text-slate-700" />
@@ -308,7 +300,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         </div>
 
         {/* Right: Recent Governance Activity (5 Cols) */}
-        <div className="lg:col-span-5 bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-4">
+        <div className="lg:col-span-5 bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-2xs space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-slate-700" />
