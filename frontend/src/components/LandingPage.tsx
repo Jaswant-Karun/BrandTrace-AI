@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ShieldCheck, GitFork, ArrowRight, Lock, 
   Sparkles, CheckCircle2, ChevronRight,
-  Network, LineChart, AlertTriangle,
+  Network, LineChart,
   FileText, Globe, Cpu,
   Check, AlertCircle, X, Menu,
   Hash, ArrowUpRight, Scale, Clock, Sliders
@@ -226,35 +226,58 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </nav>
 
       {/* ------------------------------------------------------------------- */}
-      {/* SECTION 2 — HERO SECTION                                            */}
+      {/* SECTION 2 — HERO SECTION (Matching Reference Visual Design)         */}
       {/* ------------------------------------------------------------------- */}
-      <section id="overview" className="relative pt-12 sm:pt-20 pb-16 sm:pb-24 overflow-hidden">
+      <section id="overview" className="relative pt-8 sm:pt-14 pb-16 sm:pb-24 overflow-hidden">
         {/* Subtle background ambient gradients */}
         <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
           <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-gradient-to-b from-indigo-100/50 via-purple-50/20 to-transparent dark:from-indigo-950/30 dark:via-purple-950/10 dark:to-transparent rounded-full blur-3xl" />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          {/* Top Hanging Plumb Bob Motif inspired by reference */}
+          <div className="flex justify-end pr-12 lg:pr-24 -mt-4 mb-2 pointer-events-none select-none">
+            <div className="flex flex-col items-center">
+              <div className="w-[1.5px] h-14 bg-gradient-to-b from-purple-400/20 via-purple-400/80 to-purple-500" />
+              <div className="w-3.5 h-3.5 rotate-45 bg-purple-500 border border-purple-300 shadow-md shadow-purple-500/50 mt-[-2px]" />
+              <span className="text-[9px] font-mono uppercase tracking-widest text-slate-400 dark:text-slate-500 mt-1 rotate-90 origin-left translate-x-3 translate-y-2">
+                TRUE VERTICAL
+              </span>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
             
             {/* Left Column: Bold Editorial Typography & CTA */}
             <div className="lg:col-span-7 space-y-6 text-left">
               
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>BEFORE IT'S PUBLISHED • AUTONOMOUS GOVERNANCE</span>
+              <div className="space-y-1">
+                <span className="text-xs font-mono font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 block">
+                  BEFORE IT'S PUBLISHED
+                </span>
+                
+                {/* Massive Bold Headline directly styled like Reference Image 1 */}
+                <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 dark:text-white leading-[1.02] uppercase font-sans">
+                  EVERY CLAIM <br />
+                  <span className="line-through decoration-rose-500 decoration-4 text-rose-600 dark:text-rose-400">
+                    CLINICALLY PROVEN
+                  </span> <br />
+                  <span className="text-emerald-600 dark:text-emerald-400">
+                    SHOWN TO VISIBLY REDUCE*
+                  </span> <br />
+                  CHECKED.
+                </h1>
               </div>
 
-              {/* Bold Title with Editorial Styling inspired by reference */}
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.08]">
-                Protect Your Brand. <br />
-                <span className="bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 bg-clip-text text-transparent">
-                  Govern Every Claim.
-                </span>
-              </h1>
+              {/* Substantiation Footnote directly matching reference */}
+              <p className="text-[11px] sm:text-xs font-mono text-slate-500 dark:text-slate-400">
+                *FACT-014 · 32% fewer visible dark spots in 8 weeks · in-house study, 48 participants
+              </p>
 
-              <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
-                BrandTrace AI brings brand knowledge, AI content intelligence, risk detection, impact simulation and release verification into one connected governance platform.
+              {/* Subtitle Statement */}
+              <p className="text-base sm:text-lg font-bold text-slate-800 dark:text-slate-200 uppercase tracking-tight max-w-xl leading-snug">
+                CHECK MARKETING CONTENT AGAINST YOUR BRAND'S OWN RULES AND FACTS, BEFORE IT'S PUBLISHED.
               </p>
 
               {/* Action Buttons */}
@@ -416,86 +439,172 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* ------------------------------------------------------------------- */}
-      {/* SECTION 4 — PROBLEM SECTION                                         */}
+      {/* SECTION 4 — PROBLEM SECTION (Matching Reference Visuals)            */}
       {/* ------------------------------------------------------------------- */}
       <section className="py-16 sm:py-24 bg-slate-50 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
           <div className="text-center max-w-3xl mx-auto space-y-4">
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">
-              The Enterprise Governance Crisis
+              THE PROBLEM
             </span>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
-              Content comes from everyone now. <br />
-              <span className="text-rose-600 dark:text-rose-400">So do the mistakes.</span>
+              CONTENT COMES FROM EVERYONE NOW. <br />
+              <span className="text-rose-600 dark:text-rose-400">SO DO THE MISTAKES.</span>
             </h2>
             <p className="text-base text-slate-600 dark:text-slate-300 leading-relaxed">
-              Writers, agencies, influencers and AI tools all post for the brand. The brand guidelines are a 90-page PDF none of them has open.
+              Writers, agencies, influencers and AI tools all post for the brand. The brand book is a PDF none of them has open.
             </p>
           </div>
 
-          {/* 3 Real-World Problem Cards (Inspired by Reference Image 3) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* 3 Real-World Problem Cards (Directly matching Reference Image 4) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
             
-            {/* Card 1: Medical / Diagnostic Claim Violation */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-3 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-xs font-mono text-slate-500 border-b border-slate-100 dark:border-slate-800 pb-2">
-                  <span className="font-semibold text-slate-800 dark:text-slate-200">INSTAGRAM CAMPAIGN</span>
-                  <span className="text-rose-600 font-bold">REJECTED</span>
+            {/* Card 1: INSTAGRAM POST (Serum bottle on podium) */}
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col justify-between">
+              <div>
+                {/* Header */}
+                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800 text-[11px] font-mono text-slate-400">
+                  <span className="font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">INSTAGRAM POST</span>
+                  <div className="flex gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700" />
+                    <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700" />
+                  </div>
                 </div>
-                <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl space-y-2">
-                  <p className="text-xs text-slate-700 dark:text-slate-300 font-medium">
-                    "Aurelle Pulse Smart Ring is a <span className="line-through text-rose-600 font-bold">medical-grade diagnostic cure</span> that eliminates cardiovascular symptoms."
-                  </p>
+
+                {/* Account row */}
+                <div className="p-3.5 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full bg-amber-500 text-white font-bold text-xs flex items-center justify-center">
+                      A
+                    </div>
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200 font-sans">aurelle.skin</span>
+                  </div>
+                  <span className="text-[10px] text-slate-400 font-medium">Sponsored</span>
+                </div>
+
+                {/* Visual Body (Serum Product Mockup) */}
+                <div className="relative bg-gradient-to-b from-stone-100 to-stone-200 dark:from-slate-800 dark:to-slate-850 p-6 flex flex-col items-center justify-center min-h-[220px]">
+                  {/* Cosmetic amber bottle representation */}
+                  <div className="relative flex flex-col items-center">
+                    {/* Dropper top */}
+                    <div className="w-3.5 h-6 bg-slate-800 rounded-t-sm" />
+                    <div className="w-5 h-2.5 bg-slate-700 rounded-xs" />
+                    {/* Amber bottle */}
+                    <div className="w-16 h-28 bg-gradient-to-r from-amber-700 via-amber-600 to-amber-800 rounded-lg shadow-lg flex flex-col items-center justify-center p-1.5 border border-amber-900/40 relative">
+                      {/* Bottle label */}
+                      <div className="w-full bg-stone-50 text-[6px] text-slate-900 font-sans py-2 px-1 text-center rounded-xs shadow-xs space-y-0.5">
+                        <div className="font-extrabold uppercase tracking-widest text-[7px]">AURELLE</div>
+                        <div className="text-[5px] text-slate-600 font-medium leading-none">VITAMIN C SERUM</div>
+                        <div className="text-[4px] text-slate-400">30 ML</div>
+                      </div>
+                    </div>
+                    {/* Pedestal shadow */}
+                    <div className="w-24 h-3 bg-stone-400/50 dark:bg-black/50 rounded-full blur-[2px] mt-1" />
+                  </div>
                 </div>
               </div>
-              <div className="p-2.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl text-xs text-rose-800 dark:text-rose-300 flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-                <span>
-                  <strong>BLOCKS "Diagnostic cure":</strong> Consumer wearables cannot claim disease cures under <strong>FDA 21 CFR §870</strong> (GL-AUR-03).
+
+              {/* Bottom Notice */}
+              <div className="p-3 bg-slate-50 dark:bg-slate-950/60 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                Asset ID: AST-AUR-IG-09 · Influencer Draft
+              </div>
+            </div>
+
+            {/* Card 2: WEB BANNER ("GLOW IN 2 WEEKS" Violation) */}
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col justify-between">
+              <div>
+                {/* Header */}
+                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800 text-[11px] font-mono text-slate-400">
+                  <span className="font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">WEB BANNER</span>
+                  <div className="flex gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700" />
+                    <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700" />
+                  </div>
+                </div>
+
+                {/* Banner Content Body */}
+                <div className="bg-[#f5ebe1] dark:bg-stone-900 p-5 min-h-[220px] flex flex-col justify-between text-slate-900 dark:text-stone-100 relative overflow-hidden">
+                  <div>
+                    <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight leading-tight">
+                      GLOW IN <br />
+                      <span className="relative inline-block text-rose-700 dark:text-rose-400 underline decoration-rose-500 decoration-wavy decoration-2">
+                        2 WEEKS
+                      </span>
+                    </h3>
+                  </div>
+
+                  {/* Serum droplet discs visual */}
+                  <div className="flex items-center justify-center gap-2 py-4">
+                    <div className="w-14 h-14 rounded-full bg-amber-400/30 border border-amber-500/40 flex items-center justify-center shadow-inner">
+                      <div className="w-8 h-8 rounded-full bg-amber-500/40" />
+                    </div>
+                    <div className="w-16 h-16 rounded-full bg-amber-300/40 border border-amber-400/50 flex items-center justify-center shadow-inner">
+                      <div className="w-10 h-10 rounded-full bg-amber-400/50" />
+                    </div>
+                  </div>
+
+                  <div className="text-right">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-700 dark:text-stone-300">
+                      AURELLE
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Alert Pill matching Reference */}
+              <div className="p-3 bg-slate-900 text-slate-100 border-t border-slate-800 text-xs flex items-start gap-2">
+                <span className="text-rose-400 font-bold">◆</span>
+                <span className="leading-snug text-[11px]">
+                  <strong className="text-rose-300">BLOCKS "Glow in 2 weeks":</strong> the clinical evidence covers 8 weeks, not 2 (FACT-014).
                 </span>
               </div>
             </div>
 
-            {/* Card 2: Outdated Price Contradiction */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-3 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-xs font-mono text-slate-500 border-b border-slate-100 dark:border-slate-800 pb-2">
-                  <span className="font-semibold text-slate-800 dark:text-slate-200">WEB AD CAMPAIGN</span>
-                  <span className="text-rose-600 font-bold">OUTDATED</span>
+            {/* Card 3: EMAIL ("OUR DIWALI SALE IS HERE" Violation) */}
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col justify-between">
+              <div>
+                {/* Header */}
+                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800 text-[11px] font-mono text-slate-400">
+                  <span className="font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">EMAIL</span>
+                  <div className="flex gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700" />
+                    <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700" />
+                  </div>
                 </div>
-                <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl space-y-2">
-                  <p className="text-xs text-slate-700 dark:text-slate-300 font-medium">
-                    "Scale creative workflows with Cloud Studio starting at <span className="line-through text-rose-600 font-bold">₹599/mo</span> with unlimited audio mastering."
-                  </p>
-                </div>
-              </div>
-              <div className="p-2.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 rounded-xl text-xs text-amber-900 dark:text-amber-300 flex items-start gap-2">
-                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                <span>
-                  <strong>BLOCKS "₹599/mo":</strong> Active approved master price is <strong>₹499/mo</strong>. Proposed revision requires Digital Twin commit (FACT-AUR-PRC-01).
-                </span>
-              </div>
-            </div>
 
-            {/* Card 3: Expired Promotion */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-3 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-xs font-mono text-slate-500 border-b border-slate-100 dark:border-slate-800 pb-2">
-                  <span className="font-semibold text-slate-800 dark:text-slate-200">EMAIL NEWSLETTER</span>
-                  <span className="text-rose-600 font-bold">EXPIRED</span>
-                </div>
-                <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl space-y-2">
-                  <p className="text-xs text-slate-700 dark:text-slate-300 font-medium">
-                    "Claim your <span className="line-through text-rose-600 font-bold">Free Founder Trial</span> with 12 months complimentary spatial access."
-                  </p>
+                {/* Email Content Body */}
+                <div className="bg-[#f8f5f0] dark:bg-stone-900/90 p-5 min-h-[220px] flex flex-col justify-between text-slate-900 dark:text-stone-100">
+                  <div className="space-y-1 text-xs text-slate-600 dark:text-stone-400">
+                    <div><span className="font-medium text-slate-400">From</span> <strong className="text-slate-800 dark:text-stone-200">Aurelle Skin</strong></div>
+                    <div><span className="font-medium text-slate-400">Subject</span> <strong className="text-slate-800 dark:text-stone-200">Something big is coming</strong></div>
+                  </div>
+
+                  <div className="py-3 flex items-center justify-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-amber-400/40 border border-amber-500/30" />
+                    <div className="w-12 h-12 rounded-full bg-amber-500/30 border border-amber-600/30" />
+                    <div className="w-10 h-10 rounded-full bg-amber-300/40 border border-amber-400/30" />
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="text-xs sm:text-sm font-extrabold tracking-tight uppercase leading-snug">
+                      <span className="underline decoration-rose-500 decoration-wavy decoration-2 text-rose-700 dark:text-rose-400">
+                        OUR DIWALI SALE IS HERE:
+                      </span>{' '}
+                      20% OFF EVERYTHING.
+                    </p>
+                    <button className="px-3 py-1 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-[10px] font-bold uppercase tracking-wider cursor-pointer">
+                      SHOP NOW
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div className="p-2.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl text-xs text-rose-800 dark:text-rose-300 flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-                <span>
-                  <strong>BLOCKS "Founder Trial":</strong> Promotional entitlement window expired in December 2025 (FACT-AUR-EXP-01).
+
+              {/* Bottom Alert Pill matching Reference */}
+              <div className="p-3 bg-slate-900 text-slate-100 border-t border-slate-800 text-xs flex items-start gap-2">
+                <span className="text-rose-400 font-bold">◆</span>
+                <span className="leading-snug text-[11px]">
+                  <strong className="text-rose-300">BLOCKS</strong> Announces the Diwali sale while it's still embargoed until November (FACT-033).
                 </span>
               </div>
             </div>
@@ -1008,43 +1117,150 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* ------------------------------------------------------------------- */}
-      {/* SECTION 9 — FINAL CALL TO ACTION (Homage to reference banner)       */}
+      {/* SECTION 9 — ROLE PERSONAS (Matching Reference Image 5)              */}
       {/* ------------------------------------------------------------------- */}
-      <section className="py-20 sm:py-28 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900/60 dark:to-slate-950 border-t border-slate-200 dark:border-slate-800 text-center relative overflow-hidden transition-colors">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-8">
+      <section className="py-16 sm:py-24 bg-slate-900 text-white relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
-          <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center mx-auto shadow-md">
-            <ShieldCheck className="w-7 h-7 stroke-[2.2]" />
-          </div>
-
-          {/* Bold Statement directly inspired by reference image 5 */}
-          <div className="space-y-3">
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 block">
-              Silence is Never Clearance
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-purple-400">
+              EXPERIENCE THE PLATFORM BY ROLE
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
-              Make Every Brand Decision Verifiable.
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
+              One Unified Governance Engine. Tailored For Every Stakeholder.
             </h2>
-            <p className="text-base text-slate-600 dark:text-slate-300 max-w-xl mx-auto leading-relaxed">
-              Bring your brand knowledge, content intelligence and governance workflows into one connected platform.
+            <p className="text-xs sm:text-sm text-slate-400">
+              Select any role to experience contextual guardrails, automated fact-checking, and role-based workflows.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-            <button
-              onClick={() => onEnterApp('command-center')}
-              className="px-8 py-4 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md hover:shadow-xl transition-all flex items-center gap-2 cursor-pointer ring-2 ring-indigo-500/20"
-            >
-              <span>Continue to Dashboard</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+          {/* 5 Persona Cards Row (Directly matching Reference Image 5) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            
+            {/* Card 1: CREATOR */}
+            <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-slate-700 transition-colors space-y-4">
+              <div className="space-y-3">
+                <p className="text-xs text-slate-300 leading-relaxed font-sans min-h-[50px]">
+                  Check a draft privately, accept cited fixes and send it for review.
+                </p>
+                <div className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+                  OPENS &rarr; CHECK A POST
+                </div>
+              </div>
+              <button
+                onClick={() => onEnterApp('content-studio')}
+                className="w-full py-2.5 px-3 rounded-xl bg-white text-slate-900 hover:bg-slate-100 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
+              >
+                TRY AS CREATOR
+              </button>
+            </div>
 
-            <button
-              onClick={onSignIn || (() => onEnterApp('command-center'))}
-              className="px-7 py-4 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 shadow-xs transition-all cursor-pointer"
-            >
-              Switch Account / Sign In
-            </button>
+            {/* Card 2: AGENCY */}
+            <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-slate-700 transition-colors space-y-4">
+              <div className="space-y-3">
+                <p className="text-xs text-slate-300 leading-relaxed font-sans min-h-[50px]">
+                  Check her own drafts. Confidential facts stay hidden from her.
+                </p>
+                <div className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+                  OPENS &rarr; CHECK A POST
+                </div>
+              </div>
+              <button
+                onClick={() => onEnterApp('content-studio')}
+                className="w-full py-2.5 px-3 rounded-xl bg-white text-slate-900 hover:bg-slate-100 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
+              >
+                TRY AS AGENCY
+              </button>
+            </div>
+
+            {/* Card 3: REVIEWER */}
+            <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-slate-700 transition-colors space-y-4">
+              <div className="space-y-3">
+                <p className="text-xs text-slate-300 leading-relaxed font-sans min-h-[50px]">
+                  Work through the queue: agree or disagree with each finding, then approve.
+                </p>
+                <div className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+                  OPENS &rarr; REVIEW QUEUE
+                </div>
+              </div>
+              <button
+                onClick={() => onEnterApp('approvals')}
+                className="w-full py-2.5 px-3 rounded-xl bg-white text-slate-900 hover:bg-slate-100 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
+              >
+                TRY AS REVIEWER
+              </button>
+            </div>
+
+            {/* Card 4: COMPLIANCE */}
+            <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-slate-700 transition-colors space-y-4">
+              <div className="space-y-3">
+                <p className="text-xs text-slate-300 leading-relaxed font-sans min-h-[50px]">
+                  Decide claims and confidential findings, and give the compliance sign-off.
+                </p>
+                <div className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+                  OPENS &rarr; REVIEW QUEUE
+                </div>
+              </div>
+              <button
+                onClick={() => onEnterApp('approvals')}
+                className="w-full py-2.5 px-3 rounded-xl bg-white text-slate-900 hover:bg-slate-100 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
+              >
+                TRY AS COMPLIANCE
+              </button>
+            </div>
+
+            {/* Card 5: BRAND OWNER */}
+            <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-slate-700 transition-colors space-y-4">
+              <div className="space-y-3">
+                <p className="text-xs text-slate-300 leading-relaxed font-sans min-h-[50px]">
+                  Own the rulebook and see which rules people find unclear.
+                </p>
+                <div className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+                  OPENS &rarr; GUIDELINE HEALTH
+                </div>
+              </div>
+              <button
+                onClick={() => onEnterApp('knowledge-base')}
+                className="w-full py-2.5 px-3 rounded-xl bg-white text-slate-900 hover:bg-slate-100 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
+              >
+                TRY AS BRAND OWNER
+              </button>
+            </div>
+
+          </div>
+
+          {/* Hanging Plumb Bob & Grand Statement directly matching Reference Image 5 */}
+          <div className="pt-16 pb-8 text-center space-y-6 flex flex-col items-center">
+            
+            {/* Hanging Plumb Bob wire with purple diamond */}
+            <div className="flex flex-col items-center pointer-events-none select-none">
+              <div className="w-[1.5px] h-16 bg-gradient-to-b from-purple-400/20 via-purple-400 to-purple-500" />
+              <div className="w-4 h-4 rotate-45 bg-purple-500 border border-purple-300 shadow-lg shadow-purple-500/50 mt-[-2px]" />
+            </div>
+
+            {/* Headline */}
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight uppercase">
+              SILENCE IS NEVER CLEARANCE.
+            </h2>
+
+            {/* Check Your First Post Underlined Link / Button */}
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-6">
+              <button
+                onClick={() => onEnterApp('content-studio')}
+                className="text-lg sm:text-xl font-bold uppercase tracking-wider text-white underline decoration-white decoration-2 underline-offset-8 hover:text-indigo-300 hover:decoration-indigo-300 transition-colors cursor-pointer"
+              >
+                CHECK YOUR FIRST POST
+              </button>
+              
+              <button
+                onClick={() => onEnterApp('command-center')}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md"
+              >
+                <span>Continue to Dashboard</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
           </div>
 
         </div>

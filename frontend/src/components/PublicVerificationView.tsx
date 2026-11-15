@@ -148,7 +148,7 @@ export const PublicVerificationView: React.FC<PublicVerificationViewProps> = ({
         </div>
 
         {/* Top Reference Header Banner */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-100/70 via-rose-50/60 to-amber-50/40 dark:from-purple-950/40 dark:via-indigo-950/30 dark:to-slate-900/90 border border-purple-200/50 dark:border-purple-900/40 p-6 sm:p-8 md:p-10 shadow-xs transition-colors duration-200">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-100/70 via-indigo-50/50 to-amber-50/40 dark:from-purple-950/40 dark:via-indigo-950/30 dark:to-slate-900/90 border border-purple-200/60 dark:border-purple-900/50 p-6 sm:p-8 md:p-10 shadow-xs transition-colors duration-200">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
             
             {/* Left text block */}
@@ -175,7 +175,7 @@ export const PublicVerificationView: React.FC<PublicVerificationViewProps> = ({
                 <select
                   value={brandName}
                   onChange={(e) => setBrandName(e.target.value)}
-                  className="bg-white/80 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md px-2 py-0.5 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none"
+                  className="bg-white/90 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none shadow-2xs"
                 >
                   <option value="Velora Money" className="dark:bg-slate-900 dark:text-white">Velora Money</option>
                   <option value="Apex Dynamics" className="dark:bg-slate-900 dark:text-white">Apex Dynamics</option>
@@ -186,37 +186,43 @@ export const PublicVerificationView: React.FC<PublicVerificationViewProps> = ({
               </div>
             </div>
 
-            {/* Right circular status badges */}
+            {/* Right circular status badges (3D Stitched Seal Discs inspired by reference) */}
             <div className="flex items-center gap-3 sm:gap-4 self-center lg:self-auto shrink-0">
               
               {/* APPROVED Circle */}
-              <div className={`flex flex-col items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 transition-all ${
+              <div className={`relative flex flex-col items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full transition-all duration-300 shadow-md ${
                 result?.status === 'APPROVED' 
-                  ? 'bg-emerald-500 text-white border-emerald-600 ring-4 ring-emerald-200 shadow-md scale-105' 
-                  : 'bg-emerald-500/90 text-white border-emerald-600/40 shadow-xs'
+                  ? 'bg-gradient-to-br from-emerald-400 to-emerald-600 text-white ring-4 ring-emerald-300 dark:ring-emerald-700 shadow-emerald-500/30 scale-105' 
+                  : 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-emerald-500/20 hover:scale-102'
               }`}>
-                <Check className="w-6 h-6 stroke-[3] mb-0.5" />
-                <span className="text-[10px] sm:text-[11px] font-extrabold tracking-wider">APPROVED</span>
+                {/* Inner dashed ring styling */}
+                <div className="absolute inset-1.5 rounded-full border border-dashed border-white/50 pointer-events-none" />
+                <Check className="w-6 h-6 stroke-[3.5] mb-0.5 relative z-10 drop-shadow-xs" />
+                <span className="text-[10px] sm:text-[11px] font-black tracking-wider relative z-10 drop-shadow-xs">APPROVED</span>
               </div>
 
               {/* OUTDATED Circle */}
-              <div className={`flex flex-col items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 transition-all ${
+              <div className={`relative flex flex-col items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full transition-all duration-300 shadow-md ${
                 result?.status === 'OUTDATED'
-                  ? 'bg-amber-500 text-white border-amber-600 ring-4 ring-amber-200 shadow-md scale-105'
-                  : 'bg-amber-500/90 text-white border-amber-600/40 shadow-xs'
+                  ? 'bg-gradient-to-br from-amber-400 to-amber-600 text-white ring-4 ring-amber-300 dark:ring-amber-700 shadow-amber-500/30 scale-105'
+                  : 'bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-amber-500/20 hover:scale-102'
               }`}>
-                <RefreshCw className="w-5 h-5 stroke-[2.5] mb-1" />
-                <span className="text-[10px] sm:text-[11px] font-extrabold tracking-wider">OUTDATED</span>
+                {/* Inner dashed ring styling */}
+                <div className="absolute inset-1.5 rounded-full border border-dashed border-white/50 pointer-events-none" />
+                <RefreshCw className="w-5 h-5 stroke-[3] mb-1 relative z-10 drop-shadow-xs" />
+                <span className="text-[10px] sm:text-[11px] font-black tracking-wider relative z-10 drop-shadow-xs">OUTDATED</span>
               </div>
 
               {/* MODIFIED Circle */}
-              <div className={`flex flex-col items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 transition-all ${
+              <div className={`relative flex flex-col items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full transition-all duration-300 shadow-md ${
                 result?.status === 'MODIFIED'
-                  ? 'bg-rose-500 text-white border-rose-600 ring-4 ring-rose-200 shadow-md scale-105'
-                  : 'bg-rose-500/90 text-white border-rose-600/40 shadow-xs'
+                  ? 'bg-gradient-to-br from-rose-400 to-rose-600 text-white ring-4 ring-rose-300 dark:ring-rose-700 shadow-rose-500/30 scale-105'
+                  : 'bg-gradient-to-br from-rose-500 to-rose-600 text-white shadow-rose-500/20 hover:scale-102'
               }`}>
-                <span className="text-xl font-black leading-none mb-0.5">≠</span>
-                <span className="text-[10px] sm:text-[11px] font-extrabold tracking-wider">MODIFIED</span>
+                {/* Inner dashed ring styling */}
+                <div className="absolute inset-1.5 rounded-full border border-dashed border-white/50 pointer-events-none" />
+                <span className="text-xl sm:text-2xl font-black leading-none mb-0.5 relative z-10 drop-shadow-xs">≠</span>
+                <span className="text-[10px] sm:text-[11px] font-black tracking-wider relative z-10 drop-shadow-xs">MODIFIED</span>
               </div>
             </div>
 
