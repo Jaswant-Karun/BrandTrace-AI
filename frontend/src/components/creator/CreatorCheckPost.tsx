@@ -159,7 +159,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
   });
 
   const [channel, setChannel] = useState<PostChannel>(revisionData?.channel || 'instagram');
-  const [keyPhrases, setKeyPhrases] = useState<string>('dark spots, skin barrier');
+  const [keyPhrases, setKeyPhrases] = useState<string>('');
   const [callToAction, setCallToAction] = useState<string>('Shop');
   const [isAccordionOpen, setIsAccordionOpen] = useState<boolean>(true); // Open by default
   const [isChecking, setIsChecking] = useState<boolean>(false);
@@ -266,7 +266,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
   const handleOpenSample = () => {
     setDraftContent(DEFAULT_SAMPLE_TEXT);
     setChannel('instagram');
-    setKeyPhrases('dark spots, skin barrier');
+    setKeyPhrases('');
     setCallToAction('Shop');
     setHasChecked(false);
     setAnalysisId(null);
@@ -314,8 +314,8 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
         content: activeText,
         campaign_name: `${activeBrandName} Marketing Asset`,
         channel: channel.toLowerCase(),
-        key_phrases: keyPhrases,
-        call_to_action: callToAction,
+        key_phrases: undefined,
+        call_to_action: undefined,
       }),
     });
     setAnalysisId(res?.verification_id || null);
@@ -376,51 +376,10 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
       });
     }
 
-    // 2. Evaluate Optional Content Requirements: Key Phrases
-    if (keyPhrases.trim()) {
-      const phrases = keyPhrases.split(',').map((p) => p.trim()).filter(Boolean);
-      phrases.forEach((phrase) => {
-        if (!activeText.toLowerCase().includes(phrase.toLowerCase())) {
-          parsedFindings.push({
-            id: `f-${count}`,
-            number: count,
-            title: 'Missing Required Key Phrase',
-            category: 'Campaign Content Requirements',
-            source: 'Rule Engine',
-            ruleCitation: 'Campaign Directive: Mandated Phrase Preservation',
-            rejectedText: `[Missing: "${phrase}"]`,
-            approvedText: phrase,
-            recommendation: `The mandatory key phrase "${phrase}" is absent from your post. Include this phrase to meet campaign guidelines.`,
-            severity: 'MINOR',
-            accepted: false,
-          });
-          count++;
-        }
-      });
-    }
+    // Keep findings tied to text that actually appears in the draft. Optional
+    // phrases and CTA values are metadata, not synthetic errors.
 
-    // 3. Evaluate Optional Content Requirements: Call To Action
-    if (callToAction.trim()) {
-      const ctaPattern = new RegExp(`\\b${callToAction.trim()}\\b`, 'i');
-      if (!ctaPattern.test(activeText)) {
-        parsedFindings.push({
-          id: `f-${count}`,
-          number: count,
-          title: 'Missing Mandated Call To Action',
-          category: 'Conversion & CTA Policy',
-          source: 'Rule Engine',
-          ruleCitation: 'Aurelle Brand Book v1.3 §5.1 Calls to action',
-          rejectedText: `[Missing CTA: "${callToAction}"]`,
-          approvedText: callToAction,
-          recommendation: `Requested Call to Action "${callToAction}" was not found in the copy. Add clear call to action directing customers.`,
-          severity: 'MINOR',
-          accepted: false,
-        });
-        count++;
-      }
-    }
-
-    // 4. Fallback realistic findings if clean demo post was submitted with specific test claims
+    // Fallback realistic findings if clean demo post was submitted with specific test claims
     if (parsedFindings.length === 0 && activeText.includes('by 60% in just 2 weeks')) {
       parsedFindings.push(
         {
@@ -1169,26 +1128,32 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
                     }
 
                     const isSelected = selectedFindingId === m.finding.id;
-                    const sevColor = 
-                      m.finding.severity === 'BLOCKING' ? 'bg-rose-200 text-rose-900 border-rose-400' :
-                      m.finding.severity === 'MAJOR' ? 'bg-amber-200 text-amber-900 border-amber-400' :
-                      m.finding.severity === 'NEEDS_HUMAN' ? 'bg-purple-200 text-purple-900 border-purple-400' :
-                      m.finding.severity === 'MINOR' ? 'bg-blue-200 text-blue-900 border-blue-400' :
-                      'bg-neutral-200 text-neutral-800 border-neutral-400';
+                    const sevColor =
+                      m.finding.severity === 'BLOCKING' ? 'border-rose-400' :
+                      m.finding.severity === 'MAJOR' ? 'border-amber-400' :
+                      m.finding.severity === 'NEEDS_HUMAN' ? 'border-purple-400' :
+                      m.finding.severity === 'MINOR' ? 'border-blue-400' :
+                      'border-neutral-400';
+                    const numberColor =
+                      m.finding.severity === 'BLOCKING' ? 'bg-rose-500' :
+                      m.finding.severity === 'MAJOR' ? 'bg-amber-500' :
+                      m.finding.severity === 'NEEDS_HUMAN' ? 'bg-purple-500' :
+                      m.finding.severity === 'MINOR' ? 'bg-blue-500' :
+                      'bg-neutral-500';
 
                     parts.push(
                       <span
                         key={`match-${i}`}
                         onClick={() => handleHighlightClick(m.finding.id)}
-                        className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border cursor-pointer transition-all ${sevColor} ${
+                        className={`inline-flex items-center gap-1 border-b-2 cursor-pointer transition-all text-neutral-900 ${sevColor} ${
                           isSelected ? 'ring-2 ring-indigo-500 scale-105' : 'hover:brightness-95'
                         }`}
                         title={`Finding #${m.finding.number}: ${m.finding.title}`}
                       >
-                        <span className="font-medium underline decoration-dotted">{m.finding.rejectedText}</span>
-                        <span className="text-[10px] font-mono font-bold bg-black/15 px-1 rounded">
-                          [{m.finding.number}]
+                        <span className={`inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-mono font-bold text-white ${numberColor}`}>
+                          {m.finding.number}
                         </span>
+                        <span className="font-medium underline decoration-dotted">{m.finding.rejectedText}</span>
                       </span>
                     );
                     lastIdx = m.end;
@@ -1202,22 +1167,6 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
                 })()}
               </div>
 
-              {/* Missing Requirements Callout */}
-              {findings.some((f) => !f.accepted && f.rejectedText.startsWith('[Missing')) && (
-                <div className="p-3.5 rounded-xl bg-neutral-900 border border-neutral-800 space-y-1.5 text-xs font-mono">
-                  <div className="text-amber-400 font-bold uppercase text-[11px] flex items-center gap-1.5">
-                    <AlertTriangle className="w-3.5 h-3.5" />
-                    <span>Unfulfilled Content Requirements</span>
-                  </div>
-                  {findings
-                    .filter((f) => !f.accepted && f.rejectedText.startsWith('[Missing'))
-                    .map((f) => (
-                      <div key={f.id} className="text-neutral-400 pl-4">
-                        • {f.title}: <strong className="text-neutral-200">"{f.approvedText}"</strong>
-                      </div>
-                    ))}
-                </div>
-              )}
             </div>
 
             {/* RIGHT COLUMN: GROUPED FINDING CARDS (7 cols) */}
