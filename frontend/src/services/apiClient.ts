@@ -164,6 +164,68 @@ class ApiClient {
       this.request<any[]>(`/api/content/files${orgId ? `?org_id=${orgId}` : ''}`),
   };
 
+  public documents = {
+    list: (params?: { workspace_id?: string; org_id?: string; category?: string; is_demo?: boolean }) => {
+      const q = new URLSearchParams();
+      if (params?.workspace_id) q.set('workspace_id', params.workspace_id);
+      if (params?.org_id) q.set('org_id', params.org_id);
+      if (params?.category) q.set('category', params.category);
+      if (params?.is_demo !== undefined) q.set('is_demo', String(params.is_demo));
+      const qs = q.toString();
+      return this.request<any[]>(`/api/documents${qs ? `?${qs}` : ''}`);
+    },
+    get: (docId: string) => this.request<any>(`/api/documents/${docId}`),
+    create: (data: { workspace_id: string; org_id?: string; title: string; category: string; description?: string; raw_content: string }) =>
+      this.request<any>('/api/documents', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      }),
+    update: (docId: string, data: { title?: string; category?: string; description?: string; raw_content?: string; change_summary?: string }) =>
+      this.request<any>(`/api/documents/${docId}`, {
+        method: 'PUT',
+        body: JSON.stringify(data)
+      }),
+    delete: (docId: string) =>
+      this.request<any>(`/api/documents/${docId}`, {
+        method: 'DELETE'
+      }),
+    getVersions: (docId: string) =>
+      this.request<any[]>(`/api/documents/${docId}/versions`),
+    upload: (formData: FormData) =>
+      this.request<any>('/api/documents/upload', {
+        method: 'POST',
+        body: formData
+      }),
+    importWebsitePreview: (data: { url: string; workspace_id: string; org_id?: string }) =>
+      this.request<any>('/api/documents/import-website/preview', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      }),
+    importWebsiteCommit: (data: { workspace_id: string; org_id?: string; url: string; title: string; category: string; description?: string; raw_content: string }) =>
+      this.request<any>('/api/documents/import-website/commit', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      }),
+  };
+
+  public publicVerification = {
+    verifySeal: (data: { seal_code: string; brand_id?: string; content_text?: string }) =>
+      this.request<any>('/api/public/verify-seal', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      }),
+    verifyText: (data: { content_text: string; brand_id?: string }) =>
+      this.request<any>('/api/public/verify-text', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      }),
+    verifyImage: (formData: FormData) =>
+      this.request<any>('/api/public/verify-image', {
+        method: 'POST',
+        body: formData
+      }),
+  };
+
   public demo = {
     getScenarioStatus: () => this.request<any>('/api/demo/scenario-status'),
     executeStep: (stepNumber: number, actorRole?: string, actorName?: string) =>

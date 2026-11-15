@@ -18,6 +18,7 @@ export type NavigationTab =
   | 'knowledge-base'
   | 'analytics'
   | 'audit-trust'
+  | 'public-verification'
   | 'settings';
 
 interface SidebarProps {
@@ -71,6 +72,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         { id: 'impact-simulator', label: 'Change Impact Simulator', icon: <Flame className="w-4 h-4" /> },
         { id: 'approvals', label: 'Approval Center', icon: <CheckSquare className="w-4 h-4" /> },
         { id: 'audit-trust', label: 'Trust & Audit Ledger', icon: <Lock className="w-4 h-4" /> },
+        { id: 'public-verification', label: 'Public Verification', icon: <ShieldCheck className="w-4 h-4 text-indigo-600" /> },
       ]
     },
     {

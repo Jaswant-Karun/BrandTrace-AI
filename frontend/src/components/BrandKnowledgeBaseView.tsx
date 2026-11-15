@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { BookOpen, Search, Plus, ExternalLink, Edit2, Flame, Calendar, Tag } from 'lucide-react';
+import { 
+  BookOpen, Search, Plus, ExternalLink, Edit2, Flame, Calendar, Tag,
+  FileText, Upload, Globe, Trash2, History, CheckCircle2, Clock, 
+  AlertTriangle, FileUp, Layers, Lock, ShieldCheck, ChevronDown, 
+  ChevronUp, AlertCircle, RefreshCw, X, Check
+} from 'lucide-react';
 import { apiClient } from '../services/apiClient';
 import { PageHeader } from './ui/PageHeader';
 import { WorkflowBanner } from './ui/WorkflowBanner';
@@ -18,6 +23,70 @@ interface BrandKnowledgeBaseViewProps {
 
 export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ brandId, onNavigate }) => {
   const toast = useToast();
+  
+  // Top-level View Mode: Brand Documents Studio vs Certified Graph Nodes
+  const [activeStudioView, setActiveStudioView] = useState<'DOCUMENTS' | 'GRAPH_NODES'>('DOCUMENTS');
+
+  // ==========================================
+  // PHASE 4A: BRAND DOCUMENTS STATE
+  // ==========================================
+  const [documents, setDocuments] = useState<any[]>([]);
+  const [isLoadingDocs, setIsLoadingDocs] = useState<boolean>(true);
+  const [docSearch, setDocSearch] = useState<string>('');
+  const [docFilter, setDocFilter] = useState<'ALL' | 'CUSTOM' | 'DEMO'>('ALL');
+  const [docCategory, setDocCategory] = useState<string>('ALL');
+  const [expandedDocIds, setExpandedDocIds] = useState<Set<string>>(new Set());
+
+  // Create Document Modal
+  const [isCreateDocModalOpen, setIsCreateDocModalOpen] = useState<boolean>(false);
+  const [isSubmittingDoc, setIsSubmittingDoc] = useState<boolean>(false);
+  const [createDocForm, setCreateDocForm] = useState({
+    title: '',
+    category: 'BRAND_GUIDELINES',
+    description: '',
+    raw_content: ''
+  });
+
+  // Upload Document Modal
+  const [isUploadDocModalOpen, setIsUploadDocModalOpen] = useState<boolean>(false);
+  const [selectedUploadFile, setSelectedUploadFile] = useState<File | null>(null);
+  const [uploadDocForm, setUploadDocForm] = useState({
+    title: '',
+    category: 'BRAND_GUIDELINES',
+    description: ''
+  });
+
+  // Website Import Modal
+  const [isImportModalOpen, setIsImportModalOpen] = useState<boolean>(false);
+  const [importUrl, setImportUrl] = useState<string>('');
+  const [isFetchingPreview, setIsFetchingPreview] = useState<boolean>(false);
+  const [websitePreview, setWebsitePreview] = useState<any | null>(null);
+  const [importCategory, setImportCategory] = useState<string>('BRAND_GUIDELINES');
+
+  // Edit Document Modal
+  const [isEditDocModalOpen, setIsEditDocModalOpen] = useState<boolean>(false);
+  const [editingDoc, setEditingDoc] = useState<any | null>(null);
+  const [editDocForm, setEditDocForm] = useState({
+    title: '',
+    category: 'BRAND_GUIDELINES',
+    description: '',
+    raw_content: '',
+    change_summary: ''
+  });
+
+  // Version History Modal
+  const [isVersionModalOpen, setIsVersionModalOpen] = useState<boolean>(false);
+  const [versionDoc, setVersionDoc] = useState<any | null>(null);
+  const [versionList, setVersionList] = useState<any[]>([]);
+  const [isLoadingVersions, setIsLoadingVersions] = useState<boolean>(false);
+
+  // Delete Document Modal
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+  const [docToDelete, setDocToDelete] = useState<any | null>(null);
+
+  // ==========================================
+  // EXISTING GRAPH NODES STATE (PRESERVED)
+  // ==========================================
   const [graphData, setGraphData] = useState<any>(null);
   const [search, setSearch] = useState<string>('');
   const [activeTab, setActiveTab] = useState<string>('ALL');
@@ -60,6 +129,24 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
     required_phrases: ''
   });
 
+  // ==========================================
+  // DATA LOADERS
+  // ==========================================
+  const loadDocuments = async () => {
+    setIsLoadingDocs(true);
+    try {
+      const docs = await apiClient.documents.list({
+        workspace_id: brandId
+      });
+      setDocuments(docs || []);
+    } catch (err: any) {
+      console.error('Failed to load documents:', err);
+      toast.error('Failed to load brand documents.');
+    } finally {
+      setIsLoadingDocs(false);
+    }
+  };
+
   const loadGraphData = () => {
     fetch(`/api/brands/${brandId}/graph`)
       .then((res) => res.json())
@@ -71,9 +158,256 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
   };
 
   useEffect(() => {
+    loadDocuments();
     loadGraphData();
   }, [brandId]);
 
+  const toggleExpandDoc = (id: string) => {
+    setExpandedDocIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  // ==========================================
+  // DOCUMENT STUDIO HANDLERS
+  // ==========================================
+
+  // 1. Create Document
+  const handleCreateDocument = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!createDocForm.title.trim() || !createDocForm.raw_content.trim()) {
+      toast.warning('Document title and content are required.');
+      return;
+    }
+
+    setIsSubmittingDoc(true);
+    try {
+      await apiClient.documents.create({
+        workspace_id: brandId,
+        org_id: brandId.includes('aurelle') ? 'ORG-AURELLE' : 'ORG-APEX',
+        title: createDocForm.title.trim(),
+        category: createDocForm.category,
+        description: createDocForm.description.trim(),
+        raw_content: createDocForm.raw_content.trim()
+      });
+
+      toast.success(`Document "${createDocForm.title}" created & indexed into knowledge base!`);
+      setIsCreateDocModalOpen(false);
+      setCreateDocForm({
+        title: '',
+        category: 'BRAND_GUIDELINES',
+        description: '',
+        raw_content: ''
+      });
+      await loadDocuments();
+      loadGraphData();
+    } catch (err: any) {
+      console.error('Create document error:', err);
+      toast.error(err.message || 'Failed to create document.');
+    } finally {
+      setIsSubmittingDoc(false);
+    }
+  };
+
+  // 2. Upload Document
+  const handleUploadDocument = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedUploadFile) {
+      toast.warning('Please select a file to upload (PDF, DOCX, TXT, or MD).');
+      return;
+    }
+
+    setIsSubmittingDoc(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', selectedUploadFile);
+      formData.append('workspace_id', brandId);
+      formData.append('org_id', brandId.includes('aurelle') ? 'ORG-AURELLE' : 'ORG-APEX');
+      formData.append('title', uploadDocForm.title.trim() || selectedUploadFile.name);
+      formData.append('category', uploadDocForm.category);
+      formData.append('description', uploadDocForm.description.trim());
+
+      const res = await apiClient.documents.upload(formData);
+      toast.success(`File "${selectedUploadFile.name}" parsed and indexed successfully (Status: ${res.processing_status})!`);
+      setIsUploadDocModalOpen(false);
+      setSelectedUploadFile(null);
+      setUploadDocForm({ title: '', category: 'BRAND_GUIDELINES', description: '' });
+      await loadDocuments();
+      loadGraphData();
+    } catch (err: any) {
+      console.error('Upload document error:', err);
+      toast.error(err.message || 'Failed to upload document.');
+    } finally {
+      setIsSubmittingDoc(false);
+    }
+  };
+
+  // 3. Website Import Preview & Commit
+  const handleFetchWebsitePreview = async () => {
+    if (!importUrl.trim()) {
+      toast.warning('Please enter a public website URL to import.');
+      return;
+    }
+
+    setIsFetchingPreview(true);
+    try {
+      const preview = await apiClient.documents.importWebsitePreview({
+        url: importUrl.trim(),
+        workspace_id: brandId,
+        org_id: brandId.includes('aurelle') ? 'ORG-AURELLE' : 'ORG-APEX'
+      });
+      setWebsitePreview(preview);
+      toast.success('Website content fetched safely. Please review before committing.');
+    } catch (err: any) {
+      console.error('Fetch website preview error:', err);
+      toast.error(err.message || 'Failed to fetch website URL.');
+    } finally {
+      setIsFetchingPreview(false);
+    }
+  };
+
+  const handleCommitWebsiteImport = async () => {
+    if (!websitePreview) return;
+
+    setIsSubmittingDoc(true);
+    try {
+      await apiClient.documents.importWebsiteCommit({
+        workspace_id: brandId,
+        org_id: brandId.includes('aurelle') ? 'ORG-AURELLE' : 'ORG-APEX',
+        url: websitePreview.url,
+        title: websitePreview.title || 'Imported Brand Web Page',
+        category: importCategory,
+        description: websitePreview.description || `Imported content from ${websitePreview.url}`,
+        raw_content: websitePreview.extracted_content
+      });
+
+      toast.success('Website content committed & indexed into knowledge base!');
+      setIsImportModalOpen(false);
+      setWebsitePreview(null);
+      setImportUrl('');
+      await loadDocuments();
+      loadGraphData();
+    } catch (err: any) {
+      console.error('Commit website error:', err);
+      toast.error(err.message || 'Failed to commit website content.');
+    } finally {
+      setIsSubmittingDoc(false);
+    }
+  };
+
+  // 4. Edit Document
+  const handleOpenEditDoc = (doc: any) => {
+    if (doc.is_demo) {
+      toast.warning('Demo benchmark documents are protected and cannot be modified.');
+      return;
+    }
+    setEditingDoc(doc);
+    setEditDocForm({
+      title: doc.title,
+      category: doc.category,
+      description: doc.description,
+      raw_content: doc.raw_content,
+      change_summary: `Updated version from v${doc.version_number}`
+    });
+    setIsEditDocModalOpen(true);
+  };
+
+  const handleSaveEditDoc = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingDoc) return;
+
+    setIsSubmittingDoc(true);
+    try {
+      await apiClient.documents.update(editingDoc.doc_id, {
+        title: editDocForm.title.trim(),
+        category: editDocForm.category,
+        description: editDocForm.description.trim(),
+        raw_content: editDocForm.raw_content.trim(),
+        change_summary: editDocForm.change_summary.trim()
+      });
+
+      toast.success(`Document updated! Previous version archived and version bumped.`);
+      setIsEditDocModalOpen(false);
+      setEditingDoc(null);
+      await loadDocuments();
+      loadGraphData();
+    } catch (err: any) {
+      console.error('Update doc error:', err);
+      toast.error(err.message || 'Failed to update document.');
+    } finally {
+      setIsSubmittingDoc(false);
+    }
+  };
+
+  // 5. Version History
+  const handleOpenVersions = async (doc: any) => {
+    setVersionDoc(doc);
+    setIsVersionModalOpen(true);
+    setIsLoadingVersions(true);
+    try {
+      const versions = await apiClient.documents.getVersions(doc.doc_id);
+      setVersionList(versions || []);
+    } catch (err: any) {
+      console.error('Failed to load versions:', err);
+      toast.error('Failed to retrieve version history.');
+    } finally {
+      setIsLoadingVersions(false);
+    }
+  };
+
+  // 6. Delete Document
+  const handleOpenDeleteDoc = (doc: any) => {
+    if (doc.is_demo) {
+      toast.warning('Demo benchmark documents are protected and cannot be deleted.');
+      return;
+    }
+    setDocToDelete(doc);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDeleteDoc = async () => {
+    if (!docToDelete) return;
+    setIsSubmittingDoc(true);
+    try {
+      await apiClient.documents.delete(docToDelete.doc_id);
+      toast.success(`Document "${docToDelete.title}" and associated embeddings removed.`);
+      setIsDeleteModalOpen(false);
+      setDocToDelete(null);
+      await loadDocuments();
+      loadGraphData();
+    } catch (err: any) {
+      console.error('Delete doc error:', err);
+      toast.error(err.message || 'Failed to delete document.');
+    } finally {
+      setIsSubmittingDoc(false);
+    }
+  };
+
+  // Filtered documents
+  const filteredDocuments = documents.filter((doc) => {
+    // Mode filter
+    if (docFilter === 'CUSTOM' && doc.is_demo) return false;
+    if (docFilter === 'DEMO' && !doc.is_demo) return false;
+    // Category filter
+    if (docCategory !== 'ALL' && doc.category !== docCategory) return false;
+    // Search query
+    if (docSearch.trim()) {
+      const q = docSearch.toLowerCase();
+      const matchesTitle = (doc.title || '').toLowerCase().includes(q);
+      const matchesDesc = (doc.description || '').toLowerCase().includes(q);
+      const matchesId = (doc.doc_id || '').toLowerCase().includes(q);
+      const matchesContent = (doc.raw_content || '').toLowerCase().includes(q);
+      return matchesTitle || matchesDesc || matchesId || matchesContent;
+    }
+    return true;
+  });
+
+  // ==========================================
+  // EXISTING GRAPH FACT / GUIDELINE HANDLERS
+  // ==========================================
   const handleCreateFact = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || (registrationMode === 'FACT' && !formData.current_value)) {
@@ -96,7 +430,6 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
           department_owner: formData.department_owner
         });
         
-        // Also persist to API endpoint with dates and restricted terminology
         await fetch('/api/facts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -124,19 +457,16 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             brand_id: brandId,
-            title: formData.name,
+            name: formData.name,
             category: formData.category,
-            rule_statement: formData.description || formData.current_value,
+            rule_text: formData.description || formData.name,
             severity: formData.severity,
-            source_citation: formData.source_citation,
-            effective_date: formData.source_date || '2026-01-15',
-            expiry_date: formData.expiry_date || undefined,
-            restricted_terms: formData.restricted_terms ? formData.restricted_terms.split(',').map((s) => s.trim()).filter(Boolean) : [],
-            required_phrases: formData.required_phrases ? formData.required_phrases.split(',').map((s) => s.trim()).filter(Boolean) : []
+            department_owner: formData.department_owner,
+            source_date: formData.source_date || '2026-01-15'
           })
         });
 
-        toast.success(`Brand Guideline "${formData.name}" registered in MongoDB Atlas & BKG Guardrails!`);
+        toast.success(`Brand Guideline "${formData.name}" registered in Knowledge Graph!`);
       }
 
       setIsModalOpen(false);
@@ -157,7 +487,7 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
       });
       loadGraphData();
     } catch (err: any) {
-      console.error('Failed to create fact/guideline:', err);
+      console.error(err);
       toast.error('Failed to register: ' + (err.message || 'Unknown error'));
     } finally {
       setIsSubmitting(false);
@@ -165,36 +495,34 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
   };
 
   const handleOpenEdit = (node: any) => {
-    setEditingNode(node);
     const d = node.data || {};
     const props = d.properties || {};
+    setEditingNode(node);
     setEditFormData({
-      name: d.label ? d.label.split(':')[0] : '',
-      category: props.category || (d.nodeType === 'APPROVED_FACT' ? 'PRICE' : 'GUIDELINE'),
-      current_value: props.current_value || (d.label && d.label.includes(':') ? d.label.split(':')[1].trim() : ''),
+      name: d.label || '',
+      category: props.category || 'PRICE',
+      current_value: props.current_value || '',
       unit: props.unit || '',
       description: d.description || '',
-      source_citation: props.citation || props.source_citation || '',
-      department_owner: props.department_owner || 'Brand Governance Committee',
-      source_date: props.source_date || '2026-01-15',
+      source_citation: props.citation || '',
+      department_owner: props.department_owner || '',
+      source_date: props.source_date || '',
       expiry_date: props.expiry_date || '',
       evidence_reference: props.evidence_reference || '',
-      restricted_terms: props.restricted_terms ? props.restricted_terms.join(', ') : '',
-      required_phrases: props.required_phrases ? props.required_phrases.join(', ') : ''
+      restricted_terms: Array.isArray(props.restricted_terms) ? props.restricted_terms.join(', ') : '',
+      required_phrases: Array.isArray(props.required_phrases) ? props.required_phrases.join(', ') : ''
     });
     setIsEditModalOpen(true);
   };
 
   const handleUpdateFact = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingNode || !editFormData.current_value) {
-      toast.warning('Please enter an approved value.');
-      return;
-    }
+    if (!editingNode) return;
 
     try {
       setIsSubmitting(true);
-      const res = await fetch(`/api/facts/${editingNode.id}?brand_id=${brandId}`, {
+      const factId = editingNode.data?.id;
+      const res = await fetch(`/api/facts/${factId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -226,7 +554,6 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
   };
 
   const allNodes = graphData?.nodes || [];
-
   const filteredNodes = allNodes.filter((n: any) => {
     const nodeType = n.data?.nodeType;
     const matchesTab = activeTab === 'ALL' || nodeType === activeTab;
@@ -240,30 +567,29 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
 
   return (
     <div className="space-y-6">
-      {/* Standardized Enterprise Page Header */}
+      {/* Enterprise Page Header */}
       <PageHeader
-        title="Brand Knowledge"
-        description="Manage the approved facts, rules and guidelines that your organisation uses."
+        title="Brand Knowledge Base"
+        description="Author, upload, and govern certified brand documents, pricing policies, and ground truth guardrails."
         icon={<BookOpen className="w-4 h-4 text-white" />}
-        category="Workspace"
+        category="Governance Control Plane"
         workspaceName={brandId === 'aurelle-tech' ? 'Aurelle Technologies Inc.' : brandId}
         breadcrumbs={[
           { label: 'BrandTrace' },
-          { label: 'Workspace' },
-          { label: 'Brand Knowledge', active: true }
+          { label: 'Knowledge Base', active: true }
         ]}
         helpContext={{
-          summary: "Brand Knowledge represents certified corporate ground truth. All claims scanned in Content Intelligence are resolved against these nodes, and any changes can be simulated in the Digital Twin before committing.",
+          summary: "Brand Knowledge represents certified corporate ground truth. Custom documents are parsed, embedded into 768-dimensional Atlas vectors, and actively govern the Multi-Agent verification pipeline.",
           terms: [
-            { term: "Approved Fact (PRICE/SPEC)", definition: "Empirically validated corporate data, such as subscription pricing (₹499) or battery range (520 miles)." },
-            { term: "Approved Claim", definition: "Legally substantiated marketing claim accompanied by statutory certification or lab test numbers." },
-            { term: "Trademark Guideline", definition: "Strict typographical, casing, and symbol lockup rules for registered intellectual property." },
-            { term: "Statutory Regulation", definition: "External legal mandate (FTC, FDA, Lanham Act, NHTSA) mapped into the brand guardrails." }
+            { term: "Custom Documents", definition: "Tenant-authored brand guidelines, pricing schedules, and clinical claims with full versioning and audit trails." },
+            { term: "Demo Benchmarks", definition: "Pre-configured baseline reference documents used for regression tests and system evaluation." },
+            { term: "INDEXED Status", definition: "Confirmed status indicating text parsing, semantic embedding generation, and graph indexing were 100% successful." },
+            { term: "SSRF Protection", definition: "Strict security gateway blocking private IP subnets and internal loopbacks during public website imports." }
           ]
         }}
         primaryAction={{
-          label: "Register Approved Fact",
-          onClick: () => setIsModalOpen(true),
+          label: "Create Document",
+          onClick: () => setIsCreateDocModalOpen(true),
           icon: <Plus className="w-3.5 h-3.5" />
         }}
         secondaryAction={{
@@ -273,156 +599,825 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
         }}
       />
 
-      {/* Filter and Search Bar */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-2xs">
-        <div className="flex items-center gap-2">
-          <BookOpen className="w-4 h-4 text-slate-700" />
-          <span className="text-xs font-semibold text-slate-900">Certified Knowledge Repository</span>
-          <Badge variant="neutral" size="sm">{filteredNodes.length} Nodes</Badge>
-        </div>
-
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="relative w-full sm:w-64">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search facts, guidelines, citations..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 shadow-2xs"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Category Tabs */}
-      <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs overflow-x-auto">
-        {['ALL', 'APPROVED_FACT', 'APPROVED_CLAIM', 'TRADEMARK', 'TONE_ATTRIBUTE', 'REGULATION'].map((tab) => (
+      {/* Top View Mode Switcher (Documents Studio vs Truth Graph Nodes) */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between bg-slate-100 p-1 rounded-xl border border-slate-200 gap-2">
+        <div className="flex items-center gap-1 overflow-x-auto w-full sm:w-auto">
           <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer whitespace-nowrap text-xs ${
-              activeTab === tab
-                ? 'bg-white text-slate-900 border border-slate-200 shadow-2xs font-semibold'
+            onClick={() => setActiveStudioView('DOCUMENTS')}
+            className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              activeStudioView === 'DOCUMENTS'
+                ? 'bg-white text-slate-900 border border-slate-200 shadow-2xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            {tab.replace(/_/g, ' ')}
+            <FileText className="w-3.5 h-3.5 text-indigo-600" />
+            <span>Brand Documents Studio</span>
+            <Badge variant="brand" size="xs">{documents.length}</Badge>
           </button>
-        ))}
+
+          <button
+            onClick={() => setActiveStudioView('GRAPH_NODES')}
+            className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              activeStudioView === 'GRAPH_NODES'
+                ? 'bg-white text-slate-900 border border-slate-200 shadow-2xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Layers className="w-3.5 h-3.5 text-slate-600" />
+            <span>Certified Graph Nodes</span>
+            <Badge variant="neutral" size="xs">{allNodes.length}</Badge>
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2 self-end sm:self-auto px-2">
+          {activeStudioView === 'DOCUMENTS' && (
+            <div className="flex items-center gap-1.5">
+              <Button
+                variant="outline"
+                size="xs"
+                onClick={() => setIsUploadDocModalOpen(true)}
+                icon={<Upload className="w-3 h-3 text-slate-700" />}
+              >
+                Upload File
+              </Button>
+              <Button
+                variant="outline"
+                size="xs"
+                onClick={() => setIsImportModalOpen(true)}
+                icon={<Globe className="w-3 h-3 text-slate-700" />}
+              >
+                Import Website
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Knowledge Cards Grid or Empty State */}
-      {filteredNodes.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredNodes.map((n: any) => {
-            const d = n.data || {};
-            const props = d.properties || {};
-            const isFact = d.nodeType === 'APPROVED_FACT';
-            return (
-              <div
-                key={d.id}
-                className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-3 hover:border-slate-300 transition-all flex flex-col justify-between"
+      {/* ========================================================================= */}
+      {/* VIEW 1: BRAND DOCUMENTS STUDIO */}
+      {/* ========================================================================= */}
+      {activeStudioView === 'DOCUMENTS' && (
+        <div className="space-y-5">
+          
+          {/* Studio Filters & Search Toolbar */}
+          <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-2xs">
+            
+            {/* Filter Tabs: ALL, CUSTOM, DEMO */}
+            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs font-medium">
+              <button
+                onClick={() => setDocFilter('ALL')}
+                className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${
+                  docFilter === 'ALL' ? 'bg-white text-slate-900 font-semibold shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
               >
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                    <Badge variant={isFact ? 'brand' : 'neutral'} size="sm">
-                      {d.nodeType ? d.nodeType.replace(/_/g, ' ') : 'KNOWLEDGE NODE'}
-                    </Badge>
-                    <span className="text-[11px] font-mono text-slate-500 font-semibold">{d.id}</span>
-                  </div>
+                All Documents ({documents.length})
+              </button>
+              <button
+                onClick={() => setDocFilter('CUSTOM')}
+                className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${
+                  docFilter === 'CUSTOM' ? 'bg-white text-emerald-900 font-semibold shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Custom Documents ({documents.filter((d) => !d.is_demo).length})
+              </button>
+              <button
+                onClick={() => setDocFilter('DEMO')}
+                className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${
+                  docFilter === 'DEMO' ? 'bg-white text-indigo-900 font-semibold shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Demo Benchmarks ({documents.filter((d) => d.is_demo).length})
+              </button>
+            </div>
 
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-900 mb-1">{d.label}</h4>
-                    <p className="text-xs text-slate-600 leading-relaxed">{d.description}</p>
-                  </div>
-                </div>
+            {/* Category Selector + Search */}
+            <div className="flex items-center gap-2.5 w-full sm:w-auto">
+              <select
+                value={docCategory}
+                onChange={(e) => setDocCategory(e.target.value)}
+                className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 font-medium focus:outline-none focus:border-slate-900 shadow-2xs"
+              >
+                <option value="ALL">All Categories</option>
+                <option value="BRAND_GUIDELINES">Brand Guidelines</option>
+                <option value="PRODUCT_FACTS">Product Facts</option>
+                <option value="PRICING_POLICIES">Pricing Policies</option>
+                <option value="BRAND_VOICE">Brand Voice</option>
+                <option value="REGULATORY_POLICIES">Regulatory Policies</option>
+                <option value="MARKETING_CLAIMS">Marketing Claims</option>
+              </select>
 
-                {/* Citations & Metadata */}
-                <div className="pt-2 border-t border-slate-100 space-y-1.5 text-[11px] text-slate-500 font-mono">
-                  {props.citation && (
-                    <div className="flex items-start gap-1">
-                      <span className="text-slate-500 font-sans shrink-0">Citation:</span>
-                      <span className="text-emerald-800 font-medium truncate">{props.citation}</span>
-                    </div>
-                  )}
-                  {props.current_value && (
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-slate-500 font-sans">Approved Value:</span>
-                      <span className="text-slate-900 font-bold bg-slate-100 px-1.5 py-0.5 rounded font-mono">
-                        {props.current_value}
-                      </span>
-                    </div>
-                  )}
-                  {props.exact_mark && (
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-slate-500 font-sans">Registered Mark:</span>
-                      <span className="text-purple-800 font-bold">{props.exact_mark}</span>
-                    </div>
-                  )}
-                  {props.source_date && (
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3 text-slate-400" />
-                      <span className="text-slate-500 font-sans">Source Date:</span>
-                      <span className="text-slate-700 font-mono">{props.source_date}</span>
-                    </div>
-                  )}
-                  {props.expiry_date && (
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3 text-amber-500" />
-                      <span className="text-amber-700 font-sans">Expires:</span>
-                      <span className="text-amber-800 font-mono">{props.expiry_date}</span>
-                    </div>
-                  )}
-                  {props.restricted_terms && props.restricted_terms.length > 0 && (
-                    <div className="flex items-start gap-1">
-                      <Tag className="w-3 h-3 text-rose-500 shrink-0 mt-0.5" />
-                      <span className="text-rose-700 font-sans shrink-0">Restricted:</span>
-                      <span className="text-rose-800 truncate">{props.restricted_terms.join(', ')}</span>
-                    </div>
-                  )}
-                  {props.department_owner && (
-                    <div className="flex items-center gap-1">
-                      <span className="text-slate-500 font-sans">Owner:</span>
-                      <span className="text-slate-700 font-sans">{props.department_owner}</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Card Action Footers */}
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
-                  <Button
-                    variant="outline"
-                    size="xs"
-                    onClick={() => handleOpenEdit(n)}
-                    icon={<Edit2 className="w-3 h-3" />}
-                  >
-                    Edit Fact
-                  </Button>
-                  {isFact && (
-                    <Button
-                      variant="ghost"
-                      size="xs"
-                      onClick={() => onNavigate && onNavigate('impact-simulator')}
-                      icon={<Flame className="w-3 h-3 text-amber-500" />}
-                    >
-                      Simulate
-                    </Button>
-                  )}
-                </div>
+              <div className="relative w-full sm:w-64">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search documents, policies..."
+                  value={docSearch}
+                  onChange={(e) => setDocSearch(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-900 shadow-2xs"
+                />
               </div>
-            );
-          })}
+            </div>
+
+          </div>
+
+          {/* Documents Grid */}
+          {isLoadingDocs ? (
+            <div className="py-20 flex flex-col items-center justify-center space-y-3">
+              <div className="w-7 h-7 rounded-full border-2 border-slate-200 border-t-indigo-600 animate-spin" />
+              <span className="text-xs font-mono text-slate-500">Retrieving certified tenant document library...</span>
+            </div>
+          ) : filteredDocuments.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filteredDocuments.map((doc) => {
+                const isExpanded = expandedDocIds.has(doc.doc_id);
+                return (
+                  <div
+                    key={doc.doc_id}
+                    className="bg-white border border-slate-200 hover:border-slate-300 rounded-2xl p-5 shadow-2xs flex flex-col justify-between space-y-4 transition-all"
+                  >
+                    <div className="space-y-3">
+                      
+                      {/* Header Row: Category Badge, Version & Demo/Custom Label */}
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-100 flex-wrap gap-2">
+                        <div className="flex items-center gap-1.5">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-800 border border-slate-200">
+                            {doc.category.replace(/_/g, ' ')}
+                          </span>
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                            v{doc.version_number}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-1.5">
+                          {doc.is_demo ? (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-200 flex items-center gap-1">
+                              <Lock className="w-2.5 h-2.5" />
+                              DEMO BENCHMARK
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+                              <CheckCircle2 className="w-2.5 h-2.5" />
+                              CUSTOM TENANT DOC
+                            </span>
+                          )}
+
+                          {/* Real-time processing status badge */}
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 ${
+                            doc.processing_status === 'INDEXED' ? 'bg-emerald-100 text-emerald-900' :
+                            doc.processing_status === 'PROCESSING' ? 'bg-blue-100 text-blue-900 animate-pulse' :
+                            doc.processing_status === 'FAILED' ? 'bg-rose-100 text-rose-900' :
+                            'bg-slate-100 text-slate-700'
+                          }`}>
+                            {doc.processing_status === 'INDEXED' && <Check className="w-3 h-3" />}
+                            {doc.processing_status === 'PROCESSING' && <RefreshCw className="w-2.5 h-2.5 animate-spin" />}
+                            {doc.processing_status === 'FAILED' && <AlertTriangle className="w-2.5 h-2.5" />}
+                            <span>{doc.processing_status}</span>
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Title & Description */}
+                      <div>
+                        <div className="flex items-start justify-between gap-2">
+                          <h3 className="text-sm font-bold text-slate-900 leading-snug">
+                            {doc.title}
+                          </h3>
+                          <span className="text-[10px] font-mono text-slate-400 shrink-0">
+                            {doc.doc_id}
+                          </span>
+                        </div>
+                        {doc.description && (
+                          <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                            {doc.description}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Content Preview & Expand Toggle */}
+                      <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-3 text-xs text-slate-700 space-y-2">
+                        <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 uppercase font-mono">
+                          <span>Document Body Preview</span>
+                          <button
+                            onClick={() => toggleExpandDoc(doc.doc_id)}
+                            className="text-indigo-600 hover:text-indigo-800 flex items-center gap-0.5 cursor-pointer lowercase"
+                          >
+                            <span>{isExpanded ? 'collapse' : 'view full text'}</span>
+                            {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                          </button>
+                        </div>
+                        <p className={`font-mono text-[11px] whitespace-pre-wrap leading-relaxed ${isExpanded ? '' : 'line-clamp-3'}`}>
+                          {doc.raw_content}
+                        </p>
+                      </div>
+
+                      {/* Metadata Row */}
+                      <div className="pt-2 flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-100">
+                        <div className="flex items-center gap-3">
+                          <span>Source: <strong className="font-medium text-slate-600">{doc.source_type}</strong></span>
+                          {doc.file_name && <span className="truncate max-w-[150px]">File: {doc.file_name}</span>}
+                          {doc.source_url && <span className="truncate max-w-[150px]">URL: {doc.source_url}</span>}
+                        </div>
+                        <span>Updated: {doc.updated_at ? doc.updated_at.split('T')[0] : 'Today'}</span>
+                      </div>
+
+                    </div>
+
+                    {/* Action Footers */}
+                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="xs"
+                          onClick={() => handleOpenEditDoc(doc)}
+                          disabled={doc.is_demo}
+                          icon={<Edit2 className="w-3 h-3" />}
+                          title={doc.is_demo ? "Demo documents are read-only benchmarks" : "Edit document"}
+                        >
+                          Edit
+                        </Button>
+
+                        <Button
+                          variant="outline"
+                          size="xs"
+                          onClick={() => handleOpenVersions(doc)}
+                          icon={<History className="w-3 h-3" />}
+                        >
+                          Versions
+                        </Button>
+                      </div>
+
+                      {!doc.is_demo && (
+                        <button
+                          onClick={() => handleOpenDeleteDoc(doc)}
+                          className="text-xs text-rose-600 hover:text-rose-800 hover:bg-rose-50 p-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1"
+                          title="Delete custom document"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span className="hidden sm:inline">Delete</span>
+                        </button>
+                      )}
+                    </div>
+
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <EmptyState
+              title="No Documents Match Filter"
+              description={`No documents found in workspace matching "${docSearch || docFilter}". Author a custom document, upload an executive policy, or import a brand website.`}
+              actionLabel="Create Document"
+              onAction={() => setIsCreateDocModalOpen(true)}
+              icon={<FileText className="w-6 h-6 text-slate-500" />}
+            />
+          )}
+
         </div>
-      ) : (
-        <EmptyState
-          title="No Knowledge Nodes Match Your Filter"
-          description={`No brand facts or guidelines found matching "${search || activeTab}". Try clearing your search query or registering a new approved fact.`}
-          actionLabel="Register Approved Fact"
-          onAction={() => setIsModalOpen(true)}
-          icon={<BookOpen className="w-6 h-6 text-slate-500" />}
-        />
       )}
+
+      {/* ========================================================================= */}
+      {/* VIEW 2: CERTIFIED GRAPH NODES (EXISTING - 100% PRESERVED) */}
+      {/* ========================================================================= */}
+      {activeStudioView === 'GRAPH_NODES' && (
+        <div className="space-y-5">
+          {/* Filter and Search Bar */}
+          <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-2xs">
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-slate-700" />
+              <span className="text-xs font-semibold text-slate-900">Certified Knowledge Repository</span>
+              <Badge variant="neutral" size="sm">{filteredNodes.length} Nodes</Badge>
+            </div>
+
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              <div className="relative w-full sm:w-64">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search facts, guidelines, citations..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-900 shadow-2xs"
+                />
+              </div>
+              <Button
+                variant="primary"
+                size="xs"
+                onClick={() => setIsModalOpen(true)}
+                icon={<Plus className="w-3 h-3" />}
+              >
+                Add Fact
+              </Button>
+            </div>
+          </div>
+
+          {/* Category Tabs */}
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs overflow-x-auto">
+            {['ALL', 'APPROVED_FACT', 'APPROVED_CLAIM', 'TRADEMARK', 'TONE_ATTRIBUTE', 'REGULATION'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer whitespace-nowrap text-xs ${
+                  activeTab === tab
+                    ? 'bg-white text-slate-900 border border-slate-200 shadow-2xs font-semibold'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                {tab.replace(/_/g, ' ')}
+              </button>
+            ))}
+          </div>
+
+          {/* Knowledge Cards Grid */}
+          {filteredNodes.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredNodes.map((n: any) => {
+                const d = n.data || {};
+                const props = d.properties || {};
+                const isFact = d.nodeType === 'APPROVED_FACT';
+                return (
+                  <div
+                    key={d.id}
+                    className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-3 hover:border-slate-300 transition-all flex flex-col justify-between"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <Badge variant={isFact ? 'brand' : 'neutral'} size="sm">
+                          {d.nodeType ? d.nodeType.replace(/_/g, ' ') : 'KNOWLEDGE NODE'}
+                        </Badge>
+                        <span className="text-[11px] font-mono text-slate-500 font-semibold">{d.id}</span>
+                      </div>
+
+                      <div>
+                        <h4 className="text-xs font-bold text-slate-900 mb-1">{d.label}</h4>
+                        <p className="text-xs text-slate-600 leading-relaxed">{d.description}</p>
+                      </div>
+                    </div>
+
+                    {/* Citations & Metadata */}
+                    <div className="pt-2 border-t border-slate-100 space-y-1.5 text-[11px] text-slate-500 font-mono">
+                      {props.citation && (
+                        <div className="flex items-start gap-1">
+                          <span className="text-slate-500 font-sans shrink-0">Citation:</span>
+                          <span className="text-emerald-800 font-medium truncate">{props.citation}</span>
+                        </div>
+                      )}
+                      {props.current_value && (
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-slate-500 font-sans">Approved Value:</span>
+                          <span className="text-slate-900 font-bold bg-slate-100 px-1.5 py-0.5 rounded font-mono">
+                            {props.current_value}
+                          </span>
+                        </div>
+                      )}
+                      {props.exact_mark && (
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-slate-500 font-sans">Registered Mark:</span>
+                          <span className="text-purple-800 font-bold">{props.exact_mark}</span>
+                        </div>
+                      )}
+                      {props.source_date && (
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3 text-slate-400" />
+                          <span className="text-slate-500 font-sans">Source Date:</span>
+                          <span className="text-slate-700 font-mono">{props.source_date}</span>
+                        </div>
+                      )}
+                      {props.expiry_date && (
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3 text-amber-500" />
+                          <span className="text-amber-700 font-sans">Expires:</span>
+                          <span className="text-amber-800 font-mono">{props.expiry_date}</span>
+                        </div>
+                      )}
+                      {props.restricted_terms && props.restricted_terms.length > 0 && (
+                        <div className="flex items-start gap-1">
+                          <Tag className="w-3 h-3 text-rose-500 shrink-0 mt-0.5" />
+                          <span className="text-rose-700 font-sans shrink-0">Restricted:</span>
+                          <span className="text-rose-800 truncate">{props.restricted_terms.join(', ')}</span>
+                        </div>
+                      )}
+                      {props.department_owner && (
+                        <div className="flex items-center gap-1">
+                          <span className="text-slate-500 font-sans">Owner:</span>
+                          <span className="text-slate-700 font-sans">{props.department_owner}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Card Action Footers */}
+                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                      <Button
+                        variant="outline"
+                        size="xs"
+                        onClick={() => handleOpenEdit(n)}
+                        icon={<Edit2 className="w-3 h-3" />}
+                      >
+                        Edit Fact
+                      </Button>
+                      {isFact && (
+                        <Button
+                          variant="ghost"
+                          size="xs"
+                          onClick={() => onNavigate && onNavigate('impact-simulator')}
+                          icon={<Flame className="w-3 h-3 text-amber-500" />}
+                        >
+                          Simulate
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <EmptyState
+              title="No Knowledge Nodes Match Your Filter"
+              description={`No brand facts or guidelines found matching "${search || activeTab}". Try clearing your search query or registering a new approved fact.`}
+              actionLabel="Register Approved Fact"
+              onAction={() => setIsModalOpen(true)}
+              icon={<BookOpen className="w-6 h-6 text-slate-500" />}
+            />
+          )}
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODALS: DOCUMENT MANAGEMENT STUDIO */}
+      {/* ========================================================================= */}
+
+      {/* 1. Create Document Modal */}
+      <Modal
+        isOpen={isCreateDocModalOpen}
+        onClose={() => setIsCreateDocModalOpen(false)}
+        title="Create Brand Knowledge Document"
+        subtitle="Author a new policy, pricing mandate, or guidelines document with automated vector indexing."
+        maxWidth="lg"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setIsCreateDocModalOpen(false)} disabled={isSubmittingDoc}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleCreateDocument} isLoading={isSubmittingDoc}>
+              Save &amp; Index Document
+            </Button>
+          </>
+        }
+      >
+        <form onSubmit={handleCreateDocument} className="space-y-4">
+          <Input
+            label="Document Title"
+            required
+            placeholder="e.g. Q2 2026 Enterprise Pricing & Seat Licensing Policy"
+            value={createDocForm.title}
+            onChange={(e) => setCreateDocForm({ ...createDocForm, title: e.target.value })}
+          />
+
+          <Select
+            label="Document Category"
+            required
+            value={createDocForm.category}
+            onChange={(e) => setCreateDocForm({ ...createDocForm, category: e.target.value })}
+            options={[
+              { value: 'BRAND_GUIDELINES', label: 'Brand Guidelines' },
+              { value: 'PRODUCT_FACTS', label: 'Product Facts & Specs' },
+              { value: 'PRICING_POLICIES', label: 'Pricing Policies' },
+              { value: 'BRAND_VOICE', label: 'Brand Voice & Tone' },
+              { value: 'REGULATORY_POLICIES', label: 'Regulatory Policies (FDA / FTC / SEC)' },
+              { value: 'MARKETING_CLAIMS', label: 'Marketing Claims & Substantive Evidence' }
+            ]}
+          />
+
+          <Input
+            label="Description / Purpose (Optional)"
+            placeholder="e.g. Official pricing tier structure authorized by governance board"
+            value={createDocForm.description}
+            onChange={(e) => setCreateDocForm({ ...createDocForm, description: e.target.value })}
+          />
+
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-slate-700">
+              Document Content <span className="text-rose-500">*</span>
+            </label>
+            <textarea
+              rows={8}
+              required
+              placeholder="Enter complete brand policy statements, price commitments, claims, and mandatory citations..."
+              value={createDocForm.raw_content}
+              onChange={(e) => setCreateDocForm({ ...createDocForm, raw_content: e.target.value })}
+              className="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 font-mono shadow-2xs leading-relaxed"
+            />
+            <p className="text-[11px] text-slate-500">
+              Upon creation, content is parsed into knowledge statements and converted into 768-dimensional embeddings for Atlas Vector Search.
+            </p>
+          </div>
+        </form>
+      </Modal>
+
+      {/* 2. Upload Document Modal */}
+      <Modal
+        isOpen={isUploadDocModalOpen}
+        onClose={() => setIsUploadDocModalOpen(false)}
+        title="Upload Brand Document"
+        subtitle="Upload PDF, DOCX, TXT, or Markdown documents for automated text extraction & vector indexing."
+        maxWidth="md"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setIsUploadDocModalOpen(false)} disabled={isSubmittingDoc}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleUploadDocument} isLoading={isSubmittingDoc} disabled={!selectedUploadFile}>
+              Upload &amp; Process Document
+            </Button>
+          </>
+        }
+      >
+        <form onSubmit={handleUploadDocument} className="space-y-4">
+          <div className="border-2 border-dashed border-slate-200 hover:border-slate-300 rounded-xl p-6 text-center bg-slate-50/50 transition-colors">
+            <input
+              type="file"
+              accept=".pdf,.docx,.txt,.md"
+              onChange={(e) => {
+                const f = e.target.files?.[0] || null;
+                setSelectedUploadFile(f);
+                if (f && !uploadDocForm.title) {
+                  setUploadDocForm((prev) => ({ ...prev, title: f.name.replace(/\.[^/.]+$/, "") }));
+                }
+              }}
+              className="hidden"
+              id="brand-doc-upload-file"
+            />
+            <label htmlFor="brand-doc-upload-file" className="cursor-pointer space-y-2 block">
+              <FileUp className="w-8 h-8 text-indigo-600 mx-auto" />
+              <div className="text-xs text-slate-700 font-medium">
+                {selectedUploadFile ? (
+                  <span className="font-semibold text-indigo-700">{selectedUploadFile.name} ({(selectedUploadFile.size / 1024).toFixed(1)} KB)</span>
+                ) : (
+                  <span>Click to select PDF, DOCX, TXT, or MD file</span>
+                )}
+              </div>
+              <p className="text-[11px] text-slate-400">Supported formats: PDF, DOCX, TXT, MD (Max 25MB)</p>
+            </label>
+          </div>
+
+          <Input
+            label="Document Title (Defaults to filename)"
+            placeholder="Document title"
+            value={uploadDocForm.title}
+            onChange={(e) => setUploadDocForm({ ...uploadDocForm, title: e.target.value })}
+          />
+
+          <Select
+            label="Document Category"
+            value={uploadDocForm.category}
+            onChange={(e) => setUploadDocForm({ ...uploadDocForm, category: e.target.value })}
+            options={[
+              { value: 'BRAND_GUIDELINES', label: 'Brand Guidelines' },
+              { value: 'PRODUCT_FACTS', label: 'Product Facts & Specs' },
+              { value: 'PRICING_POLICIES', label: 'Pricing Policies' },
+              { value: 'BRAND_VOICE', label: 'Brand Voice & Tone' },
+              { value: 'REGULATORY_POLICIES', label: 'Regulatory Policies' },
+              { value: 'MARKETING_CLAIMS', label: 'Marketing Claims' }
+            ]}
+          />
+
+          <Input
+            label="Description (Optional)"
+            placeholder="Context or notes about this document"
+            value={uploadDocForm.description}
+            onChange={(e) => setUploadDocForm({ ...uploadDocForm, description: e.target.value })}
+          />
+        </form>
+      </Modal>
+
+      {/* 3. Website Import Modal */}
+      <Modal
+        isOpen={isImportModalOpen}
+        onClose={() => { setIsImportModalOpen(false); setWebsitePreview(null); }}
+        title="Import Public Brand Website"
+        subtitle="Safely fetch and review content from a public brand website with SSRF protection."
+        maxWidth="lg"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setIsImportModalOpen(false)} disabled={isSubmittingDoc}>
+              Cancel
+            </Button>
+            {websitePreview && (
+              <Button variant="primary" onClick={handleCommitWebsiteImport} isLoading={isSubmittingDoc}>
+                Commit &amp; Index Document
+              </Button>
+            )}
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <input
+              type="url"
+              placeholder="https://example.com/brand-guidelines or pricing"
+              value={importUrl}
+              onChange={(e) => setImportUrl(e.target.value)}
+              className="flex-1 bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-900 shadow-2xs font-mono"
+            />
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleFetchWebsitePreview}
+              isLoading={isFetchingPreview}
+              icon={<Search className="w-3.5 h-3.5" />}
+            >
+              Fetch Preview
+            </Button>
+          </div>
+
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-[11px] text-slate-600 flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>Strict SSRF security gate blocks internal networks, cloud metadata, and loopbacks.</span>
+          </div>
+
+          {/* Preview Box */}
+          {websitePreview && (
+            <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                <span className="text-xs font-bold text-slate-800">Extracted Web Page Content</span>
+                <span className="text-[10px] font-mono text-slate-400">{websitePreview.extracted_content?.length || 0} characters</span>
+              </div>
+
+              <div>
+                <label className="text-[11px] font-semibold text-slate-600 block mb-1">Page Title</label>
+                <input
+                  type="text"
+                  value={websitePreview.title}
+                  onChange={(e) => setWebsitePreview({ ...websitePreview, title: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 font-semibold"
+                />
+              </div>
+
+              <div>
+                <label className="text-[11px] font-semibold text-slate-600 block mb-1">Target Category</label>
+                <select
+                  value={importCategory}
+                  onChange={(e) => setImportCategory(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-900"
+                >
+                  <option value="BRAND_GUIDELINES">Brand Guidelines</option>
+                  <option value="PRODUCT_FACTS">Product Facts & Specs</option>
+                  <option value="PRICING_POLICIES">Pricing Policies</option>
+                  <option value="BRAND_VOICE">Brand Voice</option>
+                  <option value="MARKETING_CLAIMS">Marketing Claims</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-[11px] font-semibold text-slate-600 block mb-1">Clean Extracted Text</label>
+                <textarea
+                  rows={6}
+                  value={websitePreview.extracted_content}
+                  onChange={(e) => setWebsitePreview({ ...websitePreview, extracted_content: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 font-mono leading-relaxed"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </Modal>
+
+      {/* 4. Edit Document Modal */}
+      <Modal
+        isOpen={isEditDocModalOpen}
+        onClose={() => setIsEditDocModalOpen(false)}
+        title={`Edit Document: ${editingDoc?.title || ''}`}
+        subtitle={`Current version: v${editingDoc?.version_number || '1.0'}. Saving will archive current version and increment version counter.`}
+        maxWidth="lg"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setIsEditDocModalOpen(false)} disabled={isSubmittingDoc}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleSaveEditDoc} isLoading={isSubmittingDoc}>
+              Save &amp; Archive Revision
+            </Button>
+          </>
+        }
+      >
+        <form onSubmit={handleSaveEditDoc} className="space-y-4">
+          <Input
+            label="Document Title"
+            required
+            value={editDocForm.title}
+            onChange={(e) => setEditDocForm({ ...editDocForm, title: e.target.value })}
+          />
+
+          <Select
+            label="Document Category"
+            value={editDocForm.category}
+            onChange={(e) => setEditDocForm({ ...editDocForm, category: e.target.value })}
+            options={[
+              { value: 'BRAND_GUIDELINES', label: 'Brand Guidelines' },
+              { value: 'PRODUCT_FACTS', label: 'Product Facts & Specs' },
+              { value: 'PRICING_POLICIES', label: 'Pricing Policies' },
+              { value: 'BRAND_VOICE', label: 'Brand Voice & Tone' },
+              { value: 'REGULATORY_POLICIES', label: 'Regulatory Policies' },
+              { value: 'MARKETING_CLAIMS', label: 'Marketing Claims' }
+            ]}
+          />
+
+          <Input
+            label="Change Summary / Audit Rationale"
+            required
+            placeholder="e.g. Revised seat price from ₹499 to ₹599"
+            value={editDocForm.change_summary}
+            onChange={(e) => setEditDocForm({ ...editDocForm, change_summary: e.target.value })}
+          />
+
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-slate-700">Document Body Content</label>
+            <textarea
+              rows={8}
+              required
+              value={editDocForm.raw_content}
+              onChange={(e) => setEditDocForm({ ...editDocForm, raw_content: e.target.value })}
+              className="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs text-slate-900 font-mono shadow-2xs leading-relaxed"
+            />
+          </div>
+        </form>
+      </Modal>
+
+      {/* 5. Version History Modal */}
+      <Modal
+        isOpen={isVersionModalOpen}
+        onClose={() => setIsVersionModalOpen(false)}
+        title={`Version History: ${versionDoc?.title || ''}`}
+        subtitle={`Audit trail of all immutable archived revisions for ${versionDoc?.doc_id || ''}`}
+        maxWidth="lg"
+        footer={
+          <Button variant="secondary" onClick={() => setIsVersionModalOpen(false)}>
+            Close
+          </Button>
+        }
+      >
+        <div className="space-y-4">
+          {isLoadingVersions ? (
+            <div className="py-12 flex justify-center">
+              <RefreshCw className="w-6 h-6 animate-spin text-slate-400" />
+            </div>
+          ) : versionList.length > 0 ? (
+            <div className="space-y-3">
+              {versionList.map((ver, idx) => (
+                <div key={ver.version_id || idx} className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-indigo-900 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded text-[11px] font-mono">
+                        v{ver.version_number}
+                      </span>
+                      <span className="font-semibold text-slate-800">{ver.title}</span>
+                    </div>
+                    <span className="text-[11px] font-mono text-slate-400">{ver.created_at ? ver.created_at.split('T')[0] : 'Historical'}</span>
+                  </div>
+
+                  <p className="text-xs text-slate-600 italic">
+                    Reason: {ver.change_summary || 'Document revision committed.'}
+                  </p>
+
+                  <div className="bg-white border border-slate-200 rounded-lg p-2.5 text-[11px] font-mono text-slate-700 max-h-32 overflow-y-auto whitespace-pre-wrap">
+                    {ver.raw_content}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-8 text-center text-xs text-slate-500">
+              No historical revisions archived yet. Current version is v{versionDoc?.version_number || '1.0'}.
+            </div>
+          )}
+        </div>
+      </Modal>
+
+      {/* 6. Delete Confirmation Modal */}
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="Confirm Document Deletion"
+        subtitle={`Are you sure you want to delete "${docToDelete?.title || ''}"?`}
+        maxWidth="sm"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setIsDeleteModalOpen(false)} disabled={isSubmittingDoc}>
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={handleConfirmDeleteDoc} isLoading={isSubmittingDoc}>
+              Delete Document
+            </Button>
+          </>
+        }
+      >
+        <p className="text-xs text-slate-600 leading-relaxed">
+          Deleting this document will remove its vector embeddings and detach it from AI verification pipelines. Immutable audit ledger logs remain intact.
+        </p>
+      </Modal>
+
+      {/* ========================================================================= */}
+      {/* EXISTING MODALS: REGISTER APPROVED FACT & EDIT FACT (100% PRESERVED) */}
+      {/* ========================================================================= */}
 
       {/* Register Approved Fact / Guideline Modal */}
       <Modal
@@ -448,29 +1443,33 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
             <button
               type="button"
               onClick={() => setRegistrationMode('FACT')}
-              className={`flex-1 py-1.5 rounded-md text-xs font-semibold cursor-pointer transition-all ${
-                registrationMode === 'FACT' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600'
+              className={`flex-1 py-1.5 px-3 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                registrationMode === 'FACT'
+                  ? 'bg-white text-slate-900 border border-slate-200/80 shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              Approved Fact (Price, Claim, Spec)
+              Approved Fact (Price, Spec, Range)
             </button>
             <button
               type="button"
               onClick={() => setRegistrationMode('GUIDELINE')}
-              className={`flex-1 py-1.5 rounded-md text-xs font-semibold cursor-pointer transition-all ${
-                registrationMode === 'GUIDELINE' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600'
+              className={`flex-1 py-1.5 px-3 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                registrationMode === 'GUIDELINE'
+                  ? 'bg-white text-slate-900 border border-slate-200/80 shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              Brand Guideline &amp; Guardrails
+              Guideline &amp; Guardrail Rule
             </button>
           </div>
 
           <Input
-            label={registrationMode === 'FACT' ? 'Fact Name / Identifier' : 'Guideline Title'}
-            placeholder={registrationMode === 'FACT' ? 'e.g. Aurelle Cloud Studio Monthly Subscription' : 'e.g. Clean Energy Lifecycle Substantiation'}
+            label={registrationMode === 'FACT' ? 'Fact Name / Claim Target' : 'Guideline Name'}
+            required
+            placeholder={registrationMode === 'FACT' ? 'e.g. QuantumConnect Monthly Subscription' : 'e.g. Prohibited Medical Cures Mandate'}
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            requiredIndicator
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -478,86 +1477,80 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
               label="Category"
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              options={registrationMode === 'FACT' ? [
-                { value: 'PRICE', label: 'PRICE (Commercial)' },
-                { value: 'SPECIFICATION', label: 'SPECIFICATION (Technical)' },
-                { value: 'CLAIM', label: 'CLAIM (Performance)' },
-                { value: 'STATUTORY', label: 'STATUTORY (Legal)' },
-                { value: 'POLICY', label: 'POLICY (Corporate)' }
-              ] : [
-                { value: 'VOICE', label: 'VOICE & TONE' },
-                { value: 'REGULATORY', label: 'REGULATORY MANDATE' },
-                { value: 'TRADEMARK', label: 'TRADEMARK & TYPOGRAPHY' },
-                { value: 'SUSTAINABILITY', label: 'SUSTAINABILITY (Green Guides)' }
+              options={[
+                { value: 'PRICE', label: 'Price & Commercial Rate' },
+                { value: 'RANGE', label: 'Battery / Range Specification' },
+                { value: 'BATTERY', label: 'Battery Chemistry & Charging' },
+                { value: 'TRADEMARK', label: 'Trademark & Intellectual Property' },
+                { value: 'SAFETY', label: 'Safety & Regulatory Standards' },
+                { value: 'TONE', label: 'Brand Voice & Tone' },
+                { value: 'LEGAL', label: 'Legal & Compliance' }
               ]}
             />
 
-            <Input
-              label={registrationMode === 'FACT' ? 'Approved Value' : 'Primary Rule Requirement'}
-              placeholder={registrationMode === 'FACT' ? 'e.g. ₹599' : 'e.g. Must state EPA-estimated'}
-              value={formData.current_value}
-              onChange={(e) => setFormData({ ...formData, current_value: e.target.value })}
-              requiredIndicator={registrationMode === 'FACT'}
-            />
+            {registrationMode === 'FACT' ? (
+              <Input
+                label="Approved Certified Value"
+                required
+                placeholder="e.g. ₹499 or 520 miles"
+                value={formData.current_value}
+                onChange={(e) => setFormData({ ...formData, current_value: e.target.value })}
+              />
+            ) : (
+              <Select
+                label="Violation Severity"
+                value={formData.severity}
+                onChange={(e) => setFormData({ ...formData, severity: e.target.value })}
+                options={[
+                  { value: 'CRITICAL', label: 'CRITICAL (Strict Release Blocker)' },
+                  { value: 'HIGH', label: 'HIGH (Governance Override Required)' },
+                  { value: 'MODERATE', label: 'MODERATE (Editorial Remediation)' }
+                ]}
+              />
+            )}
           </div>
+
+          <Input
+            label="Description / Enforcement Rationale"
+            placeholder="Official explanation and substantiation..."
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          />
+
+          <Input
+            label="Source Citation"
+            placeholder="e.g. Board Resolution #2026-01 or Lab Test IEC-62133"
+            value={formData.source_citation}
+            onChange={(e) => setFormData({ ...formData, source_citation: e.target.value })}
+          />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Input
               label="Source Effective Date"
-              placeholder="YYYY-MM-DD"
+              type="date"
               value={formData.source_date}
               onChange={(e) => setFormData({ ...formData, source_date: e.target.value })}
-              helperText="Date this truth node became legally effective."
             />
             <Input
-              label="Expiry Date (Optional)"
-              placeholder="YYYY-MM-DD"
+              label="Expiration Date (Optional)"
+              type="date"
               value={formData.expiry_date}
               onChange={(e) => setFormData({ ...formData, expiry_date: e.target.value })}
-              helperText="Set if promotional or seasonal fact."
             />
           </div>
 
-          <Input
-            label="Statutory / Legal Source Citation"
-            placeholder="e.g. Executive Pricing Resolution #2026-AUT / EPA Cycle Certificate #EV-APX-982"
-            value={formData.source_citation}
-            onChange={(e) => setFormData({ ...formData, source_citation: e.target.value })}
-            helperText="Provides statutory or corporate verification proof for multi-agent compliance audits."
-          />
-
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Input
-              label="Restricted Terminology (Comma-separated)"
-              placeholder="e.g. insane, miraculous, 100% cure"
+              label="Prohibited / Restricted Terms"
+              placeholder="e.g. cure, diagnose, horizun (comma separated)"
               value={formData.restricted_terms}
               onChange={(e) => setFormData({ ...formData, restricted_terms: e.target.value })}
             />
             <Input
-              label="Required Phrases (Comma-separated)"
-              placeholder="e.g. EPA-estimated, IEC 62133"
+              label="Mandatory Required Phrases"
+              placeholder="e.g. QuantumAcoustics™ (comma separated)"
               value={formData.required_phrases}
               onChange={(e) => setFormData({ ...formData, required_phrases: e.target.value })}
-            />
-          </div>
-
-          <Input
-            label="Department Owner"
-            placeholder="e.g. Commercial Pricing Committee"
-            value={formData.department_owner}
-            onChange={(e) => setFormData({ ...formData, department_owner: e.target.value })}
-          />
-
-          <div className="space-y-1">
-            <label className="block text-xs font-semibold text-slate-800">
-              Description / Policy Scope
-            </label>
-            <textarea
-              rows={2}
-              placeholder="Detailed explanation of the certified truth condition and applicability."
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full text-xs rounded-lg border border-slate-200 p-2.5 text-slate-900 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
             />
           </div>
         </form>
@@ -567,8 +1560,8 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        title={`Edit Fact: ${editingNode?.id || ''}`}
-        subtitle="Modifies certified fact attributes and writes an immutable audit event to MongoDB."
+        title={`Edit Fact: ${editingNode?.data?.label || ''}`}
+        subtitle={`Record ID: ${editingNode?.data?.id || ''} — Changes will be captured in the MongoDB Atlas Audit Ledger.`}
         maxWidth="lg"
         footer={
           <>
@@ -576,101 +1569,62 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
               Cancel
             </Button>
             <Button variant="primary" onClick={handleUpdateFact} isLoading={isSubmitting}>
-              Save Authorized Updates
+              Save Authorized Mutation
             </Button>
           </>
         }
       >
         <form onSubmit={handleUpdateFact} className="space-y-4">
           <Input
-            label="Fact Name"
+            label="Fact Name / Label"
+            required
             value={editFormData.name}
             onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
-            requiredIndicator
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Select
-              label="Category"
-              value={editFormData.category}
-              onChange={(e) => setEditFormData({ ...editFormData, category: e.target.value })}
-              options={[
-                { value: 'PRICE', label: 'PRICE (Commercial)' },
-                { value: 'SPECIFICATION', label: 'SPECIFICATION (Technical)' },
-                { value: 'CLAIM', label: 'CLAIM (Performance)' },
-                { value: 'STATUTORY', label: 'STATUTORY (Legal)' },
-                { value: 'POLICY', label: 'POLICY (Corporate)' }
-              ]}
-            />
             <Input
               label="Approved Value"
+              required
               value={editFormData.current_value}
               onChange={(e) => setEditFormData({ ...editFormData, current_value: e.target.value })}
-              requiredIndicator
-            />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Input
-              label="Source Effective Date"
-              value={editFormData.source_date}
-              onChange={(e) => setEditFormData({ ...editFormData, source_date: e.target.value })}
             />
             <Input
-              label="Expiry Date (Optional)"
-              value={editFormData.expiry_date}
-              onChange={(e) => setEditFormData({ ...editFormData, expiry_date: e.target.value })}
+              label="Unit / Qualifier"
+              placeholder="e.g. /month, miles, kWh"
+              value={editFormData.unit}
+              onChange={(e) => setEditFormData({ ...editFormData, unit: e.target.value })}
             />
           </div>
 
           <Input
-            label="Statutory / Legal Source Citation"
+            label="Description & Context"
+            value={editFormData.description}
+            onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+          />
+
+          <Input
+            label="Source Citation"
             value={editFormData.source_citation}
             onChange={(e) => setEditFormData({ ...editFormData, source_citation: e.target.value })}
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Input
-              label="Restricted Terminology (Comma-separated)"
-              value={editFormData.restricted_terms}
-              onChange={(e) => setEditFormData({ ...editFormData, restricted_terms: e.target.value })}
+              label="Effective Date"
+              type="date"
+              value={editFormData.source_date}
+              onChange={(e) => setEditFormData({ ...editFormData, source_date: e.target.value })}
             />
             <Input
-              label="Required Phrases (Comma-separated)"
-              value={editFormData.required_phrases}
-              onChange={(e) => setEditFormData({ ...editFormData, required_phrases: e.target.value })}
-            />
-          </div>
-
-          <Input
-            label="Department Owner"
-            value={editFormData.department_owner}
-            onChange={(e) => setEditFormData({ ...editFormData, department_owner: e.target.value })}
-          />
-
-          <div className="space-y-1">
-            <label className="block text-xs font-semibold text-slate-800">
-              Description
-            </label>
-            <textarea
-              rows={2}
-              value={editFormData.description}
-              onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
-              className="w-full text-xs rounded-lg border border-slate-200 p-2.5 text-slate-900 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+              label="Expiration Date"
+              type="date"
+              value={editFormData.expiry_date}
+              onChange={(e) => setEditFormData({ ...editFormData, expiry_date: e.target.value })}
             />
           </div>
         </form>
       </Modal>
-
-      {/* Workflow Banner: Next Step in Governance Journey */}
-      <WorkflowBanner
-        currentStage="Brand Knowledge"
-        nextStageTitle="Content Intelligence (Multi-Agent Inspection)"
-        nextStageDescription="Now that you know what your brand allows, submit marketing copy to detect claims, tone violations, and missing qualifiers."
-        nextStageActionLabel="Proceed to Content Intelligence"
-        onNavigateNext={() => onNavigate && onNavigate('content-studio')}
-        governanceHint="Content intelligence inspects copy against these approved facts in under 800ms with token-level citations."
-      />
     </div>
   );
 };

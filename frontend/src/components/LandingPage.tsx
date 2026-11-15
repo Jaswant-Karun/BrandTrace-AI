@@ -9,9 +9,10 @@ import {
 interface LandingPageProps {
   onEnterApp: (targetTab?: string) => void;
   brandName?: string;
+  onVerify?: () => void;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onVerify }) => {
   return (
     <div className="min-h-screen bg-white text-slate-900 flex flex-col font-sans selection:bg-slate-900 selection:text-white overflow-x-hidden">
       {/* Top Navbar */}
@@ -38,7 +39,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
           <a href="#trust" className="hover:text-slate-900 transition-colors">Security &amp; Trust</a>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={onVerify || (() => onEnterApp('public-verification'))}
+            className="px-3 py-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-900 font-semibold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+            title="Public Verification Portal (No Sign-In Needed)"
+          >
+            <ShieldCheck className="w-3.5 h-3.5 text-indigo-700" />
+            <span className="hidden sm:inline">Public Verification</span>
+            <span className="sm:hidden">Verify</span>
+          </button>
+
           <button
             onClick={() => onEnterApp('command-center')}
             className="px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
@@ -100,6 +111,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
           >
             <Sparkles className="w-4 h-4 text-slate-700" />
             Test Content Studio
+          </button>
+
+          <button
+            onClick={onVerify || (() => onEnterApp('public-verification'))}
+            className="w-full sm:w-auto px-6 py-3 rounded-lg bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-900 font-semibold text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
+          >
+            <ShieldCheck className="w-4 h-4 text-indigo-700" />
+            Public Seal Verification
           </button>
         </motion.div>
 

@@ -13,6 +13,7 @@ interface AuthHeaderProps {
   onLogout?: () => void;
   onToggleMobileMenu?: () => void;
   onOpenInstallModal?: () => void;
+  onOpenPublicVerification?: () => void;
   isInstallable?: boolean;
   isInstalled?: boolean;
 }
@@ -24,6 +25,7 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({
   onLogout,
   onToggleMobileMenu,
   onOpenInstallModal,
+  onOpenPublicVerification,
   isInstallable = false,
   isInstalled = false
 }) => {
@@ -114,6 +116,19 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
             <span className="hidden sm:inline">AURELLE Scenario</span>
             <span className="sm:hidden">Scenario</span>
+          </button>
+        )}
+
+        {/* Public Verification Link */}
+        {onOpenPublicVerification && (
+          <button
+            onClick={onOpenPublicVerification}
+            className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-900 text-xs font-medium transition-colors cursor-pointer shadow-2xs"
+            title="Public Verification Portal (No Sign-In Needed)"
+          >
+            <CheckCircle2 className="w-3.5 h-3.5 text-indigo-700" />
+            <span className="hidden lg:inline">Public Verification</span>
+            <span className="lg:hidden">Verify</span>
           </button>
         )}
 

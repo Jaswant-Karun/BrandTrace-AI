@@ -14,7 +14,7 @@ import { InstallAppModal } from './components/InstallAppModal';
 import { usePWA } from './hooks/usePWA';
 import { useAuth } from './context/AuthContext';
 import { BrandProfile, DatabaseStatus, VerificationResult } from './types';
-import { ExternalLink, RefreshCw, Search } from 'lucide-react';
+import { ExternalLink, RefreshCw, Search, ShieldCheck } from 'lucide-react';
 
 // Code-split heavy views via React.lazy for optimized initial bundle loading
 const KnowledgeGraphView = lazy(() => import('./components/KnowledgeGraphView').then(m => ({ default: m.KnowledgeGraphView })));
@@ -29,6 +29,7 @@ const BrandKnowledgeBaseView = lazy(() => import('./components/BrandKnowledgeBas
 const GovernanceAnalyticsView = lazy(() => import('./components/GovernanceAnalyticsView').then(m => ({ default: m.GovernanceAnalyticsView })));
 const AuditTrustCenterView = lazy(() => import('./components/AuditTrustCenterView').then(m => ({ default: m.AuditTrustCenterView })));
 const SettingsView = lazy(() => import('./components/SettingsView').then(m => ({ default: m.SettingsView })));
+const PublicVerificationView = lazy(() => import('./components/PublicVerificationView').then(m => ({ default: m.PublicVerificationView })));
 
 const ViewLoadingFallback: React.FC = () => (
   <div className="flex flex-col items-center justify-center py-24 space-y-3 bg-white">
@@ -40,7 +41,7 @@ const ViewLoadingFallback: React.FC = () => (
 export const App: React.FC = () => {
   const { currentWorkspace, setWorkspace, isAuthenticated } = useAuth();
   
-  const [viewMode, setViewMode] = useState<'landing' | 'login' | 'app'>(() => {
+  const [viewMode, setViewMode] = useState<'landing' | 'login' | 'app' | 'verify'>(() => {
     // If token exists, enter app directly; otherwise show login
     return localStorage.getItem('brandtrace_jwt_token') ? 'app' : 'login';
   });
@@ -148,6 +149,18 @@ export const App: React.FC = () => {
 
   const currentBrand = brands.find((b) => b.brand_id === selectedBrandId);
 
+  // If user requests Public Verification Portal (Zero authentication required)
+  if (viewMode === 'verify') {
+    return (
+      <Suspense fallback={<ViewLoadingFallback />}>
+        <PublicVerificationView
+          initialBrand={currentBrand?.brand_name || 'Velora Money'}
+          onBack={() => setViewMode(isAuthenticated ? 'app' : 'landing')}
+        />
+      </Suspense>
+    );
+  }
+
   // If user requests Public Landing Page
   if (viewMode === 'landing') {
     return (
@@ -157,6 +170,7 @@ export const App: React.FC = () => {
           if (targetTab) setCurrentTab(targetTab as NavigationTab);
           setViewMode(isAuthenticated ? 'app' : 'login');
         }}
+        onVerify={() => setViewMode('verify')}
       />
     );
   }
@@ -225,6 +239,7 @@ export const App: React.FC = () => {
             onLogout={() => setViewMode('login')}
             onToggleMobileMenu={() => setIsMobileNavOpen(!isMobileNavOpen)}
             onOpenInstallModal={() => setIsInstallModalOpen(true)}
+            onOpenPublicVerification={() => setViewMode('verify')}
             isInstallable={isInstallable}
             isInstalled={isInstalled}
           />
@@ -254,6 +269,16 @@ export const App: React.FC = () => {
                 readOnly
               />
             </div>
+
+            {/* View Public Verification Portal Button */}
+            <button
+              onClick={() => setViewMode('verify')}
+              className="text-xs text-indigo-700 hover:text-indigo-900 bg-indigo-50/80 hover:bg-indigo-100/80 px-2 sm:px-2.5 py-1.5 rounded-lg border border-indigo-200/80 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              title="Open Public Verification Portal (Zero Authentication)"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-indigo-700" />
+              <span className="hidden sm:inline">Verify Release</span>
+            </button>
 
             {/* View Public Landing Page Button */}
             <button
