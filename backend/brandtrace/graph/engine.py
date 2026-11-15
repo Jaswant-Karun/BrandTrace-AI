@@ -47,6 +47,22 @@ class BrandKnowledgeGraph:
     def get_node(self, node_id: str) -> Optional[Node]:
         return self.node_meta.get(node_id)
 
+    def update_node_property(self, node_id: str, key: str, value: Any):
+        if node_id in self.node_meta:
+            self.node_meta[node_id].properties[key] = value
+        if node_id in self.graph.nodes:
+            if "properties" not in self.graph.nodes[node_id]:
+                self.graph.nodes[node_id]["properties"] = {}
+            self.graph.nodes[node_id]["properties"][key] = value
+
+    def to_graph_data(self) -> BrandGraphData:
+        return BrandGraphData(
+            brand_id=self.brand_id,
+            brand_name=self.brand_name,
+            nodes=list(self.node_meta.values()),
+            edges=self.edge_meta
+        )
+
     def to_react_flow_elements(self) -> Dict[str, Any]:
         """
         Serializes graph to ReactFlow canvas nodes and edges with coordinates and styling.
