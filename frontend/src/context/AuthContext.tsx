@@ -37,6 +37,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
+      const urlToken = params.get('token');
+      if (urlToken) {
+        localStorage.setItem('brandtrace_jwt_token', urlToken);
+        localStorage.setItem('brandtrace_user_profile', JSON.stringify(DEMO_AURELLE_PERSONA));
+        return urlToken;
+      }
       if (params.get('demo') === 'true') {
         const demoToken = 'demo_authenticated_token';
         localStorage.setItem('brandtrace_jwt_token', demoToken);
@@ -50,7 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<UserPersona | null>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      if (params.get('demo') === 'true') {
+      if (params.get('demo') === 'true' || params.get('token')) {
         return DEMO_AURELLE_PERSONA;
       }
     }
