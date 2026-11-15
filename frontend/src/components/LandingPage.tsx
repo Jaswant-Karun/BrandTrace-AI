@@ -27,6 +27,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 }) => {
   const { user, isAuthenticated, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeSecurityIndex, setActiveSecurityIndex] = useState<number | null>(null);
+  const [activeCapabilityId, setActiveCapabilityId] = useState<string | null>(null);
 
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false);
@@ -769,65 +771,108 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               icon: Lock,
               tab: 'approval-center'
             }
-          ].map((cap) => (
-            <div 
-              key={cap.id}
-              className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col justify-between hover:border-indigo-400 dark:hover:border-indigo-600 transition-all shadow-xs hover:shadow-md group"
-            >
-              <div>
-                {/* Realistic Photographic Header with Aspect Ratio & Badges */}
-                <div className="h-52 w-full overflow-hidden relative bg-slate-100 dark:bg-slate-800">
-                  <img
-                    src={cap.image}
-                    alt={cap.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/25 to-transparent pointer-events-none" />
-                  
-                  {/* Floating Badges */}
-                  <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider bg-slate-900/80 backdrop-blur-md text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30">
-                      {cap.badge}
-                    </span>
-                    <div className="w-8 h-8 rounded-lg bg-slate-900/80 backdrop-blur-md flex items-center justify-center text-white border border-white/20 shadow-xs">
-                      <cap.icon className="w-4 h-4 text-indigo-400" />
+          ].map((cap) => {
+            const isCapActive = activeCapabilityId === cap.id;
+            return (
+              <div 
+                key={cap.id}
+                tabIndex={0}
+                role="article"
+                aria-label={cap.title}
+                onMouseEnter={() => setActiveCapabilityId(cap.id)}
+                onMouseLeave={() => {
+                  if (activeCapabilityId === cap.id) setActiveCapabilityId(null);
+                }}
+                onFocus={() => setActiveCapabilityId(cap.id)}
+                onBlur={() => {
+                  if (activeCapabilityId === cap.id) setActiveCapabilityId(null);
+                }}
+                onTouchStart={() => setActiveCapabilityId(cap.id)}
+                className={`bg-white dark:bg-slate-900 rounded-2xl border overflow-hidden flex flex-col justify-between transition-all duration-200 ease-out select-none cursor-pointer outline-none group ${
+                  isCapActive
+                    ? 'border-2 border-[#2563EB] dark:border-blue-500 ring-2 ring-[#2563EB]/25 dark:ring-blue-500/30 shadow-xl shadow-blue-500/15 dark:shadow-blue-500/25 -translate-y-1'
+                    : 'border-slate-200 dark:border-slate-800 shadow-xs hover:border-blue-400 dark:hover:border-blue-600 translate-y-0'
+                }`}
+              >
+                <div>
+                  {/* Realistic Photographic Header with Aspect Ratio & Badges */}
+                  <div className="h-52 w-full overflow-hidden relative bg-slate-100 dark:bg-slate-800">
+                    <img
+                      src={cap.image}
+                      alt={cap.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/25 to-transparent pointer-events-none" />
+                    
+                    {/* Floating Badges */}
+                    <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
+                      <span className={`text-[10px] font-mono font-bold uppercase tracking-wider backdrop-blur-md px-2 py-0.5 rounded border transition-colors duration-200 ${
+                        isCapActive
+                          ? 'bg-[#2563EB] text-white border-blue-400'
+                          : 'bg-slate-900/80 text-emerald-300 border-emerald-500/30'
+                      }`}>
+                        {cap.badge}
+                      </span>
+                      <div className={`w-8 h-8 rounded-lg backdrop-blur-md flex items-center justify-center border shadow-xs transition-colors duration-200 ${
+                        isCapActive
+                          ? 'bg-[#2563EB] text-white border-blue-400'
+                          : 'bg-slate-900/80 text-white border-white/20'
+                      }`}>
+                        <cap.icon className={`w-4 h-4 ${isCapActive ? 'text-white' : 'text-indigo-400'}`} />
+                      </div>
+                    </div>
+
+                    <div className="absolute bottom-3 left-4 right-4 pointer-events-none">
+                      <span className={`text-[11px] font-mono font-semibold block transition-colors duration-200 ${
+                        isCapActive ? 'text-blue-200' : 'text-slate-300'
+                      }`}>
+                        {cap.subtitle}
+                      </span>
+                      <h3 className={`text-base sm:text-lg font-bold tracking-tight truncate transition-colors duration-200 ${
+                        isCapActive ? 'text-blue-100' : 'text-white'
+                      }`}>
+                        {cap.title}
+                      </h3>
                     </div>
                   </div>
 
-                  <div className="absolute bottom-3 left-4 right-4 pointer-events-none">
-                    <span className="text-[11px] font-mono font-semibold text-slate-300 block">
-                      {cap.subtitle}
-                    </span>
-                    <h3 className="text-base sm:text-lg font-bold text-white tracking-tight truncate">
-                      {cap.title}
-                    </h3>
+                  {/* Card Body Description */}
+                  <div className={`p-6 space-y-3 transition-colors duration-200 ${
+                    isCapActive ? 'bg-blue-50/20 dark:bg-blue-950/20' : ''
+                  }`}>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed min-h-[58px]">
+                      {cap.desc}
+                    </p>
                   </div>
                 </div>
 
-                {/* Card Body Description */}
-                <div className="p-6 space-y-3">
-                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed min-h-[58px]">
-                    {cap.desc}
-                  </p>
+                {/* Card Footer with Metrics & Action Button */}
+                <div className={`px-6 pb-5 pt-3 border-t flex items-center justify-between mt-auto transition-colors duration-200 ${
+                  isCapActive
+                    ? 'border-blue-100 dark:border-blue-900/40 bg-blue-50/50 dark:bg-blue-950/40'
+                    : 'border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/50'
+                }`}>
+                  <span className={`text-[11px] font-mono truncate max-w-[170px] transition-colors duration-200 ${
+                    isCapActive ? 'text-blue-700 dark:text-blue-300 font-semibold' : 'text-slate-500 dark:text-slate-400'
+                  }`} title={cap.metric}>
+                    {cap.metric}
+                  </span>
+                  <button
+                    onClick={() => onEnterApp(cap.tab)}
+                    className={`inline-flex items-center gap-1 text-xs font-bold transition-colors cursor-pointer shrink-0 ${
+                      isCapActive
+                        ? 'text-[#2563EB] dark:text-blue-400'
+                        : 'text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300'
+                    }`}
+                  >
+                    <span>Explore</span>
+                    <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                  </button>
                 </div>
               </div>
-
-              {/* Card Footer with Metrics & Action Button */}
-              <div className="px-6 pb-5 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between mt-auto bg-slate-50/50 dark:bg-slate-900/50">
-                <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 truncate max-w-[170px]" title={cap.metric}>
-                  {cap.metric}
-                </span>
-                <button
-                  onClick={() => onEnterApp(cap.tab)}
-                  className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors cursor-pointer shrink-0"
-                >
-                  <span>Explore</span>
-                  <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
       </section>
@@ -1055,68 +1100,132 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          
-          <div className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-3 shadow-xs">
-            <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-              <Lock className="w-4 h-4" />
-            </div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">Strict Multi-Tenancy</h3>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Every document, fact, and verification query scopes strictly by <code className="font-mono text-indigo-600 dark:text-indigo-400">org_id</code> and <code className="font-mono text-indigo-600 dark:text-indigo-400">workspace_id</code>. Cross-tenant probes return 404.
-            </p>
-          </div>
-
-          <div className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-3 shadow-xs">
-            <div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400 flex items-center justify-center">
-              <Globe className="w-4 h-4" />
-            </div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">SSRF Defense Engine</h3>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Website import resolves DNS hostnames and strictly blocks loopback, private Class A/B/C spaces, and cloud metadata endpoints (169.254.169.254).
-            </p>
-          </div>
-
-          <div className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-3 shadow-xs">
-            <div className="w-9 h-9 rounded-xl bg-cyan-50 dark:bg-cyan-950 text-cyan-600 dark:text-cyan-400 flex items-center justify-center">
-              <Hash className="w-4 h-4" />
-            </div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">SHA-256 Chained Digests</h3>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Internal Merkle-style block digests immutably bind content payload, asset ID, approving user identity, and timestamp into a tamper-evident seal.
-            </p>
-          </div>
-
-          <div className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-3 shadow-xs">
-            <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-              <ShieldCheck className="w-4 h-4" />
-            </div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">Zero-Knowledge Verification</h3>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Public verification endpoints return authentic status and hashes without leaking employee emails, user roles, or internal database identifiers.
-            </p>
-          </div>
-
-          <div className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-3 shadow-xs">
-            <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-              <Sliders className="w-4 h-4" />
-            </div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">Role-Based Access (RBAC)</h3>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Fine-grained privileges across Admin, Compliance Reviewer, Brand Manager, Creator, and Auditor. Only authorized roles can sign release seals.
-            </p>
-          </div>
-
-          <div className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-3 shadow-xs">
-            <div className="w-9 h-9 rounded-xl bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400 flex items-center justify-center">
-              <CheckCircle2 className="w-4 h-4" />
-            </div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">Strict Human Gate</h3>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Zero autonomous publishing. Every release candidate, fact revision, and policy change requires human review sign-off with recorded audit notes.
-            </p>
-          </div>
-
+        <div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          onMouseLeave={() => setActiveSecurityIndex(null)}
+        >
+          {[
+            {
+              id: 'multi-tenancy',
+              title: 'Strict Multi-Tenancy',
+              icon: Lock,
+              defaultIconColor: 'bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400',
+              desc: (
+                <>
+                  Every document, fact, and verification query scopes strictly by{' '}
+                  <code className="font-mono text-indigo-600 dark:text-indigo-400 font-semibold">org_id</code> and{' '}
+                  <code className="font-mono text-indigo-600 dark:text-indigo-400 font-semibold">workspace_id</code>. Cross-tenant probes return 404.
+                </>
+              )
+            },
+            {
+              id: 'ssrf-defense',
+              title: 'SSRF Defense Engine',
+              icon: Globe,
+              defaultIconColor: 'bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400',
+              desc: (
+                <>
+                  Website import resolves DNS hostnames and strictly blocks loopback, private Class A/B/C spaces, and cloud metadata endpoints (169.254.169.254).
+                </>
+              )
+            },
+            {
+              id: 'sha256-digests',
+              title: 'SHA-256 Chained Digests',
+              icon: Hash,
+              defaultIconColor: 'bg-cyan-50 dark:bg-cyan-950 text-cyan-600 dark:text-cyan-400',
+              desc: (
+                <>
+                  Internal Merkle-style block digests immutably bind content payload, asset ID, approving user identity, and timestamp into a tamper-evident seal.
+                </>
+              )
+            },
+            {
+              id: 'zero-knowledge',
+              title: 'Zero-Knowledge Verification',
+              icon: ShieldCheck,
+              defaultIconColor: 'bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400',
+              desc: (
+                <>
+                  Public verification endpoints return authentic status and hashes without leaking employee emails, user roles, or internal database identifiers.
+                </>
+              )
+            },
+            {
+              id: 'rbac',
+              title: 'Role-Based Access (RBAC)',
+              icon: Sliders,
+              defaultIconColor: 'bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400',
+              desc: (
+                <>
+                  Fine-grained privileges across Admin, Compliance Reviewer, Brand Manager, Creator, and Auditor. Only authorized roles can sign release seals.
+                </>
+              )
+            },
+            {
+              id: 'human-gate',
+              title: 'Strict Human Gate',
+              icon: CheckCircle2,
+              defaultIconColor: 'bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400',
+              desc: (
+                <>
+                  Zero autonomous publishing. Every release candidate, fact revision, and policy change requires human review sign-off with recorded audit notes.
+                </>
+              )
+            }
+          ].map((feature, index) => {
+            const isActive = activeSecurityIndex === index;
+            const Icon = feature.icon;
+            return (
+              <div
+                key={feature.id}
+                tabIndex={0}
+                role="article"
+                aria-label={feature.title}
+                onMouseEnter={() => setActiveSecurityIndex(index)}
+                onMouseLeave={() => {
+                  if (activeSecurityIndex === index) {
+                    setActiveSecurityIndex(null);
+                  }
+                }}
+                onFocus={() => setActiveSecurityIndex(index)}
+                onBlur={() => {
+                  if (activeSecurityIndex === index) {
+                    setActiveSecurityIndex(null);
+                  }
+                }}
+                onTouchStart={() => setActiveSecurityIndex(index)}
+                className={`p-6 rounded-2xl space-y-3 cursor-pointer outline-none transition-all duration-200 ease-out select-none ${
+                  isActive
+                    ? 'bg-gradient-to-b from-blue-50/80 via-white to-blue-50/40 dark:from-blue-950/40 dark:via-slate-900 dark:to-blue-950/20 border-2 border-[#2563EB] dark:border-blue-500 shadow-lg shadow-blue-500/15 dark:shadow-blue-500/25 -translate-y-1 ring-2 ring-[#2563EB]/20 dark:ring-blue-500/30'
+                    : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-blue-300 dark:hover:border-blue-800 translate-y-0'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 ${
+                    isActive
+                      ? 'bg-[#2563EB] text-white shadow-md shadow-blue-500/30 scale-105'
+                      : feature.defaultIconColor
+                  }`}>
+                    <Icon className="w-4 h-4" />
+                  </div>
+                  {isActive && (
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#2563EB] dark:text-blue-400 bg-blue-100/70 dark:bg-blue-950/70 border border-blue-200 dark:border-blue-800/80 px-2 py-0.5 rounded-full transition-all">
+                      ACTIVE
+                    </span>
+                  )}
+                </div>
+                <h3 className={`text-base font-bold transition-colors duration-200 ${
+                  isActive ? 'text-[#2563EB] dark:text-blue-400' : 'text-slate-900 dark:text-white'
+                }`}>
+                  {feature.title}
+                </h3>
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                  {feature.desc}
+                </p>
+              </div>
+            );
+          })}
         </div>
 
       </section>
