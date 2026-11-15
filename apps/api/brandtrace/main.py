@@ -41,3 +41,4 @@ def root():
         "tagline": "Every brand decision connected. Every risk traceable. Every release accountable.",
         "docs_url": "/docs"
     }
+
