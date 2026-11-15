@@ -26,3 +26,30 @@ class AtlasIndexConfigResponse(BaseModel):
     atlas_json_definition: Dict[str, Any]
     status: str
     is_live_atlas_connected: bool
+
+class CreateFactRequest(BaseModel):
+    fact_id: Optional[str] = None
+    workspace_id: str = "aurelle-tech"
+    org_id: Optional[str] = "ORG-AURELLE"
+    name: str
+    category: str = "PRICE"  # PRICE, CLAIM, SPECIFICATION, STATUTORY, POLICY
+    current_value: str
+    unit: Optional[str] = ""
+    description: str
+    source_citation: str
+    department_owner: str = "Brand Governance Committee"
+
+class ApprovedFactResponse(BaseModel):
+    fact_id: str
+    workspace_id: str
+    org_id: str
+    name: str
+    category: str
+    current_value: str
+    unit: Optional[str] = ""
+    description: str
+    source_citation: str
+    department_owner: str
+    status: str = "ACTIVE"
+    created_at: str
+
