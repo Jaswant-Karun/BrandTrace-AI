@@ -166,6 +166,39 @@ class AuthService:
             workspace_id=user_record["workspace_id"]
         )
 
+    async def authenticate_user_async(
+        self,
+        email: str,
+        password: str,
+        allow_mock_fallback: bool = False
+    ) -> Optional[UserProfile]:
+        """Asynchronously authenticates against in-memory presets and remote MongoDB Atlas users collection."""
+        user = self.authenticate_user(email, password, allow_mock_fallback)
+        if user:
+            return user
+
+        clean_email = email.lower().strip() if email and isinstance(email, str) else ""
+        if not clean_email or not password:
+            return None
+
+        from brandtrace.database.mongo import mongo_manager
+        if mongo_manager.is_connected and mongo_manager.db is not None:
+            try:
+                db_user = await mongo_manager.db.users.find_one({"email": clean_email})
+                if db_user and db_user.get("password_hash"):
+                    if verify_password(password, db_user["password_hash"]):
+                        return UserProfile(
+                            user_id=db_user["user_id"],
+                            email=db_user["email"],
+                            name=db_user["name"],
+                            role=UserRole(db_user.get("role", "REVIEWER")),
+                            org_id=db_user.get("organisation_id", "ORG-APEX"),
+                            workspace_id=db_user.get("workspace_id", "apex-dynamics")
+                        )
+            except Exception:
+                pass
+        return None
+
     def create_user_token(self, user: UserProfile) -> str:
         token_data = {
             "sub": user.user_id,
