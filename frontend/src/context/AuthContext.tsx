@@ -16,6 +16,7 @@ interface AuthContextType {
   currentOrg: string;
   currentWorkspace: string;
   login: (email: string, password?: string) => Promise<void>;
+  register: (data: { name: string; email: string; password: string; role?: any; workspace_id?: string }) => Promise<void>;
   logout: () => void;
   switchPersona: (persona: UserPersona) => Promise<void>;
   setWorkspace: (workspaceId: string) => void;
@@ -91,6 +92,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const register = async (data: { name: string; email: string; password: string; role?: any; workspace_id?: string }) => {
+    try {
+      const cleanEmail = data.email.toLowerCase().trim();
+      const res = await apiClient.auth.register({
+        name: data.name.trim(),
+        email: cleanEmail,
+        password: data.password,
+        role: data.role || 'BRAND_MANAGER',
+        workspace_id: data.workspace_id || 'aurelle-tech'
+      });
+
+      localStorage.setItem('brandtrace_jwt_token', res.access_token);
+      localStorage.setItem('brandtrace_user_profile', JSON.stringify(res.user));
+      setToken(res.access_token);
+      setUser(res.user);
+      setCurrentOrg(res.user.org_id);
+      setCurrentWorkspace(res.user.workspace_id);
+    } catch (err) {
+      console.error('Registration failed:', err);
+      throw err;
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('brandtrace_jwt_token');
     localStorage.removeItem('brandtrace_user_profile');
@@ -128,6 +152,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         currentOrg,
         currentWorkspace,
         login,
+        register,
         logout,
         switchPersona,
         setWorkspace,
