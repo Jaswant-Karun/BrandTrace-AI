@@ -646,24 +646,108 @@ async def get_content_comments(asset_id: str):
     """Gets review comments for an asset."""
     return collaboration_engine.get_comments(asset_id)
 
+class RevokeRecordRequest(BaseModel):
+    identifier: str
+    revocation_reason: str = "Regulatory non-compliance or statutory recall"
+    revoked_by: str = "David Sterling, Statutory Compliance Officer"
+
+class SupersedeRecordRequest(BaseModel):
+    identifier: str
+    new_version: str = "v2.0"
+    superseded_by: str = "Julian Vance, VP Brand Governance"
+
+class GraphTraverseRequest(BaseModel):
+    brand_id: str = "aurelle-tech"
+    start_node_id: str
+    direction: str = "BOTH" # "DOWNSTREAM", "UPSTREAM", "BOTH"
+
+@router.post("/graph/traverse")
+async def traverse_graph_dependencies(req: GraphTraverseRequest):
+    """
+    Intelligent graph traversal connecting guidelines, approved facts, marketing claims,
+    campaigns, documents, and assets with evidence-backed citations.
+    """
+    bkg = get_or_load_graph(req.brand_id)
+    return bkg.traverse_dependencies(req.start_node_id, req.direction)
+
 @router.post("/ledger/verify-record")
 async def verify_ledger_record(req: VerifyRecordRequest):
     """
     Verifies content integrity against the immutable audit ledger.
     Distinguishes VALID_UNCHANGED, MODIFIED_AFTER_APPROVAL, SUPERSEDED, REVOKED, UNKNOWN_RECORD.
     """
-    # Seed a sample record in audit ledger if empty
+    # Seed sample baseline records in audit ledger if empty
     if not audit_ledger_engine.records:
+        # Apex GT valid release
         audit_ledger_engine.record_release(
-            user_identity="Chief Governance Officer",
+            user_identity="David Sterling, Chief Governance Officer",
             user_role="COMPLIANCE_REVIEWER",
             resource_id="AST-01",
             resource_type="ASSET",
-            content="520 Miles of Zero Compromise. Powered by QuantumCell™ 800V Architecture. The Apex GT arrives."
+            content="520 Miles of Zero Compromise. Powered by QuantumCell™ 800V Architecture. The Apex GT arrives.",
+            approved_version="v1.0",
+            relevant_sources=["AC-01", "TM-01", "TONE-01"]
         )
+        # Aurelle Studio v2 valid release (after ₹599 approval)
+        audit_ledger_engine.record_release(
+            user_identity="Marcus Aurelius, Content Review Lead",
+            user_role="REVIEWER",
+            resource_id="AST-AUR-01",
+            resource_type="ASSET",
+            content="Unlock next-generation spatial computing with Aurelle Cloud Studio for only ₹599 per month. Real-time audio rendering included.",
+            approved_version="v2.0",
+            relevant_sources=["FACT-AUR-PRC-01", "TM-AUR-01"]
+        )
+        # Aurelle historical v1 (superseded)
+        r_old = audit_ledger_engine.record_release(
+            user_identity="Julian Vance, VP Brand Governance",
+            user_role="BRAND_MANAGER",
+            resource_id="AST-AUR-HIST-01",
+            resource_type="ASSET",
+            content="Unlock next-generation spatial computing with Aurelle Cloud Studio for only ₹499 per month.",
+            approved_version="v1.0",
+            relevant_sources=["FACT-AUR-PRC-01"]
+        )
+        audit_ledger_engine.supersede_release(r_old.record_id, "v2.0", "Julian Vance")
+
+        # Revoked unapproved cure claim
+        r_rev = audit_ledger_engine.record_release(
+            user_identity="David Sterling, Compliance Reviewer",
+            user_role="COMPLIANCE_REVIEWER",
+            resource_id="AST-AUR-RECALLED",
+            resource_type="ASSET",
+            content="Aurelle Pulse Smart Ring provides a medical-grade diagnostic cure for cardiovascular heart disease.",
+            approved_version="v1.0",
+            relevant_sources=["GL-AUR-03"]
+        )
+        audit_ledger_engine.revoke_release(r_rev.record_id, "Violates FDA 21 CFR §870 Wellness Device Classification")
 
     result = audit_ledger_engine.verify_content(req.identifier, req.content_to_test)
     return result
+
+@router.post("/ledger/revoke-record")
+async def revoke_ledger_record(req: RevokeRecordRequest):
+    """Officially revokes a release record in the audit ledger with explanation."""
+    success, msg, rec = audit_ledger_engine.revoke_release(
+        target_record_or_resource_id=req.identifier,
+        revocation_reason=req.revocation_reason,
+        revoked_by_user=req.revoked_by
+    )
+    if not success:
+        raise HTTPException(status_code=404, detail=msg)
+    return {"status": "REVOKED", "message": msg, "record": rec}
+
+@router.post("/ledger/supersede-record")
+async def supersede_ledger_record(req: SupersedeRecordRequest):
+    """Marks an existing release record as SUPERSEDED by a newer approved version."""
+    success, msg, rec = audit_ledger_engine.supersede_release(
+        target_record_or_resource_id=req.identifier,
+        new_version=req.new_version,
+        superseded_by_user=req.superseded_by
+    )
+    if not success:
+        raise HTTPException(status_code=404, detail=msg)
+    return {"status": "SUPERSEDED", "message": msg, "record": rec}
 
 
 
