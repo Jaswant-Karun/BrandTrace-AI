@@ -1,5 +1,5 @@
 from typing import Dict, Any, List, Optional
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Body
 from brandtrace.modules.demo.models import (
     DemoScenarioStatusResponse, ExecuteStepRequest, ExecuteStepResponse,
     DemoCase, RunCaseRequest
@@ -44,7 +44,7 @@ def list_demo_cases():
     return demo_service.get_cases()
 
 @router.post("/run-case/{case_id}")
-async def run_demo_case(case_id: str, req: Optional[RunCaseRequest] = None):
+async def run_demo_case(case_id: str, req: Optional[RunCaseRequest] = Body(default=None)):
     """
     Runs the multi-agent inspection pipeline and explainable review engine on a specific demo test case.
     Returns composite risk scores, granular risk spans, agent scores, and explainable rewrites.
@@ -54,3 +54,4 @@ async def run_demo_case(case_id: str, req: Optional[RunCaseRequest] = None):
         return await demo_service.run_case(case_id, custom_content)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
+

@@ -7,7 +7,7 @@ from brandtrace.database.schemas import (
 )
 from brandtrace.data.seed_data import BRAND_SEEDS, APPROVED_FACTS_CATALOG
 from brandtrace.graph.engine import BrandKnowledgeGraph
-from brandtrace.graph.schema import FactMutationRequest, SeverityLevel
+from brandtrace.graph.schema import FactMutationRequest, SeverityLevel, RevisionTask
 from brandtrace.graph.dependency_engine import dependency_engine
 from brandtrace.engine.simulation import simulation_engine, SimulationProposedChange
 from brandtrace.engine.collaboration import collaboration_engine, UserRole
@@ -131,15 +131,14 @@ class DemoWorkflowService:
         fact = APPROVED_FACTS_CATALOG.get("FACT-AUR-PRC-01")
         current_price = fact.current_value if fact else "₹499"
 
-        # Check revision tasks
-        tasks = collaboration_engine.list_tasks(brand_id=self.workspace_id)
+        # Check revision tasks from dependency_engine
+        tasks = [t for t in dependency_engine.revision_tasks.values() if t.brand_id == self.workspace_id]
         total_tasks = len(tasks)
         pending_tasks = sum(1 for t in tasks if t.status == "PENDING_REVIEW")
         approved_tasks = sum(1 for t in tasks if t.status == "APPROVED_SEALED")
 
         # Check audit ledger records
-        ledger = audit_ledger_engine.get_brand_ledger(self.workspace_id)
-        audit_count = len(ledger)
+        audit_count = len(audit_ledger_engine.records)
 
         # Determine current step
         if current_price == "₹599" and approved_tasks >= 4 and audit_count >= 4:
@@ -336,7 +335,7 @@ class DemoWorkflowService:
             APPROVED_FACTS_CATALOG["FACT-AUR-PRC-01"].current_value = "₹499"
             bkg.update_node_property("FACT-AUR-PRC-01", "current_value", "₹499")
             BRAND_SEEDS["aurelle-tech"] = bkg.to_graph_data()
-            collaboration_engine._tasks[self.workspace_id] = []
+            dependency_engine.revision_tasks = {k: v for k, v in dependency_engine.revision_tasks.items() if v.brand_id != self.workspace_id}
             mutations = {"price": "₹499", "action": "INITIALIZED_OR_RESET"}
 
         elif step_number in [3, 4]:
@@ -365,15 +364,16 @@ class DemoWorkflowService:
 
         elif step_number == 6:
             # Step 6: BDIG DAG Traversal
-            dep_res = dependency_engine.propose_fact_mutation(
+            dep_res = dependency_engine.analyze_and_mutate_fact(
+                bkg,
                 FactMutationRequest(
                     brand_id=self.workspace_id,
                     fact_id="FACT-AUR-PRC-01",
+                    old_value="₹499",
                     new_value="₹599",
-                    changed_by=actor_name or "Julian Vance (Brand Manager)",
-                    rationale="Phase 6 Q1 Pricing Revision to ₹599"
-                ),
-                bkg
+                    mutation_reason="Phase 6 Q1 Pricing Revision to ₹599",
+                    initiated_by=actor_name or "Julian Vance (Brand Manager)"
+                )
             )
             mutations = {
                 "affected_assets_count": dep_res.total_affected_assets,
@@ -397,16 +397,17 @@ class DemoWorkflowService:
             }
 
         elif step_number == 8:
-            # Step 8: Spawn 4 revision tasks in collaboration engine
-            dep_res = dependency_engine.propose_fact_mutation(
+            # Step 8: Spawn 4 revision tasks in dependency_engine
+            dep_res = dependency_engine.analyze_and_mutate_fact(
+                bkg,
                 FactMutationRequest(
                     brand_id=self.workspace_id,
                     fact_id="FACT-AUR-PRC-01",
+                    old_value="₹499",
                     new_value="₹599",
-                    changed_by=actor_name or "Julian Vance (Brand Manager)",
-                    rationale="Phase 6 Q1 Pricing Revision to ₹599"
-                ),
-                bkg
+                    mutation_reason="Phase 6 Q1 Pricing Revision to ₹599",
+                    initiated_by=actor_name or "Julian Vance (Brand Manager)"
+                )
             )
             mutations = {
                 "tasks_spawned": len(dep_res.revision_tasks),
@@ -415,7 +416,7 @@ class DemoWorkflowService:
 
         elif step_number == 9:
             # Step 9: Creator updates content to ₹599
-            tasks = collaboration_engine.list_tasks(brand_id=self.workspace_id)
+            tasks = [t for t in dependency_engine.revision_tasks.values() if t.brand_id == self.workspace_id]
             updated_count = 0
             for t in tasks:
                 t.proposed_content = t.current_content.replace("₹499", "₹599")
@@ -425,39 +426,35 @@ class DemoWorkflowService:
 
         elif step_number == 10:
             # Step 10: Reviewers approve and seal tasks atomically
-            tasks = collaboration_engine.list_tasks(brand_id=self.workspace_id)
+            tasks = [t for t in dependency_engine.revision_tasks.values() if t.brand_id == self.workspace_id]
             resolved = []
             for t in tasks:
-                res = collaboration_engine.resolve_task(
-                    brand_id=self.workspace_id,
+                success, msg, res_task = dependency_engine.resolve_revision_task(
                     task_id=t.task_id,
-                    reviewer_role=UserRole.REVIEWER,
                     reviewer_name=actor_name or "Marcus Aurelius (Content Review Lead)",
                     decision="APPROVED",
                     final_content=t.proposed_content or t.current_content.replace("₹499", "₹599"),
                     resolution_notes="Phase 6 Verified & Approved copy update to ₹599."
                 )
-                if res:
-                    resolved.append(res.task_id)
+                if success and res_task:
+                    resolved.append(res_task.task_id)
             mutations = {"tasks_approved_and_sealed": len(resolved), "task_ids": resolved}
 
         elif step_number == 11:
             # Step 11: Audit ledger sealing
-            tasks = collaboration_engine.list_tasks(brand_id=self.workspace_id)
+            tasks = [t for t in dependency_engine.revision_tasks.values() if t.brand_id == self.workspace_id]
             sealed_entries = []
             for t in tasks:
-                entry = audit_ledger_engine.record_release(
-                    brand_id=self.workspace_id,
-                    verification_id=f"VER-AUR-{t.asset_id}",
-                    asset_id=t.asset_id,
-                    asset_title=t.asset_name,
-                    channel=t.asset_type,
+                rec = audit_ledger_engine.record_release(
+                    user_identity=actor_name or "David Sterling (Chief Governance Officer)",
+                    user_role="COMPLIANCE_REVIEWER",
+                    resource_id=t.asset_id,
+                    resource_type=t.asset_type,
                     content=t.proposed_content or t.current_content,
-                    reviewer=actor_name or "David Sterling (Chief Governance Officer)",
                     decision="APPROVED",
-                    verified_proof=t.audit_proof or f"PROOF-SHA256-{t.asset_id}"
+                    review_notes=f"Sealed release approval for {t.asset_id} updated to ₹599."
                 )
-                sealed_entries.append(entry.release_id)
+                sealed_entries.append(rec.record_id)
             mutations = {"audit_entries_sealed": len(sealed_entries), "entries": sealed_entries}
 
         elif step_number == 12:
@@ -486,8 +483,8 @@ class DemoWorkflowService:
         APPROVED_FACTS_CATALOG["FACT-AUR-PRC-01"].current_value = "₹499"
         bkg.update_node_property("FACT-AUR-PRC-01", "current_value", "₹499")
         BRAND_SEEDS["aurelle-tech"] = bkg.to_graph_data()
-        collaboration_engine._tasks[self.workspace_id] = []
-        audit_ledger_engine._ledgers[self.workspace_id] = []
+        dependency_engine.revision_tasks = {k: v for k, v in dependency_engine.revision_tasks.items() if v.brand_id != self.workspace_id}
+        audit_ledger_engine.records = {}
         return await self.get_scenario_status()
 
     def get_cases(self) -> List[DemoCase]:
