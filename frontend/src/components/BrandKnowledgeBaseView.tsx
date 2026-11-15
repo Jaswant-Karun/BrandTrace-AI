@@ -91,27 +91,27 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
     <div className="space-y-6">
       {/* Success Notification Banner */}
       {successMessage && (
-        <div className="bg-emerald-950/80 border border-emerald-500/40 p-4 rounded-2xl flex items-center justify-between text-emerald-300 text-xs shadow-lg shadow-emerald-500/10">
+        <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-xl flex items-center justify-between text-emerald-800 text-xs shadow-xs">
           <div className="flex items-center gap-2.5">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>{successMessage}</span>
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span className="font-medium">{successMessage}</span>
           </div>
-          <button onClick={() => setSuccessMessage(null)} className="text-emerald-400 hover:text-white">
+          <button onClick={() => setSuccessMessage(null)} className="text-emerald-700 hover:text-emerald-950 cursor-pointer">
             <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
       {/* Header */}
-      <div className="bg-[#0B0F19] border border-slate-800/80 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-white border border-slate-200 rounded-xl p-5 flex flex-wrap items-center justify-between gap-4 shadow-xs">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <BookOpen className="w-5 h-5 text-cyan-400" />
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider">
+            <BookOpen className="w-5 h-5 text-slate-800" />
+            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
               Brand Knowledge Base &amp; Truth-Set
             </h2>
           </div>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-500">
             Source-of-truth registry: Approved commercial facts, verified laboratory claims, registered marks, and tone taxonomies.
           </p>
         </div>
@@ -120,9 +120,9 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
           {/* Register Fact CTA */}
           <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5 shadow-lg shadow-cyan-500/20 transition-all cursor-pointer"
+            className="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-3.5 py-1.5 rounded-lg text-xs flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
           >
-            <Plus className="w-3.5 h-3.5 stroke-[3]" />
+            <Plus className="w-3.5 h-3.5" />
             <span>Register Approved Fact</span>
           </button>
 
@@ -134,22 +134,22 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
               placeholder="Search knowledge base..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-500"
+              className="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-slate-400 shadow-xs"
             />
           </div>
         </div>
       </div>
 
       {/* Category Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+      <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs overflow-x-auto">
         {['ALL', 'APPROVED_FACT', 'APPROVED_CLAIM', 'TRADEMARK', 'TONE_ATTRIBUTE', 'REGULATION'].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-3 py-1.5 rounded-xl font-semibold transition-all cursor-pointer whitespace-nowrap ${
+            className={`px-3 py-1.5 rounded-md font-semibold transition-all cursor-pointer whitespace-nowrap ${
               activeTab === tab
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
-                : 'bg-[#0B0F19] text-slate-400 hover:text-white border border-slate-800/80'
+                ? 'bg-white text-slate-900 border border-slate-200 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             {tab.replace(/_/g, ' ')}
@@ -165,44 +165,44 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
           return (
             <div
               key={d.id}
-              className="bg-[#0B0F19] border border-slate-800/80 rounded-2xl p-5 shadow-xl space-y-3 hover:border-slate-700 transition-all"
+              className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-3 hover:border-slate-300 transition-all"
             >
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-cyan-300 border border-slate-700 px-2 py-0.5 rounded">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200 px-2 py-0.5 rounded">
                   {d.nodeType.replace(/_/g, ' ')}
                 </span>
-                <span className="text-xs font-mono text-slate-400">{d.id}</span>
+                <span className="text-xs font-mono text-slate-500">{d.id}</span>
               </div>
 
               <div>
-                <h4 className="text-sm font-bold text-white mb-1">{d.label}</h4>
-                <p className="text-xs text-slate-400 leading-relaxed">{d.description}</p>
+                <h4 className="text-sm font-bold text-slate-900 mb-1">{d.label}</h4>
+                <p className="text-xs text-slate-600 leading-relaxed">{d.description}</p>
               </div>
 
               {/* Citations & Metadata */}
-              <div className="pt-2 border-t border-slate-800/80 space-y-1 text-[11px] text-slate-400 font-mono">
+              <div className="pt-2 border-t border-slate-100 space-y-1 text-[11px] text-slate-500 font-mono">
                 {props.citation && (
                   <div>
-                    <span className="text-slate-400 font-sans">Citation:</span>{' '}
-                    <span className="text-emerald-300">{props.citation}</span>
+                    <span className="text-slate-500 font-sans">Citation:</span>{' '}
+                    <span className="text-emerald-800 font-medium">{props.citation}</span>
                   </div>
                 )}
                 {props.current_value && (
                   <div>
-                    <span className="text-slate-400 font-sans">Approved Value:</span>{' '}
-                    <span className="text-cyan-300 font-bold">{props.current_value}</span>
+                    <span className="text-slate-500 font-sans">Approved Value:</span>{' '}
+                    <span className="text-slate-900 font-bold">{props.current_value}</span>
                   </div>
                 )}
                 {props.exact_mark && (
                   <div>
-                    <span className="text-slate-400 font-sans">Registered Mark:</span>{' '}
-                    <span className="text-purple-300 font-bold">{props.exact_mark}</span>
+                    <span className="text-slate-500 font-sans">Registered Mark:</span>{' '}
+                    <span className="text-purple-800 font-bold">{props.exact_mark}</span>
                   </div>
                 )}
                 {props.department_owner && (
                   <div>
-                    <span className="text-slate-400 font-sans">Owner:</span>{' '}
-                    <span className="text-slate-300">{props.department_owner}</span>
+                    <span className="text-slate-500 font-sans">Owner:</span>{' '}
+                    <span className="text-slate-700">{props.department_owner}</span>
                   </div>
                 )}
               </div>
@@ -213,18 +213,18 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
 
       {/* Register Approved Fact Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#0B0F19] border border-slate-800 rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl relative">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl relative">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-cyan-400" />
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+                <BookOpen className="w-5 h-5 text-slate-800" />
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
                   Register Approved Fact
                 </h3>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
+                className="text-slate-400 hover:text-slate-700 p-1 rounded-md hover:bg-slate-100 transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -232,24 +232,24 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
 
             <form onSubmit={handleCreateFact} className="space-y-4 text-xs">
               <div>
-                <label className="block text-slate-400 font-semibold mb-1">Fact Name *</label>
+                <label className="block text-slate-600 font-semibold mb-1">Fact Name *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Horizon Watch Ultra Introductory Price"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500"
+                  className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 focus:outline-none focus:border-slate-400 shadow-xs"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-400 font-semibold mb-1">Category</label>
+                  <label className="block text-slate-600 font-semibold mb-1">Category</label>
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500"
+                    className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 focus:outline-none focus:border-slate-400 shadow-xs"
                   >
                     <option value="PRICE">PRICE</option>
                     <option value="CLAIM">CLAIM</option>
@@ -259,75 +259,75 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
                   </select>
                 </div>
                 <div>
-                  <label className="block text-slate-400 font-semibold mb-1">Approved Value *</label>
+                  <label className="block text-slate-600 font-semibold mb-1">Approved Value *</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. ₹499"
                     value={formData.current_value}
                     onChange={(e) => setFormData({ ...formData, current_value: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500 font-mono"
+                    className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 focus:outline-none focus:border-slate-400 font-mono shadow-xs"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-400 font-semibold mb-1">Unit / Cadence</label>
+                  <label className="block text-slate-600 font-semibold mb-1">Unit / Cadence</label>
                   <input
                     type="text"
                     placeholder="e.g. per month / unit"
                     value={formData.unit}
                     onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500"
+                    className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 focus:outline-none focus:border-slate-400 shadow-xs"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-400 font-semibold mb-1">Department Owner</label>
+                  <label className="block text-slate-600 font-semibold mb-1">Department Owner</label>
                   <input
                     type="text"
                     value={formData.department_owner}
                     onChange={(e) => setFormData({ ...formData, department_owner: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500"
+                    className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 focus:outline-none focus:border-slate-400 shadow-xs"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-slate-400 font-semibold mb-1">Source Citation *</label>
+                <label className="block text-slate-600 font-semibold mb-1">Source Citation *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Executive Pricing Committee Resolution #2026-Q1"
                   value={formData.source_citation}
                   onChange={(e) => setFormData({ ...formData, source_citation: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500"
+                  className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 focus:outline-none focus:border-slate-400 shadow-xs"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-400 font-semibold mb-1">Description</label>
+                <label className="block text-slate-600 font-semibold mb-1">Description</label>
                 <textarea
                   rows={2}
                   placeholder="Additional context or regulatory grounding details..."
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500 resize-none"
+                  className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 focus:outline-none focus:border-slate-400 resize-none shadow-xs"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-slate-400 hover:text-white transition-colors"
+                  className="px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 cursor-pointer font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-5 py-2 rounded-xl transition-all shadow-lg shadow-cyan-500/20 disabled:opacity-50"
+                  className="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-5 py-2 rounded-lg transition-all shadow-xs disabled:opacity-50 cursor-pointer"
                 >
                   {isSubmitting ? 'Registering...' : 'Register Fact in MongoDB'}
                 </button>
