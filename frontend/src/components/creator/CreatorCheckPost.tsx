@@ -208,9 +208,6 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
   // Findings state
   const [findings, setFindings] = useState<FindingItem[]>([]);
 
-  // Word count helper
-  const wordCount = draftContent.trim() ? draftContent.trim().split(/\s+/).length : 0;
-
   // Calculate severity categories
   const categoryCounts = {
     blocking: findings.filter((f) => !f.accepted && f.severity === 'BLOCKING').length,
@@ -758,7 +755,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
           <div className="px-6 pt-4 pb-2 flex items-center justify-between text-[11px] font-mono font-bold text-neutral-600 select-none">
             <span className="uppercase tracking-wider">PASTE A POST, OR UPLOAD A FILE</span>
             <span className="uppercase tracking-wider text-neutral-500">
-              {draftContent.length} CHARACTERS · {wordCount} WORDS · {channel.toUpperCase()}
+              {draftContent.length} CHARACTERS · {channel.toUpperCase()}
             </span>
           </div>
 

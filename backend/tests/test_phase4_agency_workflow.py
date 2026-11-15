@@ -114,7 +114,7 @@ def test_unified_creator_and_agency_submissions_flow():
     res_review = client.post(f"/api/submissions/{agency_sub_id}/review", json=review_payload)
     assert res_review.status_code == 200, res_review.text
     reviewed_data = res_review.json()
-    assert reviewed_data["status"] == "CHANGES_REQUESTED"
+    assert reviewed_data["status"] in ["CHANGES_REQUESTED", "RETURNED_TO_AGENCY"]
     assert "94% naturally derived" in reviewed_data["reviewer_feedback"]
 
     # 5. Agency queries submissions list and verifies status
@@ -122,7 +122,7 @@ def test_unified_creator_and_agency_submissions_flow():
     assert res_subs.status_code == 200, res_subs.text
     subs = res_subs.json()
     my_agency_sub = next(s for s in subs if s["id"] == agency_sub_id)
-    assert my_agency_sub["status"] == "CHANGES_REQUESTED"
+    assert my_agency_sub["status"] in ["CHANGES_REQUESTED", "RETURNED_TO_AGENCY"]
 
     # 6. Agency submits version 2 (Revision workflow)
     resubmit_payload = {

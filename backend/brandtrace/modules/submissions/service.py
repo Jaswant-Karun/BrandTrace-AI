@@ -614,7 +614,10 @@ class SubmissionsService:
         if creator_id and role == "creator":
             query["creator_id"] = creator_id
         if status:
-            query["status"] = status
+            if status == "CHANGES_REQUESTED":
+                query["status"] = {"$in": ["CHANGES_REQUESTED", "RETURNED_TO_CREATOR", "RETURNED_TO_AGENCY"]}
+            else:
+                query["status"] = status
         if brand_id:
             query["brand_id"] = brand_id
 
@@ -628,7 +631,10 @@ class SubmissionsService:
         if creator_id and role == "creator":
             subs = [s for s in subs if s.get("creator_id") == creator_id]
         if status:
-            subs = [s for s in subs if s.get("status") == status]
+            if status == "CHANGES_REQUESTED":
+                subs = [s for s in subs if s.get("status") in ["CHANGES_REQUESTED", "RETURNED_TO_CREATOR", "RETURNED_TO_AGENCY"]]
+            else:
+                subs = [s for s in subs if s.get("status") == status]
         if brand_id:
             subs = [s for s in subs if s.get("brand_id") == brand_id]
         return subs
@@ -642,7 +648,7 @@ class SubmissionsService:
         decision: str,
         reviewer_name: str,
         feedback: Optional[str] = None,
-        finding_decisions: Optional[Dict[str, Dict[str, Any]]] = None
+        finding_decisions: Optional[Dict[str, Any]] = None
     ) -> Optional[Dict[str, Any]]:
         sub = await self.get_submission(submission_id)
         if not sub:
@@ -650,60 +656,69 @@ class SubmissionsService:
 
         now_time = _now_str()
 
-        # Update finding decisions if provided
+        # Update finding decisions if provided (supporting both ID and Number lookups)
         if finding_decisions and "findings" in sub:
             for f in sub["findings"]:
                 f_id = f.get("id")
-                if f_id in finding_decisions:
-                    d_info = finding_decisions[f_id]
-                    f["decision"] = d_info.get("decision", f.get("decision", "UNDECIDED"))
-                    if "overrule_reason" in d_info:
-                        f["overrule_reason"] = d_info["overrule_reason"]
+                f_num_str = str(f.get("number", ""))
+                lookup_key = None
+                if f_id and f_id in finding_decisions:
+                    lookup_key = f_id
+                elif f_num_str and f_num_str in finding_decisions:
+                    lookup_key = f_num_str
+
+                if lookup_key:
+                    d_info = finding_decisions[lookup_key]
+                    if isinstance(d_info, dict):
+                        f["decision"] = d_info.get("decision", f.get("decision", "UNDECIDED"))
+                        if "overrule_reason" in d_info:
+                            f["overrule_reason"] = d_info["overrule_reason"]
+                        elif "reason" in d_info:
+                            f["overrule_reason"] = d_info["reason"]
+                        if "comment" in d_info:
+                            f["reviewer_comment"] = d_info["comment"]
+                    elif isinstance(d_info, str):
+                        f["decision"] = d_info
                     if f["decision"] in ["UPHELD", "OVERRULED"]:
                         f["resolved"] = True
 
-        # Check compliance requirement
-        has_compliance_blockers = any(
-            f.get("category") in ["Regulatory Greenwashing", "Regulatory", "Statutory", "Medical / Disease Treatment", "Approved Brand Claims"]
-            for f in sub.get("findings", [])
-        )
-
         history = sub.get("approval_history", [])
+        is_agency = sub.get("creator_type") == "agency"
         
-        if decision == "APPROVE":
-            if has_compliance_blockers:
-                # Advance to Compliance Arjun
-                sub["status"] = "REVIEW_APPROVED"
-                for step in history:
-                    if step.get("stage") == "REVIEWER_APPROVAL":
-                        step["status"] = "COMPLETED"
-                        step["timestamp"] = now_time
-                        step["comments"] = feedback or "Reviewer approved. Forwarded for compliance sign-off."
-                    elif step.get("stage") == "COMPLIANCE_APPROVAL":
-                        step["status"] = "ACTIVE"
-            else:
-                # Direct approval ready for Brand Owner
-                sub["status"] = "APPROVED"
-                for step in history:
-                    if step.get("stage") == "REVIEWER_APPROVAL":
-                        step["status"] = "COMPLETED"
-                        step["timestamp"] = now_time
-                        step["comments"] = feedback or "Approved by Reviewer."
-                    elif step.get("stage") == "COMPLIANCE_APPROVAL":
-                        step["status"] = "COMPLETED"
-                        step["timestamp"] = now_time
-                        step["comments"] = "No compliance blockers identified."
-                    elif step.get("stage") == "FINAL_RELEASE":
-                        step["status"] = "COMPLETED"
-                        step["timestamp"] = now_time
+        if decision in ["APPROVE", "APPROVE_REVIEW"]:
+            # Advance to Compliance queue
+            sub["status"] = "REVIEW_APPROVED"
+            for step in history:
+                if step.get("stage") == "REVIEWER_APPROVAL":
+                    step["status"] = "COMPLETED"
+                    step["timestamp"] = now_time
+                    step["comments"] = feedback or f"Reviewer approved by {reviewer_name}. Ready for compliance sign-off."
+                elif step.get("stage") == "COMPLIANCE_APPROVAL":
+                    step["status"] = "ACTIVE"
 
-        elif decision == "REQUEST_CHANGES":
-            sub["status"] = "CHANGES_REQUESTED"
+            self.add_notification(
+                recipient_role="COMPLIANCE",
+                title=f"New submission awaiting compliance: {sub.get('title', '')[:40]}",
+                message=f"Reviewed and approved by {reviewer_name}.",
+                submission_id=submission_id
+            )
+
+        elif decision in ["REQUEST_CHANGES", "SEND_BACK", "RETURN_FOR_REVISION"]:
+            new_status = "RETURNED_TO_AGENCY" if is_agency else "RETURNED_TO_CREATOR"
+            sub["status"] = new_status
             sub["reviewer_feedback"] = feedback or "Corrections requested by reviewer."
             for step in history:
                 if step.get("stage") == "REVIEWER_APPROVAL":
-                    step["status"] = "ACTIVE"
-                    step["comments"] = f"Changes requested: {feedback}"
+                    step["status"] = "REJECTED"
+                    step["timestamp"] = now_time
+                    step["comments"] = f"Returned for revision: {feedback}"
+
+            self.add_notification(
+                recipient_role="AGENCY" if is_agency else "CREATOR",
+                title=f"Submission returned for revision by {reviewer_name}",
+                message=feedback or "Reviewer requested changes on your submission.",
+                submission_id=submission_id
+            )
 
         elif decision == "REJECT":
             sub["status"] = "REJECTED"
@@ -713,6 +728,13 @@ class SubmissionsService:
                     step["status"] = "REJECTED"
                     step["timestamp"] = now_time
                     step["comments"] = feedback or "Rejected."
+
+            self.add_notification(
+                recipient_role="AGENCY" if is_agency else "CREATOR",
+                title=f"Submission rejected by {reviewer_name}",
+                message=feedback or "Submission did not pass review criteria.",
+                submission_id=submission_id
+            )
 
         sub["updated_at"] = now_time
         sub["approval_history"] = history
@@ -729,23 +751,23 @@ class SubmissionsService:
         task_id = sub.get("task_id")
         if task_id:
             try:
-                task_decision = "APPROVED" if decision == "APPROVE" else ("CHANGES_REQUESTED" if decision == "REQUEST_CHANGES" else "REJECTED")
+                task_decision = "APPROVED" if decision in ["APPROVE", "APPROVE_REVIEW"] else ("CHANGES_REQUESTED" if decision in ["REQUEST_CHANGES", "SEND_BACK"] else "REJECTED")
                 dependency_engine.resolve_revision_task(
                     task_id=task_id,
-                    reviewer=reviewer_name,
+                    reviewer_name=reviewer_name,
                     decision=task_decision,
-                    resolution_notes=feedback
+                    resolution_notes=feedback or ""
                 )
             except Exception as e:
-                print(f"[SubmissionsService] Task resolve sync note: {e}")
+                print(f"[SubmissionsService] Task resolve note: {e}")
 
-        # Record Audit Event
-        h = _hash_str(f"{submission_id}:{decision}:{now_time}")
+        # Add to Audit Trail
+        evt_hash = _hash_str(f"review:{submission_id}:{decision}:{now_time}")
         await self.record_audit_event(
-            what=f"reviewer {decision.lower().replace('_', ' ')}: {sub.get('title', '')[:30]}",
+            what=f"reviewer decision ({decision.lower()}): {sub.get('title', '')[:30]}",
             reason=feedback or f"Decision: {decision}",
             actor_name=reviewer_name,
-            event_hash=h
+            event_hash=evt_hash
         )
 
         return sub

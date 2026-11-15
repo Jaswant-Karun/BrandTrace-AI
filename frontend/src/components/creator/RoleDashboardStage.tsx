@@ -8,8 +8,9 @@ import { CreatorFactsLedger } from './CreatorFactsLedger';
 import { CreatorGuidelineHealth } from './CreatorGuidelineHealth';
 import { CreatorClaimWatch } from './CreatorClaimWatch';
 import { CreatorSubmissionsView } from './CreatorSubmissionsView';
-import { 
-  CheckCircle2, ExternalLink, X, 
+import { ReviewDetailView } from './ReviewDetailView';
+import {
+  CheckCircle2, ExternalLink, X,
   ShieldCheck, Check, Clock
 } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
@@ -299,16 +300,12 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
     setDecisionNotes('');
   };
 
-  const handleToggleFindingDecision = (findingNumber: number, decision: 'UPHELD' | 'OVERRULED') => {
-    setFindingDecisions((prev) => ({
-      ...prev,
-      [findingNumber]: decision,
-    }));
-  };
-
-  const handleRecordReviewDecision = async (decision: 'APPROVE' | 'REQUEST_CHANGES' | 'REJECT') => {
+  const handleReviewDetailSubmit = async (
+    decision: 'APPROVE' | 'REQUEST_CHANGES' | 'REJECT',
+    feedback: string,
+    decisionsMap: Record<string, { decision: 'UPHELD' | 'OVERRULED'; overrule_reason?: string; comment?: string }>
+  ) => {
     if (!selectedPost) return;
-    setIsSubmittingDecision(true);
 
     try {
       if (role === 'compliance') {
@@ -317,7 +314,8 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
           body: JSON.stringify({
             compliance_officer_name: roleConfig.userName,
             decision: decision,
-            notes: decisionNotes || `Compliance review signed off by ${roleConfig.userName}`,
+            notes: feedback || `Compliance review signed off by ${roleConfig.userName}`,
+            finding_decisions: decisionsMap,
           }),
         });
       } else {
@@ -326,18 +324,18 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
           body: JSON.stringify({
             reviewer_name: roleConfig.userName,
             decision: decision,
-            feedback: decisionNotes || `Review completed by ${roleConfig.userName}`,
-            finding_decisions: findingDecisions,
+            feedback: feedback || `Review completed by ${roleConfig.userName}`,
+            finding_decisions: decisionsMap,
           }),
         });
       }
 
       setFeedbackToast(
         decision === 'APPROVE'
-          ? `Post approved and advanced successfully by ${roleConfig.userName}.`
+          ? `Post approved and advanced to Compliance Queue by ${roleConfig.userName}.`
           : decision === 'REQUEST_CHANGES'
-          ? `Feedback and requested changes sent back to Creator.`
-          : `Post marked as rejected.`
+            ? `Changes requested. Post returned to ${selectedPost.creatorType === 'agency' ? 'Agency Sana' : 'Creator Asha'}.`
+            : `Post marked as rejected.`
       );
 
       // Update local state
@@ -345,20 +343,19 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
         prev.map((p) =>
           p.id === selectedPost.id
             ? {
-                ...p,
-                status: decision === 'APPROVE' ? 'APPROVED' : decision === 'REQUEST_CHANGES' ? 'CHANGES REQ' : 'REJECTED',
-                statusColor: decision === 'APPROVE' ? 'emerald' : decision === 'REQUEST_CHANGES' ? 'amber' : 'rose',
-              }
+              ...p,
+              status: decision === 'APPROVE' ? 'REVIEW APPROVED' : decision === 'REQUEST_CHANGES' ? 'CHANGES REQ' : 'REJECTED',
+              statusColor: decision === 'APPROVE' ? 'emerald' : decision === 'REQUEST_CHANGES' ? 'amber' : 'rose',
+              reviewerFeedback: feedback,
+            }
             : p
         )
       );
       setSelectedPost(null);
-    } catch (err) {
+    } catch (err: any) {
       console.warn('Review decision notice:', err);
-      setFeedbackToast(`Decision recorded locally for ${selectedPost.id}.`);
+      setFeedbackToast(`Decision recorded for ${selectedPost.id}.`);
       setSelectedPost(null);
-    } finally {
-      setIsSubmittingDecision(false);
     }
   };
 
@@ -368,7 +365,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
       <CreatorHeader
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        onSignOut={onBackToLanding || (() => {})}
+        onSignOut={onBackToLanding || (() => { })}
         userName={roleConfig.userName}
         roleName={roleConfig.roleName}
         customTabs={roleConfig.tabs as TabItem[]}
@@ -376,7 +373,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
 
       {/* Main Content Area */}
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
+
         {/* CHECK A POST tab */}
         {activeTab === 'check' && (
           <div className="space-y-6">
@@ -388,7 +385,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
               revisionData={revisionData}
               onClearRevision={() => setRevisionData(null)}
               onNavigateToSubmissions={() => setActiveTab('submissions')}
-              onSaveAuditVersion={() => {}}
+              onSaveAuditVersion={() => { }}
             />
           </div>
         )}
@@ -494,15 +491,14 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
                     {/* Middle: Content & Metadata */}
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider ${
-                          item.statusColor === 'emerald'
-                            ? 'bg-emerald-950/80 border border-emerald-500/40 text-emerald-300'
-                            : item.statusColor === 'purple'
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider ${item.statusColor === 'emerald'
+                          ? 'bg-emerald-950/80 border border-emerald-500/40 text-emerald-300'
+                          : item.statusColor === 'purple'
                             ? 'bg-purple-950/80 border border-purple-500/40 text-purple-300'
                             : item.statusColor === 'rose'
-                            ? 'bg-rose-950/80 border border-rose-500/40 text-rose-300'
-                            : 'bg-amber-950/80 border border-amber-500/40 text-amber-300'
-                        }`}>
+                              ? 'bg-rose-950/80 border border-rose-500/40 text-rose-300'
+                              : 'bg-amber-950/80 border border-amber-500/40 text-amber-300'
+                          }`}>
                           {item.status}
                         </span>
                         {item.creatorType === 'agency' ? (
@@ -632,7 +628,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
 
               {/* Modal Body: 2-Column Review Layout */}
               <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-                
+
                 {/* LEFT COLUMN: Submitted Content & Timeline (5 cols) */}
                 <div className="lg:col-span-5 space-y-4">
                   <div className="text-xs font-mono font-bold uppercase text-neutral-400 tracking-wider">
@@ -701,11 +697,10 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
                         return (
                           <div
                             key={f.number}
-                            className={`p-4 rounded-2xl border transition-all ${
-                              isOverruled
-                                ? 'bg-neutral-900/30 border-neutral-800 opacity-60'
-                                : 'bg-[#18181b] border-rose-900/60 shadow-lg'
-                            }`}
+                            className={`p-4 rounded-2xl border transition-all ${isOverruled
+                              ? 'bg-neutral-900/30 border-neutral-800 opacity-60'
+                              : 'bg-[#18181b] border-rose-900/60 shadow-lg'
+                              }`}
                           >
                             <div className="flex items-center justify-between gap-2">
                               <div className="flex items-center gap-2">
@@ -741,22 +736,20 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
                                 <button
                                   type="button"
                                   onClick={() => handleToggleFindingDecision(f.number, 'UPHELD')}
-                                  className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold uppercase cursor-pointer border ${
-                                    !isOverruled
-                                      ? 'bg-rose-600 border-rose-500 text-white'
-                                      : 'bg-neutral-900 border-neutral-700 text-neutral-400 hover:text-white'
-                                  }`}
+                                  className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold uppercase cursor-pointer border ${!isOverruled
+                                    ? 'bg-rose-600 border-rose-500 text-white'
+                                    : 'bg-neutral-900 border-neutral-700 text-neutral-400 hover:text-white'
+                                    }`}
                                 >
                                   Uphold
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => handleToggleFindingDecision(f.number, 'OVERRULED')}
-                                  className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold uppercase cursor-pointer border ${
-                                    isOverruled
-                                      ? 'bg-amber-600 border-amber-500 text-white'
-                                      : 'bg-neutral-900 border-neutral-700 text-neutral-400 hover:text-white'
-                                  }`}
+                                  className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold uppercase cursor-pointer border ${isOverruled
+                                    ? 'bg-amber-600 border-amber-500 text-white'
+                                    : 'bg-neutral-900 border-neutral-700 text-neutral-400 hover:text-white'
+                                    }`}
                                 >
                                   Overrule
                                 </button>

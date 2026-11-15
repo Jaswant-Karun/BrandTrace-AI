@@ -134,13 +134,13 @@ class ReviewDecisionRequest(BaseModel):
     reviewer_name: str = "Reviewer Meera"
     reviewer_role: str = "REVIEWER"
     feedback: Optional[str] = None
-    finding_decisions: Optional[Dict[str, Dict[str, Any]]] = None
+    finding_decisions: Optional[Dict[str, Any]] = None
 
 class ComplianceDecisionRequest(BaseModel):
     decision: str  # APPROVE, REQUEST_CHANGES, REJECT
     compliance_name: str = "Compliance Arjun"
     notes: Optional[str] = None
-    finding_decisions: Optional[Dict[str, Dict[str, Any]]] = None
+    finding_decisions: Optional[Dict[str, Any]] = None
 
 class FinalApprovalRequest(BaseModel):
     approver_name: str = "Brand Owner Kabir"

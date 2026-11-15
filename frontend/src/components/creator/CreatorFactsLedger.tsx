@@ -74,22 +74,22 @@ const FACTS_DATA: FactCardItem[] = [
 ];
 
 const TIMELINE_FACTS = [
-  { code: 'FACT-029', status: 'expired', label: 'ended 30 Sept 2026', width: 35, start: 18 },
-  { code: 'FACT-032', status: 'active', label: 'ends 30 Nov 2026', width: 14, start: 42 },
-  { code: 'FACT-006', status: 'active', label: 'ends 31 Dec 2026', width: 26, start: 31 },
-  { code: 'FACT-013', status: 'active', label: 'ends 31 Dec 2026', width: 44, start: 13 },
-  { code: 'FACT-025', status: 'active', label: 'ends 31 Dec 2026', width: 26, start: 31 },
-  { code: 'FACT-028', status: 'active', label: 'ends 31 Dec 2026', width: 21, start: 36 },
-  { code: 'FACT-030', status: 'active', label: 'ends 31 Dec 2026', width: 26, start: 31 },
-  { code: 'FACT-014', status: 'active', label: 'ends 31 Mar 2027', width: 32, start: 32 },
-  { code: 'FACT-005', status: 'active', label: 'ends 30 Jun 2027', width: 56, start: 18 },
-  { code: 'FACT-010', status: 'active', label: 'ends 30 Sept 2027', width: 55, start: 23 },
-  { code: 'FACT-026', status: 'active', label: 'ends 30 Sept 2027', width: 53, start: 25 },
-  { code: 'FACT-015', status: 'active', label: 'ends 31 Oct 2027', width: 52, start: 27 },
-  { code: 'FACT-009', status: 'active', label: 'ends 31 Dec 2027', width: 64, start: 18 },
-  { code: 'FACT-018', status: 'active', label: 'ends 31 Dec 2027', width: 49, start: 33 },
-  { code: 'FACT-017', status: 'active', label: 'ends 31 Jan 2028', width: 51, start: 33 },
-  { code: 'FACT-019', status: 'active', label: 'ends 31 Jan 2028', width: 51, start: 33 },
+  { code: 'FACT-029', status: 'expired', label: 'ended 30 Sept 2026', width: 24.5, start: 18 },
+  { code: 'FACT-032', status: 'active', label: 'ends 30 Nov 2026', width: 14, start: 43.5 },
+  { code: 'FACT-006', status: 'active', label: 'ends 31 Dec 2026', width: 24, start: 31 },
+  { code: 'FACT-013', status: 'active', label: 'ends 31 Dec 2026', width: 42, start: 13 },
+  { code: 'FACT-025', status: 'active', label: 'ends 31 Dec 2026', width: 24, start: 31 },
+  { code: 'FACT-028', status: 'active', label: 'ends 31 Dec 2026', width: 20, start: 35 },
+  { code: 'FACT-030', status: 'active', label: 'ends 31 Dec 2026', width: 24, start: 31 },
+  { code: 'FACT-014', status: 'active', label: 'ends 31 Mar 2027', width: 30, start: 32 },
+  { code: 'FACT-005', status: 'active', label: 'ends 30 Jun 2027', width: 46, start: 18 },
+  { code: 'FACT-010', status: 'active', label: 'ends 30 Sept 2027', width: 48, start: 23 },
+  { code: 'FACT-026', status: 'active', label: 'ends 30 Sept 2027', width: 46, start: 25 },
+  { code: 'FACT-015', status: 'active', label: 'ends 31 Oct 2027', width: 45, start: 27 },
+  { code: 'FACT-009', status: 'active', label: 'ends 31 Dec 2027', width: 57, start: 18 },
+  { code: 'FACT-018', status: 'active', label: 'ends 31 Dec 2027', width: 42, start: 33 },
+  { code: 'FACT-017', status: 'active', label: 'ends 31 Jan 2028', width: 43, start: 33 },
+  { code: 'FACT-019', status: 'active', label: 'ends 31 Jan 2028', width: 43, start: 33 },
 ];
 
 const SHELF_PRODUCTS = [
@@ -223,10 +223,10 @@ export const CreatorFactsLedger: React.FC<CreatorFactsLedgerProps> = ({
         <div className="relative pt-6 pb-2">
           {/* Vertical TODAY line */}
           <div 
-            className="absolute top-0 bottom-0 w-[1px] bg-neutral-400/80 z-20 pointer-events-none flex flex-col items-center"
-            style={{ left: '42%' }}
+            className="absolute top-0 bottom-0 w-[1px] bg-neutral-500/70 z-20 pointer-events-none flex flex-col items-center"
+            style={{ left: '43.5%' }}
           >
-            <span className="text-[9px] font-mono font-bold text-white bg-neutral-900 border border-neutral-700 px-1.5 py-0.5 rounded -mt-2.5 shadow-sm">
+            <span className="text-[9px] font-mono font-bold text-white bg-[#151518] border border-neutral-700 px-2 py-0.5 rounded -mt-2.5 shadow-sm uppercase tracking-wider">
               TODAY
             </span>
           </div>
@@ -236,45 +236,48 @@ export const CreatorFactsLedger: React.FC<CreatorFactsLedgerProps> = ({
             {TIMELINE_FACTS.map((tf, idx) => (
               <motion.div
                 key={tf.code}
-                initial={{ opacity: 0, x: -10 }}
+                initial={{ opacity: 0, x: -12 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: false, amount: 0.1 }}
+                viewport={{ once: false, amount: 0.15 }}
                 transition={{
-                  duration: 0.4,
+                  duration: 0.45,
                   delay: idx * 0.04,
                   ease: "easeOut"
                 }}
                 className="flex items-center text-[10px] font-mono h-6 relative group"
               >
-                <span className="w-16 text-neutral-400 shrink-0 font-medium group-hover:text-white transition-colors">
+                <span className="w-20 text-neutral-400 shrink-0 font-mono text-[11px] font-medium group-hover:text-white transition-colors">
                   {tf.code}
                 </span>
-                <div className="flex-1 relative h-5 bg-neutral-950/60 rounded overflow-hidden">
+                <div className="flex-1 relative h-6 bg-[#121214] border border-neutral-800/40 rounded overflow-hidden">
                   <motion.div
                     initial={{ width: 0, opacity: 0 }}
                     whileInView={{ width: `${tf.width}%`, opacity: 1 }}
-                    viewport={{ once: false, amount: 0.1 }}
+                    viewport={{ once: false, amount: 0.15 }}
                     transition={{
                       duration: 0.85,
-                      delay: idx * 0.06,
-                      ease: [0.16, 1, 0.3, 1] // Fluid cubic-bezier expansion
+                      delay: idx * 0.075,
+                      ease: [0.16, 1, 0.3, 1] // Fluid cubic-bezier expansion one by one
                     }}
                     style={{ left: `${tf.start}%` }}
-                    className={`absolute top-0 bottom-0 rounded px-2 flex items-center justify-end text-[9px] font-mono font-bold text-white whitespace-nowrap transition-all group-hover:brightness-110 ${
+                    className={`absolute top-0 bottom-0 rounded px-2.5 flex items-center justify-end text-[9.5px] font-mono font-bold text-white whitespace-nowrap transition-all group-hover:brightness-110 ${
                       tf.status === 'expired'
-                        ? 'bg-[#dc2643] shadow-[0_0_12px_rgba(220,38,67,0.5)]'
-                        : 'bg-[#009b66] shadow-[0_0_10px_rgba(0,155,102,0.3)]'
+                        ? 'bg-gradient-to-r from-[#dc2643] to-[#e62044] shadow-[0_0_16px_rgba(220,38,67,0.55)]'
+                        : 'bg-gradient-to-r from-[#00875a] to-[#009b66] shadow-[0_0_12px_rgba(0,155,102,0.35)]'
                     }`}
                   >
+                    {/* Active Leading Expansion Edge Shimmer */}
+                    <div className="absolute right-0 top-0 bottom-0 w-2.5 bg-white/25 rounded-r pointer-events-none blur-[0.5px]" />
+
                     <motion.span
-                      initial={{ opacity: 0 }}
-                      whileInView={{ opacity: 1 }}
-                      viewport={{ once: false, amount: 0.1 }}
+                      initial={{ opacity: 0, x: -4 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: false, amount: 0.15 }}
                       transition={{
-                        duration: 0.3,
-                        delay: idx * 0.06 + 0.3
+                        duration: 0.35,
+                        delay: idx * 0.075 + 0.32
                       }}
-                      className="text-[8.5px] truncate select-none font-mono tracking-tight"
+                      className="text-[9px] truncate select-none font-mono tracking-tight"
                     >
                       {tf.label}
                     </motion.span>

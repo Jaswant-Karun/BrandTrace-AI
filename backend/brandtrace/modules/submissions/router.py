@@ -87,12 +87,13 @@ async def list_submissions(
     role: Optional[str] = Query(None),
     status: Optional[str] = Query(None),
     brand_id: Optional[str] = Query(None),
+    creator_id: Optional[str] = Query(None),
     user: UserProfile = Depends(get_current_user)
 ):
     """Lists submissions filtered by user role, brand, or review state."""
-    creator_id = user.email if role == "creator" else None
+    active_creator_id = creator_id
     return await submissions_service.list_submissions(
-        creator_id=creator_id,
+        creator_id=active_creator_id,
         role=role,
         status=status,
         brand_id=brand_id
