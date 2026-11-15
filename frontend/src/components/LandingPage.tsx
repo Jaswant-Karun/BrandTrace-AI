@@ -6,7 +6,8 @@ import {
   Network, RotateCcw,
   Globe,
   X, Menu,
-  Hash, Sliders, BookOpen, Sparkles, ShieldAlert
+  Hash, Sliders, BookOpen, Sparkles, ShieldAlert,
+  Heart, MessageCircle, Send, Bookmark
 } from 'lucide-react';
 import { ThemeToggle } from './ui/ThemeToggle';
 import { PlumbBob } from './ui/PlumbBob';
@@ -743,172 +744,257 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* ------------------------------------------------------------------- */}
-      {/* SECTION 4 — PROBLEM SECTION (Matching Reference Visuals)            */}
+      {/* SECTION 4 — PROBLEM SECTION (Staggered Editorial Images & Live Scan) */}
       {/* ------------------------------------------------------------------- */}
-      <section className="py-16 sm:py-24 bg-slate-50 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      <section className="py-20 sm:py-28 bg-black text-white border-b border-neutral-900 transition-colors relative overflow-hidden">
+        {/* Subtle background ambient vertical grid guides matching Plumbline */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.05] stroke-neutral-500">
+          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="grid-pattern" width="80" height="80" patternUnits="userSpaceOnUse">
+                <path d="M 80 0 L 0 0 0 80" fill="none" stroke="currentColor" strokeWidth="1" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid-pattern)" />
+          </svg>
+        </div>
+
+        <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:pl-6 xl:pl-8 lg:pr-6 xl:pr-8 space-y-16 relative z-10">
           
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-rose-500">
               THE PROBLEM
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
               CONTENT COMES FROM EVERYONE NOW. <br />
-              <span className="text-rose-600 dark:text-rose-400">SO DO THE MISTAKES.</span>
+              <span className="text-rose-500">SO DO THE MISTAKES.</span>
             </h2>
-            <p className="text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+            <p className="text-sm sm:text-base text-neutral-400 leading-relaxed max-w-2xl mx-auto">
               Writers, agencies, influencers and AI tools all post for the brand. The brand book is a PDF none of them has open.
             </p>
           </div>
 
-          {/* 3 Real-World Problem Cards (Directly matching Reference Image 4) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+          {/* 3 Staggered, Non-Formal Editorial Image Cards with Live AI Scanning Effect */}
+          <div className="flex flex-col lg:flex-row items-center lg:items-start justify-center gap-8 lg:gap-8 xl:gap-10">
             
-            {/* Card 1: INSTAGRAM POST (Serum bottle on podium) */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col justify-between">
+            {/* Card 1: INSTAGRAM POST (BIG & TALL on Left) */}
+            <div className="w-full max-w-[420px] lg:max-w-[440px] shrink-0 bg-[#fbf9f5] text-slate-900 rounded-2xl border border-neutral-800 shadow-2xl overflow-hidden flex flex-col justify-between">
               <div>
-                {/* Header */}
-                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800 text-[11px] font-mono text-slate-400">
-                  <span className="font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">INSTAGRAM POST</span>
+                {/* Header with dots */}
+                <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-200/80 text-[11px] font-mono text-neutral-400 bg-white">
+                  <span className="font-bold uppercase tracking-wider text-neutral-800">INSTAGRAM POST</span>
                   <div className="flex gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700" />
-                    <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700" />
+                    <span className="w-2 h-2 rounded-full bg-neutral-300" />
+                    <span className="w-2 h-2 rounded-full bg-neutral-300" />
                   </div>
                 </div>
 
                 {/* Account row */}
-                <div className="p-3.5 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
+                <div className="p-3.5 flex items-center justify-between border-b border-neutral-200/80 bg-white">
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-amber-500 text-white font-bold text-xs flex items-center justify-center">
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-500 to-amber-600 text-white font-bold text-xs flex items-center justify-center shadow-xs">
                       A
                     </div>
-                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200 font-sans">aurelle.skin</span>
+                    <span className="text-xs font-bold text-neutral-900 font-sans">aurelle.skin</span>
                   </div>
-                  <span className="text-[10px] text-slate-400 font-medium">Sponsored</span>
+                  <span className="text-[10px] text-neutral-400 font-medium">Sponsored</span>
                 </div>
 
-                {/* Visual Body (Serum Product Mockup) */}
-                <div className="relative bg-gradient-to-b from-stone-100 to-stone-200 dark:from-slate-800 dark:to-slate-850 p-6 flex flex-col items-center justify-center min-h-[220px]">
-                  {/* Cosmetic amber bottle representation */}
-                  <div className="relative flex flex-col items-center">
-                    {/* Dropper top */}
-                    <div className="w-3.5 h-6 bg-slate-800 rounded-t-sm" />
-                    <div className="w-5 h-2.5 bg-slate-700 rounded-xs" />
-                    {/* Amber bottle */}
-                    <div className="w-16 h-28 bg-gradient-to-r from-amber-700 via-amber-600 to-amber-800 rounded-lg shadow-lg flex flex-col items-center justify-center p-1.5 border border-amber-900/40 relative">
-                      {/* Bottle label */}
-                      <div className="w-full bg-stone-50 text-[6px] text-slate-900 font-sans py-2 px-1 text-center rounded-xs shadow-xs space-y-0.5">
-                        <div className="font-extrabold uppercase tracking-widest text-[7px]">AURELLE</div>
-                        <div className="text-[5px] text-slate-600 font-medium leading-none">VITAMIN C SERUM</div>
-                        <div className="text-[4px] text-slate-400">30 ML</div>
-                      </div>
-                    </div>
-                    {/* Pedestal shadow */}
-                    <div className="w-24 h-3 bg-stone-400/50 dark:bg-black/50 rounded-full blur-[2px] mt-1" />
+                {/* Visual Body with Real Serum Image & Live Scanning Effect */}
+                <div className="relative w-full h-[320px] sm:h-[350px] overflow-hidden bg-stone-100 flex items-center justify-center group">
+                  <img
+                    src="/images/instagram_serum_pedestal.jpg"
+                    alt="Aurelle Skin Vitamin C Serum on Pedestal"
+                    className="w-full h-full object-cover"
+                  />
+                  
+                  {/* Multimodal AI Scanning Laser Line (Smooth top-to-bottom sweep) */}
+                  <motion.div
+                    animate={{ y: [-10, 320, -10] }}
+                    transition={{ duration: 4.0, repeat: Infinity, ease: 'easeInOut' }}
+                    className="absolute left-0 right-0 h-[2px] bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.95)] z-20 pointer-events-none"
+                  >
+                    <div className="h-12 -mt-12 bg-gradient-to-t from-cyan-400/20 to-transparent pointer-events-none" />
+                  </motion.div>
+
+                  {/* Red dashed detection bounding box */}
+                  <div className="absolute bottom-6 left-6 right-6 border-2 border-dashed border-rose-500 rounded p-1.5 pointer-events-none z-10 bg-rose-500/10">
+                    <div className="absolute -top-1 -left-1 w-2.5 h-2.5 border-t-2 border-l-2 border-rose-500" />
+                    <div className="absolute -top-1 -right-1 w-2.5 h-2.5 border-t-2 border-r-2 border-rose-500" />
+                    <div className="absolute -bottom-1 -left-1 w-2.5 h-2.5 border-b-2 border-l-2 border-rose-500" />
+                    <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 border-b-2 border-r-2 border-rose-500" />
                   </div>
+
+                  {/* Floating Inspection Chip */}
+                  <div className="absolute top-4 right-4 bg-black/85 backdrop-blur-md border border-rose-500/60 shadow-xl rounded-xl p-2.5 max-w-[210px] text-left z-20 pointer-events-none">
+                    <div className="text-[9.5px] font-mono font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
+                      <span>BLOCKS · VLM EVIDENCE</span>
+                    </div>
+                    <p className="text-[10px] text-neutral-200 font-sans mt-0.5 leading-snug">
+                      "by 60% in just 2 weeks": clinical evidence says 32% in 8 weeks (FACT-014).
+                    </p>
+                  </div>
+                </div>
+
+                {/* Social interactions & Caption */}
+                <div className="p-4 bg-white space-y-2 border-t border-neutral-200/80">
+                  <div className="flex items-center justify-between text-neutral-700">
+                    <div className="flex items-center gap-3">
+                      <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
+                      <MessageCircle className="w-4 h-4" />
+                      <Send className="w-4 h-4" />
+                    </div>
+                    <Bookmark className="w-4 h-4" />
+                  </div>
+                  <p className="text-xs text-neutral-800 leading-relaxed font-sans pt-1">
+                    <strong className="text-neutral-900 mr-1.5">aurelle.skin</strong>
+                    Meet the NEW Vitamin C serum! Clinically proven to fade dark spots{' '}
+                    <span className="relative inline-block px-1 bg-rose-100 text-rose-700 font-bold rounded">
+                      <span className="line-through decoration-rose-600 decoration-2">
+                        by 60% in just 2 weeks.
+                      </span>
+                    </span>
+                  </p>
                 </div>
               </div>
 
               {/* Bottom Notice */}
-              <div className="p-3 bg-slate-50 dark:bg-slate-950/60 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 font-mono">
-                Asset ID: AST-AUR-IG-09 · Influencer Draft
-              </div>
-            </div>
-
-            {/* Card 2: WEB BANNER ("GLOW IN 2 WEEKS" Violation) */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col justify-between">
-              <div>
-                {/* Header */}
-                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800 text-[11px] font-mono text-slate-400">
-                  <span className="font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">WEB BANNER</span>
-                  <div className="flex gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700" />
-                    <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700" />
-                  </div>
-                </div>
-
-                {/* Banner Content Body */}
-                <div className="bg-[#f5ebe1] dark:bg-stone-900 p-5 min-h-[220px] flex flex-col justify-between text-slate-900 dark:text-stone-100 relative overflow-hidden">
-                  <div>
-                    <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight leading-tight">
-                      GLOW IN <br />
-                      <span className="relative inline-block text-rose-700 dark:text-rose-400 underline decoration-rose-500 decoration-wavy decoration-2">
-                        2 WEEKS
-                      </span>
-                    </h3>
-                  </div>
-
-                  {/* Serum droplet discs visual */}
-                  <div className="flex items-center justify-center gap-2 py-4">
-                    <div className="w-14 h-14 rounded-full bg-amber-400/30 border border-amber-500/40 flex items-center justify-center shadow-inner">
-                      <div className="w-8 h-8 rounded-full bg-amber-500/40" />
-                    </div>
-                    <div className="w-16 h-16 rounded-full bg-amber-300/40 border border-amber-400/50 flex items-center justify-center shadow-inner">
-                      <div className="w-10 h-10 rounded-full bg-amber-400/50" />
-                    </div>
-                  </div>
-
-                  <div className="text-right">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-700 dark:text-stone-300">
-                      AURELLE
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Bottom Alert Pill matching Reference */}
-              <div className="p-3 bg-slate-900 text-slate-100 border-t border-slate-800 text-xs flex items-start gap-2">
-                <span className="text-rose-400 font-bold">◆</span>
-                <span className="leading-snug text-[11px]">
-                  <strong className="text-rose-300">BLOCKS "Glow in 2 weeks":</strong> the clinical evidence covers 8 weeks, not 2 (FACT-014).
+              <div className="p-3 bg-neutral-950 text-neutral-100 border-t border-neutral-800 text-xs flex items-start gap-2 select-none">
+                <span className="text-rose-400 font-bold text-sm">◆</span>
+                <span className="leading-snug text-[11px] font-mono">
+                  <strong className="text-rose-300 uppercase">BLOCKS 60% in 2 weeks:</strong> the evidence says 32% in 8 (FACT-014)
                 </span>
               </div>
             </div>
 
-            {/* Card 3: EMAIL ("OUR DIWALI SALE IS HERE" Violation) */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col justify-between">
+            {/* Card 2: WEB BANNER (COMPACT / STAGGERED / MEDIUM - Floating Higher) */}
+            <div className="w-full max-w-[340px] lg:max-w-[360px] shrink-0 bg-[#fbf9f5] text-slate-900 rounded-2xl border border-neutral-800 shadow-2xl overflow-hidden flex flex-col justify-between self-start lg:-translate-y-4">
               <div>
                 {/* Header */}
-                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800 text-[11px] font-mono text-slate-400">
-                  <span className="font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">EMAIL</span>
+                <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-200/80 text-[11px] font-mono text-neutral-400 bg-white">
+                  <span className="font-bold uppercase tracking-wider text-neutral-800">WEB BANNER</span>
                   <div className="flex gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700" />
-                    <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700" />
+                    <span className="w-2 h-2 rounded-full bg-neutral-300" />
+                    <span className="w-2 h-2 rounded-full bg-neutral-300" />
                   </div>
                 </div>
 
-                {/* Email Content Body */}
-                <div className="bg-[#f8f5f0] dark:bg-stone-900/90 p-5 min-h-[220px] flex flex-col justify-between text-slate-900 dark:text-stone-100">
-                  <div className="space-y-1 text-xs text-slate-600 dark:text-stone-400">
-                    <div><span className="font-medium text-slate-400">From</span> <strong className="text-slate-800 dark:text-stone-200">Aurelle Skin</strong></div>
-                    <div><span className="font-medium text-slate-400">Subject</span> <strong className="text-slate-800 dark:text-stone-200">Something big is coming</strong></div>
+                {/* Banner Body with Real Uploaded Serum Image & Live Scanning Effect */}
+                <div className="relative w-full h-[280px] sm:h-[300px] overflow-hidden bg-amber-50 group">
+                  <img
+                    src="/images/serum_scan_glow.jpg"
+                    alt="Aurelle Glow In 2 Weeks Banner"
+                    className="w-full h-full object-cover"
+                  />
+                  
+                  {/* Scanning Laser Beam */}
+                  <motion.div
+                    animate={{ y: [-10, 270, -10] }}
+                    transition={{ duration: 3.2, delay: 0.5, repeat: Infinity, ease: 'easeInOut' }}
+                    className="absolute left-0 right-0 h-[2px] bg-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.95)] z-20 pointer-events-none"
+                  >
+                    <div className="h-10 -mt-10 bg-gradient-to-t from-rose-400/20 to-transparent pointer-events-none" />
+                  </motion.div>
+
+                  {/* Red dashed detection bounding box around "GLOW IN 2 WEEKS" */}
+                  <div className="absolute top-3 left-3 w-40 h-16 border-2 border-dashed border-rose-500 rounded p-1 pointer-events-none z-10 bg-rose-500/10">
+                    <div className="absolute -top-1 -left-1 w-2.5 h-2.5 border-t-2 border-l-2 border-rose-500" />
+                    <div className="absolute -top-1 -right-1 w-2.5 h-2.5 border-t-2 border-r-2 border-rose-500" />
+                    <div className="absolute -bottom-1 -left-1 w-2.5 h-2.5 border-b-2 border-l-2 border-rose-500" />
+                    <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 border-b-2 border-r-2 border-rose-500" />
                   </div>
 
-                  <div className="py-3 flex items-center justify-center gap-2">
-                    <div className="w-10 h-10 rounded-full bg-amber-400/40 border border-amber-500/30" />
-                    <div className="w-12 h-12 rounded-full bg-amber-500/30 border border-amber-600/30" />
-                    <div className="w-10 h-10 rounded-full bg-amber-300/40 border border-amber-400/30" />
-                  </div>
-
-                  <div className="space-y-2">
-                    <p className="text-xs sm:text-sm font-extrabold tracking-tight uppercase leading-snug">
-                      <span className="underline decoration-rose-500 decoration-wavy decoration-2 text-rose-700 dark:text-rose-400">
-                        OUR DIWALI SALE IS HERE:
-                      </span>{' '}
-                      20% OFF EVERYTHING.
+                  {/* Floating Inspection Chip matching User Reference */}
+                  <div className="absolute top-3 right-3 bg-black/85 backdrop-blur-md border border-rose-500/60 shadow-xl rounded-xl p-2 max-w-[165px] text-left z-20 pointer-events-none">
+                    <div className="text-[9px] font-mono font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
+                      <span>BLOCKS · A11Y</span>
+                    </div>
+                    <p className="text-[9.5px] text-neutral-200 font-sans mt-0.5 leading-snug">
+                      "GLOW IN 2 WEEKS" is 1.96:1. Large text needs 3:1.
                     </p>
-                    <button className="px-3 py-1 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-[10px] font-bold uppercase tracking-wider cursor-pointer">
-                      SHOP NOW
-                    </button>
                   </div>
                 </div>
               </div>
 
-              {/* Bottom Alert Pill matching Reference */}
-              <div className="p-3 bg-slate-900 text-slate-100 border-t border-slate-800 text-xs flex items-start gap-2">
-                <span className="text-rose-400 font-bold">◆</span>
-                <span className="leading-snug text-[11px]">
-                  <strong className="text-rose-300">BLOCKS</strong> Announces the Diwali sale while it's still embargoed until November (FACT-033).
+              {/* Bottom Alert Pill */}
+              <div className="p-3 bg-neutral-950 text-neutral-100 border-t border-neutral-800 text-xs flex items-start gap-2 select-none">
+                <span className="text-rose-400 font-bold text-sm">◆</span>
+                <span className="leading-snug text-[11px] font-mono">
+                  <strong className="text-rose-300 uppercase">BLOCKS "Glow in 2 weeks":</strong> evidence covers 8 weeks, not 2 (FACT-014)
+                </span>
+              </div>
+            </div>
+
+            {/* Card 3: EMAIL (WIDE / STAGGERED on Right - Floating Slightly Lower) */}
+            <div className="w-full max-w-[400px] lg:max-w-[420px] shrink-0 bg-[#fbf9f5] text-slate-900 rounded-2xl border border-neutral-800 shadow-2xl overflow-hidden flex flex-col justify-between self-start lg:translate-y-6">
+              <div>
+                {/* Header */}
+                <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-200/80 text-[11px] font-mono text-neutral-400 bg-white">
+                  <span className="font-bold uppercase tracking-wider text-neutral-800">EMAIL</span>
+                  <div className="flex gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-neutral-300" />
+                    <span className="w-2 h-2 rounded-full bg-neutral-300" />
+                  </div>
+                </div>
+
+                {/* Email Metadata */}
+                <div className="p-3.5 bg-white border-b border-neutral-200/80 space-y-0.5 text-xs text-neutral-600 font-sans">
+                  <div><span className="text-neutral-400 font-medium">From</span> <strong className="text-neutral-900 ml-1">Aurelle Skin</strong></div>
+                  <div><span className="text-neutral-400 font-medium">Subject</span> <strong className="text-neutral-900 ml-1">Something big is coming</strong></div>
+                </div>
+
+                {/* Email Visual with Live Scanning Effect */}
+                <div className="relative w-full h-[180px] sm:h-[195px] overflow-hidden bg-stone-100 flex items-center justify-center group">
+                  <img
+                    src="/images/email_swatches_leaves.jpg"
+                    alt="Diwali Campaign Swatches"
+                    className="w-full h-full object-cover"
+                  />
+                  
+                  {/* Scanning Laser Beam */}
+                  <motion.div
+                    animate={{ y: [-10, 180, -10] }}
+                    transition={{ duration: 3.6, delay: 1.0, repeat: Infinity, ease: 'easeInOut' }}
+                    className="absolute left-0 right-0 h-[2px] bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.95)] z-20 pointer-events-none"
+                  >
+                    <div className="h-8 -mt-8 bg-gradient-to-t from-cyan-400/20 to-transparent pointer-events-none" />
+                  </motion.div>
+
+                  {/* Floating Inspection Chip */}
+                  <div className="absolute top-3 right-3 bg-black/85 backdrop-blur-md border border-rose-500/60 shadow-xl rounded-xl p-2 max-w-[190px] text-left z-20 pointer-events-none">
+                    <div className="text-[9px] font-mono font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
+                      <span>BLOCKS · EMBARGO</span>
+                    </div>
+                    <p className="text-[9.5px] text-neutral-200 font-sans mt-0.5 leading-snug">
+                      Diwali campaign is embargoed until official launch (FACT-033).
+                    </p>
+                  </div>
+                </div>
+
+                {/* Email Content Body */}
+                <div className="p-4 bg-white space-y-3">
+                  <p className="text-xs sm:text-sm font-extrabold tracking-tight uppercase leading-snug text-neutral-900">
+                    <span className="relative inline-block">
+                      <span className="underline decoration-rose-500 decoration-wavy decoration-2 text-rose-600">
+                        OUR DIWALI SALE IS HERE:
+                      </span>
+                    </span>{' '}
+                    20% OFF EVERYTHING.
+                  </p>
+                  <button className="px-4 py-1.5 rounded-full bg-neutral-900 text-white text-[10px] font-bold uppercase tracking-wider hover:bg-neutral-800 transition-colors cursor-pointer">
+                    SHOP NOW
+                  </button>
+                </div>
+              </div>
+
+              {/* Bottom Alert Pill */}
+              <div className="p-3 bg-neutral-950 text-neutral-100 border-t border-neutral-800 text-xs flex items-start gap-2 select-none">
+                <span className="text-rose-400 font-bold text-sm">◆</span>
+                <span className="leading-snug text-[11px] font-mono">
+                  <strong className="text-rose-300 uppercase">BLOCKS</strong> Announces the Diwali sale while it's still embargoed (FACT-033)
                 </span>
               </div>
             </div>
@@ -920,209 +1006,210 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ------------------------------------------------------------------- */}
       {/* SECTION 3 — CORE CAPABILITIES (Unified, Aligned & Realistic Visuals) */}
       {/* ------------------------------------------------------------------- */}
-      <section id="platform" className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16 relative">
+      <section id="platform" className="py-20 sm:py-28 bg-black text-white border-b border-neutral-900 relative">
         {/* Anchor for features nav link */}
         <div id="features" className="absolute -top-24 left-0 pointer-events-none" />
         
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300">
-            <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-            <span>Autonomous Brand Intelligence &amp; Governance</span>
+        <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:pl-6 xl:pl-8 lg:pr-6 xl:pr-8 space-y-16">
+          <div className="text-center max-w-3xl mx-auto space-y-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-indigo-950/80 border border-indigo-800 text-indigo-300">
+              <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+              <span>Autonomous Brand Intelligence &amp; Governance</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
+              Six Enterprise Capabilities. Grounded In Real Evidence.
+            </h2>
+            <p className="text-sm sm:text-base text-neutral-400">
+              From raw packaging inspection and brand fact curation to multi-agent risk gating, Digital Twin simulation, and cryptographic audit proofs.
+            </p>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            Six Enterprise Capabilities. Grounded In Real Evidence.
-          </h2>
-          <p className="text-base text-slate-600 dark:text-slate-300">
-            From raw packaging inspection and brand fact curation to multi-agent risk gating, Digital Twin simulation, and cryptographic audit proofs.
-          </p>
-        </div>
 
-        {/* Aligned 6-Card Grid with Blue Hover & Keyboard Focus Highlights */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-          {[
-            {
-              id: 'brand-knowledge' as WorkspaceCategory,
-              title: 'Brand Knowledge',
-              subtitle: 'Ground Truth & Guidelines',
-              desc: 'Centralized repository for brand guidelines, master facts, product claims, and terminology rules. Ingests PDFs, DOCX, and regulatory rules into immutable truth nodes with interactive knowledge graph traversal.',
-              image: '/images/product_truth_bottle.jpg',
-              badge: 'GROUND TRUTH REPOSITORY',
-              metric: '100% Deterministic Fact Matching',
-              icon: BookOpen,
-              subTab: 'guidelines'
-            },
-            {
-              id: 'content-intelligence' as WorkspaceCategory,
-              title: 'Content Intelligence',
-              subtitle: 'Pre-Publication Multi-Agent Review',
-              desc: 'Multi-agent governance scanning marketing copy, social ads, packaging, and digital creatives. Evaluates tone of voice, checks claim substantiation against ground-truth facts, and generates instant reverse corrections.',
-              image: '/images/analytics_dashboard.jpg',
-              badge: 'PRE-RELEASE COPY AUDIT',
-              metric: 'Sub-800ms Multi-Agent Latency',
-              icon: Sparkles,
-              subTab: 'inspector'
-            },
-            {
-              id: 'risk-intelligence' as WorkspaceCategory,
-              title: 'Risk Intelligence',
-              subtitle: 'Compliance & Exposure Analytics',
-              desc: 'Cross-channel regulatory risk scoring and exposure detection. Identifies FTC Green Guide violations, unauthorized superlative claims, trademark non-compliance, and NHTSA autonomous restrictions across campaigns.',
-              image: '/images/campaign_approval.jpg',
-              badge: 'REGULATORY EXPOSURE GATE',
-              metric: 'Cross-Channel Risk Heatmap',
-              icon: ShieldAlert,
-              subTab: 'risks'
-            },
-            {
-              id: 'impact-simulation' as WorkspaceCategory,
-              title: 'Impact Simulation',
-              subtitle: 'Digital Twin Blast Radius',
-              desc: 'Virtual sandbox simulating the cascading consequences of proposed commercial fact, claim, or price revisions before commit. Traverses enterprise dependency maps across published assets, rate cards, and partner touchpoints.',
-              image: '/images/digital_twin_network.jpg',
-              badge: 'ORGANIZATIONAL SIMULATOR',
-              metric: 'Real-Time Blast Radius Tracing',
-              icon: GitFork,
-              subTab: 'simulator'
-            },
-            {
-              id: 'governance-approval' as WorkspaceCategory,
-              title: 'Governance & Approval',
-              subtitle: 'Human-in-the-Loop Sign-Off',
-              desc: 'Strict human-in-the-loop governance with zero autonomous publishing. Multi-tier review queue with role-based sign-offs, SLA tracking, audit notes, and statutory approval status transitions.',
-              image: '/images/campaign_approval.jpg',
-              badge: 'HUMAN-IN-THE-LOOP CONTROL',
-              metric: 'Zero Autonomous Publishing Gate',
-              icon: CheckCircle2,
-              subTab: 'approvals'
-            },
-            {
-              id: 'trust-verification' as WorkspaceCategory,
-              title: 'Trust & Verification',
-              subtitle: 'SHA-256 Release Digest & Public Portal',
-              desc: 'Tamper-evident SHA-256 cryptographic release digest chain permanently linking approved content, reviewer credentials, and timestamps. Public zero-auth comparison portal enables external consumer and partner verification.',
-              image: '/images/cryptographic_ledger.jpg',
-              badge: 'CRYPTOGRAPHIC ACCOUNTABILITY',
-              metric: '177 Automated Tests Passing',
-              icon: Lock,
-              subTab: 'ledger'
-            },
-          ].map((cap) => {
-            const isSelected = activeWorkspaceCategory === cap.id;
-            const isHovered = activeCapabilityId === cap.id;
-            const isHighlighted = isSelected || isHovered;
-            const Icon = cap.icon;
+          {/* Aligned 6-Card Grid with Blue Hover & Keyboard Focus Highlights */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
+            {[
+              {
+                id: 'brand-knowledge' as WorkspaceCategory,
+                title: 'Brand Knowledge',
+                subtitle: 'Ground Truth & Guidelines',
+                desc: 'Centralized repository for brand guidelines, master facts, product claims, and terminology rules. Ingests PDFs, DOCX, and regulatory rules into immutable truth nodes with interactive knowledge graph traversal.',
+                image: '/images/product_truth_bottle.jpg',
+                badge: 'GROUND TRUTH REPOSITORY',
+                metric: '100% Deterministic Fact Matching',
+                icon: BookOpen,
+                subTab: 'guidelines'
+              },
+              {
+                id: 'content-intelligence' as WorkspaceCategory,
+                title: 'Content Intelligence',
+                subtitle: 'Pre-Publication Multi-Agent Review',
+                desc: 'Multi-agent governance scanning marketing copy, social ads, packaging, and digital creatives. Evaluates tone of voice, checks claim substantiation against ground-truth facts, and generates instant reverse corrections.',
+                image: '/images/analytics_dashboard.jpg',
+                badge: 'PRE-RELEASE COPY AUDIT',
+                metric: 'Sub-800ms Multi-Agent Latency',
+                icon: Sparkles,
+                subTab: 'inspector'
+              },
+              {
+                id: 'risk-intelligence' as WorkspaceCategory,
+                title: 'Risk Intelligence',
+                subtitle: 'Compliance & Exposure Analytics',
+                desc: 'Cross-channel regulatory risk scoring and exposure detection. Identifies FTC Green Guide violations, unauthorized superlative claims, trademark non-compliance, and NHTSA autonomous restrictions across campaigns.',
+                image: '/images/campaign_approval.jpg',
+                badge: 'REGULATORY EXPOSURE GATE',
+                metric: 'Cross-Channel Risk Heatmap',
+                icon: ShieldAlert,
+                subTab: 'risks'
+              },
+              {
+                id: 'impact-simulation' as WorkspaceCategory,
+                title: 'Impact Simulation',
+                subtitle: 'Digital Twin Blast Radius',
+                desc: 'Virtual sandbox simulating the cascading consequences of proposed commercial fact, claim, or price revisions before commit. Traverses enterprise dependency maps across published assets, rate cards, and partner touchpoints.',
+                image: '/images/digital_twin_network.jpg',
+                badge: 'ORGANIZATIONAL SIMULATOR',
+                metric: 'Real-Time Blast Radius Tracing',
+                icon: GitFork,
+                subTab: 'simulator'
+              },
+              {
+                id: 'governance-approval' as WorkspaceCategory,
+                title: 'Governance & Approval',
+                subtitle: 'Human-in-the-Loop Sign-Off',
+                desc: 'Strict human-in-the-loop governance with zero autonomous publishing. Multi-tier review queue with role-based sign-offs, SLA tracking, audit notes, and statutory approval status transitions.',
+                image: '/images/campaign_approval.jpg',
+                badge: 'HUMAN-IN-THE-LOOP CONTROL',
+                metric: 'Zero Autonomous Publishing Gate',
+                icon: CheckCircle2,
+                subTab: 'approvals'
+              },
+              {
+                id: 'trust-verification' as WorkspaceCategory,
+                title: 'Trust & Verification',
+                subtitle: 'SHA-256 Release Digest & Public Portal',
+                desc: 'Tamper-evident SHA-256 cryptographic release digest chain permanently linking approved content, reviewer credentials, and timestamps. Public zero-auth comparison portal enables external consumer and partner verification.',
+                image: '/images/cryptographic_ledger.jpg',
+                badge: 'CRYPTOGRAPHIC ACCOUNTABILITY',
+                metric: '177 Automated Tests Passing',
+                icon: Lock,
+                subTab: 'ledger'
+              },
+            ].map((cap) => {
+              const isSelected = activeWorkspaceCategory === cap.id;
+              const isHovered = activeCapabilityId === cap.id;
+              const isHighlighted = isSelected || isHovered;
+              const Icon = cap.icon;
 
-            return (
-              <div 
-                key={cap.id}
-                tabIndex={0}
-                role="button"
-                aria-label={`Open ${cap.title} Workspace`}
-                onMouseEnter={() => setActiveCapabilityId(cap.id)}
-                onMouseLeave={() => {
-                  if (activeCapabilityId === cap.id) setActiveCapabilityId(null);
-                }}
-                onFocus={() => setActiveCapabilityId(cap.id)}
-                onBlur={() => {
-                  if (activeCapabilityId === cap.id) setActiveCapabilityId(null);
-                }}
-                onClick={() => handleSelectCapability(cap.id, cap.subTab)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleSelectCapability(cap.id, cap.subTab);
-                  }
-                }}
-                className={`bg-white dark:bg-slate-900 rounded-2xl border overflow-hidden flex flex-col justify-between transition-all duration-200 ease-out select-none cursor-pointer outline-none group ${
-                  isHighlighted
-                    ? 'border-2 border-[#2563EB] dark:border-blue-500 ring-2 ring-[#2563EB]/25 dark:ring-blue-500/30 shadow-xl shadow-blue-500/15 dark:shadow-blue-500/25 -translate-y-1'
-                    : 'border-slate-200 dark:border-slate-800 shadow-xs hover:border-blue-400 dark:hover:border-blue-600 translate-y-0'
-                }`}
-              >
-                <div>
-                  {/* Realistic Photographic Header with Aspect Ratio & Badges */}
-                  <div className="h-48 sm:h-52 w-full overflow-hidden relative bg-slate-100 dark:bg-slate-800">
-                    <img
-                      src={cap.image}
-                      alt={cap.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/25 to-transparent pointer-events-none" />
-                    
-                    {/* Floating Badges */}
-                    <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
-                      <span className={`text-[10px] font-mono font-bold uppercase tracking-wider backdrop-blur-md px-2 py-0.5 rounded border transition-colors duration-200 ${
-                        isHighlighted
-                          ? 'bg-[#2563EB] text-white border-blue-400'
-                          : 'bg-slate-900/80 text-emerald-300 border-emerald-500/30'
-                      }`}>
-                        {isSelected ? 'ACTIVE WORKSPACE' : cap.badge}
-                      </span>
-                      <div className={`w-8 h-8 rounded-lg backdrop-blur-md flex items-center justify-center border shadow-xs transition-colors duration-200 ${
-                        isHighlighted
-                          ? 'bg-[#2563EB] text-white border-blue-400'
-                          : 'bg-slate-900/80 text-white border-white/20'
-                      }`}>
-                        <Icon className={`w-4 h-4 ${isHighlighted ? 'text-white' : 'text-blue-400'}`} />
+              return (
+                <div 
+                  key={cap.id}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`Open ${cap.title} Workspace`}
+                  onMouseEnter={() => setActiveCapabilityId(cap.id)}
+                  onMouseLeave={() => {
+                    if (activeCapabilityId === cap.id) setActiveCapabilityId(null);
+                  }}
+                  onFocus={() => setActiveCapabilityId(cap.id)}
+                  onBlur={() => {
+                    if (activeCapabilityId === cap.id) setActiveCapabilityId(null);
+                  }}
+                  onClick={() => handleSelectCapability(cap.id, cap.subTab)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleSelectCapability(cap.id, cap.subTab);
+                    }
+                  }}
+                  className={`bg-neutral-950 rounded-2xl border overflow-hidden flex flex-col justify-between transition-all duration-200 ease-out select-none cursor-pointer outline-none group ${
+                    isHighlighted
+                      ? 'border-2 border-[#2563EB] ring-2 ring-[#2563EB]/25 shadow-xl shadow-blue-500/15 -translate-y-1'
+                      : 'border-neutral-800 shadow-xs hover:border-neutral-700 translate-y-0'
+                  }`}
+                >
+                  <div>
+                    {/* Realistic Photographic Header with Aspect Ratio & Badges */}
+                    <div className="h-48 sm:h-52 w-full overflow-hidden relative bg-neutral-900">
+                      <img
+                        src={cap.image}
+                        alt={cap.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/30 to-transparent pointer-events-none" />
+                      
+                      {/* Floating Badges */}
+                      <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
+                        <span className={`text-[10px] font-mono font-bold uppercase tracking-wider backdrop-blur-md px-2 py-0.5 rounded border transition-colors duration-200 ${
+                          isHighlighted
+                            ? 'bg-[#2563EB] text-white border-blue-400'
+                            : 'bg-neutral-900/80 text-emerald-300 border-emerald-500/30'
+                        }`}>
+                          {isSelected ? 'ACTIVE WORKSPACE' : cap.badge}
+                        </span>
+                        <div className={`w-8 h-8 rounded-lg backdrop-blur-md flex items-center justify-center border shadow-xs transition-colors duration-200 ${
+                          isHighlighted
+                            ? 'bg-[#2563EB] text-white border-blue-400'
+                            : 'bg-neutral-900/80 text-white border-white/20'
+                        }`}>
+                          <Icon className={`w-4 h-4 ${isHighlighted ? 'text-white' : 'text-blue-400'}`} />
+                        </div>
+                      </div>
+
+                      <div className="absolute bottom-3 left-4 right-4 pointer-events-none">
+                        <span className={`text-[11px] font-mono font-semibold block transition-colors duration-200 ${
+                          isHighlighted ? 'text-blue-200' : 'text-neutral-400'
+                        }`}>
+                          {cap.subtitle}
+                        </span>
+                        <h3 className={`text-base sm:text-lg font-bold tracking-tight truncate transition-colors duration-200 ${
+                          isHighlighted ? 'text-blue-100' : 'text-white'
+                        }`}>
+                          {cap.title}
+                        </h3>
                       </div>
                     </div>
 
-                    <div className="absolute bottom-3 left-4 right-4 pointer-events-none">
-                      <span className={`text-[11px] font-mono font-semibold block transition-colors duration-200 ${
-                        isHighlighted ? 'text-blue-200' : 'text-slate-300'
-                      }`}>
-                        {cap.subtitle}
-                      </span>
-                      <h3 className={`text-base sm:text-lg font-bold tracking-tight truncate transition-colors duration-200 ${
-                        isHighlighted ? 'text-blue-100' : 'text-white'
-                      }`}>
-                        {cap.title}
-                      </h3>
+                    {/* Card Body Description */}
+                    <div className={`p-6 space-y-3 transition-colors duration-200 ${
+                      isHighlighted ? 'bg-blue-950/20' : ''
+                    }`}>
+                      <p className="text-xs text-neutral-400 leading-relaxed min-h-[58px]">
+                        {cap.desc}
+                      </p>
                     </div>
                   </div>
 
-                  {/* Card Body Description */}
-                  <div className={`p-6 space-y-3 transition-colors duration-200 ${
-                    isHighlighted ? 'bg-blue-50/20 dark:bg-blue-950/20' : ''
+                  {/* Card Footer with Metrics & Action Button */}
+                  <div className={`px-6 pb-5 pt-3 border-t flex items-center justify-between mt-auto transition-colors duration-200 ${
+                    isHighlighted
+                      ? 'border-blue-900/40 bg-blue-950/40'
+                      : 'border-neutral-800/80 bg-neutral-900/60'
                   }`}>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed min-h-[58px]">
-                      {cap.desc}
-                    </p>
+                    <span className={`text-[11px] font-mono truncate max-w-[170px] transition-colors duration-200 ${
+                      isHighlighted ? 'text-blue-300 font-semibold' : 'text-neutral-400'
+                    }`} title={cap.metric}>
+                      {cap.metric}
+                    </span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelectCapability(cap.id, cap.subTab);
+                      }}
+                      className={`inline-flex items-center gap-1 text-xs font-bold transition-colors cursor-pointer shrink-0 ${
+                        isHighlighted
+                          ? 'text-blue-400'
+                          : 'text-blue-400 hover:text-blue-300'
+                      }`}
+                    >
+                      <span>{isSelected ? 'Open Workspace' : 'Explore'}</span>
+                      <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                    </button>
                   </div>
                 </div>
-
-                {/* Card Footer with Metrics & Action Button */}
-                <div className={`px-6 pb-5 pt-3 border-t flex items-center justify-between mt-auto transition-colors duration-200 ${
-                  isHighlighted
-                    ? 'border-blue-100 dark:border-blue-900/40 bg-blue-50/50 dark:bg-blue-950/40'
-                    : 'border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/50'
-                }`}>
-                  <span className={`text-[11px] font-mono truncate max-w-[170px] transition-colors duration-200 ${
-                    isHighlighted ? 'text-blue-700 dark:text-blue-300 font-semibold' : 'text-slate-500 dark:text-slate-400'
-                  }`} title={cap.metric}>
-                    {cap.metric}
-                  </span>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleSelectCapability(cap.id, cap.subTab);
-                    }}
-                    className={`inline-flex items-center gap-1 text-xs font-bold transition-colors cursor-pointer shrink-0 ${
-                      isHighlighted
-                        ? 'text-[#2563EB] dark:text-blue-400'
-                        : 'text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300'
-                    }`}
-                  >
-                    <span>{isSelected ? 'Open Workspace' : 'Explore'}</span>
-                    <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-
       </section>
 
       {/* ------------------------------------------------------------------- */}
@@ -1253,8 +1340,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ------------------------------------------------------------------- */}
       {/* SECTION 7 — SIGNATURE INNOVATION (Brand Governance Digital Twin)    */}
       {/* ------------------------------------------------------------------- */}
-      <section id="digital-twin" className="py-16 sm:py-24 bg-slate-900 text-white overflow-hidden relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      <section id="digital-twin" className="py-20 sm:py-28 bg-black text-white overflow-hidden relative border-b border-neutral-900">
+        <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:pl-6 xl:pl-8 lg:pr-6 xl:pr-8 space-y-12">
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             
@@ -1272,40 +1359,40 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </span>
               </h2>
 
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
+              <p className="text-sm sm:text-base text-neutral-300 leading-relaxed">
                 Ordinary tools lint the text in front of them in isolation. The BrandTrace Digital Twin simulates the cascading consequences of a proposed fact or policy change <em>before</em> an authorized change is committed.
               </p>
 
               {/* Realistic Demonstration Comparison */}
-              <div className="p-4 bg-slate-800/80 rounded-xl border border-slate-700 space-y-3">
-                <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
+              <div className="p-4 bg-neutral-950 rounded-xl border border-neutral-800 space-y-3">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-neutral-400">
                   Illustrative Simulation Scenario (Synthetic Demo Data)
                 </span>
                 
                 <div className="grid grid-cols-2 gap-4 text-xs font-mono">
-                  <div className="p-2.5 bg-slate-900 rounded-lg border border-slate-700">
-                    <span className="text-slate-400 text-[10px] block">APPROVED PRICE</span>
+                  <div className="p-2.5 bg-neutral-900 rounded-lg border border-neutral-800">
+                    <span className="text-neutral-400 text-[10px] block">APPROVED PRICE</span>
                     <strong className="text-emerald-400 text-sm">₹499 / month</strong>
-                    <span className="text-slate-500 text-[10px] block mt-0.5">FACT-AUR-PRC-01</span>
+                    <span className="text-neutral-500 text-[10px] block mt-0.5">FACT-AUR-PRC-01</span>
                   </div>
-                  <div className="p-2.5 bg-slate-900 rounded-lg border border-indigo-800">
-                    <span className="text-slate-400 text-[10px] block">PROPOSED MUTATION</span>
+                  <div className="p-2.5 bg-neutral-900 rounded-lg border border-indigo-800">
+                    <span className="text-neutral-400 text-[10px] block">PROPOSED MUTATION</span>
                     <strong className="text-cyan-400 text-sm">₹599 / month</strong>
                     <span className="text-indigo-400 text-[10px] block mt-0.5">Semi-Annual Revision</span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-700/60 text-center font-mono">
+                <div className="grid grid-cols-3 gap-2 pt-2 border-t border-neutral-800 text-center font-mono">
                   <div>
-                    <span className="text-slate-400 text-[10px] block">AFFECTED TOUCHPOINTS</span>
+                    <span className="text-neutral-400 text-[10px] block">AFFECTED TOUCHPOINTS</span>
                     <strong className="text-white text-xs">4 Assets</strong>
                   </div>
                   <div>
-                    <span className="text-slate-400 text-[10px] block">EXPOSURE AT RISK</span>
+                    <span className="text-neutral-400 text-[10px] block">EXPOSURE AT RISK</span>
                     <strong className="text-rose-400 text-xs">$320,000</strong>
                   </div>
                   <div>
-                    <span className="text-slate-400 text-[10px] block">ESTIMATED WORKLOAD</span>
+                    <span className="text-neutral-400 text-[10px] block">ESTIMATED WORKLOAD</span>
                     <strong className="text-amber-400 text-xs">12.5 Hours</strong>
                   </div>
                 </div>
@@ -1314,7 +1401,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="pt-2">
                 <button
                   onClick={() => handleSelectCapability('impact-simulation', 'simulator')}
-                  className="px-5 py-3 rounded-xl text-xs font-bold text-slate-900 bg-white hover:bg-slate-100 transition-colors flex items-center gap-2 cursor-pointer shadow-md"
+                  className="px-5 py-3 rounded-xl text-xs font-bold text-neutral-900 bg-white hover:bg-neutral-100 transition-colors flex items-center gap-2 cursor-pointer shadow-md"
                 >
                   <span>Launch Change Impact Simulator</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -1324,28 +1411,28 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Right: Graph Canvas Simulation Preview Card */}
-            <div className="lg:col-span-6 bg-slate-800/90 border border-slate-700 rounded-2xl p-6 space-y-4 shadow-2xl">
+            <div className="lg:col-span-6 bg-neutral-950 border border-neutral-800 rounded-2xl p-6 space-y-4 shadow-2xl">
               {/* Realistic Neural Dependency Mesh Header */}
-              <div className="h-32 w-full rounded-xl overflow-hidden relative border border-slate-700">
+              <div className="h-32 w-full rounded-xl overflow-hidden relative border border-neutral-800">
                 <img
                   src="/images/digital_twin_network.jpg"
                   alt="Digital Twin Neural Dependency Mesh"
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
                 <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-xs font-mono">
                   <span className="text-cyan-300 font-bold flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
                     Live Neural Dependency Mesh
                   </span>
-                  <span className="text-slate-300 text-[10px]">4 Downstream Nodes Flagged</span>
+                  <span className="text-neutral-300 text-[10px]">4 Downstream Nodes Flagged</span>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between border-b border-slate-700 pb-3">
+              <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
                 <div className="flex items-center gap-2">
                   <GitFork className="w-4 h-4 text-cyan-400" />
-                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-200">
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-neutral-200">
                     Downstream Blast Radius Map
                   </span>
                 </div>
@@ -1361,10 +1448,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   { id: 'AST-AUR-WEB-01', name: 'Aurelle Cloud Studio Pricing & Checkout', status: 'REQUIRES REVISION', risk: 'CRITICAL' },
                   { id: 'AST-AUR-DOC-01', name: 'B2B Enterprise Rate Card PDF', status: 'REQUIRES REVISION', risk: 'MEDIUM' },
                 ].map((item, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-2.5 bg-slate-900/90 border border-slate-700/80 rounded-lg text-xs font-mono">
+                  <div key={idx} className="flex items-center justify-between p-2.5 bg-neutral-900 border border-neutral-800 rounded-lg text-xs font-mono">
                     <div>
-                      <span className="text-slate-400 text-[10px] block">{item.id}</span>
-                      <span className="text-slate-200 font-sans font-medium text-[11px]">{item.name}</span>
+                      <span className="text-neutral-400 text-[10px] block">{item.id}</span>
+                      <span className="text-neutral-200 font-sans font-medium text-[11px]">{item.name}</span>
                     </div>
                     <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-rose-950 text-rose-300 border border-rose-800">
                       {item.status}
@@ -1373,7 +1460,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 ))}
               </div>
 
-              <div className="p-3 bg-slate-900 border border-slate-700/80 rounded-xl text-[11px] text-slate-400 flex items-center gap-2">
+              <div className="p-3 bg-neutral-900 border border-neutral-800 rounded-xl text-[11px] text-neutral-400 flex items-center gap-2">
                 <Lock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                 <span>Non-destructive guarantee: Production database facts remain unchanged until authorized.</span>
               </div>
@@ -1387,153 +1474,155 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ------------------------------------------------------------------- */}
       {/* SECTION 8 — TRUST AND SECURITY                                      */}
       {/* ------------------------------------------------------------------- */}
-      <section id="security" className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      <section id="security" className="py-20 sm:py-28 bg-black text-white border-b border-neutral-900 space-y-12">
+        <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:pl-6 xl:pl-8 lg:pr-6 xl:pr-8 space-y-12">
         
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-            Enterprise Integrity
-          </span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            Security, Isolation &amp; Cryptographic Accountability
-          </h2>
-          <p className="text-base text-slate-600 dark:text-slate-300">
-            Built from the ground up for strict multi-tenancy, immutable auditability, and zero unauthenticated data leaks.
-          </p>
-        </div>
+          <div className="text-center max-w-3xl mx-auto space-y-4">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-400">
+              Enterprise Integrity
+            </span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
+              Security, Isolation &amp; Cryptographic Accountability
+            </h2>
+            <p className="text-sm sm:text-base text-neutral-400">
+              Built from the ground up for strict multi-tenancy, immutable auditability, and zero unauthenticated data leaks.
+            </p>
+          </div>
 
-        <div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          onMouseLeave={() => setActiveSecurityIndex(null)}
-        >
-          {[
-            {
-              id: 'multi-tenancy',
-              title: 'Strict Multi-Tenancy',
-              icon: Lock,
-              defaultIconColor: 'bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400',
-              desc: (
-                <>
-                  Strict organizational boundary isolation ensures brand facts, guidelines, and assets remain entirely confidential and segregated across enterprise teams.
-                </>
-              )
-            },
-            {
-              id: 'ssrf-defense',
-              title: 'Secure External Ingestion',
-              icon: Globe,
-              defaultIconColor: 'bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400',
-              desc: (
-                <>
-                  Automated website and document ingestion operates through secure sandboxed fetchers, isolating internal corporate networks and infrastructure from external exposure.
-                </>
-              )
-            },
-            {
-              id: 'sha256-digests',
-              title: 'Cryptographic Release Digest Chain',
-              icon: Hash,
-              defaultIconColor: 'bg-cyan-50 dark:bg-cyan-950 text-cyan-600 dark:text-cyan-400',
-              desc: (
-                <>
-                  Every approved release receives an immutable SHA-256 cryptographic release digest chain, permanently linking approved wording, reviewer credentials, and release timestamps into a tamper-evident record.
-                </>
-              )
-            },
-            {
-              id: 'identity-sanitized',
-              title: 'Identity-Sanitized Public Verification',
-              icon: ShieldCheck,
-              defaultIconColor: 'bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400',
-              desc: (
-                <>
-                  Public verification endpoints validate release status and cryptographic hashes with zero authentication required, without leaking reviewer emails, internal roles, or database identifiers.
-                </>
-              )
-            },
-            {
-              id: 'rbac',
-              title: 'Role-Based Access (RBAC)',
-              icon: Sliders,
-              defaultIconColor: 'bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400',
-              desc: (
-                <>
-                  Fine-grained privileges across Brand Manager, Legal Compliance, Creative Director, and External Auditor. Only authorized roles can commit fact updates or sign release seals.
-                </>
-              )
-            },
-            {
-              id: 'automated-tests',
-              title: '177 Automated Tests Passing',
-              icon: CheckCircle2,
-              defaultIconColor: 'bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400',
-              desc: (
-                <>
-                  100% verified pytest test suite covering multi-agent coordination, graph blast radius traversal, salted SHA-256 authentication, SSRF protection, and cryptographic verification.
-                </>
-              )
-            }
-          ].map((feature, index) => {
-            const isActive = activeSecurityIndex === index;
-            const Icon = feature.icon;
-            return (
-              <div
-                key={feature.id}
-                tabIndex={0}
-                role="article"
-                aria-label={feature.title}
-                onMouseEnter={() => setActiveSecurityIndex(index)}
-                onMouseLeave={() => {
-                  if (activeSecurityIndex === index) {
-                    setActiveSecurityIndex(null);
-                  }
-                }}
-                onFocus={() => setActiveSecurityIndex(index)}
-                onBlur={() => {
-                  if (activeSecurityIndex === index) {
-                    setActiveSecurityIndex(null);
-                  }
-                }}
-                onTouchStart={() => setActiveSecurityIndex(index)}
-                className={`p-6 rounded-2xl space-y-3 cursor-pointer outline-none transition-all duration-200 ease-out select-none ${
-                  isActive
-                    ? 'bg-gradient-to-b from-blue-50/80 via-white to-blue-50/40 dark:from-blue-950/40 dark:via-slate-900 dark:to-blue-950/20 border-2 border-[#2563EB] dark:border-blue-500 shadow-lg shadow-blue-500/15 dark:shadow-blue-500/25 -translate-y-1 ring-2 ring-[#2563EB]/20 dark:ring-blue-500/30'
-                    : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-blue-300 dark:hover:border-blue-800 translate-y-0'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 ${
+          <div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            onMouseLeave={() => setActiveSecurityIndex(null)}
+          >
+            {[
+              {
+                id: 'multi-tenancy',
+                title: 'Strict Multi-Tenancy',
+                icon: Lock,
+                defaultIconColor: 'bg-indigo-950 text-indigo-400',
+                desc: (
+                  <>
+                    Strict organizational boundary isolation ensures brand facts, guidelines, and assets remain entirely confidential and segregated across enterprise teams.
+                  </>
+                )
+              },
+              {
+                id: 'ssrf-defense',
+                title: 'Secure External Ingestion',
+                icon: Globe,
+                defaultIconColor: 'bg-purple-950 text-purple-400',
+                desc: (
+                  <>
+                    Automated website and document ingestion operates through secure sandboxed fetchers, isolating internal corporate networks and infrastructure from external exposure.
+                  </>
+                )
+              },
+              {
+                id: 'sha256-digests',
+                title: 'Cryptographic Release Digest Chain',
+                icon: Hash,
+                defaultIconColor: 'bg-cyan-950 text-cyan-400',
+                desc: (
+                  <>
+                    Every approved release receives an immutable SHA-256 cryptographic release digest chain, permanently linking approved wording, reviewer credentials, and release timestamps into a tamper-evident record.
+                  </>
+                )
+              },
+              {
+                id: 'identity-sanitized',
+                title: 'Identity-Sanitized Public Verification',
+                icon: ShieldCheck,
+                defaultIconColor: 'bg-emerald-950 text-emerald-400',
+                desc: (
+                  <>
+                    Public verification endpoints validate release status and cryptographic hashes with zero authentication required, without leaking reviewer emails, internal roles, or database identifiers.
+                  </>
+                )
+              },
+              {
+                id: 'rbac',
+                title: 'Role-Based Access (RBAC)',
+                icon: Sliders,
+                defaultIconColor: 'bg-amber-950 text-amber-400',
+                desc: (
+                  <>
+                    Fine-grained privileges across Brand Manager, Legal Compliance, Creative Director, and External Auditor. Only authorized roles can commit fact updates or sign release seals.
+                  </>
+                )
+              },
+              {
+                id: 'automated-tests',
+                title: '177 Automated Tests Passing',
+                icon: CheckCircle2,
+                defaultIconColor: 'bg-emerald-950 text-emerald-400',
+                desc: (
+                  <>
+                    100% verified pytest test suite covering multi-agent coordination, graph blast radius traversal, salted SHA-256 authentication, SSRF protection, and cryptographic verification.
+                  </>
+                )
+              }
+            ].map((feature, index) => {
+              const isActive = activeSecurityIndex === index;
+              const Icon = feature.icon;
+              return (
+                <div
+                  key={feature.id}
+                  tabIndex={0}
+                  role="article"
+                  aria-label={feature.title}
+                  onMouseEnter={() => setActiveSecurityIndex(index)}
+                  onMouseLeave={() => {
+                    if (activeSecurityIndex === index) {
+                      setActiveSecurityIndex(null);
+                    }
+                  }}
+                  onFocus={() => setActiveSecurityIndex(index)}
+                  onBlur={() => {
+                    if (activeSecurityIndex === index) {
+                      setActiveSecurityIndex(null);
+                    }
+                  }}
+                  onTouchStart={() => setActiveSecurityIndex(index)}
+                  className={`p-6 rounded-2xl space-y-3 cursor-pointer outline-none transition-all duration-200 ease-out select-none ${
                     isActive
-                      ? 'bg-[#2563EB] text-white shadow-md shadow-blue-500/30 scale-105'
-                      : feature.defaultIconColor
-                  }`}>
-                    <Icon className="w-4 h-4" />
+                      ? 'bg-blue-950/20 border-2 border-[#2563EB] shadow-lg shadow-blue-500/15 -translate-y-1 ring-2 ring-[#2563EB]/20'
+                      : 'bg-neutral-950 border border-neutral-800 text-white shadow-xs hover:border-neutral-700 translate-y-0'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 ${
+                      isActive
+                        ? 'bg-[#2563EB] text-white shadow-md shadow-blue-500/30 scale-105'
+                        : feature.defaultIconColor
+                    }`}>
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    {isActive && (
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-400 bg-blue-950/80 border border-blue-800/80 px-2 py-0.5 rounded-full transition-all">
+                        ACTIVE
+                      </span>
+                    )}
                   </div>
-                  {isActive && (
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#2563EB] dark:text-blue-400 bg-blue-100/70 dark:bg-blue-950/70 border border-blue-200 dark:border-blue-800/80 px-2 py-0.5 rounded-full transition-all">
-                      ACTIVE
-                    </span>
-                  )}
+                  <h3 className={`text-base font-bold transition-colors duration-200 ${
+                    isActive ? 'text-blue-400' : 'text-white'
+                  }`}>
+                    {feature.title}
+                  </h3>
+                  <p className="text-xs text-neutral-400 leading-relaxed">
+                    {feature.desc}
+                  </p>
                 </div>
-                <h3 className={`text-base font-bold transition-colors duration-200 ${
-                  isActive ? 'text-[#2563EB] dark:text-blue-400' : 'text-slate-900 dark:text-white'
-                }`}>
-                  {feature.title}
-                </h3>
-                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                  {feature.desc}
-                </p>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
 
+        </div>
       </section>
 
       {/* ------------------------------------------------------------------- */}
       {/* SECTION 9 — ROLE PERSONAS (Matching Reference Image 5)              */}
       {/* ------------------------------------------------------------------- */}
-      <section className="py-16 sm:py-24 bg-slate-900 text-white relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      <section className="py-20 sm:py-28 bg-black text-white relative overflow-hidden border-b border-neutral-900">
+        <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:pl-6 xl:pl-8 lg:pr-6 xl:pr-8 space-y-12">
           
           <div className="text-center max-w-3xl mx-auto space-y-3">
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-purple-400">
@@ -1542,7 +1631,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
               One Unified Governance Engine. Tailored For Every Stakeholder.
             </h2>
-            <p className="text-xs sm:text-sm text-slate-400">
+            <p className="text-xs sm:text-sm text-neutral-400">
               Select any role to experience contextual guardrails, automated fact-checking, and role-based workflows.
             </p>
           </div>
@@ -1551,90 +1640,90 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             
             {/* Card 1: CREATOR */}
-            <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-slate-700 transition-colors space-y-4">
+            <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4">
               <div className="space-y-3">
-                <p className="text-xs text-slate-300 leading-relaxed font-sans min-h-[50px]">
+                <p className="text-xs text-neutral-300 leading-relaxed font-sans min-h-[50px]">
                   Check a draft privately, accept cited fixes and send it for review.
                 </p>
-                <div className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+                <div className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider">
                   OPENS &rarr; CHECK A POST
                 </div>
               </div>
               <button
                 onClick={() => handleSelectCapability('content-intelligence', 'inspector')}
-                className="w-full py-2.5 px-3 rounded-xl bg-white text-slate-900 hover:bg-slate-100 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
+                className="w-full py-2.5 px-3 rounded-xl bg-white text-neutral-900 hover:bg-neutral-200 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
               >
                 TRY AS CREATOR
               </button>
             </div>
 
             {/* Card 2: AGENCY */}
-            <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-slate-700 transition-colors space-y-4">
+            <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4">
               <div className="space-y-3">
-                <p className="text-xs text-slate-300 leading-relaxed font-sans min-h-[50px]">
+                <p className="text-xs text-neutral-300 leading-relaxed font-sans min-h-[50px]">
                   Check her own drafts. Confidential facts stay hidden from her.
                 </p>
-                <div className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+                <div className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider">
                   OPENS &rarr; CHECK A POST
                 </div>
               </div>
               <button
                 onClick={() => handleSelectCapability('content-intelligence', 'inspector')}
-                className="w-full py-2.5 px-3 rounded-xl bg-white text-slate-900 hover:bg-slate-100 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
+                className="w-full py-2.5 px-3 rounded-xl bg-white text-neutral-900 hover:bg-neutral-200 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
               >
                 TRY AS AGENCY
               </button>
             </div>
 
             {/* Card 3: REVIEWER */}
-            <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-slate-700 transition-colors space-y-4">
+            <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4">
               <div className="space-y-3">
-                <p className="text-xs text-slate-300 leading-relaxed font-sans min-h-[50px]">
+                <p className="text-xs text-neutral-300 leading-relaxed font-sans min-h-[50px]">
                   Work through the queue: agree or disagree with each finding, then approve.
                 </p>
-                <div className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+                <div className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider">
                   OPENS &rarr; REVIEW QUEUE
                 </div>
               </div>
               <button
                 onClick={() => handleSelectCapability('governance-approval', 'approvals')}
-                className="w-full py-2.5 px-3 rounded-xl bg-white text-slate-900 hover:bg-slate-100 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
+                className="w-full py-2.5 px-3 rounded-xl bg-white text-neutral-900 hover:bg-neutral-200 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
               >
                 TRY AS REVIEWER
               </button>
             </div>
 
             {/* Card 4: COMPLIANCE */}
-            <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-slate-700 transition-colors space-y-4">
+            <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4">
               <div className="space-y-3">
-                <p className="text-xs text-slate-300 leading-relaxed font-sans min-h-[50px]">
+                <p className="text-xs text-neutral-300 leading-relaxed font-sans min-h-[50px]">
                   Decide claims and confidential findings, and give the compliance sign-off.
                 </p>
-                <div className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+                <div className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider">
                   OPENS &rarr; REVIEW QUEUE
                 </div>
               </div>
               <button
                 onClick={() => handleSelectCapability('governance-approval', 'approvals')}
-                className="w-full py-2.5 px-3 rounded-xl bg-white text-slate-900 hover:bg-slate-100 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
+                className="w-full py-2.5 px-3 rounded-xl bg-white text-neutral-900 hover:bg-neutral-200 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
               >
                 TRY AS COMPLIANCE
               </button>
             </div>
 
             {/* Card 5: BRAND OWNER */}
-            <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-slate-700 transition-colors space-y-4">
+            <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4">
               <div className="space-y-3">
-                <p className="text-xs text-slate-300 leading-relaxed font-sans min-h-[50px]">
+                <p className="text-xs text-neutral-300 leading-relaxed font-sans min-h-[50px]">
                   Own the rulebook and see which rules people find unclear.
                 </p>
-                <div className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+                <div className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider">
                   OPENS &rarr; GUIDELINE HEALTH
                 </div>
               </div>
               <button
                 onClick={() => handleSelectCapability('brand-knowledge', 'guidelines')}
-                className="w-full py-2.5 px-3 rounded-xl bg-white text-slate-900 hover:bg-slate-100 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
+                className="w-full py-2.5 px-3 rounded-xl bg-white text-neutral-900 hover:bg-neutral-200 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
               >
                 TRY AS BRAND OWNER
               </button>
@@ -1647,7 +1736,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             
             {/* Hanging Plumb Bob wire with horizontal T-bar and purple diamond */}
             <div className="flex flex-col items-center pointer-events-none select-none">
-              <div className="w-8 h-[2px] bg-slate-400 dark:bg-slate-500 rounded-full" />
+              <div className="w-8 h-[2px] bg-neutral-600 rounded-full" />
               <div className="w-[1.5px] h-10 bg-indigo-500" />
               <div className="w-4 h-4 rotate-45 bg-[#6366f1] border border-indigo-300 shadow-md shadow-indigo-500/50 mt-[-2px]" />
             </div>
@@ -1675,29 +1764,29 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ------------------------------------------------------------------- */}
       {/* SECTION 10 — FOOTER (Minimalist Single Line Matching Reference)     */}
       {/* ------------------------------------------------------------------- */}
-      <footer id="about" className="border-t border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-950 py-5 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-x-6 gap-y-3 text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 w-full">
+      <footer id="about" className="border-t border-neutral-900 bg-black py-6 transition-colors text-neutral-400">
+        <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:pl-6 xl:pl-8 lg:pr-6 xl:pr-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-x-6 gap-y-3 text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-neutral-400 w-full">
             
             <div className="flex items-center gap-4 sm:gap-6 shrink-0 whitespace-nowrap">
-              <span className="font-bold text-slate-800 dark:text-slate-200 tracking-wider">
+              <span className="font-bold text-white tracking-wider">
                 EVIDENCE OR SILENCE.
               </span>
               <button
                 onClick={onVerify || (() => onEnterApp('public-verification'))}
-                className="hover:text-indigo-600 dark:hover:text-indigo-400 font-bold transition-colors cursor-pointer"
+                className="hover:text-indigo-400 font-bold transition-colors cursor-pointer"
               >
                 STATUS
               </button>
               <button
                 onClick={() => scrollToSection('how-it-works')}
-                className="hover:text-indigo-600 dark:hover:text-indigo-400 font-bold transition-colors cursor-pointer"
+                className="hover:text-indigo-400 font-bold transition-colors cursor-pointer"
               >
                 HOW I KNOW IT WORKS
               </button>
             </div>
 
-            <div className="flex items-center gap-3 sm:gap-4 shrink-0 text-center md:text-right text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-500 whitespace-nowrap">
+            <div className="flex items-center gap-3 sm:gap-4 shrink-0 text-center md:text-right text-[10px] sm:text-[11px] text-neutral-500 whitespace-nowrap">
               <span>AURELLE SKIN IS A FICTIONAL BRAND; NO REAL DATA IS USED.</span>
               <span className="opacity-40">•</span>
               <span>DEMO RUNS ON FREE MODEL TIERS WITH FICTIONAL DATA ONLY.</span>
