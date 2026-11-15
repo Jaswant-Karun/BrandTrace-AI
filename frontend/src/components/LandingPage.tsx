@@ -482,14 +482,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Right Column: Visual Book Document & Floating Issues with Animated Seal (Compact Editorial Book Design) */}
-            <div className="lg:col-span-7 relative">
+            <div className="lg:col-span-7 relative pb-16 sm:pb-20">
               {/* Plumb Bob Motif hanging along the left edge */}
               <div className="hidden lg:block absolute -top-8 -left-5 pointer-events-none select-none z-20">
                 <PlumbBob stringLength={140} />
               </div>
 
               {/* Composition Container with subtle dark blueprint / glow background */}
-              <div className="relative max-w-[560px] lg:max-w-[610px] ml-auto p-2.5 sm:p-3 pb-3 sm:pb-3.5 rounded-2xl sm:rounded-3xl bg-slate-900/60 dark:bg-slate-950/70 border border-slate-800/80 shadow-2xl backdrop-blur-md overflow-hidden">
+              <div className="relative max-w-[560px] lg:max-w-[610px] ml-auto p-2.5 sm:p-3 pb-0 rounded-2xl sm:rounded-3xl bg-slate-900/60 dark:bg-slate-950/70 border border-slate-800/80 shadow-2xl backdrop-blur-md overflow-visible">
                 
                 {/* Background ambient lighting */}
                 <div className="absolute top-1/4 right-1/4 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -637,8 +637,43 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
 
                 {/* Motion Approved Circular Stamp Seal ("APPROVED VLM-SEALED") */}
-                {/* Dynamically stamps onto the inspection upon entering the page, centered with zero wasted empty space */}
-                <div className="mt-2.5 sm:mt-3 flex justify-center items-center relative z-20 select-none">
+                {/* Centered directly on the container's bottom border line: the line passes right through the middle of the logo */}
+                <div className="mt-3 -mb-[75px] sm:-mb-[75px] flex justify-center items-center relative z-20 select-none">
+                  <motion.div
+                    key={`stamp-seal-${motionStep}`}
+                    initial={{ scale: 2.3, opacity: 0, rotate: -32 }}
+                    animate={{ scale: 1, opacity: 1, rotate: -12 }}
+                    transition={{
+                      delay: 0.35,
+                      duration: 0.45,
+                      type: 'spring',
+                      damping: 13,
+                      stiffness: 250
+                    }}
+                    className="relative flex items-center justify-center select-none"
+                  >
+                    {/* Concentric Double Rings */}
+                    <div className="w-34 h-34 sm:w-38 sm:h-38 lg:w-[150px] lg:h-[150px] rounded-full border-2 border-emerald-500/90 bg-[#06281e]/95 backdrop-blur-md shadow-[0_0_35px_rgba(16,185,129,0.35)] flex items-center justify-center p-2 hover:scale-105 transition-transform duration-200 cursor-default">
+                      <div className="w-full h-full rounded-full border border-dashed border-emerald-400/85 flex flex-col items-center justify-center text-center p-2.5">
+                        <span className="text-sm sm:text-[15px] lg:text-[16px] font-black tracking-widest text-emerald-300 uppercase font-sans">
+                          APPROVED
+                        </span>
+                        <div className="w-14 sm:w-16 h-[1.5px] bg-emerald-500/70 my-1" />
+                        <span className="text-[10px] sm:text-[11px] lg:text-xs font-mono font-extrabold tracking-widest text-emerald-400">
+                          VLM-SEALED
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Shockwave Impact Ring upon sealing */}
+                    <motion.span
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: [0.85, 1.45], opacity: [0.9, 0] }}
+                      transition={{ delay: 0.42, duration: 0.6, ease: 'easeOut' }}
+                      className="absolute inset-0 rounded-full border-2 border-emerald-400 pointer-events-none"
+                    />
+                  </motion.div>
+                </div>
                   <motion.div
                     key={`stamp-seal-${motionStep}`}
                     initial={{ scale: 2.3, opacity: 0, rotate: -32 }}
