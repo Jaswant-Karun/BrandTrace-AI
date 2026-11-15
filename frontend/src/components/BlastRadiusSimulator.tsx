@@ -5,12 +5,14 @@ import {
 } from 'lucide-react';
 import { BlastRadiusResponse } from '../types';
 import { PageHeader } from './ui/PageHeader';
+import { WorkflowBanner } from './ui/WorkflowBanner';
 
 interface BlastRadiusSimulatorProps {
   brandId: string;
+  onNavigate?: (tab: any) => void;
 }
 
-export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ brandId }) => {
+export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ brandId, onNavigate }) => {
   const [activeTab, setActiveTab] = useState<'change_simulator' | 'policy_cascade'>('change_simulator');
 
   // Change Impact Simulation State
@@ -201,14 +203,33 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
     <div className="space-y-6">
       {/* Standardized Enterprise Page Header */}
       <PageHeader
-        title="Change Impact Simulator (Digital Twin)"
-        description="Preview how a proposed change to an approved brand fact or guideline may affect connected content before approving it."
-        category="Digital Twin Simulation"
-        workspaceName={brandId || 'aurelle-tech'}
+        title="Change Impact Simulator"
+        description="Preview which content may be affected before changing approved brand knowledge."
+        category="Governance"
+        workspaceName={brandId === 'aurelle-tech' ? 'Aurelle Technologies Inc.' : (brandId || 'aurelle-tech')}
+        breadcrumbs={[
+          { label: 'BrandTrace' },
+          { label: 'Governance' },
+          { label: 'Change Impact Simulator', active: true }
+        ]}
+        helpContext={{
+          summary: "The Digital Twin provides a safe virtual DAG sandbox. You can simulate mutations (such as increasing subscription price from ₹499 to ₹599) to calculate downstream blast radius, affected touchpoints, and unbudgeted reprint/ad liability without altering live production facts until authorized human approval.",
+          terms: [
+            { term: "Virtual DAG Sandbox", definition: "Isolated copy of the brand ontology graph where proposed changes are calculated without mutating production data." },
+            { term: "Direct vs Indirect Dependency", definition: "Direct dependencies cite the specific fact ID; indirect dependencies reference the product or related terminology." },
+            { term: "Policy Conflict Engine", definition: "Evaluates prospective mutations against active rules to catch contradictions, regulatory violations, and typography conflicts." },
+            { term: "Commit Gate", definition: "Mandates authorized human role sign-off (BRAND_MANAGER or ADMIN) before updating approved facts and generating revision tasks." }
+          ]
+        }}
         primaryAction={{
           label: isSimulating ? "Simulating..." : "Run Blast Radius Simulation",
           onClick: handleRunSimulation,
           icon: <Flame className="w-3.5 h-3.5 text-amber-300" />
+        }}
+        secondaryAction={{
+          label: "View Approval Center",
+          onClick: () => onNavigate && onNavigate('approvals'),
+          icon: <Lock className="w-3.5 h-3.5" />
         }}
       />
 
@@ -838,6 +859,16 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
           </div>
         </div>
       )}
+
+      {/* Workflow Banner: Next Step in Governance Journey */}
+      <WorkflowBanner
+        currentStage="Change Impact Simulator"
+        nextStageTitle="Approval Center (Human Sign-off)"
+        nextStageDescription="Review findings, authorize revision tasks created by committed simulations, and record decisions with full reviewer attribution."
+        nextStageActionLabel="Go to Approval Center"
+        onNavigateNext={() => onNavigate && onNavigate('approvals')}
+        governanceHint="Human review is non-negotiable: content is never automatically republished without explicit reviewer approval."
+      />
     </div>
   );
 };

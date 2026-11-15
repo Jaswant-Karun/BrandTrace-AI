@@ -269,14 +269,33 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
     <div className="space-y-6">
       {/* Standardized Enterprise Page Header */}
       <PageHeader
-        title="Content Studio & Multi-Agent Inspection"
-        description="Inspect marketing content against certified brand knowledge and identify claims, outdated facts, and guidelines that require verification."
-        category="Content Intelligence"
-        workspaceName={brandId}
+        title="Content Intelligence"
+        description="Check content against your approved brand knowledge."
+        category="Intelligence"
+        workspaceName={brandId === 'aurelle-tech' ? 'Aurelle Technologies Inc.' : brandId}
+        breadcrumbs={[
+          { label: 'BrandTrace' },
+          { label: 'Intelligence' },
+          { label: 'Content Intelligence', active: true }
+        ]}
+        helpContext={{
+          summary: "Content Intelligence parses marketing copy in real-time, executing 3 concurrent agent pipelines in under 800ms to detect unapproved claims, tone deviations, and statutory legal violations.",
+          terms: [
+            { term: "Claim Substantiation", definition: "Verifies quantitative facts and features against the certified brand knowledge graph." },
+            { term: "Voice & Persona", definition: "Detects banned hype language, tone deviations, and non-compliant punctuation." },
+            { term: "Regulatory Compliance", definition: "Enforces FTC Green Guides (16 CFR §260), FDA Fair Balance (21 CFR §202.1), and Lanham Act §43(a)." },
+            { term: "Reverse-Offset Remediation", definition: "Generates a 1-click compliant rewrite repairing defects in reverse order without text corruption." }
+          ]
+        }}
         primaryAction={{
-          label: isVerifying ? "Verifying Copy..." : "Start Pre-Release Verification",
+          label: isVerifying ? "Verifying Copy..." : "Inspect Copy",
           onClick: handleVerify,
           icon: <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+        }}
+        secondaryAction={{
+          label: "View Impact Simulator",
+          onClick: () => onNavigate && onNavigate('impact-simulator'),
+          icon: <ArrowRight className="w-3.5 h-3.5" />
         }}
       />
 
@@ -839,6 +858,16 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
           )}
         </div>
       </div>
+
+      {/* Workflow Banner: Next Step in Governance Journey */}
+      <WorkflowBanner
+        currentStage="Content Intelligence"
+        nextStageTitle="Change Impact Simulator"
+        nextStageDescription="Preview which content and downstream touchpoints may be affected before changing approved brand knowledge (e.g. ₹499 ➔ ₹599)."
+        nextStageActionLabel="Go to Change Impact Simulator"
+        onNavigateNext={() => onNavigate && onNavigate('impact-simulator')}
+        governanceHint="The Digital Twin sandboxes prospective changes in an isolated DAG so live production content is never altered prematurely."
+      />
     </div>
   );
 };
