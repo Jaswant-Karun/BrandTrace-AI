@@ -193,35 +193,45 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 flex font-sans selection:bg-slate-900 selection:text-white">
-      {/* Enterprise Sidebar Navigation (12 Sections) */}
-      <Sidebar
-        currentTab={currentTab}
-        setCurrentTab={setCurrentTab}
-        brands={brands}
-        selectedBrandId={selectedBrandId}
-        setSelectedBrandId={(id) => {
-          setSelectedBrandId(id);
-          setWorkspace(id);
-        }}
-        dbStatus={dbStatus}
-        isCollapsed={isSidebarCollapsed}
-        setIsCollapsed={setIsSidebarCollapsed}
-        onOpenLanding={() => setViewMode('landing')}
-      />
+    <div className="min-h-screen bg-white text-slate-900 flex flex-col font-sans selection:bg-slate-900 selection:text-white">
+      {/* Offline Status Security Guardrail Banner */}
+      <OfflineBanner isOnline={isOnline} />
 
-      {/* Main App Workspace */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-white">
-        {/* Enterprise Tenant & Auth Header */}
-        <AuthHeader
-          onOpenDbStatus={() => setIsDbModalOpen(true)}
-          onOpenDemoWalkthrough={() => setIsDemoModalOpen(true)}
-          onStartTour={handleStartTour}
-          onLogout={() => setViewMode('login')}
+      <div className="flex-1 flex min-h-0 overflow-hidden">
+        {/* Enterprise Sidebar Navigation (Responsive Desktop & Mobile Drawer) */}
+        <Sidebar
+          currentTab={currentTab}
+          setCurrentTab={setCurrentTab}
+          brands={brands}
+          selectedBrandId={selectedBrandId}
+          setSelectedBrandId={(id) => {
+            setSelectedBrandId(id);
+            setWorkspace(id);
+          }}
+          dbStatus={dbStatus}
+          isCollapsed={isSidebarCollapsed}
+          setIsCollapsed={setIsSidebarCollapsed}
+          onOpenLanding={() => setViewMode('landing')}
+          isMobileOpen={isMobileNavOpen}
+          setIsMobileOpen={setIsMobileNavOpen}
         />
 
-        {/* Top Control Bar */}
-        <header className="border-b border-slate-200 bg-white px-6 py-2.5 flex items-center justify-between sticky top-0 z-20">
+        {/* Main App Workspace */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-white">
+          {/* Enterprise Tenant & Auth Header */}
+          <AuthHeader
+            onOpenDbStatus={() => setIsDbModalOpen(true)}
+            onOpenDemoWalkthrough={() => setIsDemoModalOpen(true)}
+            onStartTour={handleStartTour}
+            onLogout={() => setViewMode('login')}
+            onToggleMobileMenu={() => setIsMobileNavOpen(!isMobileNavOpen)}
+            onOpenInstallModal={() => setIsInstallModalOpen(true)}
+            isInstallable={isInstallable}
+            isInstalled={isInstalled}
+          />
+
+          {/* Top Control Bar */}
+          <header className="border-b border-slate-200 bg-white px-4 sm:px-6 py-2.5 flex items-center justify-between sticky top-0 z-20">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
               <span>BrandTrace</span>
@@ -376,6 +386,16 @@ export const App: React.FC = () => {
           </AnimatePresence>
         </main>
       </div>
+      </div>
+
+      {/* Progressive Web App Install Modal */}
+      <InstallAppModal
+        isOpen={isInstallModalOpen}
+        onClose={() => setIsInstallModalOpen(false)}
+        isInstallable={isInstallable}
+        isInstalled={isInstalled}
+        onPromptInstall={promptInstall}
+      />
 
       {/* Database Status Modal */}
       <DatabaseStatusModal

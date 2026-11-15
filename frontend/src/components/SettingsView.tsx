@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Database, Cpu, RefreshCw, CheckCircle2, Bell, Shield } from 'lucide-react';
+import { Database, Cpu, RefreshCw, CheckCircle2, Bell, Shield, Monitor, Download } from 'lucide-react';
 import { BrandProfile, DatabaseStatus } from '../types';
 import { PageHeader } from './ui/PageHeader';
 import { WorkflowBanner } from './ui/WorkflowBanner';
 import { useToast } from './ui/ToastContext';
+import { usePWA } from '../hooks/usePWA';
 
 interface SettingsViewProps {
   brand: BrandProfile | undefined;
@@ -15,6 +16,7 @@ interface SettingsViewProps {
 
 export const SettingsView: React.FC<SettingsViewProps> = ({ brand, dbStatus, onReseed, isReseeding, onNavigate }) => {
   const toast = useToast();
+  const { isOnline, isInstallable, isInstalled, promptInstall } = usePWA();
   const [llmProvider, setLlmProvider] = useState<string>("mock");
   const [webhookUrl, setWebhookUrl] = useState<string>("https://hooks.slack.com/services/T00/B00/XXXX");
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
@@ -186,6 +188,66 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ brand, dbStatus, onR
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Progressive Web App & Chrome Ecosystem Runtime Status */}
+      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
+        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+          <div className="flex items-center gap-2">
+            <Monitor className="w-4 h-4 text-slate-700" />
+            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+              Browser Runtime &amp; PWA Distribution
+            </h3>
+          </div>
+          <span className="text-[10px] font-mono font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded">
+            PWA Standalone Ready
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <div className="p-3 rounded-lg border border-slate-200 bg-slate-50 space-y-1">
+            <span className="text-[10px] uppercase font-bold text-slate-500 block">Display Mode</span>
+            <span className="font-semibold text-slate-900 font-mono">
+              {isInstalled ? 'Standalone Window' : 'Browser Tab'}
+            </span>
+            <p className="text-[10px] text-slate-500">
+              {isInstalled ? 'Running as installed desktop app' : 'Running in browser tab environment'}
+            </p>
+          </div>
+
+          <div className="p-3 rounded-lg border border-slate-200 bg-slate-50 space-y-1">
+            <span className="text-[10px] uppercase font-bold text-slate-500 block">Service Worker</span>
+            <span className="font-semibold text-emerald-700 flex items-center gap-1 font-mono">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Active (Zero-Trust)
+            </span>
+            <p className="text-[10px] text-slate-500">Static shell precached · API network-only</p>
+          </div>
+
+          <div className="p-3 rounded-lg border border-slate-200 bg-slate-50 space-y-1">
+            <span className="text-[10px] uppercase font-bold text-slate-500 block">Network State</span>
+            <span className="font-semibold text-slate-900 font-mono flex items-center gap-1">
+              <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+              {isOnline ? 'Connected' : 'Offline'}
+            </span>
+            <p className="text-[10px] text-slate-500">Real-time gateway connectivity</p>
+          </div>
+        </div>
+
+        {isInstallable && !isInstalled && (
+          <div className="pt-2 flex items-center justify-between">
+            <span className="text-xs text-slate-600">
+              Install BrandTrace AI as an independent desktop window with taskbar and dock launch.
+            </span>
+            <button
+              onClick={() => promptInstall()}
+              className="px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+            >
+              <Download className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Install Desktop App</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Workflow Banner: Next Step in Governance Journey */}
