@@ -8,7 +8,7 @@ import { DemoWalkthroughModal } from './components/DemoWalkthroughModal';
 import { AuthHeader } from './components/AuthHeader';
 import { useAuth } from './context/AuthContext';
 import { BrandProfile, DatabaseStatus, VerificationResult } from './types';
-import { ExternalLink, Database, RefreshCw, Sparkles } from 'lucide-react';
+import { ExternalLink, Database, RefreshCw, Sparkles, Search } from 'lucide-react';
 
 // Code-split heavy views via React.lazy for optimized initial bundle loading
 const KnowledgeGraphView = lazy(() => import('./components/KnowledgeGraphView').then(m => ({ default: m.KnowledgeGraphView })));
@@ -25,9 +25,9 @@ const AuditTrustCenterView = lazy(() => import('./components/AuditTrustCenterVie
 const SettingsView = lazy(() => import('./components/SettingsView').then(m => ({ default: m.SettingsView })));
 
 const ViewLoadingFallback: React.FC = () => (
-  <div className="flex flex-col items-center justify-center py-24 space-y-3">
-    <div className="w-8 h-8 rounded-full border-2 border-cyan-500/20 border-t-cyan-400 animate-spin" />
-    <span className="text-xs font-mono text-slate-400 tracking-wide">Loading module workspace...</span>
+  <div className="flex flex-col items-center justify-center py-24 space-y-3 bg-white">
+    <div className="w-8 h-8 rounded-full border-2 border-slate-200 border-t-slate-900 animate-spin" />
+    <span className="text-xs font-mono text-slate-500 tracking-wide">Loading module workspace...</span>
   </div>
 );
 
@@ -144,7 +144,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#070B14] text-slate-100 flex font-sans selection:bg-cyan-500 selection:text-black">
+    <div className="min-h-screen bg-white text-slate-900 flex font-sans selection:bg-slate-900 selection:text-white">
       {/* Enterprise Sidebar Navigation (12 Sections) */}
       <Sidebar
         currentTab={currentTab}
@@ -162,7 +162,7 @@ export const App: React.FC = () => {
       />
 
       {/* Main App Workspace */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-white">
         {/* Enterprise Tenant & Auth Header */}
         <AuthHeader
           onOpenDbStatus={() => setIsDbModalOpen(true)}
@@ -170,36 +170,39 @@ export const App: React.FC = () => {
         />
 
         {/* Top Control Bar */}
-        <header className="border-b border-slate-800/80 bg-[#0B0F19]/80 backdrop-blur-xl px-6 py-3 flex items-center justify-between sticky top-0 z-30">
+        <header className="border-b border-slate-200 bg-white px-6 py-2.5 flex items-center justify-between sticky top-0 z-20">
           <div className="flex items-center gap-3">
-            <h1 className="text-sm font-bold text-white tracking-tight">
-              {getTabTitle(currentTab)}
-            </h1>
-            <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-slate-600" />
-            <span className="hidden sm:inline-block text-xs text-slate-400 font-mono">
+            <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
+              <span>BrandTrace</span>
+              <span className="text-slate-300">/</span>
+              <span className="text-slate-900 font-semibold">{getTabTitle(currentTab)}</span>
+            </div>
+            <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-slate-300" />
+            <span className="hidden sm:inline-block text-[11px] text-slate-600 font-mono bg-slate-50 border border-slate-200 px-2 py-0.5 rounded">
               {currentBrand ? currentBrand.brand_name : 'Apex Dynamics'}
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
-            {/* Phase 6 Guided Demo Button */}
-            <button
-              onClick={() => setIsDemoModalOpen(true)}
-              className="text-xs font-bold text-cyan-300 bg-cyan-950/60 hover:bg-cyan-900/60 px-3 py-1 rounded-lg border border-cyan-500/40 transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm shadow-cyan-500/20"
-              title="Launch AURELLE 12-Step Lifecycle & 9 Test Cases"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-              <span>AURELLE Demo Walkthrough</span>
-            </button>
+          <div className="flex items-center gap-2.5">
+            {/* Global Search Bar */}
+            <div className="relative hidden md:block">
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search facts, rules, assets... (Ctrl+K)"
+                className="w-64 bg-slate-50 border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-900 focus:bg-white transition-all shadow-2xs"
+                readOnly
+              />
+            </div>
 
             {/* View Public Landing Page Button */}
             <button
               onClick={() => setViewMode('landing')}
-              className="text-xs text-slate-400 hover:text-white px-2.5 py-1 rounded-lg border border-slate-800 hover:border-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer"
+              className="text-xs text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
               title="View Public Overview Landing Page"
             >
-              <ExternalLink className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="hidden md:inline">Public Landing Page</span>
+              <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
+              <span className="hidden sm:inline">Landing Page</span>
             </button>
 
             {/* Quick Re-seed */}
@@ -207,34 +210,22 @@ export const App: React.FC = () => {
               onClick={handleReseed}
               disabled={isReseeding}
               title="Re-seed MongoDB and Graph Data"
-              className="p-1.5 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 hover:text-white hover:border-slate-700 transition-colors"
+              className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors shadow-2xs"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isReseeding ? 'animate-spin text-cyan-400' : ''}`} />
-            </button>
-
-            {/* DB Status Button */}
-            <button
-              onClick={() => setIsDbModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border bg-slate-950 border-slate-800 hover:border-slate-700 transition-colors cursor-pointer"
-            >
-              <Database className={`w-3.5 h-3.5 ${dbStatus?.connected ? 'text-emerald-400' : 'text-amber-400'}`} />
-              <span className="text-slate-300 font-mono text-[11px] hidden sm:inline">
-                {dbStatus?.connected ? 'MongoDB' : 'Memory'}
-              </span>
-              <span className={`w-1.5 h-1.5 rounded-full ${dbStatus?.connected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${isReseeding ? 'animate-spin text-slate-900' : ''}`} />
             </button>
           </div>
         </header>
 
         {/* Viewport Canvas with Framer Motion */}
-        <main className="flex-1 p-6 overflow-y-auto max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-6 overflow-y-auto max-w-7xl w-full mx-auto bg-white">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentTab}
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.22, ease: 'easeOut' }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
             >
               <Suspense fallback={<ViewLoadingFallback />}>
                 {currentTab === 'command-center' && (
@@ -244,30 +235,30 @@ export const App: React.FC = () => {
                 {currentTab === 'bdig' && (
                   <div className="space-y-4">
                     {/* BDIG Sub-Navigation */}
-                    <div className="flex items-center justify-between bg-slate-900/60 p-1.5 rounded-2xl border border-slate-800">
-                      <div className="flex items-center gap-1.5">
+                    <div className="flex items-center justify-between bg-slate-50 p-1 rounded-xl border border-slate-200">
+                      <div className="flex items-center gap-1">
                         <button
                           onClick={() => setBdigSubTab('canvas')}
-                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+                          className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 ${
                             bdigSubTab === 'canvas'
-                              ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm shadow-cyan-500/20'
-                              : 'text-slate-400 hover:text-white'
+                              ? 'bg-white text-slate-900 border border-slate-200 shadow-2xs font-semibold'
+                              : 'text-slate-600 hover:text-slate-900'
                           }`}
                         >
                           Interactive Knowledge Graph Canvas
                         </button>
                         <button
                           onClick={() => setBdigSubTab('workflow')}
-                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+                          className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 ${
                             bdigSubTab === 'workflow'
-                              ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40 shadow-sm shadow-rose-500/20'
-                              : 'text-slate-400 hover:text-white'
+                              ? 'bg-white text-slate-900 border border-slate-200 shadow-2xs font-semibold'
+                              : 'text-slate-600 hover:text-slate-900'
                           }`}
                         >
                           Fact Mutation &amp; Revision Workflow
                         </button>
                       </div>
-                      <span className="text-[11px] font-mono text-slate-400 pr-3 hidden sm:inline">
+                      <span className="text-[11px] font-mono text-slate-500 pr-3 hidden sm:inline">
                         Live MongoDB Graph Ontology
                       </span>
                     </div>

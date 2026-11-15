@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { 
-  Building, UserCheck, ChevronDown, 
+  Building2, UserCheck, ChevronDown, 
   Database, Sparkles
 } from 'lucide-react';
 
@@ -17,58 +17,57 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({ onOpenDbStatus, onOpenDe
   const getRoleBadge = (role?: string) => {
     switch (role) {
       case 'ADMIN':
-        return <span className="bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded text-[10px] font-bold">ADMIN</span>;
+        return <span className="bg-slate-900 text-white px-2 py-0.5 rounded text-[10px] font-semibold">ADMIN</span>;
       case 'COMPLIANCE_REVIEWER':
-        return <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded text-[10px] font-bold">COMPLIANCE REVIEWER</span>;
+        return <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-semibold">COMPLIANCE REVIEWER</span>;
       case 'BRAND_MANAGER':
-        return <span className="bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-2 py-0.5 rounded text-[10px] font-bold">BRAND MANAGER</span>;
+        return <span className="bg-slate-100 text-slate-800 border border-slate-200 px-2 py-0.5 rounded text-[10px] font-semibold">BRAND MANAGER</span>;
       case 'CREATOR':
-        return <span className="bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded text-[10px] font-bold">CREATOR</span>;
+        return <span className="bg-slate-100 text-slate-800 border border-slate-200 px-2 py-0.5 rounded text-[10px] font-semibold">CREATOR</span>;
       default:
-        return <span className="bg-slate-800 text-slate-300 px-2 py-0.5 rounded text-[10px] font-bold">{role || 'REVIEWER'}</span>;
+        return <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[10px] font-semibold">{role || 'REVIEWER'}</span>;
     }
   };
 
   return (
-    <div className="bg-[#0B0F19]/90 backdrop-blur-md border-b border-slate-800/80 px-6 py-2.5 flex flex-wrap items-center justify-between gap-4 z-40 sticky top-0">
+    <div className="bg-white border-b border-slate-200 px-6 py-2.5 flex flex-wrap items-center justify-between gap-4 z-30 sticky top-0">
       {/* Left: Organization & Workspace Selector */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1">
-          <Building className="w-3.5 h-3.5 text-cyan-400" />
-          <span className="text-xs font-semibold text-slate-300">{currentOrg}</span>
-          <span className="text-slate-600">|</span>
+        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1">
+          <Building2 className="w-3.5 h-3.5 text-slate-500" />
+          <span className="text-xs font-semibold text-slate-700">{currentOrg}</span>
+          <span className="text-slate-300">/</span>
           <select
             value={currentWorkspace}
             onChange={(e) => setWorkspace(e.target.value)}
-            className="bg-transparent text-xs font-bold text-white focus:outline-none cursor-pointer"
+            className="bg-transparent text-xs font-semibold text-slate-900 focus:outline-none cursor-pointer"
           >
-            <option value="aurelle-tech" className="bg-slate-950 text-white">Aurelle Technologies (Consumer Tech)</option>
-            <option value="apex-dynamics" className="bg-slate-950 text-white">Apex Dynamics (EV Mobility)</option>
-            <option value="novus-health" className="bg-slate-950 text-white">Novus Health (BioPharma)</option>
-            <option value="aurelle-maison" className="bg-slate-950 text-white">Aurelle Maison (Eco-Luxury)</option>
+            <option value="aurelle-tech">Aurelle Technologies (Consumer Tech)</option>
+            <option value="apex-dynamics">Apex Dynamics (EV Mobility)</option>
+            <option value="novus-health">Novus Health (BioPharma)</option>
+            <option value="aurelle-maison">Aurelle Maison (Eco-Luxury)</option>
           </select>
         </div>
 
         {/* MongoDB Atlas Indicator */}
         <button
           onClick={onOpenDbStatus}
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-medium hover:bg-emerald-500/20 transition-all cursor-pointer"
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-medium hover:bg-emerald-100/60 transition-colors cursor-pointer"
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <Database className="w-3 h-3" />
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <Database className="w-3 h-3 text-emerald-600" />
           <span>MongoDB Atlas Vector Search Active</span>
         </button>
 
-        {/* Phase 6 Guided Demo Pill */}
+        {/* Guided Demo Pill */}
         {onOpenDemoWalkthrough && (
           <button
             onClick={onOpenDemoWalkthrough}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-indigo-500/20 border border-cyan-500/40 text-cyan-300 text-xs font-bold hover:bg-cyan-500/30 transition-all cursor-pointer shadow-sm shadow-cyan-500/20"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-colors cursor-pointer shadow-2xs"
             title="Open Interactive AURELLE Walkthrough & 9 Test Cases"
           >
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-            <span>Guided Demo: AURELLE</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+            <Sparkles className="w-3 h-3 text-amber-300" />
+            <span>AURELLE Interactive Lifecycle</span>
           </button>
         )}
       </div>
@@ -76,53 +75,52 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({ onOpenDbStatus, onOpenDe
       {/* Right: Authenticated User & Persona Switcher */}
       <div className="flex items-center gap-3 relative">
         <div className="text-right hidden sm:block">
-          <div className="text-xs font-bold text-white flex items-center justify-end gap-1.5">
+          <div className="text-xs font-semibold text-slate-900 flex items-center justify-end gap-1.5">
             <span>{user?.name}</span>
             {getRoleBadge(user?.role)}
           </div>
-          <div className="text-[10px] font-mono text-slate-400">{user?.email}</div>
+          <div className="text-[11px] font-mono text-slate-500">{user?.email}</div>
         </div>
 
         {/* Persona Switcher Dropdown Button */}
         <button
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          className="flex items-center gap-1.5 bg-slate-950 hover:bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-200 transition-all cursor-pointer"
+          className="flex items-center gap-1.5 bg-white hover:bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-700 transition-colors cursor-pointer shadow-2xs"
         >
-          <UserCheck className="w-3.5 h-3.5 text-cyan-400" />
+          <UserCheck className="w-3.5 h-3.5 text-slate-600" />
           <span className="hidden md:inline">Switch Persona</span>
           <ChevronDown className="w-3 h-3 text-slate-400" />
         </button>
 
         {/* Dropdown Menu */}
         {isDropdownOpen && (
-          <div className="absolute right-0 top-11 w-72 bg-[#0B0F19] border border-slate-800 rounded-2xl shadow-2xl p-2 space-y-1 z-50 animate-fadeIn">
-            <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 flex items-center justify-between border-b border-slate-800 pb-2 mb-1">
+          <div className="absolute right-0 top-11 w-76 bg-white border border-slate-200 rounded-xl shadow-lg p-1.5 space-y-1 z-50">
+            <div className="px-3 py-1.5 text-[10px] uppercase font-semibold text-slate-400 flex items-center justify-between border-b border-slate-100 pb-2 mb-1">
               <span>Enterprise RBAC Personas</span>
-              <Sparkles className="w-3 h-3 text-cyan-400" />
+              <span className="text-[10px] font-mono text-slate-400">JWT Authorized</span>
             </div>
-
-            {personas.map((p, idx) => (
-              <button
-                key={idx}
-                onClick={() => {
-                  switchPersona(p);
-                  setIsDropdownOpen(false);
-                }}
-                className={`w-full text-left p-2 rounded-xl text-xs flex items-center justify-between transition-all ${
-                  user?.email === p.email
-                    ? 'bg-cyan-500/10 border border-cyan-500/30 text-white'
-                    : 'hover:bg-slate-900 text-slate-300'
-                }`}
-              >
-                <div>
-                  <div className="font-semibold text-white">{p.name}</div>
-                  <div className="text-[10px] font-mono text-slate-400">{p.email}</div>
-                </div>
-                <div>
-                  {getRoleBadge(p.role)}
-                </div>
-              </button>
-            ))}
+            <div className="max-h-72 overflow-y-auto space-y-1">
+              {personas.map((p) => (
+                <button
+                  key={p.email}
+                  onClick={() => {
+                    switchPersona(p);
+                    setIsDropdownOpen(false);
+                  }}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-colors flex flex-col cursor-pointer ${
+                    user?.email === p.email
+                      ? 'bg-slate-100 text-slate-900 font-semibold'
+                      : 'hover:bg-slate-50 text-slate-700'
+                  }`}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="font-medium text-slate-900 truncate">{p.name}</span>
+                    {getRoleBadge(p.role)}
+                  </div>
+                  <span className="text-[11px] text-slate-400 font-mono mt-0.5 truncate">{p.email}</span>
+                </button>
+              ))}
+            </div>
           </div>
         )}
       </div>
