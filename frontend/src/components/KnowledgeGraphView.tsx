@@ -28,7 +28,7 @@ const nodeTypes = {
   brandNode: BrandNode,
 };
 
-export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId: initialBrandId }) => {
+export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId: initialBrandId, onNavigate }) => {
   const [activeBrandId, setActiveBrandId] = useState<string>(initialBrandId || 'aurelle-tech');
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -196,10 +196,28 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
     <div className="space-y-4">
       {/* Standardized Enterprise Page Header */}
       <PageHeader
-        title="Brand Knowledge Graph & Dependency Intelligence"
-        description="Explore how your approved brand facts, guidelines, assets, campaigns, and content are structurally connected in a live MongoDB DAG."
-        category="Knowledge Graph Ontology"
-        workspaceName={activeBrandId}
+        title="Knowledge Graph"
+        description="Explore and visualize relationships between brand guidelines, approved facts, campaigns, and marketing assets."
+        category="Workspace"
+        workspaceName={activeBrandId === 'aurelle-tech' ? 'Aurelle Technologies Inc.' : activeBrandId}
+        breadcrumbs={[
+          { label: 'BrandTrace' },
+          { label: 'Workspace' },
+          { label: 'Knowledge Graph', active: true }
+        ]}
+        helpContext={{
+          summary: "The Brand Knowledge Graph models all enterprise touchpoints in a directed acyclic graph (DAG). Edges represent dependencies such as 'CITES_FACT', 'GOVERNED_BY', or 'PROHIBITS_CLAIM'.",
+          terms: [
+            { term: "Node Types", definition: "Approved Facts, Guidelines, Registered Trademarks, Touchpoints, and Prohibited Claims." },
+            { term: "DAG Traversal", definition: "Click any node to highlight upstream root facts and downstream dependent marketing assets." },
+            { term: "Evidence Citations", definition: "Structural graph connections linking copy assertions to certified laboratory tests or regulatory filings." }
+          ]
+        }}
+        primaryAction={{
+          label: "Inspect Copy",
+          onClick: () => onNavigate && onNavigate('content-studio'),
+          icon: <Sparkles className="w-3.5 h-3.5" />
+        }}
         secondaryAction={{
           label: "Reload Graph",
           onClick: loadGraph,
@@ -478,6 +496,16 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
           </div>
         )}
       </div>
+
+      {/* Workflow Banner: Next Step in Governance Journey */}
+      <WorkflowBanner
+        currentStage="Knowledge Graph"
+        nextStageTitle="Content Intelligence"
+        nextStageDescription="Submit marketing copy to test multi-agent inspection against the certified nodes discovered in this graph."
+        nextStageActionLabel="Go to Content Intelligence"
+        onNavigateNext={() => onNavigate && onNavigate('content-studio')}
+        governanceHint="The graph links every marketing asset to root corporate facts and governing legal guardrails."
+      />
     </div>
   );
 };

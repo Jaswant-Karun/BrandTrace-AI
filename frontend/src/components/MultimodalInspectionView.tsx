@@ -4,12 +4,14 @@ import {
   FileText, Image as ImageIcon, Video, ShieldCheck, Check, Sparkles, AlertOctagon, HelpCircle
 } from 'lucide-react';
 import { PageHeader } from './ui/PageHeader';
+import { WorkflowBanner } from './ui/WorkflowBanner';
 
 interface MultimodalInspectionViewProps {
   brandId: string;
+  onNavigate?: (tab: any) => void;
 }
 
-export const MultimodalInspectionView: React.FC<MultimodalInspectionViewProps> = ({ brandId }) => {
+export const MultimodalInspectionView: React.FC<MultimodalInspectionViewProps> = ({ brandId, onNavigate }) => {
   const [activeTab, setActiveTab] = useState<'file_inspect' | 'token_studio'>('file_inspect');
 
   // File Inspection State
