@@ -104,6 +104,42 @@ PRESET_USERS: Dict[str, Dict] = {
         "workspace_id": "aurelle-tech",
         "password_hash": hash_password("brandtrace2026")
     },
+    "sana@aurelle.com": {
+        "user_id": "USR-AUR-SANA",
+        "email": "sana@aurelle.com",
+        "name": "Agency Sana, Outside Agency",
+        "role": UserRole.CREATOR,
+        "org_id": "ORG-AURELLE",
+        "workspace_id": "aurelle-tech",
+        "password_hash": hash_password("brandtrace2026")
+    },
+    "meera@aurelle.com": {
+        "user_id": "USR-AUR-MEERA",
+        "email": "meera@aurelle.com",
+        "name": "Reviewer Meera, Content Reviewer",
+        "role": UserRole.REVIEWER,
+        "org_id": "ORG-AURELLE",
+        "workspace_id": "aurelle-tech",
+        "password_hash": hash_password("brandtrace2026")
+    },
+    "arjun@aurelle.com": {
+        "user_id": "USR-AUR-ARJUN",
+        "email": "arjun@aurelle.com",
+        "name": "Compliance Arjun, Compliance Officer",
+        "role": UserRole.COMPLIANCE_REVIEWER,
+        "org_id": "ORG-AURELLE",
+        "workspace_id": "aurelle-tech",
+        "password_hash": hash_password("brandtrace2026")
+    },
+    "kabir@aurelle.com": {
+        "user_id": "USR-AUR-KABIR",
+        "email": "kabir@aurelle.com",
+        "name": "Brand Owner Kabir, Brand Owner",
+        "role": UserRole.BRAND_MANAGER,
+        "org_id": "ORG-AURELLE",
+        "workspace_id": "aurelle-tech",
+        "password_hash": hash_password("brandtrace2026")
+    },
     "reviewer@aurelle.com": {
         "user_id": "USR-AUR-REV",
         "email": "reviewer@aurelle.com",

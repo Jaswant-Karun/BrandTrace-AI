@@ -141,7 +141,7 @@ export const CreatorRulebook: React.FC<CreatorRulebookProps> = ({
       {/* Breadcrumb & Section Header */}
       <div className="space-y-2">
         <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
-          PLUMBLINE · {brandName.toUpperCase()}
+          BRANDTRACE · {brandName.toUpperCase()}
         </div>
         <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-white font-sans uppercase">
           RULEBOOK

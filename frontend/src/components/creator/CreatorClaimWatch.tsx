@@ -64,7 +64,7 @@ export const CreatorClaimWatch: React.FC<CreatorClaimWatchProps> = ({
       {/* Breadcrumb & Section Header */}
       <div className="space-y-2">
         <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
-          PLUMBLINE · {brandName.toUpperCase()}
+          BRANDTRACE · {brandName.toUpperCase()}
         </div>
         <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-white font-sans uppercase">
           CLAIM WATCH
@@ -119,7 +119,7 @@ export const CreatorClaimWatch: React.FC<CreatorClaimWatchProps> = ({
             <span>LIVE PAGES</span>
           </div>
           <p className="text-xs sm:text-sm text-neutral-400 font-sans leading-relaxed">
-            Tell Plumbline where an approved post is live. It reads the page and compares it with the approved text, sentence by sentence; extra text on the page is ignored, but a missing or reworded sentence (or a changed number) raises a task.
+            Tell BrandTrace where an approved post is live. It reads the page and compares it with the approved text, sentence by sentence; extra text on the page is ignored, but a missing or reworded sentence (or a changed number) raises a task.
           </p>
         </div>
 

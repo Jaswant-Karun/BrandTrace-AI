@@ -40,7 +40,7 @@ export const CreatorHeader: React.FC<CreatorHeaderProps> = ({
             </svg>
           </div>
           <span className="font-extrabold text-sm sm:text-base tracking-wider text-white font-mono">
-            PLUMBLINE
+            BRANDTRACE
           </span>
         </div>
 
