@@ -1,6 +1,6 @@
-from typing import Optional, Dict
+from typing import Optional, Dict, Any
 from brandtrace.core.security import create_access_token, decode_access_token, hash_password, verify_password
-from brandtrace.modules.auth.models import UserProfile, UserRole
+from brandtrace.modules.auth.models import UserProfile, UserRole, RegisterRequest
 
 PRESET_USERS: Dict[str, Dict] = {
     "admin@apex.com": {
@@ -183,7 +183,7 @@ class AuthService:
             workspace_id=payload.get("workspace_id", "apex-dynamics")
         )
 
-    async def register_user(self, req: Any) -> UserProfile:
+    async def register_user(self, req: RegisterRequest) -> UserProfile:
         import uuid
         clean_email = req.email.lower().strip()
         if not clean_email or "@" not in clean_email:
