@@ -1,0 +1,72 @@
+{
+  "name": "BrandTrace AI — Autonomous Brand Intelligence & Governance Control Plane",
+  "short_name": "BrandTrace AI",
+  "description": "The Autonomous Brand Intelligence & Governance Control Plane. Every brand decision connected. Every risk traceable. Every release accountable.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FFFFFF",
+  "theme_color": "#0F172A",
+  "categories": [
+    "business",
+    "productivity",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Command Center",
+      "short_name": "Overview",
+      "description": "Workspace overview and telemetry",
+      "url": "/?tab=command-center",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Content Intelligence",
+      "short_name": "Inspector",
+      "description": "Multi-agent autonomous content inspection",
+      "url": "/?tab=content-studio",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Impact Simulator",
+      "short_name": "Simulator",
+      "description": "Digital twin blast radius simulator",
+      "url": "/?tab=impact-simulator",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Brand Knowledge",
+      "short_name": "Knowledge",
+      "description": "Certified brand truth and guidelines",
+      "url": "/?tab=knowledge-base",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
