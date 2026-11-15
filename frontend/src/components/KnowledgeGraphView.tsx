@@ -17,9 +17,11 @@ import {
   CheckCircle2, RefreshCw, X 
 } from 'lucide-react';
 import { PageHeader } from './ui/PageHeader';
+import { WorkflowBanner } from './ui/WorkflowBanner';
 
 interface KnowledgeGraphViewProps {
   brandId: string;
+  onNavigate?: (tab: any) => void;
 }
 
 const nodeTypes = {

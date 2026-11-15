@@ -5,12 +5,16 @@ import {
 } from 'lucide-react';
 import { ReleaseLedgerEntry } from '../types';
 import { PageHeader } from './ui/PageHeader';
+import { WorkflowBanner } from './ui/WorkflowBanner';
+import { useToast } from './ui/ToastContext';
 
 interface AuditTrustCenterViewProps {
   brandId: string;
+  onNavigate?: (tab: any) => void;
 }
 
-export const AuditTrustCenterView: React.FC<AuditTrustCenterViewProps> = ({ brandId }) => {
+export const AuditTrustCenterView: React.FC<AuditTrustCenterViewProps> = ({ brandId, onNavigate }) => {
+  const toast = useToast();
   const [releases, setReleases] = useState<ReleaseLedgerEntry[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [search, setSearch] = useState<string>('');
@@ -145,7 +149,7 @@ export const AuditTrustCenterView: React.FC<AuditTrustCenterViewProps> = ({ bran
       setActiveActionModal(null);
       loadLedger();
     } catch (e: any) {
-      alert(e.message);
+      toast.error(e.message || 'Revocation failed');
     }
   };
 
@@ -166,11 +170,11 @@ export const AuditTrustCenterView: React.FC<AuditTrustCenterViewProps> = ({ bran
       });
       if (!res.ok) throw new Error('Superseding failed');
       const data = await res.json();
-      setActionSuccessMsg(data.message);
+      toast.success(data.message || 'Record successfully marked as superseded.');
       setActiveActionModal(null);
       loadLedger();
     } catch (e: any) {
-      alert(e.message);
+      toast.error(e.message || 'Superseding failed');
     }
   };
 
@@ -237,13 +241,33 @@ export const AuditTrustCenterView: React.FC<AuditTrustCenterViewProps> = ({ bran
       {/* Standardized Enterprise Page Header */}
       <PageHeader
         title="Trust & Audit Ledger"
-        description="Immutable record of approved releases with SHA-256 cryptographic proof digests. Use the interactive 5-state verifier to test for tampering or revocation."
-        category="Cryptographic Assurance"
-        workspaceName={brandId || 'aurelle-tech'}
+        description="Verify the integrity and history of governance decisions."
+        category="Governance"
+        workspaceName={brandId === 'aurelle-tech' ? 'Aurelle Technologies Inc.' : (brandId || 'aurelle-tech')}
+        breadcrumbs={[
+          { label: 'BrandTrace' },
+          { label: 'Governance' },
+          { label: 'Trust & Audit Ledger', active: true }
+        ]}
+        helpContext={{
+          summary: "The Trust Ledger provides cryptographic assurance that marketing releases have not been tampered with or revoked. Every release seal binds content to the reviewer's signature, timestamp, and previous block hash in a SHA-256 Merkle chain.",
+          terms: [
+            { term: "VALID_UNCHANGED", definition: "Content hash strictly matches the active approved SHA-256 ledger record." },
+            { term: "MODIFIED_AFTER_APPROVAL", definition: "Content has been altered or tampered with since authorized sign-off." },
+            { term: "SUPERSEDED", definition: "Release was validly approved but has been officially replaced by a newer version (e.g. v1.0 ➔ v2.0)." },
+            { term: "REVOKED", definition: "Release was formally cancelled by compliance due to regulatory recall or statutory violation." },
+            { term: "UNKNOWN_RECORD", definition: "Identifier or seal is unregistered and does not exist in the ledger." }
+          ]
+        }}
         primaryAction={{
           label: "Export Audit Manifest JSON",
           onClick: handleExportAudit,
           icon: <Download className="w-3.5 h-3.5" />
+        }}
+        secondaryAction={{
+          label: "View Governance Analytics",
+          onClick: () => onNavigate && onNavigate('analytics'),
+          icon: <ArrowRight className="w-3.5 h-3.5" />
         }}
       />
 
@@ -560,6 +584,16 @@ export const AuditTrustCenterView: React.FC<AuditTrustCenterViewProps> = ({ bran
           </div>
         </div>
       )}
+
+      {/* Workflow Banner: Next Step in Governance Journey */}
+      <WorkflowBanner
+        currentStage="Trust & Audit Ledger"
+        nextStageTitle="Governance Analytics & Velocity"
+        nextStageDescription="Examine compliance trends over time, departmental resolution velocity, and active violation distributions across enterprise touchpoints."
+        nextStageActionLabel="Go to Analytics"
+        onNavigateNext={() => onNavigate && onNavigate('analytics')}
+        governanceHint="Audit records provide immutable evidence for executive governance reviews and external statutory compliance reporting."
+      />
     </div>
   );
 };
