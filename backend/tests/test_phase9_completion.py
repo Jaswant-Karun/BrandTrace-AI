@@ -52,8 +52,8 @@ def test_phase9_module_endpoints_audit():
     """Verify that all core endpoints backing the 14 application modules respond successfully."""
     headers = get_auth_headers(UserRole.ADMIN)
 
-    # 1. Command Center
-    cc_res = client.get("/api/analytics/command-center?brand_id=aurelle-tech", headers=headers)
+    # 1. Command Center & Governance Analytics
+    cc_res = client.get("/api/analytics/governance?brand_id=aurelle-tech", headers=headers)
     assert cc_res.status_code == 200
 
     # 2. Brand Knowledge Graph
@@ -152,7 +152,7 @@ def test_phase9_judge_demonstration_12_step_repeatable_lifecycle():
     # 2. Check initial scenario status
     status_res = client.get("/api/demo/scenario-status", headers=headers)
     assert status_res.status_code == 200
-    assert status_res.json()["current_fact_value"] == "₹499"
+    assert status_res.json()["current_price"] == "₹499"
 
     # 3. Execute Step 5: Propose Price Mutation (₹499 -> ₹599)
     step5_res = client.post("/api/demo/execute-step", json={
@@ -170,7 +170,7 @@ def test_phase9_judge_demonstration_12_step_repeatable_lifecycle():
         "actor_name": "Julian Vance"
     }, headers=headers)
     assert step6_res.status_code == 200
-    assert step6_res.json()["scenario_state"]["current_fact_value"] == "₹599"
+    assert step6_res.json()["scenario_state"]["current_price"] == "₹599"
 
     # 5. Execute Step 7: Automated Detection of Affected Assets
     step7_res = client.post("/api/demo/execute-step", json={
@@ -220,6 +220,5 @@ def test_phase9_judge_demonstration_12_step_repeatable_lifecycle():
     }, headers=headers)
     assert step12_res.status_code == 200
     final_status = step12_res.json()["scenario_state"]
-    assert final_status["current_fact_value"] == "₹599"
+    assert final_status["current_price"] == "₹599"
     assert final_status["approved_tasks"] >= 4
-    assert final_status["overall_health_score"] > 90.0

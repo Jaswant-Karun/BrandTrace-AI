@@ -140,6 +140,7 @@ async def create_approved_fact(req: CreateFactRequest):
     """
     fact_id = req.fact_id or f"FACT-{req.workspace_id[:3].upper()}-{int(time.time() * 1000) % 100000:05d}"
     org_id = req.org_id or ("ORG-AURELLE" if "aurelle" in req.workspace_id else "ORG-APEX")
+    now_int = int(time.time())
     now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
     
     # 1. Save to MongoDB Atlas Repository
@@ -147,16 +148,16 @@ async def create_approved_fact(req: CreateFactRequest):
         fact_id=fact_id,
         organisation_id=org_id,
         workspace_id=req.workspace_id,
-        fact_name=req.name,
+        name=req.name,
         category=req.category,
         current_value=req.current_value,
         unit=req.unit or "",
         description=req.description,
         source_citation=req.source_citation,
         department_owner=req.department_owner,
-        status="ACTIVE",
-        created_at=now_iso,
-        updated_at=now_iso
+        last_verified=now_iso,
+        created_at=now_int,
+        updated_at=now_int
     )
     await mongo_manager.repo.add_approved_fact(fact_doc)
     
@@ -242,15 +243,15 @@ async def list_approved_facts(workspace_id: Optional[str] = None, org_id: Option
                 fact_id=fid,
                 workspace_id=d.get("workspace_id", workspace_id or "aurelle-tech"),
                 org_id=d.get("organisation_id", effective_org),
-                name=d.get("fact_name", ""),
+                name=d.get("name") or d.get("fact_name", ""),
                 category=d.get("category", "PRICE"),
                 current_value=d.get("current_value", ""),
                 unit=d.get("unit", ""),
                 description=d.get("description", ""),
                 source_citation=d.get("source_citation", ""),
                 department_owner=d.get("department_owner", ""),
-                status=d.get("status", "ACTIVE"),
-                created_at=d.get("created_at", datetime.datetime.now(datetime.timezone.utc).isoformat())
+                status="ACTIVE",
+                created_at=str(d.get("created_at", datetime.datetime.now(datetime.timezone.utc).isoformat()))
             ))
             
     for fact in APPROVED_FACTS_CATALOG.values():
