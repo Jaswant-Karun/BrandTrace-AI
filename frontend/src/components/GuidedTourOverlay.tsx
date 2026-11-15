@@ -1,11 +1,18 @@
 import React from 'react';
 import { ArrowRight, ArrowLeft, X, Sparkles, CheckCircle2 } from 'lucide-react';
-import { NavigationTab } from './Sidebar';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
 
+export type TourTab =
+  | 'overview'
+  | 'knowledge-base'
+  | 'content-studio'
+  | 'impact-simulator'
+  | 'audit-trust'
+  | string;
+
 export interface TourStep {
-  tab: NavigationTab;
+  tab: TourTab;
   title: string;
   category: string;
   description: string;
@@ -16,7 +23,7 @@ export interface TourStep {
 
 const TOUR_STEPS: TourStep[] = [
   {
-    tab: 'command-center',
+    tab: 'overview',
     title: '1. Welcome to BrandTrace AI',
     category: 'Overview',
     description: 'Welcome to BrandTrace AI — the autonomous brand intelligence & governance control plane. Every brand decision connected. Every risk traceable. Every release accountable.',
@@ -25,7 +32,7 @@ const TOUR_STEPS: TourStep[] = [
     highlightTip: 'Your governance workspace at a glance: real-time compliance index, sealed release counts, and pending approvals.'
   },
   {
-    tab: 'command-center',
+    tab: 'overview',
     title: '2. Product Promise in Plain Language',
     category: 'Core Value',
     description: 'Know what your brand allows. Detect what your content risks. Understand the impact of changes. Approve with evidence. Preserve an auditable record.',
@@ -34,13 +41,13 @@ const TOUR_STEPS: TourStep[] = [
     highlightTip: 'Eliminates siloed brand books, accidental price leaks, greenwashing lawsuits, and unverified marketing claims.'
   },
   {
-    tab: 'command-center',
+    tab: 'overview',
     title: '3. Introduce the AURELLE Demo Workspace',
     category: 'Showcase Workspace',
     description: 'Aurelle Technologies Inc. is pre-loaded as your live demonstration workspace. It features next-generation spatial computing hardware, proprietary audio patents, and subscription pricing.',
     actionText: 'Next: View Approved Brand Facts',
     badge: 'Step 3 of 8',
-    highlightTip: 'You can switch between Aurelle Technologies, Apex Dynamics, and Novus Health Solutions in the sidebar.'
+    highlightTip: 'You can switch between Aurelle Technologies, Apex Dynamics, and Novus Health Solutions in the brand selector.'
   },
   {
     tab: 'knowledge-base',
@@ -92,7 +99,7 @@ const TOUR_STEPS: TourStep[] = [
 interface GuidedTourOverlayProps {
   isOpen: boolean;
   currentStepIndex: number;
-  onStepChange: (index: number, tab: NavigationTab) => void;
+  onStepChange: (index: number, tab: TourTab) => void;
   onClose: () => void;
 }
 

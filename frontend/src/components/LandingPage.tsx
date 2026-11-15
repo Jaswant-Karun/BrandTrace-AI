@@ -214,14 +214,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             ) : (
               <>
                 <button
-                  onClick={onSignIn || (() => onEnterApp('command-center'))}
+                  onClick={onSignIn}
                   className="text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0 whitespace-nowrap"
                 >
                   Sign In
                 </button>
 
                 <button
-                  onClick={onSignIn || (() => onEnterApp('command-center'))}
+                  onClick={onSignIn}
                   className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 shadow-xs hover:shadow-md transition-all cursor-pointer shrink-0 whitespace-nowrap"
                 >
                   <span>Get Started</span>

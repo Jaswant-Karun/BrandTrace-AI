@@ -166,10 +166,10 @@ export const GovernanceAnalyticsView: React.FC<GovernanceAnalyticsViewProps> = (
       {/* Workflow Banner: Next Step in Governance Journey */}
       <WorkflowBanner
         currentStage="Analytics"
-        nextStageTitle="Overview & Command Center"
-        nextStageDescription="Return to the executive command center to view active postures, quick actions, and overall workspace status."
-        nextStageActionLabel="Return to Overview"
-        onNavigateNext={() => onNavigate && onNavigate('command-center')}
+        nextStageTitle="Approval Center"
+        nextStageDescription="Proceed to the Approval Center to view pending reviews and human-in-the-loop sign-offs."
+        nextStageActionLabel="Go to Approvals"
+        onNavigateNext={() => onNavigate && onNavigate('approvals')}
         governanceHint="High compliance velocity indicates healthy alignment between creative teams and certified brand knowledge."
       />
     </div>
