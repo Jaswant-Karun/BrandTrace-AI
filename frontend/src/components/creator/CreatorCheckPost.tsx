@@ -166,6 +166,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
   const [hasChecked, setHasChecked] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [submissionStatus, setSubmissionStatus] = useState<string | null>(null);
+  const [analysisId, setAnalysisId] = useState<string | null>(null);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
   const [reviewNote, setReviewNote] = useState<string>('');
   const [privateVersionCount, setPrivateVersionCount] = useState<number>(revisionData ? revisionData.version : 1);
@@ -180,6 +181,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
       if (revisionData.brandId) setActiveWorkspaceId(revisionData.brandId);
       if (revisionData.brandName) setActiveBrandName(revisionData.brandName);
       setHasChecked(false);
+      setAnalysisId(null);
       setSubmissionStatus(null);
     }
   }, [revisionData]);
@@ -192,6 +194,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
       setActiveBrandName(found.name);
     }
     setHasChecked(false);
+    setAnalysisId(null);
     setSubmissionStatus(null);
   };
   
@@ -266,6 +269,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
     setKeyPhrases('dark spots, skin barrier');
     setCallToAction('Shop');
     setHasChecked(false);
+    setAnalysisId(null);
     setSubmissionStatus(null);
   };
 
@@ -275,6 +279,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
     setKeyPhrases(ex.keyPhrases);
     setCallToAction(ex.cta);
     setHasChecked(false);
+    setAnalysisId(null);
     setSubmissionStatus(null);
     setSelectedFile(null);
   };
@@ -289,6 +294,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
         reader.onload = (event) => {
           if (event.target?.result) {
             setDraftContent(event.target.result as string);
+            setAnalysisId(null);
           }
         };
         reader.readAsText(file);
@@ -312,6 +318,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
         call_to_action: callToAction,
       }),
     });
+    setAnalysisId(res?.verification_id || null);
 
     const parsedFindings: FindingItem[] = [];
     let count = 1;
@@ -490,6 +497,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
     } else if (finding.rejectedText.startsWith('[Missing')) {
       setDraftContent((prev) => prev.trim() + ' ' + finding.approvedText);
     }
+    setAnalysisId(null);
 
     setFindings((prev) =>
       prev.map((f) => (f.id === findingId ? { ...f, accepted: true } : f))
@@ -540,6 +548,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
   // Accept suggested version in full
   const handleAcceptSuggested = () => {
     setDraftContent(suggestedContent);
+    setAnalysisId(null);
     setFindings((prev) => prev.map((f) => ({ ...f, accepted: true })));
     setSubmissionStatus('Suggested version accepted and applied to editor.');
   };
@@ -588,6 +597,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
             creator_name: subCreatorName,
             creator_type: subCreatorType,
             org_id: subOrgId,
+            analysis_id: analysisId || undefined,
             channel: channel.toLowerCase(),
             title: draftContent.slice(0, 95) + (draftContent.length > 95 ? '...' : ''),
             original_content: draftContent,
@@ -772,7 +782,10 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
             {/* Textarea */}
             <textarea
               value={draftContent}
-              onChange={(e) => setDraftContent(e.target.value)}
+              onChange={(e) => {
+                setDraftContent(e.target.value);
+                setAnalysisId(null);
+              }}
               placeholder="Paste your draft here"
               rows={6}
               className="w-full bg-transparent resize-y text-sm sm:text-base text-neutral-900 placeholder:text-neutral-400 leading-relaxed font-sans focus:outline-none border-0 p-0 pl-4 sm:pl-7 pr-2.5 sm:pr-4"
@@ -987,21 +1000,46 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
           
           {/* A. THE VERDICT CARD */}
           {verdict && (
-            <div className={`p-6 rounded-2xl border shadow-xl ${verdict.bgClass} space-y-2`}>
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-mono font-bold tracking-widest uppercase">
-                  THE VERDICT
-                </span>
-                <span className={`px-2.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${verdict.badgeClass}`}>
-                  {verdict.type}
-                </span>
+            <div className="rounded-2xl border border-neutral-800 bg-[#17171a] shadow-xl overflow-hidden">
+              <div className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[1.15fr_0.85fr]">
+                <div className="space-y-2">
+                  <span className="text-[11px] font-mono font-bold tracking-widest uppercase text-neutral-400">
+                    THE VERDICT
+                  </span>
+                  <h2 className={`text-2xl sm:text-4xl font-black font-sans uppercase tracking-tight ${
+                    categoryCounts.blocking > 0 ? 'text-rose-400' :
+                    categoryCounts.needsHuman > 0 ? 'text-purple-300' :
+                    categoryCounts.major > 0 ? 'text-amber-300' : 'text-emerald-400'
+                  }`}>
+                    {categoryCounts.blocking > 0
+                      ? `${categoryCounts.blocking} ISSUE${categoryCounts.blocking === 1 ? '' : 'S'} BLOCK PUBLISHING`
+                      : verdict.title}
+                  </h2>
+                  <p className="text-xs sm:text-sm font-sans text-neutral-400">
+                    {categoryCounts.blocking} blocking · {categoryCounts.major} major · {categoryCounts.minor} minor · {categoryCounts.needsHuman} need human eyes · {categoryCounts.advisory} advisory
+                  </p>
+                </div>
+                <div className="space-y-2 self-end">
+                  <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-neutral-400">
+                    <span>Blocking issues handled</span>
+                    <strong className="text-lg text-white">{findings.filter((f) => f.accepted && f.severity === 'BLOCKING').length}/{findings.filter((f) => f.severity === 'BLOCKING').length}</strong>
+                  </div>
+                  <div className="h-2 overflow-hidden rounded-full bg-neutral-800">
+                    <div
+                      className="h-full rounded-full bg-rose-400 transition-all"
+                      style={{
+                        width: `${findings.filter((f) => f.severity === 'BLOCKING').length
+                          ? (findings.filter((f) => f.accepted && f.severity === 'BLOCKING').length / findings.filter((f) => f.severity === 'BLOCKING').length) * 100
+                          : 100}%`,
+                      }}
+                    />
+                  </div>
+                  <p className="text-[10px] font-mono text-neutral-500">
+                    Accept a fix, edit the words, or ask a reviewer about each issue.
+                  </p>
+                </div>
               </div>
-              <h2 className="text-xl sm:text-2xl font-black font-sans uppercase tracking-tight text-white">
-                {verdict.title}
-              </h2>
-              <p className="text-xs sm:text-sm font-sans text-neutral-300">
-                {verdict.subtitle}
-              </p>
+              <div className={`h-1 ${verdict.type === 'CLEAN' ? 'bg-emerald-500' : verdict.type === 'MAJOR' ? 'bg-amber-500' : 'bg-rose-500'}`} />
             </div>
           )}
 
@@ -1095,7 +1133,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
               </div>
 
               {/* Render Draft with Interactive Highlight Spans */}
-              <div className="bg-[#121214] border border-neutral-800 rounded-2xl p-5 text-sm sm:text-base leading-relaxed font-sans text-neutral-200">
+              <div className="bg-[#f3f1eb] border border-neutral-300 rounded-2xl p-5 text-sm sm:text-base leading-relaxed font-sans text-neutral-900 shadow-sm">
                 {(() => {
                   if (findings.length === 0) {
                     return <p>{draftContent}</p>;
@@ -1107,7 +1145,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
                   );
 
                   if (activeFindings.length === 0) {
-                    return <p className="text-emerald-400 font-mono text-xs">All in-line findings resolved.</p>;
+                    return <p className="text-emerald-700 font-mono text-xs">All in-line findings resolved.</p>;
                   }
 
                   // Build highlighted segments
@@ -1132,23 +1170,23 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
 
                     const isSelected = selectedFindingId === m.finding.id;
                     const sevColor = 
-                      m.finding.severity === 'BLOCKING' ? 'bg-rose-500/30 text-rose-300 border-rose-500/60' :
-                      m.finding.severity === 'MAJOR' ? 'bg-amber-500/30 text-amber-300 border-amber-500/60' :
-                      m.finding.severity === 'NEEDS_HUMAN' ? 'bg-purple-500/30 text-purple-300 border-purple-500/60' :
-                      m.finding.severity === 'MINOR' ? 'bg-blue-500/30 text-blue-300 border-blue-500/60' :
-                      'bg-neutral-800 text-neutral-300 border-neutral-700';
+                      m.finding.severity === 'BLOCKING' ? 'bg-rose-200 text-rose-900 border-rose-400' :
+                      m.finding.severity === 'MAJOR' ? 'bg-amber-200 text-amber-900 border-amber-400' :
+                      m.finding.severity === 'NEEDS_HUMAN' ? 'bg-purple-200 text-purple-900 border-purple-400' :
+                      m.finding.severity === 'MINOR' ? 'bg-blue-200 text-blue-900 border-blue-400' :
+                      'bg-neutral-200 text-neutral-800 border-neutral-400';
 
                     parts.push(
                       <span
                         key={`match-${i}`}
                         onClick={() => handleHighlightClick(m.finding.id)}
                         className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border cursor-pointer transition-all ${sevColor} ${
-                          isSelected ? 'ring-2 ring-white scale-105' : 'hover:brightness-125'
+                          isSelected ? 'ring-2 ring-indigo-500 scale-105' : 'hover:brightness-95'
                         }`}
                         title={`Finding #${m.finding.number}: ${m.finding.title}`}
                       >
                         <span className="font-medium underline decoration-dotted">{m.finding.rejectedText}</span>
-                        <span className="text-[10px] font-mono font-bold bg-black/60 px-1 rounded">
+                        <span className="text-[10px] font-mono font-bold bg-black/15 px-1 rounded">
                           [{m.finding.number}]
                         </span>
                       </span>
