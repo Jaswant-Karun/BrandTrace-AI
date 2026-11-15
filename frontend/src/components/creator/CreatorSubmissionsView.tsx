@@ -5,6 +5,7 @@ import {
   Edit3, ShieldCheck, ChevronDown, ChevronUp, FileText
 } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
+import { useAuth } from '../../context/AuthContext';
 
 export interface SubmissionItem {
   submission_id: string;
@@ -157,30 +158,60 @@ const DEFAULT_SUBMISSIONS: SubmissionItem[] = [
 void DEFAULT_SUBMISSIONS;
 
 export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
-  role = 'agency',
+  role = 'creator',
   userId,
-  userName = 'Agency Sana',
-  orgId = 'ORG-AGENCY-PULSE',
+  userName,
+  orgId,
   brandName = 'Aurelle Skin',
   onEditAndResubmit,
 }) => {
   const shouldReduceMotion = useReducedMotion();
+  const { user } = useAuth();
   const [submissions, setSubmissions] = useState<SubmissionItem[]>([]);
   const [filter, setFilter] = useState<'ALL' | 'CHANGES_REQUESTED' | 'PENDING' | 'APPROVED'>('ALL');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
+  // Resolve effective identity from auth context, falling back to props
+  const effectiveUserId = userId || user?.email || '';
+  const effectiveUserName = userName || user?.name || 'Creator';
+  const effectiveOrgId = orgId || user?.org_id || 'ORG-AURELLE';
+
+  // Map backend role to the correct API role param
+  const getApiRole = (): string => {
+    const backendRole = user?.role || '';
+    if (role === 'agency') return 'agency';
+    if (backendRole === 'REVIEWER') return 'reviewer';
+    if (backendRole === 'COMPLIANCE_REVIEWER') return 'compliance';
+    if (backendRole === 'BRAND_MANAGER' || backendRole === 'ADMIN') return 'brand-owner';
+    return 'creator';
+  };
+
   const loadSubmissions = async () => {
     setIsLoading(true);
     setLoadError(null);
     try {
-      const params = new URLSearchParams({ role, brand_id: 'aurelle-tech' });
-      if (role === 'creator' && userId) params.set('creator_id', userId);
+      const apiRole = getApiRole();
+      const params = new URLSearchParams({ role: apiRole });
+      // Always scope to this user's brand workspace
+      const brandId = user?.workspace_id || 'aurelle-tech';
+      params.set('brand_id', brandId);
+      // For creator/agency roles, also scope to this user's own submissions
+      if ((apiRole === 'creator' || apiRole === 'agency') && effectiveUserId) {
+        params.set('creator_id', effectiveUserId);
+      }
       const data = await apiClient.request<SubmissionItem[]>(`/api/submissions?${params.toString()}`, { skipCache: true });
       setSubmissions(Array.isArray(data) ? data : []);
     } catch (error: any) {
-      setLoadError(error?.message || 'Unable to load persisted submissions.');
+      // 403 means role mismatch — show a clear, helpful message rather than the raw backend error
+      if (error?.status === 403) {
+        setLoadError('Your account role does not have access to this submission workspace. Please sign in with a Creator account.');
+      } else if (error?.status === 0) {
+        setLoadError('Backend is unreachable. Please check your connection or try again shortly.');
+      } else {
+        setLoadError(error?.message || 'Unable to load submissions. Please try refreshing.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -188,7 +219,8 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
 
   useEffect(() => {
     loadSubmissions();
-  }, [role, userId]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [role, effectiveUserId, user?.role]);
 
   const filteredSubmissions = submissions.filter((sub) => {
     if (filter === 'ALL') return true;
@@ -209,7 +241,7 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
-            BRANDTRACE · {brandName.toUpperCase()} · {userName.toUpperCase()} ({orgId})
+            BRANDTRACE · {brandName.toUpperCase()} · {effectiveUserName.toUpperCase()} ({effectiveOrgId})
           </div>
           <button
             onClick={loadSubmissions}
@@ -231,8 +263,18 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
       </div>
 
       {loadError && (
-        <div className="rounded-xl border border-rose-800/60 bg-rose-950/30 p-4 text-sm text-rose-200">
-          {loadError}
+        <div className="rounded-xl border border-rose-800/60 bg-rose-950/30 p-4 text-sm text-rose-200 flex items-start gap-3">
+          <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+          <div>
+            <div className="font-mono font-bold text-rose-300 text-xs uppercase tracking-wider mb-1">Unable to load submissions</div>
+            <div className="text-rose-200/80">{loadError}</div>
+            <button
+              onClick={loadSubmissions}
+              className="mt-2 text-xs font-mono text-rose-300 hover:text-white underline underline-offset-2 cursor-pointer"
+            >
+              Try again
+            </button>
+          </div>
         </div>
       )}
 

@@ -114,19 +114,23 @@ async def list_submissions(
 ):
     """Lists submissions filtered by user role, brand, or review state with pagination."""
     requested_role = (role or "").lower()
+    user_role_val = user.role.value if hasattr(user.role, "value") else str(user.role)
+    # BRAND_MANAGER and ADMIN can view all submission workspaces for governance
+    is_admin_or_owner = user_role_val in {"BRAND_MANAGER", "ADMIN"}
     allowed_roles = {
-        "creator": {"CREATOR"},
-        "agency": {"CREATOR"},
-        "reviewer": {"REVIEWER"},
-        "compliance": {"COMPLIANCE_REVIEWER"},
+        "creator": {"CREATOR", "BRAND_MANAGER", "ADMIN"},
+        "agency": {"CREATOR", "BRAND_MANAGER", "ADMIN"},
+        "reviewer": {"REVIEWER", "BRAND_MANAGER", "ADMIN"},
+        "compliance": {"COMPLIANCE_REVIEWER", "BRAND_MANAGER", "ADMIN"},
         "brand-owner": {"BRAND_MANAGER", "ADMIN"},
         "brand_owner": {"BRAND_MANAGER", "ADMIN"},
     }
-    if requested_role in allowed_roles and user.role.value not in allowed_roles[requested_role]:
+    if requested_role in allowed_roles and user_role_val not in allowed_roles[requested_role]:
         raise HTTPException(status_code=403, detail="This account is not authorized for the requested submission workspace.")
 
     active_creator_id = creator_id
-    if user.role.value == "CREATOR" and role == "creator":
+    # Scope to this creator's own submissions unless they are an admin/owner viewing all
+    if user_role_val == "CREATOR" and role in ("creator", "agency"):
         active_creator_id = user.user_id
     return await submissions_service.list_submissions(
         creator_id=active_creator_id,
