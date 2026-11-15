@@ -60,6 +60,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSecurityIndex, setActiveSecurityIndex] = useState<number | null>(null);
   const [activeStepIndex, setActiveStepIndex] = useState<number>(3);
+  const [pointedRole, setPointedRole] = useState<RoleType>('creator');
+  const [hoveredRole, setHoveredRole] = useState<RoleType | null>(null);
 
   // Motion choreography state for hero headline & approved seal:
   // Starts at 0 (EVERY CLAIM), animates through 1 (CLINICALLY PROVEN), 2 (strikethroughs), and 3 (SHOWN TO VISIBLY REDUCE* + APPROVED VLM-SEALED slam)
@@ -1468,164 +1470,140 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </p>
           </div>
 
-          {/* 5 Persona Cards Row (Directly matching Reference Image 1 with Motion Increase on Scroll) */}
+          {/* 5 Persona Cards Row (Pointing / Hovering any role highlights it in vibrant blue) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-
-            {/* Card 1: CREATOR */}
-            <motion.div
-              initial={shouldReduceMotion ? false : { opacity: 0, y: 20, scale: 0.98 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: false, amount: 0.15 }}
-              transition={{ duration: 0.45, delay: shouldReduceMotion ? 0 : 0.05, ease: 'easeOut' }}
-              className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-200 space-y-4 shadow-lg"
-            >
-              <div className="space-y-3">
-                <div className="w-9 h-9 rounded-xl bg-indigo-600/30 border border-indigo-500/50 flex items-center justify-center text-indigo-400">
-                  <PenTool className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="text-base font-black font-sans text-white uppercase tracking-wider">CREATOR</h3>
-                  <div className="text-[10px] font-mono text-neutral-400 uppercase">ASHA · IN-HOUSE WRITER</div>
-                </div>
-                <p className="text-xs text-neutral-300 leading-relaxed font-sans min-h-[50px]">
-                  Check a draft privately, accept cited fixes and send it for review.
-                </p>
-                <div className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider">
-                  OPENS &rarr; CHECK A POST
-                </div>
-              </div>
-              <button
-                onClick={() => onNavigateRole ? onNavigateRole('creator') : onOpenCreatorDashboard ? onOpenCreatorDashboard() : null}
-                className="w-full py-2.5 px-3 rounded-xl bg-[#544df2] hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider cursor-pointer shadow-md transition-colors min-h-[44px] flex items-center justify-center active:scale-[0.98]"
-              >
-                TRY AS CREATOR
-              </button>
-            </motion.div>
-
-            {/* Card 2: AGENCY */}
-            <motion.div
-              initial={shouldReduceMotion ? false : { opacity: 0, y: 20, scale: 0.98 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: false, amount: 0.15 }}
-              transition={{ duration: 0.45, delay: shouldReduceMotion ? 0 : 0.15, ease: 'easeOut' }}
-              className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-200 space-y-4 shadow-lg"
-            >
-              <div className="space-y-3">
-                <div className="w-9 h-9 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400">
-                  <Building2 className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="text-base font-black font-sans text-white uppercase tracking-wider">AGENCY</h3>
-                  <div className="text-[10px] font-mono text-neutral-400 uppercase">SANA · OUTSIDE AGENCY</div>
-                </div>
-                <p className="text-xs text-neutral-300 leading-relaxed font-sans min-h-[50px]">
-                  Check her own drafts. Confidential facts stay hidden from her.
-                </p>
-                <div className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider">
-                  OPENS &rarr; CHECK A POST
-                </div>
-              </div>
-              <button
-                onClick={() => onNavigateRole ? onNavigateRole('agency') : null}
-                className="w-full py-2.5 px-3 rounded-xl bg-[#f0ede6] hover:bg-white text-neutral-900 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors min-h-[44px] flex items-center justify-center active:scale-[0.98]"
-              >
-                TRY AS AGENCY
-              </button>
-            </motion.div>
-
-            {/* Card 3: REVIEWER */}
-            <motion.div
-              initial={shouldReduceMotion ? false : { opacity: 0, y: 20, scale: 0.98 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: false, amount: 0.15 }}
-              transition={{ duration: 0.45, delay: shouldReduceMotion ? 0 : 0.25, ease: 'easeOut' }}
-              className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-200 space-y-4 shadow-lg"
-            >
-              <div className="space-y-3">
-                <div className="w-9 h-9 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400">
-                  <CheckCircle2 className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="text-base font-black font-sans text-white uppercase tracking-wider">REVIEWER</h3>
-                  <div className="text-[10px] font-mono text-neutral-400 uppercase">MEERA · CONTENT REVIEWER</div>
-                </div>
-                <p className="text-xs text-neutral-300 leading-relaxed font-sans min-h-[50px]">
-                  Work through the queue: agree or disagree with each finding, then approve.
-                </p>
-                <div className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider">
-                  OPENS &rarr; REVIEW QUEUE
-                </div>
-              </div>
-              <button
-                onClick={() => onNavigateRole ? onNavigateRole('reviewer') : null}
-                className="w-full py-2.5 px-3 rounded-xl bg-[#f0ede6] hover:bg-white text-neutral-900 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors min-h-[44px] flex items-center justify-center active:scale-[0.98]"
-              >
-                TRY AS REVIEWER
-              </button>
-            </motion.div>
-
-            {/* Card 4: COMPLIANCE */}
-            <motion.div
-              initial={shouldReduceMotion ? false : { opacity: 0, y: 20, scale: 0.98 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: false, amount: 0.15 }}
-              transition={{ duration: 0.45, delay: shouldReduceMotion ? 0 : 0.35, ease: 'easeOut' }}
-              className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-200 space-y-4 shadow-lg"
-            >
-              <div className="space-y-3">
-                <div className="w-9 h-9 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400">
-                  <ClipboardCheck className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="text-base font-black font-sans text-white uppercase tracking-wider">COMPLIANCE</h3>
-                  <div className="text-[10px] font-mono text-neutral-400 uppercase">ARJUN · COMPLIANCE</div>
-                </div>
-                <p className="text-xs text-neutral-300 leading-relaxed font-sans min-h-[50px]">
-                  Decide claims and confidential findings, and give the compliance sign-off.
-                </p>
-                <div className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider">
-                  OPENS &rarr; REVIEW QUEUE
-                </div>
-              </div>
-              <button
-                onClick={() => onNavigateRole ? onNavigateRole('compliance') : null}
-                className="w-full py-2.5 px-3 rounded-xl bg-[#f0ede6] hover:bg-white text-neutral-900 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors min-h-[44px] flex items-center justify-center active:scale-[0.98]"
-              >
-                TRY AS COMPLIANCE
-              </button>
-            </motion.div>
-
-            {/* Card 5: BRAND OWNER */}
-            <motion.div
-              initial={shouldReduceMotion ? false : { opacity: 0, y: 20, scale: 0.98 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: false, amount: 0.15 }}
-              transition={{ duration: 0.45, delay: shouldReduceMotion ? 0 : 0.45, ease: 'easeOut' }}
-              className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-200 space-y-4 shadow-lg"
-            >
-              <div className="space-y-3">
-                <div className="w-9 h-9 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400">
-                  <Megaphone className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="text-base font-black font-sans text-white uppercase tracking-wider">BRAND OWNER</h3>
-                  <div className="text-[10px] font-mono text-neutral-400 uppercase">KABIR · BRAND OWNER</div>
-                </div>
-                <p className="text-xs text-neutral-300 leading-relaxed font-sans min-h-[50px]">
-                  Own the rulebook and see which rules people find unclear.
-                </p>
-                <div className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider">
-                  OPENS &rarr; GUIDELINE HEALTH
-                </div>
-              </div>
-              <button
-                onClick={() => onNavigateRole ? onNavigateRole('brand-owner') : null}
-                className="w-full py-2.5 px-3 rounded-xl bg-[#f0ede6] hover:bg-white text-neutral-900 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors min-h-[44px] flex items-center justify-center active:scale-[0.98]"
-              >
-                TRY AS BRAND OWNER
-              </button>
-            </motion.div>
-
+            {[
+              {
+                id: 'creator' as RoleType,
+                title: 'CREATOR',
+                person: 'ASHA · IN-HOUSE WRITER',
+                desc: 'Check a draft privately, accept cited fixes and send it for review.',
+                opens: 'OPENS → CHECK A POST',
+                buttonText: 'TRY AS CREATOR',
+                icon: PenTool,
+                delay: 0.05,
+              },
+              {
+                id: 'agency' as RoleType,
+                title: 'AGENCY',
+                person: 'SANA · OUTSIDE AGENCY',
+                desc: 'Check her own drafts. Confidential facts stay hidden from her.',
+                opens: 'OPENS → CHECK A POST',
+                buttonText: 'TRY AS AGENCY',
+                icon: Building2,
+                delay: 0.15,
+              },
+              {
+                id: 'reviewer' as RoleType,
+                title: 'REVIEWER',
+                person: 'MEERA · CONTENT REVIEWER',
+                desc: 'Work through the queue: agree or disagree with each finding, then approve.',
+                opens: 'OPENS → REVIEW QUEUE',
+                buttonText: 'TRY AS REVIEWER',
+                icon: CheckCircle2,
+                delay: 0.25,
+              },
+              {
+                id: 'compliance' as RoleType,
+                title: 'COMPLIANCE',
+                person: 'ARJUN · COMPLIANCE',
+                desc: 'Decide claims and confidential findings, and give the compliance sign-off.',
+                opens: 'OPENS → REVIEW QUEUE',
+                buttonText: 'TRY AS COMPLIANCE',
+                icon: ClipboardCheck,
+                delay: 0.35,
+              },
+              {
+                id: 'brand-owner' as RoleType,
+                title: 'BRAND OWNER',
+                person: 'KABIR · BRAND OWNER',
+                desc: 'Own the rulebook and see which rules people find unclear.',
+                opens: 'OPENS → GUIDELINE HEALTH',
+                buttonText: 'TRY AS BRAND OWNER',
+                icon: Megaphone,
+                delay: 0.45,
+              },
+            ].map((role) => {
+              const isPointed = hoveredRole ? hoveredRole === role.id : pointedRole === role.id;
+              const IconComponent = role.icon;
+              return (
+                <motion.div
+                  key={role.id}
+                  initial={shouldReduceMotion ? false : { opacity: 0, y: 20, scale: 0.98 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  viewport={{ once: false, amount: 0.15 }}
+                  transition={{ duration: 0.45, delay: shouldReduceMotion ? 0 : role.delay, ease: 'easeOut' }}
+                  onMouseEnter={() => {
+                    setHoveredRole(role.id);
+                    setPointedRole(role.id);
+                  }}
+                  onMouseLeave={() => setHoveredRole(null)}
+                  className={`group bg-neutral-950 border rounded-2xl p-5 flex flex-col justify-between transition-all duration-200 space-y-4 shadow-lg cursor-pointer ${
+                    isPointed
+                      ? 'border-blue-500 shadow-xl shadow-blue-500/20 ring-1 ring-blue-500/50 scale-[1.02]'
+                      : 'border-neutral-800 hover:border-blue-500 hover:shadow-xl hover:shadow-blue-500/20'
+                  }`}
+                  onClick={() => {
+                    setPointedRole(role.id);
+                    if (role.id === 'creator') {
+                      onNavigateRole ? onNavigateRole('creator') : onOpenCreatorDashboard ? onOpenCreatorDashboard() : null;
+                    } else {
+                      onNavigateRole ? onNavigateRole(role.id) : null;
+                    }
+                  }}
+                >
+                  <div className="space-y-3">
+                    <div
+                      className={`w-9 h-9 rounded-xl border flex items-center justify-center transition-all duration-200 ${
+                        isPointed
+                          ? 'bg-blue-600/30 border-blue-500/60 text-blue-400'
+                          : 'bg-neutral-900 border-neutral-800 text-neutral-400 group-hover:bg-blue-600/30 group-hover:border-blue-500/60 group-hover:text-blue-400'
+                      }`}
+                    >
+                      <IconComponent className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3
+                        className={`text-base font-black font-sans uppercase tracking-wider transition-colors ${
+                          isPointed ? 'text-white' : 'text-white group-hover:text-blue-300'
+                        }`}
+                      >
+                        {role.title}
+                      </h3>
+                      <div className="text-[10px] font-mono text-neutral-400 uppercase">{role.person}</div>
+                    </div>
+                    <p className="text-xs text-neutral-300 leading-relaxed font-sans min-h-[50px]">
+                      {role.desc}
+                    </p>
+                    <div
+                      className={`text-[10px] font-mono uppercase tracking-wider transition-colors ${
+                        isPointed ? 'text-blue-400 font-semibold' : 'text-neutral-500 group-hover:text-blue-400'
+                      }`}
+                    >
+                      {role.opens}
+                    </div>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPointedRole(role.id);
+                      if (role.id === 'creator') {
+                        onNavigateRole ? onNavigateRole('creator') : onOpenCreatorDashboard ? onOpenCreatorDashboard() : null;
+                      } else {
+                        onNavigateRole ? onNavigateRole(role.id) : null;
+                      }
+                    }}
+                    className={`w-full py-2.5 px-3 rounded-xl font-bold text-xs uppercase tracking-wider cursor-pointer transition-all duration-200 min-h-[44px] flex items-center justify-center active:scale-[0.98] ${
+                      isPointed
+                        ? 'bg-[#544df2] hover:bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+                        : 'bg-[#f0ede6] hover:bg-white text-neutral-900 group-hover:bg-[#544df2] group-hover:text-white group-hover:shadow-lg group-hover:shadow-blue-500/30 shadow-xs'
+                    }`}
+                  >
+                    {role.buttonText}
+                  </button>
+                </motion.div>
+              );
+            })}
           </div>
 
           {/* Hanging Plumb Bob & Grand Statement directly matching Reference Image 1 */}
