@@ -263,23 +263,67 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
         {/* ========================================================================= */}
         <div className="lg:col-span-5 space-y-6">
           
-          {/* Main Large REVIEW / COMPLIANCE Heading */}
+          {/* Main Large REVIEW / COMPLIANCE / FINAL RELEASE Heading */}
           <div className="space-y-2">
             <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
               PLUMBLINE · {brandName.toUpperCase()} · {roleName.toUpperCase()}
             </div>
             <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white font-sans uppercase">
-              {roleName === 'COMPLIANCE' ? 'COMPLIANCE' : 'REVIEW'}
+              {roleName === 'BRAND OWNER' ? 'FINAL RELEASE' : roleName === 'COMPLIANCE' ? 'COMPLIANCE' : 'REVIEW'}
             </h1>
             <p className="text-sm text-neutral-400 font-sans leading-relaxed">
-              {roleName === 'COMPLIANCE'
+              {roleName === 'BRAND OWNER'
+                ? 'Final executive approval and cryptographic sealing. Verify complete approval history across Creator, Reviewer, and Compliance stages before generating an immutable release.'
+                : roleName === 'COMPLIANCE'
                 ? 'Statutory validation against FTC Green Guides §260, FDA 21 CFR §201, and clinical evidence. Approve, request evidence, or return for revision.'
                 : 'Agree or disagree with each blocking problem, then approve the post or send it back. Every step is recorded.'}
             </p>
           </div>
 
-          {/* Prior Reviewer Sign-off Banner (shown for Compliance role or when prior reviewer feedback exists) */}
-          {(roleName === 'COMPLIANCE' || post.reviewerFeedback) && (
+          {/* Mandatory Workflow Audit Chain (for Brand Owner) */}
+          {roleName === 'BRAND OWNER' ? (
+            <div className="p-4 rounded-xl bg-neutral-900/90 border border-neutral-700/80 space-y-3 shadow-lg">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-neutral-300 flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                  MANDATORY WORKFLOW AUDIT CHAIN
+                </span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-950/80 text-emerald-300 border border-emerald-500/40">
+                  READY FOR SEALING
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-[11px] font-mono">
+                <div className="p-2.5 rounded-lg bg-neutral-950 border border-neutral-800 space-y-0.5">
+                  <div className="text-[9px] text-neutral-500 uppercase">Stage 1 · Submitter</div>
+                  <div className="text-white font-semibold truncate text-[11px]">{post.creatorName || 'Creator Asha'}</div>
+                  <div className="text-[9px] text-purple-400">SUBMITTED</div>
+                </div>
+                <div className="p-2.5 rounded-lg bg-neutral-950 border border-neutral-800 space-y-0.5">
+                  <div className="text-[9px] text-neutral-500 uppercase">Stage 2 · Reviewer</div>
+                  <div className="text-white font-semibold truncate text-[11px]">Reviewer Meera</div>
+                  <div className="text-[9px] text-emerald-400">APPROVED</div>
+                </div>
+                <div className="p-2.5 rounded-lg bg-neutral-950 border border-neutral-800 space-y-0.5">
+                  <div className="text-[9px] text-neutral-500 uppercase">Stage 3 · Compliance</div>
+                  <div className="text-white font-semibold truncate text-[11px]">Officer Arjun</div>
+                  <div className="text-[9px] text-emerald-400">CERTIFIED</div>
+                </div>
+                <div className="p-2.5 rounded-lg bg-neutral-950 border border-indigo-500/40 space-y-0.5">
+                  <div className="text-[9px] text-neutral-500 uppercase">Stage 4 · Owner</div>
+                  <div className="text-white font-semibold truncate text-[11px]">{userName}</div>
+                  <div className="text-[9px] text-amber-300 animate-pulse">PENDING SEAL</div>
+                </div>
+              </div>
+
+              {/* Gated Publishing Restriction Alert */}
+              <div className="p-2.5 rounded-lg bg-amber-950/30 border border-amber-600/40 text-amber-200 text-[11px] font-sans flex items-start gap-2">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+                <span>
+                  <strong>PUBLISHING RESTRICTION ACTIVE:</strong> External distribution is strictly gated. Content will not be published automatically to external platforms without explicit API authorization.
+                </span>
+              </div>
+            </div>
+          ) : (roleName === 'COMPLIANCE' || post.reviewerFeedback) ? (
             <div className="p-3.5 rounded-xl bg-indigo-950/40 border border-indigo-700/50 flex items-start gap-3">
               <ShieldCheck className="w-4 h-4 text-indigo-400 mt-0.5 shrink-0" />
               <div className="text-xs space-y-0.5">
@@ -291,7 +335,7 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
                 </p>
               </div>
             </div>
-          )}
+          ) : null}
 
           {/* Submitter & Metadata Card */}
           <div className="p-4 rounded-2xl bg-neutral-950 border border-neutral-800 space-y-2.5 shadow-md">
@@ -676,7 +720,34 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
               Cancel / Back to Queue
             </button>
 
-            {roleName === 'COMPLIANCE' ? (
+            {roleName === 'BRAND OWNER' ? (
+              <div className="flex flex-wrap items-center gap-2.5">
+                <button
+                  disabled={isSubmitting}
+                  onClick={() => handleTriggerDecision('REJECT')}
+                  className="px-4 py-2.5 rounded-xl bg-rose-950/60 border border-rose-600/70 hover:bg-rose-900 text-rose-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer"
+                >
+                  Reject Release
+                </button>
+
+                <button
+                  disabled={isSubmitting}
+                  onClick={() => handleTriggerDecision('REQUEST_CHANGES')}
+                  className="px-4 py-2.5 rounded-xl bg-neutral-900 border border-amber-600/70 hover:bg-neutral-800 text-amber-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer"
+                >
+                  Request Changes
+                </button>
+
+                <button
+                  disabled={isSubmitting}
+                  onClick={() => handleTriggerDecision('APPROVE')}
+                  className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold uppercase shadow-lg transition-colors cursor-pointer flex items-center gap-1.5"
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Grant Final Approval & Release</span>
+                </button>
+              </div>
+            ) : roleName === 'COMPLIANCE' ? (
               <div className="flex flex-wrap items-center gap-2.5">
                 <button
                   disabled={isSubmitting}

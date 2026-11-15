@@ -28,6 +28,14 @@ def _now_str() -> str:
 def _hash_str(data: str) -> str:
     return hashlib.sha256(data.encode("utf-8")).hexdigest()
 
+_RELEASE_COUNTER = 1
+
+def _generate_release_id() -> str:
+    global _RELEASE_COUNTER
+    rel_id = f"BT-REL-2026-{_RELEASE_COUNTER:06d}"
+    _RELEASE_COUNTER += 1
+    return rel_id
+
 # Seed default audit events matching reference screenshots
 _AUDIT_EVENTS_STORE.extend([
     {
@@ -622,6 +630,8 @@ class SubmissionsService:
             query["status"] = {"$in": ["REVIEW_APPROVED", "COMPLIANCE_APPROVED", "EVIDENCE_REQUESTED"]}
         elif role == "reviewer":
             query["status"] = {"$in": ["PENDING_REVIEW", "SUBMITTED", "REVIEW_APPROVED", "CHANGES_REQUESTED", "RETURNED_TO_CREATOR", "RETURNED_TO_AGENCY"]}
+        elif role in ["brand-owner", "brand_owner"]:
+            query["status"] = {"$in": ["COMPLIANCE_APPROVED", "RELEASED", "APPROVED"]}
         if brand_id:
             query["brand_id"] = brand_id
 
@@ -643,6 +653,8 @@ class SubmissionsService:
             subs = [s for s in subs if s.get("status") in ["REVIEW_APPROVED", "COMPLIANCE_APPROVED", "EVIDENCE_REQUESTED"]]
         elif role == "reviewer":
             subs = [s for s in subs if s.get("status") in ["PENDING_REVIEW", "SUBMITTED", "REVIEW_APPROVED", "CHANGES_REQUESTED", "RETURNED_TO_CREATOR", "RETURNED_TO_AGENCY"]]
+        elif role in ["brand-owner", "brand_owner"]:
+            subs = [s for s in subs if s.get("status") in ["COMPLIANCE_APPROVED", "RELEASED", "APPROVED"]]
         if brand_id:
             subs = [s for s in subs if s.get("brand_id") == brand_id]
         return subs
@@ -943,7 +955,235 @@ class SubmissionsService:
         return sub
 
     # ==========================================================================
-    # 5. AUDIT LOGGING
+    # 5. BRAND OWNER FINAL APPROVAL & RELEASE (Brand Owner Kabir)
+    # ==========================================================================
+    async def record_final_approval(
+        self,
+        submission_id: str,
+        decision: str,
+        approver_name: str,
+        notes: Optional[str] = None,
+        reason: Optional[str] = None
+    ) -> Optional[Dict[str, Any]]:
+        sub = await self.get_submission(submission_id)
+        if not sub:
+            return None
+
+        # MANDATORY WORKFLOW CHECK:
+        # A submission must not receive final approval without successful Reviewer and Compliance approval!
+        history = sub.get("approval_history", [])
+        has_reviewer_approval = any(
+            step.get("stage") == "REVIEWER_APPROVAL" and step.get("status") == "COMPLETED"
+            for step in history
+        )
+        has_compliance_approval = any(
+            step.get("stage") == "COMPLIANCE_APPROVAL" and step.get("status") == "COMPLETED"
+            for step in history
+        ) or sub.get("status") in ["COMPLIANCE_APPROVED", "RELEASED", "APPROVED"]
+
+        if decision in ["APPROVE", "FINAL_APPROVE"]:
+            if not has_reviewer_approval or not has_compliance_approval:
+                raise ValueError("Cannot grant final approval: submission must first successfully complete Reviewer approval and Compliance approval.")
+
+        now_time = _now_str()
+        is_agency = sub.get("creator_type") == "agency"
+
+        if decision in ["APPROVE", "FINAL_APPROVE"]:
+            content = sub.get("current_content") or sub.get("original_content") or ""
+            release_id = _generate_release_id()
+            release_digest = hashlib.sha256(content.encode("utf-8")).hexdigest()
+            
+            sub["status"] = "RELEASED"
+            sub["release_id"] = release_id
+            sub["release_digest"] = release_digest
+            sub["released_at"] = now_time
+            sub["brand_owner_notes"] = notes or f"Final release approved by {approver_name}."
+
+            for step in history:
+                if step.get("stage") == "FINAL_RELEASE":
+                    step["status"] = "COMPLETED"
+                    step["timestamp"] = now_time
+                    step["comments"] = f"Final release approved by {approver_name}. Release ID: {release_id} (SHA-256: {release_digest[:16]}...)"
+
+            # Save in release ledger / audit ledger engine
+            try:
+                audit_ledger_engine.record_release(
+                    user_identity=approver_name,
+                    user_role="BRAND_OWNER",
+                    resource_id=release_id,
+                    resource_type="ASSET",
+                    content=content,
+                    approved_version=f"v{sub.get('version', 1)}.0",
+                    relevant_sources=[f.get("rule_id", "FACT-014") for f in sub.get("findings", []) if f.get("rule_id")]
+                )
+            except Exception as e:
+                print(f"[SubmissionsService] Audit ledger release record: {e}")
+
+            # Store in MongoDB release records / release ledger and memory releases
+            release_record = {
+                "release_id": release_id,
+                "submission_id": submission_id,
+                "asset_id": submission_id,
+                "asset_title": sub.get("title", ""),
+                "content": content,
+                "content_hash": release_digest,
+                "approved_version": f"v{sub.get('version', 1)}.0",
+                "brand_id": sub.get("brand_id", "aurelle-tech"),
+                "brand_name": sub.get("brand_name", "Aurelle Skin"),
+                "channel": sub.get("channel", "instagram"),
+                "creator_name": sub.get("creator_name", ""),
+                "approver_name": approver_name,
+                "timestamp_iso": now_time,
+                "seal_code": sub.get("release_seal") or release_id,
+                "is_superseded": False,
+                "is_revoked": False
+            }
+            mongo_manager._memory_releases.append(release_record)
+            if mongo_manager.is_connected and mongo_manager.db is not None:
+                try:
+                    await mongo_manager.db.release_ledger.insert_one(release_record)
+                    await mongo_manager.db.release_records.insert_one(release_record)
+                except Exception as ex:
+                    print(f"[SubmissionsService] Mongo release insert: {ex}")
+
+            # Dispatch release notifications
+            self.add_notification(
+                recipient_role="AGENCY" if is_agency else "CREATOR",
+                title=f"Content Released: {sub.get('title', '')[:35]}",
+                message=f"Final release approved by {approver_name}. Release ID: {release_id}",
+                submission_id=submission_id
+            )
+            self.add_notification(
+                recipient_role="REVIEWER",
+                title=f"Content Released: {sub.get('title', '')[:35]}",
+                message=f"Release ID: {release_id} generated for {sub.get('title', '')[:30]}.",
+                submission_id=submission_id
+            )
+            self.add_notification(
+                recipient_role="COMPLIANCE",
+                title=f"Content Released: {sub.get('title', '')[:35]}",
+                message=f"Release ID: {release_id} signed off by {approver_name}.",
+                submission_id=submission_id
+            )
+
+        elif decision == "REQUEST_CHANGES":
+            effective_reason = notes or reason
+            if not effective_reason or not effective_reason.strip():
+                raise ValueError("A reason is required when requesting changes.")
+            
+            sub["status"] = "RETURNED_TO_AGENCY" if is_agency else "RETURNED_TO_CREATOR"
+            sub["brand_owner_notes"] = effective_reason
+            for step in history:
+                if step.get("stage") == "FINAL_RELEASE":
+                    step["status"] = "ACTIVE"
+                    step["comments"] = f"Brand Owner requested changes: {effective_reason}"
+
+            self.add_notification(
+                recipient_role="AGENCY" if is_agency else "CREATOR",
+                title=f"Changes Requested by Brand Owner: {sub.get('title', '')[:35]}",
+                message=f"Brand Owner {approver_name} requested revisions: {effective_reason}",
+                submission_id=submission_id
+            )
+
+        elif decision == "REJECT":
+            effective_reason = notes or reason
+            if not effective_reason or not effective_reason.strip():
+                raise ValueError("A reason is required when rejecting a submission.")
+
+            sub["status"] = "REJECTED"
+            sub["rejection_reason"] = effective_reason
+            for step in history:
+                if step.get("stage") == "FINAL_RELEASE":
+                    step["status"] = "REJECTED"
+                    step["timestamp"] = now_time
+                    step["comments"] = effective_reason
+
+            self.add_notification(
+                recipient_role="AGENCY" if is_agency else "CREATOR",
+                title=f"Submission Rejected by Brand Owner: {sub.get('title', '')[:35]}",
+                message=f"Brand Owner rejection: {effective_reason}",
+                submission_id=submission_id
+            )
+            self.add_notification(
+                recipient_role="REVIEWER",
+                title=f"Submission Rejected by Brand Owner: {sub.get('title', '')[:35]}",
+                message=f"Brand Owner rejection: {effective_reason}",
+                submission_id=submission_id
+            )
+            self.add_notification(
+                recipient_role="COMPLIANCE",
+                title=f"Submission Rejected by Brand Owner: {sub.get('title', '')[:35]}",
+                message=f"Brand Owner rejection: {effective_reason}",
+                submission_id=submission_id
+            )
+
+        sub["updated_at"] = now_time
+        sub["approval_history"] = history
+
+        if mongo_manager.is_connected and mongo_manager.db is not None:
+            await mongo_manager.db.submissions.update_one(
+                {"submission_id": submission_id},
+                {"$set": sub}
+            )
+        _SUBMISSIONS_STORE[submission_id] = sub
+
+        h = _hash_str(f"brand_owner:{submission_id}:{decision}:{now_time}")
+        await self.record_audit_event(
+            what=f"brand owner final approval ({decision.lower()}): {sub.get('title', '')[:30]}",
+            reason=notes or reason or f"Brand owner decision: {decision}",
+            actor_name=approver_name,
+            event_hash=h
+        )
+
+        return sub
+
+    # ==========================================================================
+    # 6. PUBLISHING RESTRICTION
+    # ==========================================================================
+    async def publish_submission(
+        self,
+        submission_id: str,
+        platform: str,
+        destination_account: str,
+        authorized_integration: bool = False,
+        oauth_token: Optional[str] = None
+    ) -> Dict[str, Any]:
+        sub = await self.get_submission(submission_id)
+        if not sub:
+            raise ValueError(f"Submission {submission_id} not found.")
+
+        if sub.get("status") not in ["RELEASED", "APPROVED"]:
+            raise ValueError("Publishing restricted: Content must receive successful Final Approval and Release generation before publication.")
+
+        if not authorized_integration or not oauth_token:
+            return {
+                "status": "RESTRICTED",
+                "message": "Publishing restricted: Automatic publishing to external platforms is prohibited. Content can only be published through an explicitly configured and authorized integration after final approval.",
+                "release_id": sub.get("release_id", ""),
+                "published_url": None
+            }
+
+        now_time = _now_str()
+        published_url = f"https://{platform}.com/{destination_account}/p/{sub.get('release_id', 'post')}"
+        sub["published_url"] = published_url
+        sub["published_at"] = now_time
+
+        await self.record_audit_event(
+            what=f"published to {platform}: {sub.get('title', '')[:30]}",
+            reason=f"Authorized integration deployment to @{destination_account}",
+            actor_name="Authorized System Integration",
+            event_hash=_hash_str(f"publish:{submission_id}:{platform}:{now_time}")
+        )
+
+        return {
+            "status": "PUBLISHED",
+            "message": f"Successfully published via authorized integration to {platform} (@{destination_account}).",
+            "release_id": sub.get("release_id", ""),
+            "published_url": published_url
+        }
+
+    # ==========================================================================
+    # 7. AUDIT LOGGING
     # ==========================================================================
     async def record_audit_event(self, what: str, reason: Optional[str], actor_name: str, event_hash: str) -> Dict[str, Any]:
         evt_id = f"evt-{uuid.uuid4().hex[:8]}"

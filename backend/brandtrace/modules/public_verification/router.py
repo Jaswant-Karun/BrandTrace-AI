@@ -132,6 +132,38 @@ def ensure_baseline_ledger():
 async def find_release_record_by_seal(seal_code: str) -> Optional[Dict[str, Any]]:
     clean_seal = seal_code.strip()
     
+    # 0. Search submissions store releases
+    try:
+        from brandtrace.modules.submissions.service import _SUBMISSIONS_STORE
+        for s in _SUBMISSIONS_STORE.values():
+            s_rel = s.get("release_id") or ""
+            s_seal = s.get("release_seal") or ""
+            s_id = s.get("submission_id") or ""
+            if (
+                (s_rel and s_rel.lower() == clean_seal.lower()) or
+                (s_seal and s_seal.lower() == clean_seal.lower()) or
+                (s_id and s_id.lower() == clean_seal.lower())
+            ):
+                content = s.get("current_content") or s.get("original_content") or ""
+                return {
+                    "source": "SUBMISSION_RELEASE",
+                    "record_id": s_rel or s_seal,
+                    "asset_id": s_id,
+                    "asset_title": s.get("title") or s_id,
+                    "seal_code": s_seal or s_rel,
+                    "content": content,
+                    "content_hash": s.get("release_digest") or hashlib.sha256(content.encode("utf-8")).hexdigest(),
+                    "approved_version": f"v{s.get('version', 1)}.0",
+                    "timestamp_iso": s.get("released_at") or s.get("updated_at"),
+                    "is_superseded": False,
+                    "superseded_by": None,
+                    "is_revoked": s.get("status") == "REJECTED",
+                    "revocation_reason": s.get("rejection_reason"),
+                    "brand_id": s.get("brand_id", "aurelle-tech")
+                }
+    except Exception:
+        pass
+
     # 1. Search in-memory AuditTrustLedger
     for rec in audit_ledger_engine.records.values():
         if (rec.tamper_evident_seal.lower() == clean_seal.lower() or
@@ -484,6 +516,13 @@ async def verify_public_seal(req: VerifySealRequest):
         explanation="Approved & Authentic: Cryptographic seal verified against immutable SHA-256 release ledger."
     )
 
+@router.get("/public/verify/{release_id}", response_model=PublicVerificationResponse)
+async def verify_public_release_by_id(release_id: str):
+    """
+    Public zero-auth cryptographic verification of brand release IDs (e.g. BT-REL-2026-000001).
+    Verifies existence, integrity, SHA-256 digest, and verification result without exposing confidential brand details.
+    """
+    return await verify_public_seal(VerifySealRequest(seal_code=release_id))
 
 @router.post("/public/verify-text", response_model=PublicVerificationResponse)
 async def verify_public_text(req: VerifyTextRequest):

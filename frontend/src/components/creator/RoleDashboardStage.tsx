@@ -8,6 +8,7 @@ import { CreatorGuidelineHealth } from './CreatorGuidelineHealth';
 import { CreatorClaimWatch } from './CreatorClaimWatch';
 import { CreatorSubmissionsView } from './CreatorSubmissionsView';
 import { ReviewDetailView, ReviewDecisionType } from './ReviewDetailView';
+import { PublicVerificationView } from '../PublicVerificationView';
 import { CheckCircle2, ExternalLink, X } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 
@@ -207,15 +208,17 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
     'brand-owner': {
       userName: 'BRAND OWNER KABIR',
       roleName: 'BRAND OWNER',
-      title: 'GUIDELINE HEALTH',
-      defaultTab: 'health' as CreatorTab,
+      title: 'FINAL APPROVAL & RELEASE',
+      defaultTab: 'queue' as CreatorTab,
       tabs: [
-        { id: 'check' as CreatorTab, label: 'CHECK A POST' },
-        { id: 'audit' as CreatorTab, label: 'AUDIT LOG' },
-        { id: 'rulebook' as CreatorTab, label: 'RULEBOOK' },
-        { id: 'facts' as CreatorTab, label: 'FACTS' },
+        { id: 'queue' as CreatorTab, label: 'FINAL APPROVALS' },
         { id: 'health' as CreatorTab, label: 'GUIDELINE HEALTH' },
+        { id: 'facts' as CreatorTab, label: 'BRAND KNOWLEDGE' },
+        { id: 'rulebook' as CreatorTab, label: 'RULEBOOK' },
         { id: 'watch' as CreatorTab, label: 'CLAIM WATCH' },
+        { id: 'audit' as CreatorTab, label: 'AUDIT LEDGER' },
+        { id: 'verify' as CreatorTab, label: 'RELEASE VERIFY' },
+        { id: 'check' as CreatorTab, label: 'CHECK A POST' },
       ],
     },
   }[role];
@@ -241,7 +244,12 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
   // Load dynamic submissions from backend queue endpoint
   useEffect(() => {
     if (activeTab === 'queue') {
-      const qUrl = role === 'compliance' ? '/api/submissions/queue?role=compliance' : '/api/submissions/queue?role=reviewer';
+      const qUrl =
+        role === 'brand-owner'
+          ? '/api/submissions/queue?role=brand-owner'
+          : role === 'compliance'
+          ? '/api/submissions/queue?role=compliance'
+          : '/api/submissions/queue?role=reviewer';
       apiClient
         .request<any[]>(qUrl)
         .then((subs) => {
@@ -249,7 +257,8 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
             const mapped: QueueItem[] = subs.map((s) => {
               const blocking = (s.findings || []).filter((f: any) => f.severity === 'BLOCKING' && f.status !== 'OVERRULED').length;
               let sColor: 'emerald' | 'purple' | 'amber' | 'rose' = 'amber';
-              if (s.status === 'APPROVED' || s.status === 'COMPLIANCE_APPROVED') sColor = 'emerald';
+              if (s.status === 'APPROVED' || s.status === 'RELEASED') sColor = 'emerald';
+              else if (s.status === 'COMPLIANCE_APPROVED') sColor = 'purple';
               else if (s.status === 'PENDING_REVIEW' || s.status === 'SUBMITTED') sColor = 'purple';
               else if (s.status === 'EVIDENCE_REQUESTED') sColor = 'amber';
               else if (s.status === 'REJECTED') sColor = 'rose';
@@ -274,10 +283,13 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
               };
             });
 
-            // For compliance, only include reviewer-approved default posts
-            const allowedDefaults = role === 'compliance'
-              ? DEFAULT_QUEUE_POSTS.filter((dp) => dp.status === 'APPROVED' || dp.status === 'REVIEW APPROVED')
-              : DEFAULT_QUEUE_POSTS;
+            // Role-specific defaults
+            const allowedDefaults =
+              role === 'brand-owner'
+                ? DEFAULT_QUEUE_POSTS.filter((dp) => dp.status === 'APPROVED' || dp.status === 'RELEASED')
+                : role === 'compliance'
+                ? DEFAULT_QUEUE_POSTS.filter((dp) => dp.status === 'APPROVED' || dp.status === 'REVIEW APPROVED')
+                : DEFAULT_QUEUE_POSTS;
 
             // Merge with default posts to guarantee richness
             const existingIds = new Set(mapped.map((m) => m.id));
@@ -303,7 +315,25 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
     if (!selectedPost) return;
 
     try {
-      if (role === 'compliance') {
+      if (role === 'brand-owner') {
+        const res = await apiClient.request<any>(`/api/submissions/${selectedPost.id}/final-approval`, {
+          method: 'POST',
+          body: JSON.stringify({
+            decision: decision === 'APPROVE' ? 'FINAL_APPROVE' : decision,
+            approver_name: roleConfig.userName,
+            notes: feedback || `Final release approved by ${roleConfig.userName}`,
+            reason: feedback,
+          }),
+        });
+
+        const toastMsg =
+          decision === 'APPROVE'
+            ? `Immutable release generated: ${res.release_id || 'BT-REL-2026-000001'} with SHA-256 digest.`
+            : decision === 'REQUEST_CHANGES'
+            ? `Revisions requested by Brand Owner. Returned to creator.`
+            : `Submission rejected by Brand Owner.`;
+        setFeedbackToast(toastMsg);
+      } else if (role === 'compliance') {
         await apiClient.request(`/api/submissions/${selectedPost.id}/compliance`, {
           method: 'POST',
           body: JSON.stringify({
@@ -353,7 +383,11 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
                 ...p,
                 status:
                   decision === 'APPROVE'
-                    ? role === 'compliance' ? 'COMPLIANCE APPROVED' : 'REVIEW APPROVED'
+                    ? role === 'brand-owner'
+                      ? 'RELEASED'
+                      : role === 'compliance'
+                      ? 'COMPLIANCE APPROVED'
+                      : 'REVIEW APPROVED'
                     : decision === 'REQUEST_EVIDENCE'
                     ? 'EVIDENCE REQUESTED'
                     : decision === 'REQUEST_CHANGES'
@@ -451,10 +485,12 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
                 BRANDTRACE · {brandName.toUpperCase()}
               </div>
               <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-white font-sans uppercase">
-                {role === 'compliance' ? 'COMPLIANCE AUDIT QUEUE' : 'REVIEW QUEUE'}
+                {role === 'brand-owner' ? 'FINAL APPROVAL & RELEASE QUEUE' : role === 'compliance' ? 'COMPLIANCE AUDIT QUEUE' : 'REVIEW QUEUE'}
               </h1>
               <p className="text-xs sm:text-sm text-neutral-400 font-sans max-w-2xl leading-relaxed">
-                {role === 'compliance'
+                {role === 'brand-owner'
+                  ? 'Submissions certified by Regulatory Compliance, awaiting final executive release and cryptographic SHA-256 sealing.'
+                  : role === 'compliance'
                   ? 'Submissions approved by Content Review, prioritized for statutory validation (FTC, FDA, NHTSA). Only Reviewer-approved content enters this queue.'
                   : 'Posts sent for review, riskiest first. Drafts people check privately never appear here.'}
               </p>
@@ -480,7 +516,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
                   {queuePosts.length}
                 </div>
                 <div className="text-xs font-mono text-neutral-400 uppercase font-semibold">
-                  {role === 'compliance' ? 'AWAITING AUDIT' : 'WAITING'}
+                  {role === 'brand-owner' ? 'AWAITING FINAL APPROVAL' : role === 'compliance' ? 'AWAITING AUDIT' : 'WAITING'}
                 </div>
               </div>
               <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 space-y-1">
@@ -488,25 +524,27 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
                   {queuePosts.filter((p) => p.blockingCount > 0).length}
                 </div>
                 <div className="text-xs font-mono text-neutral-400 uppercase font-semibold">
-                  {role === 'compliance' ? 'STATUTORY BLOCKERS' : 'BLOCKING, STILL WAITING'}
+                  {role === 'brand-owner' ? 'STATUTORY BLOCKERS' : role === 'compliance' ? 'STATUTORY BLOCKERS' : 'BLOCKING, STILL WAITING'}
                 </div>
               </div>
               <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 space-y-1">
                 <div className="text-3xl sm:text-4xl font-extrabold text-sky-400 font-mono">
-                  {role === 'compliance'
+                  {role === 'brand-owner'
+                    ? queuePosts.filter((p) => p.status.includes('COMPLIANCE')).length
+                    : role === 'compliance'
                     ? queuePosts.filter((p) => p.status.includes('EVIDENCE')).length
                     : 5}
                 </div>
                 <div className="text-xs font-mono text-neutral-400 uppercase font-semibold">
-                  {role === 'compliance' ? 'EVIDENCE REQUESTED' : 'NEED COMPLIANCE'}
+                  {role === 'brand-owner' ? 'COMPLIANCE CERTIFIED' : role === 'compliance' ? 'EVIDENCE REQUESTED' : 'NEED COMPLIANCE'}
                 </div>
               </div>
               <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 space-y-1">
                 <div className="text-3xl sm:text-4xl font-extrabold text-emerald-400 font-mono">
-                  {queuePosts.filter((p) => p.status.includes('APPROVED')).length}
+                  {queuePosts.filter((p) => p.status.includes('RELEASE') || p.status === 'APPROVED').length}
                 </div>
                 <div className="text-xs font-mono text-neutral-400 uppercase font-semibold">
-                  {role === 'compliance' ? 'COMPLIANCE APPROVED' : 'APPROVED'}
+                  {role === 'brand-owner' ? 'IMMUTABLE RELEASES' : role === 'compliance' ? 'COMPLIANCE APPROVED' : 'APPROVED'}
                 </div>
               </div>
             </div>
@@ -636,6 +674,13 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
         {/* CLAIM WATCH tab */}
         {activeTab === 'watch' && (
           <CreatorClaimWatch brandName={brandName} />
+        )}
+
+        {/* PUBLIC RELEASE VERIFICATION tab */}
+        {activeTab === 'verify' && (
+          <div className="space-y-6">
+            <PublicVerificationView initialBrand={brandName} />
+          </div>
         )}
 
       </main>

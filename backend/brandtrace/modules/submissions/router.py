@@ -7,6 +7,7 @@ from brandtrace.modules.submissions.models import (
     DraftVersionRequest, DraftVersionResponse,
     SubmissionCreateRequest, SubmissionResponse,
     ReviewDecisionRequest, ComplianceDecisionRequest, FinalApprovalRequest,
+    PublishRequest, PublishResponse,
     AuditRecordRequest, AuditEventResponse
 )
 from brandtrace.modules.submissions.service import submissions_service
@@ -105,16 +106,10 @@ async def get_reviewer_queue(
     role: Optional[str] = Query(None),
     user: UserProfile = Depends(get_current_user)
 ):
-    """Retrieves submissions queue filtered by role (reviewer vs compliance)."""
-    filter_role = role
-    if not filter_role and user and getattr(user, "role", None):
-        user_role_str = str(user.role).upper()
-        if user_role_str in ["COMPLIANCE_REVIEWER", "COMPLIANCE"]:
-            filter_role = "compliance"
-    
+    """Retrieves submissions queue filtered by role (reviewer vs compliance vs brand-owner)."""
     return await submissions_service.list_submissions(
         brand_id=brand_id,
-        role=filter_role
+        role=role
     )
 
 @router.get("/submissions/{submission_id}", response_model=SubmissionResponse)
@@ -173,6 +168,54 @@ async def compliance_submission(
     if not sub:
         raise HTTPException(status_code=404, detail="Submission not found")
     return sub
+
+@router.post("/submissions/{submission_id}/final-approval", response_model=SubmissionResponse)
+async def final_approval_submission(
+    submission_id: str,
+    req: FinalApprovalRequest,
+    user: UserProfile = Depends(get_current_user)
+):
+    """Brand Owner decision: verifies Reviewer & Compliance stages, issues unique Release ID and immutable release record."""
+    if user and getattr(user, "role", None):
+        user_role_str = (user.role.value if hasattr(user.role, "value") else str(user.role)).upper()
+        if user_role_str in ["CREATOR"]:
+            raise HTTPException(status_code=403, detail="Creators are not authorized to grant final brand release.")
+        if user_role_str in ["REVIEWER"]:
+            raise HTTPException(status_code=403, detail="Reviewers are not authorized to grant final brand release.")
+
+    try:
+        sub = await submissions_service.record_final_approval(
+            submission_id=submission_id,
+            decision=req.decision,
+            approver_name=req.approver_name or user.name,
+            notes=req.notes,
+            reason=req.reason
+        )
+    except ValueError as val_err:
+        raise HTTPException(status_code=400, detail=str(val_err))
+
+    if not sub:
+        raise HTTPException(status_code=404, detail="Submission not found")
+    return sub
+
+@router.post("/submissions/{submission_id}/publish", response_model=PublishResponse)
+async def publish_submission_route(
+    submission_id: str,
+    req: PublishRequest,
+    user: UserProfile = Depends(get_current_user)
+):
+    """Restricted publishing gateway: strictly gates external publishing to authorized and configured integrations."""
+    try:
+        res = await submissions_service.publish_submission(
+            submission_id=submission_id,
+            platform=req.platform,
+            destination_account=req.destination_account,
+            authorized_integration=req.authorized_integration,
+            oauth_token=req.oauth_token
+        )
+        return PublishResponse(**res)
+    except ValueError as val_err:
+        raise HTTPException(status_code=400, detail=str(val_err))
 
 # ==============================================================================
 # 3. AUDIT LOG API
