@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { CheckSquare, Lock, CheckCircle2, ShieldAlert, Users, ArrowRight } from 'lucide-react';
+import { CheckSquare, Lock, CheckCircle2 } from 'lucide-react';
 import { RevisionTask } from '../types';
 
 interface ApprovalCenterViewProps {

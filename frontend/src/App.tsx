@@ -16,7 +16,7 @@ import { AuditTrustCenterView } from './components/AuditTrustCenterView';
 import { SettingsView } from './components/SettingsView';
 import { DatabaseStatusModal } from './components/DatabaseStatusModal';
 import { BrandProfile, DatabaseStatus, VerificationResult } from './types';
-import { ExternalLink, Database, RefreshCw, ShieldCheck } from 'lucide-react';
+import { ExternalLink, Database, RefreshCw } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [viewMode, setViewMode] = useState<'landing' | 'app'>('app');

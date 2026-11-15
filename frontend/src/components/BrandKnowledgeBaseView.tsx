@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BookOpen, Search, CheckCircle2, Stamp, Layers, Sparkles, Shield } from 'lucide-react';
+import { BookOpen, Search } from 'lucide-react';
 
 interface BrandKnowledgeBaseViewProps {
   brandId: string;
@@ -7,7 +7,6 @@ interface BrandKnowledgeBaseViewProps {
 
 export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ brandId }) => {
   const [graphData, setGraphData] = useState<any>(null);
-  const [facts, setFacts] = useState<any[]>([]);
   const [search, setSearch] = useState<string>('');
   const [activeTab, setActiveTab] = useState<string>('ALL');
 
@@ -15,11 +14,6 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
     fetch(`/api/brands/${brandId}/graph`)
       .then((res) => res.json())
       .then((data) => setGraphData(data))
-      .catch((err) => console.error(err));
-
-    fetch(`/api/facts?brand_id=${brandId}`)
-      .then((res) => res.json())
-      .then((data) => setFacts(data || []))
       .catch((err) => console.error(err));
   }, [brandId]);
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FileText, Building, DollarSign, Layers, CheckCircle2, ChevronRight } from 'lucide-react';
+import { FileText, DollarSign, Layers, CheckCircle2 } from 'lucide-react';
 
 interface CampaignIntelligenceViewProps {
   brandId: string;
