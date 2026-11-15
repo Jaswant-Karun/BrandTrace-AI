@@ -91,6 +91,24 @@ class ApiClient {
         method: 'POST',
         body: JSON.stringify({ org_id: orgId, workspace_id: workspaceId })
       }),
+    createFact: (data: {
+      fact_id?: string;
+      workspace_id: string;
+      org_id?: string;
+      name: string;
+      category: string;
+      current_value: string;
+      unit?: string;
+      description: string;
+      source_citation: string;
+      department_owner: string;
+    }) =>
+      this.request<any>('/api/knowledge-base/facts', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      }),
+    listFacts: (workspaceId?: string) =>
+      this.request<any[]>(`/api/knowledge-base/facts${workspaceId ? `?workspace_id=${workspaceId}` : ''}`),
   };
 
   public graph = {
