@@ -56,6 +56,52 @@ PRESET_USERS: Dict[str, Dict] = {
         "org_id": "ORG-AURELLE",
         "workspace_id": "aurelle-maison",
         "password_hash": hash_password("brandtrace2026")
+    },
+    # Phase 6 AURELLE Consumer Technology Enterprise Demo Users
+    "admin@aurelle.com": {
+        "user_id": "USR-AUR-ADM",
+        "email": "admin@aurelle.com",
+        "name": "Sarah Chen, Chief Technology Officer & System Administrator",
+        "role": UserRole.ADMIN,
+        "org_id": "ORG-AURELLE",
+        "workspace_id": "aurelle-tech",
+        "password_hash": hash_password("brandtrace2026")
+    },
+    "brandmanager@aurelle.com": {
+        "user_id": "USR-AUR-BM",
+        "email": "brandmanager@aurelle.com",
+        "name": "Julian Vance, VP Global Brand Governance & Commercial Operations",
+        "role": UserRole.BRAND_MANAGER,
+        "org_id": "ORG-AURELLE",
+        "workspace_id": "aurelle-tech",
+        "password_hash": hash_password("brandtrace2026")
+    },
+    "creator@aurelle.com": {
+        "user_id": "USR-AUR-CRT",
+        "email": "creator@aurelle.com",
+        "name": "Maya Lin, Senior Creative Director & Content Producer",
+        "role": UserRole.CREATOR,
+        "org_id": "ORG-AURELLE",
+        "workspace_id": "aurelle-tech",
+        "password_hash": hash_password("brandtrace2026")
+    },
+    "reviewer@aurelle.com": {
+        "user_id": "USR-AUR-REV",
+        "email": "reviewer@aurelle.com",
+        "name": "Marcus Aurelius, Content Review Lead & Editorial Editor",
+        "role": UserRole.REVIEWER,
+        "org_id": "ORG-AURELLE",
+        "workspace_id": "aurelle-tech",
+        "password_hash": hash_password("brandtrace2026")
+    },
+    "compliance@aurelle.com": {
+        "user_id": "USR-AUR-CMP",
+        "email": "compliance@aurelle.com",
+        "name": "David Sterling, Regulatory & Statutory Compliance Officer",
+        "role": UserRole.COMPLIANCE_REVIEWER,
+        "org_id": "ORG-AURELLE",
+        "workspace_id": "aurelle-tech",
+        "password_hash": hash_password("brandtrace2026")
     }
 }
 

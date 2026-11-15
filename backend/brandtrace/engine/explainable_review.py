@@ -195,13 +195,77 @@ class ExplainableReviewEngine:
                             claim_text=clause,
                             classification=ClaimClassification.EXPIRED_SOURCE,
                             confidence_score=0.95,
-                            matched_source_id="FACT-PRC-01",
-                            source_citation="Commercial Operations Pricing Committee Resolution #2026-Q1-PRC",
+                            matched_source_id="FACT-AUR-PRC-01" if "aurelle" in lower else "FACT-PRC-01",
+                            source_citation="Commercial Operations Pricing Committee Resolution #2026-Q1-AUR" if "aurelle" in lower else "Commercial Operations Pricing Committee Resolution #2026-Q1-PRC",
                             explanation=f"Price {price_val} is an outdated approved fact superseded by proposed revision to ₹599.",
                             minimal_change_rewrite=clause.replace(price_val, "₹599"),
                             human_override_allowed=True
                         )
                     )
+
+            # 5. Aurelle Consumer Tech: Unbreakable Claim
+            if "100% unbreakable" in lower or "completely indestructible" in lower:
+                deterministic_rules += 1
+                assessments.append(
+                    ExplainableClaimAssessment(
+                        claim_text=clause,
+                        classification=ClaimClassification.POTENTIALLY_MISLEADING,
+                        confidence_score=0.99,
+                        matched_source_id="PIL-AUR-01",
+                        source_citation="FTC Policy Statement Regarding Advertising Substantiation / ASTM B265 Grade 5 Titanium Benchmark",
+                        explanation="Unsubstantiated absolute claim of unbreakability. Physical consumer electronics cannot be represented as indestructible.",
+                        minimal_change_rewrite=re.sub(r"(?i)100%\s+unbreakable\s+and\s+completely\s+indestructible", "engineered with Grade 5 Aerospace Titanium for extreme durability", clause),
+                        human_override_allowed=True
+                    )
+                )
+
+            # 6. Aurelle Consumer Tech: Expired Founder Promo
+            if "founder launch trial" in lower or ("₹0" in lower and "founder" in lower):
+                deterministic_rules += 1
+                assessments.append(
+                    ExplainableClaimAssessment(
+                        claim_text=clause,
+                        classification=ClaimClassification.EXPIRED_SOURCE,
+                        confidence_score=0.98,
+                        matched_source_id="FACT-AUR-EXP-01",
+                        source_citation="Aurelle Founder Growth Promotion #2025-FNDR (Status: EXPIRED Dec 31, 2025)",
+                        explanation="Reference relies on an expired promotional fact that lapsed on December 31, 2025.",
+                        minimal_change_rewrite="Subscribe to Aurelle Cloud Studio starting at ₹499/month",
+                        human_override_allowed=True
+                    )
+                )
+
+            # 7. Aurelle Consumer Tech: Medical Diagnostic Cure Claim
+            if "diagnostic cure" in lower or ("cure" in lower and "cardiovascular" in lower):
+                deterministic_rules += 1
+                assessments.append(
+                    ExplainableClaimAssessment(
+                        claim_text=clause,
+                        classification=ClaimClassification.POTENTIALLY_MISLEADING,
+                        confidence_score=0.99,
+                        matched_source_id="GL-AUR-03",
+                        source_citation="Brand Guideline GL-AUR-03 / FDA 21 CFR §870 Wellness Device Classification",
+                        explanation="Pulse Smart Ring is a consumer general wellness monitor; claiming to be a medical-grade diagnostic cure triggers severe FDA enforcement.",
+                        minimal_change_rewrite="Aurelle Pulse Smart Ring is a consumer wellness monitor designed for lifestyle tracking.",
+                        human_override_allowed=True
+                    )
+                )
+
+            # 8. Aurelle Consumer Tech: Battery Claim Disclosure Footnote
+            if ("72-hour" in lower or "72h" in lower) and "iec" not in lower and "battery" in lower:
+                deterministic_rules += 1
+                assessments.append(
+                    ExplainableClaimAssessment(
+                        claim_text=clause,
+                        classification=ClaimClassification.NEEDS_VERIFICATION,
+                        confidence_score=0.94,
+                        matched_source_id="GL-AUR-04",
+                        source_citation="Brand Guideline GL-AUR-04 (Battery Life Statutory Testing Disclosure)",
+                        explanation="72-hour battery life claim requires mandatory IEC 62133 standardized testing conditions footnote.",
+                        minimal_change_rewrite=f"{clause}* (*Tested under IEC 62133 standardized lab protocol. Actual results vary.)",
+                        human_override_allowed=True
+                    )
+                )
 
         # Summary Counts
         supported_count = sum(1 for a in assessments if a.classification == ClaimClassification.SUPPORTED)
