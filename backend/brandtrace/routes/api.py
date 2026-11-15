@@ -231,10 +231,13 @@ async def verify_asset(request: VerificationRequest, current_user: UserProfile =
                 )
                 request.image_analysis = rep.model_dump()
                 if not request.content or not request.content.strip():
-                    request.content = rep.extracted_text_preview
+                    if rep.extracted_text_preview:
+                        request.content = str(rep.extracted_text_preview)
     elif not request.content or not request.content.strip():
-        if request.image_analysis and (request.image_analysis.get("extracted_text") or request.image_analysis.get("extracted_text_preview")):
-            request.content = request.image_analysis.get("extracted_text") or request.image_analysis.get("extracted_text_preview")
+        if request.image_analysis:
+            extracted = request.image_analysis.get("extracted_text") or request.image_analysis.get("extracted_text_preview")
+            if extracted:
+                request.content = str(extracted)
     if not request.content or not request.content.strip():
         raise HTTPException(status_code=400, detail="Content cannot be empty. Content or uploaded image is required for governance inspection.")
     if len(request.content) > 50000:
@@ -824,6 +827,27 @@ class GuidelineHealthResponse(BaseModel):
     rules_with_decisions: int
     items: List[GuidelineHealthItem]
 
+class _RuleAccumulator:
+    def __init__(
+        self,
+        rule_id: str,
+        rule_title: str,
+        rule_description: str,
+        category: str,
+        flags: int = 0,
+        upheld: int = 0,
+        overruled: int = 0,
+        dismissed: int = 0
+    ) -> None:
+        self.rule_id: str = rule_id
+        self.rule_title: str = rule_title
+        self.rule_description: str = rule_description
+        self.category: str = category
+        self.flags: int = flags
+        self.upheld: int = upheld
+        self.overruled: int = overruled
+        self.dismissed: int = dismissed
+
 @router.get("/guidelines/health", response_model=GuidelineHealthResponse)
 async def get_guideline_health_api(brand_id: Optional[str] = Query(None)):
     """
@@ -833,80 +857,78 @@ async def get_guideline_health_api(brand_id: Optional[str] = Query(None)):
     import math
     target_brand = brand_id or "aurelle-skin"
 
-    baseline_rules = [
-        {
-            "rule_id": "TN-03",
-            "rule_title": "Avoid all-caps words",
-            "rule_description": "Avoid all-caps words (brand name and standard acronyms excepted)",
-            "category": "TONE",
-            "flags": 11,
-            "upheld": 7,
-            "overruled": 4,
-            "dismissed": 0
-        },
-        {
-            "rule_id": "TN-01",
-            "rule_title": "Tone is warm and energetic",
-            "rule_description": "Tone is warm and energetic, never hype or pressure",
-            "category": "TONE",
-            "flags": 7,
-            "upheld": 7,
-            "overruled": 0,
-            "dismissed": 0
-        },
-        {
-            "rule_id": "GM10",
-            "rule_title": "Numbers over three digits get commas",
-            "rule_description": "Numbers over three digits get commas",
-            "category": "GRAMMAR",
-            "flags": 5,
-            "upheld": 5,
-            "overruled": 0,
-            "dismissed": 0
-        },
-        {
-            "rule_id": "CL-03",
-            "rule_title": "Environmental claims must be specific",
-            "rule_description": "Environmental claims must be specific and substantiated",
-            "category": "CLAIMS",
-            "flags": 3,
-            "upheld": 3,
-            "overruled": 0,
-            "dismissed": 0
-        },
-        {
-            "rule_id": "CL-01",
-            "rule_title": "Regulated efficacy phrases need a matching fact",
-            "rule_description": "Regulated efficacy phrases need a matching fact and approved wording",
-            "category": "CLAIMS",
-            "flags": 2,
-            "upheld": 2,
-            "overruled": 0,
-            "dismissed": 0
-        },
-        {
-            "rule_id": "CL-05",
-            "rule_title": "Endorsement claims need evidence in fact ledger",
-            "rule_description": "Endorsement claims need evidence in the fact ledger",
-            "category": "CLAIMS",
-            "flags": 2,
-            "upheld": 2,
-            "overruled": 0,
-            "dismissed": 0
-        },
-        {
-            "rule_id": "DL-REQ",
-            "rule_title": "Study claim needs study footnote",
-            "rule_description": "A study or percentage claim needs its study footnote",
-            "category": "DISCLOSURE",
-            "flags": 2,
-            "upheld": 2,
-            "overruled": 0,
-            "dismissed": 0
-        }
-    ]
-
-    rule_map = {r["rule_id"]: dict(r) for r in baseline_rules}
+    rule_map: Dict[str, _RuleAccumulator] = {
+        "TN-03": _RuleAccumulator(
+            rule_id="TN-03",
+            rule_title="Avoid all-caps words",
+            rule_description="Avoid all-caps words (brand name and standard acronyms excepted)",
+            category="TONE",
+            flags=11,
+            upheld=7,
+            overruled=4,
+            dismissed=0
+        ),
+        "TN-01": _RuleAccumulator(
+            rule_id="TN-01",
+            rule_title="Tone is warm and energetic",
+            rule_description="Tone is warm and energetic, never hype or pressure",
+            category="TONE",
+            flags=7,
+            upheld=7,
+            overruled=0,
+            dismissed=0
+        ),
+        "GM10": _RuleAccumulator(
+            rule_id="GM10",
+            rule_title="Numbers over three digits get commas",
+            rule_description="Numbers over three digits get commas",
+            category="GRAMMAR",
+            flags=5,
+            upheld=5,
+            overruled=0,
+            dismissed=0
+        ),
+        "CL-03": _RuleAccumulator(
+            rule_id="CL-03",
+            rule_title="Environmental claims must be specific",
+            rule_description="Environmental claims must be specific and substantiated",
+            category="CLAIMS",
+            flags=3,
+            upheld=3,
+            overruled=0,
+            dismissed=0
+        ),
+        "CL-01": _RuleAccumulator(
+            rule_id="CL-01",
+            rule_title="Regulated efficacy phrases need a matching fact",
+            rule_description="Regulated efficacy phrases need a matching fact and approved wording",
+            category="CLAIMS",
+            flags=2,
+            upheld=2,
+            overruled=0,
+            dismissed=0
+        ),
+        "CL-05": _RuleAccumulator(
+            rule_id="CL-05",
+            rule_title="Endorsement claims need evidence in fact ledger",
+            rule_description="Endorsement claims need evidence in the fact ledger",
+            category="CLAIMS",
+            flags=2,
+            upheld=2,
+            overruled=0,
+            dismissed=0
+        ),
+        "DL-REQ": _RuleAccumulator(
+            rule_id="DL-REQ",
+            rule_title="Study claim needs study footnote",
+            rule_description="A study or percentage claim needs its study footnote",
+            category="DISCLOSURE",
+            flags=2,
+            upheld=2,
+            overruled=0,
+            dismissed=0
+        ),
+    }
 
     try:
         if mongo_manager.is_connected and mongo_manager.db is not None:
@@ -915,27 +937,24 @@ async def get_guideline_health_api(brand_id: Optional[str] = Query(None)):
             ).limit(200)
             async for sub in cursor:
                 for f in sub.get("findings", []) or []:
-                    r_id = f.get("rule_id")
-                    decision = f.get("decision") or f.get("reviewer_decision")
+                    r_id = str(f.get("rule_id") or "")
+                    decision = str(f.get("decision") or f.get("reviewer_decision") or "")
                     if r_id and decision in ("UPHELD", "OVERRULED", "DISMISSED"):
                         if r_id not in rule_map:
-                            rule_map[r_id] = {
-                                "rule_id": r_id,
-                                "rule_title": f.get("rule_name") or r_id,
-                                "rule_description": f.get("message") or r_id,
-                                "category": f.get("category") or "GENERAL",
-                                "flags": 0,
-                                "upheld": 0,
-                                "overruled": 0,
-                                "dismissed": 0
-                            }
-                        rule_map[r_id]["flags"] += 1
+                            rule_map[r_id] = _RuleAccumulator(
+                                rule_id=r_id,
+                                rule_title=str(f.get("rule_name") or r_id),
+                                rule_description=str(f.get("message") or r_id),
+                                category=str(f.get("category") or "GENERAL"),
+                            )
+                        acc = rule_map[r_id]
+                        acc.flags += 1
                         if decision == "UPHELD":
-                            rule_map[r_id]["upheld"] += 1
+                            acc.upheld += 1
                         elif decision == "OVERRULED":
-                            rule_map[r_id]["overruled"] += 1
+                            acc.overruled += 1
                         elif decision == "DISMISSED":
-                            rule_map[r_id]["dismissed"] += 1
+                            acc.dismissed += 1
     except Exception:
         pass
 
@@ -953,29 +972,29 @@ async def get_guideline_health_api(brand_id: Optional[str] = Query(None)):
         if target_brand in ("aurelle-skin", "aurelle-tech") and r_id not in allowed_rules:
             continue
 
-        flags = r["flags"]
-        upheld = r["upheld"]
-        overruled = r["overruled"]
-        dismissed = r["dismissed"]
+        flags: int = r.flags
+        upheld: int = r.upheld
+        overruled: int = r.overruled
+        dismissed: int = r.dismissed
         total_flags += flags
         total_upheld += upheld
         total_overruled += overruled
 
         if flags > 0:
-            p = upheld / flags
-            denom = 1 + (z * z) / flags
-            center = (p + (z * z) / (2 * flags)) / denom
-            margin = (z / denom) * math.sqrt((p * (1 - p) / flags) + ((z * z) / (4 * flags * flags)))
+            p = float(upheld) / float(flags)
+            denom = 1.0 + (z * z) / float(flags)
+            center = (p + (z * z) / (2.0 * float(flags))) / denom
+            margin = (z / denom) * math.sqrt((p * (1.0 - p) / float(flags)) + ((z * z) / (4.0 * float(flags * flags))))
             lower = max(0.0, round(center - margin, 4))
             upper = min(1.0, round(center + margin, 4))
             agreement = round(p, 4)
 
             # Wilson lower bound for disagreement (overrules + dismissals)
-            disagreed = overruled + dismissed
+            disagreed: int = overruled + dismissed
             if disagreed > 0:
-                p_dis = disagreed / flags
-                center_dis = (p_dis + (z * z) / (2 * flags)) / denom
-                margin_dis = (z / denom) * math.sqrt((p_dis * (1 - p_dis) / flags) + ((z * z) / (4 * flags * flags)))
+                p_dis = float(disagreed) / float(flags)
+                center_dis = (p_dis + (z * z) / (2.0 * float(flags))) / denom
+                margin_dis = (z / denom) * math.sqrt((p_dis * (1.0 - p_dis) / float(flags)) + ((z * z) / (4.0 * float(flags * flags))))
                 disagree_lower = max(0.0, center_dis - margin_dis)
             else:
                 disagree_lower = 0.0
@@ -995,10 +1014,10 @@ async def get_guideline_health_api(brand_id: Optional[str] = Query(None)):
             status = "UNDER REVIEW"
 
         items.append(GuidelineHealthItem(
-            rule_id=r["rule_id"],
-            rule_title=r["rule_title"],
-            rule_description=r["rule_description"],
-            category=r["category"],
+            rule_id=r.rule_id,
+            rule_title=r.rule_title,
+            rule_description=r.rule_description,
+            category=r.category,
             flags=flags,
             upheld=upheld,
             overruled=overruled,
