@@ -107,7 +107,7 @@ Verified live database collections on MongoDB Atlas:
 
 The complete end-to-end governance lifecycle was verified using real database persistence in `backend/tests/test_phase2_five_role_workflow.py`:
 
-```
+```text
                                ┌────────────────────────────────────────────────────────┐
                                │ STEP 1: Creator Workspace                              │
                                │ Drafts copy: "Clinically proven 60% in 2 weeks. ₹499" │

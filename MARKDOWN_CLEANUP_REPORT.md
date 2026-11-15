@@ -177,7 +177,7 @@ backend\.venv\Scripts\pytest.exe backend/tests -q
 
 ## 6. Final Clean Repository Structure (Markdown Files)
 
-```
+```text
 c:\Users\jaswant karun\BRANDTRACE AI\
 ├── README.md                                      # Primary project documentation & quickstart
 ├── DEPLOYMENT.md                                  # Production deployment & environment variables guide

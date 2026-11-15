@@ -8,7 +8,7 @@
 
 ---
 
-### Slide 1: Title & Product Vision
+## Slide 1: Title & Product Vision
 
 - **Header:** BRANDTRACE AI — The Autonomous Brand Intelligence & Governance Control Plane
 - **Tagline:** *Detect. Predict. Verify. Prevent.*
@@ -18,7 +18,7 @@
 
 ---
 
-### Slide 2: The Problem Statement
+## Slide 2: The Problem Statement
 
 - **Headline:** Modern Brands Move Faster Than Brand Governance Can Keep Up
 - **The Core Challenges:**
@@ -29,7 +29,7 @@
 
 ---
 
-### Slide 3: The Proposed Solution
+## Slide 3: The Proposed Solution
 
 - **Headline:** A Connected Control Plane from Brand Truth to Public Release
 - **The BrandTrace Approach:**
@@ -41,7 +41,7 @@
 
 ---
 
-### Slide 4: System Architecture
+## Slide 4: System Architecture
 
 - **Headline:** Resilient, Low-Latency Architecture Built for Enterprise Scale
 - **Key Architectural Pillars:**
