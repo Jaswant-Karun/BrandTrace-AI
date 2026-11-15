@@ -759,11 +759,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <span className="text-[10px] text-neutral-400 font-medium">Sponsored</span>
                 </div>
 
-                {/* Visual Body with Real Serum Image & Live Scanning Effect */}
+                {/* Visual Body with Luxury Aurelle Radiance Serum Image & Live Scanning Effect */}
                 <div className="relative w-full h-[320px] sm:h-[350px] overflow-hidden bg-stone-100 flex items-center justify-center group cursor-crosshair">
                   <img
-                    src="/images/instagram_serum_pedestal.jpg"
-                    alt="Aurelle Skin Vitamin C Serum on Pedestal"
+                    src="/images/aurelle_luxury_serum_radiance.jpg"
+                    alt="Aurelle Skin C-Radiance Complex Serum"
                     className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   />
 
