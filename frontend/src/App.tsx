@@ -11,7 +11,7 @@ import { GuidedTourOverlay } from './components/GuidedTourOverlay';
 import { AuthHeader } from './components/AuthHeader';
 import { useAuth } from './context/AuthContext';
 import { BrandProfile, DatabaseStatus, VerificationResult } from './types';
-import { ExternalLink, RefreshCw, Search, LogOut } from 'lucide-react';
+import { ExternalLink, RefreshCw, Search } from 'lucide-react';
 
 // Code-split heavy views via React.lazy for optimized initial bundle loading
 const KnowledgeGraphView = lazy(() => import('./components/KnowledgeGraphView').then(m => ({ default: m.KnowledgeGraphView })));
@@ -35,7 +35,7 @@ const ViewLoadingFallback: React.FC = () => (
 );
 
 export const App: React.FC = () => {
-  const { currentWorkspace, setWorkspace, isAuthenticated, user, logout } = useAuth();
+  const { currentWorkspace, setWorkspace, isAuthenticated } = useAuth();
   
   const [viewMode, setViewMode] = useState<'landing' | 'login' | 'app'>(() => {
     // If token exists, enter app directly; otherwise show login
@@ -148,7 +148,7 @@ export const App: React.FC = () => {
   }
 
   // If not authenticated or in login mode, render dedicated LoginPage
-  if (viewMode === 'login' || (!isAuthenticated && viewMode !== 'landing')) {
+  if (viewMode === 'login' || !isAuthenticated) {
     return (
       <LoginPage
         onSuccess={() => {
