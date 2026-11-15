@@ -68,7 +68,7 @@ app.include_router(approvals_router, prefix="/api")
 app.include_router(demo_router, prefix="/api")
 app.include_router(security_router, prefix="/api")
 
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD"])
 async def health_check():
     db_status = await mongo_manager.get_db_status()
     return {
@@ -90,7 +90,7 @@ async def health_check():
         "tenant_isolation": "ORGANIZATION_STRICT"
     }
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 def root():
     return {
         "name": "BRANDTRACE AI",
@@ -106,3 +106,9 @@ def root():
             "storage": "Cloud Object Storage Abstraction with SHA-256 Integrity"
         }
     }
+
+if __name__ == "__main__":
+    import os
+    import uvicorn
+    port = int(os.getenv("PORT", "8000"))
+    uvicorn.run("brandtrace.main:app", host="0.0.0.0", port=port)
