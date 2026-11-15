@@ -1,6 +1,7 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { OfflineBanner } from './components/OfflineBanner';
 import { InstallRecommendationBanner } from './components/InstallRecommendationBanner';
+import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { usePWA } from './hooks/usePWA';
 import { useAuth, UserPersona } from './context/AuthContext';
 import { BrandProfile, DatabaseStatus, VerificationResult } from './types';
@@ -244,110 +245,124 @@ export const App: React.FC = () => {
   // 1. PUBLIC ZERO-AUTHENTICATION VERIFICATION VIEW
   if (viewMode === 'verify') {
     return (
-      <Suspense fallback={<ViewLoadingFallback />}>
-        <PublicVerificationView
-          initialBrand={currentBrand?.brand_name || 'Aurelle Technologies'}
-          onBack={() => {
-            setViewMode('landing');
-            if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
-          }}
-        />
-      </Suspense>
+      <ErrorBoundary onReset={() => setViewMode('landing')} fallbackTitle="Public Verification View Error">
+        <Suspense fallback={<ViewLoadingFallback />}>
+          <PublicVerificationView
+            initialBrand={currentBrand?.brand_name || 'Aurelle Technologies'}
+            onBack={() => {
+              setViewMode('landing');
+              if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
+            }}
+          />
+        </Suspense>
+      </ErrorBoundary>
     );
   }
 
   // 2. ULTRA-FAST LOGIN & REGISTRATION VIEW
   if (viewMode === 'login') {
     return (
-      <Suspense fallback={<ViewLoadingFallback />}>
-        <LoginPage
-          onSuccess={handleLoginSuccess}
-          onOpenLanding={() => {
-            setJustLoggedIn(false);
-            setViewMode('landing');
-            if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
-          }}
-        />
-      </Suspense>
+      <ErrorBoundary onReset={() => setViewMode('landing')} fallbackTitle="Login Experience Error">
+        <Suspense fallback={<ViewLoadingFallback />}>
+          <LoginPage
+            onSuccess={handleLoginSuccess}
+            onOpenLanding={() => {
+              setJustLoggedIn(false);
+              setViewMode('landing');
+              if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
+            }}
+          />
+        </Suspense>
+      </ErrorBoundary>
     );
   }
 
   // 3. DEDICATED INDEPENDENT CREATOR DASHBOARD VIEW
   if (viewMode === 'creator-dashboard') {
     return (
-      <Suspense fallback={<ViewLoadingFallback />}>
-        <CreatorDashboard
-          brandName={currentBrand?.brand_name || 'Aurelle Skin'}
-          onBackToLanding={() => {
-            setViewMode('landing');
-            if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
-          }}
-        />
-      </Suspense>
+      <ErrorBoundary onReset={() => setViewMode('landing')} fallbackTitle="Creator Dashboard Error">
+        <Suspense fallback={<ViewLoadingFallback />}>
+          <CreatorDashboard
+            brandName={currentBrand?.brand_name || 'Aurelle Skin'}
+            onBackToLanding={() => {
+              setViewMode('landing');
+              if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
+            }}
+          />
+        </Suspense>
+      </ErrorBoundary>
     );
   }
 
   // 4. DEDICATED INDEPENDENT AGENCY DASHBOARD VIEW
   if (viewMode === 'agency-dashboard') {
     return (
-      <Suspense fallback={<ViewLoadingFallback />}>
-        <RoleDashboardStage
-          role="agency"
-          brandName={currentBrand?.brand_name || 'Aurelle Skin'}
-          onBackToLanding={() => {
-            setViewMode('landing');
-            if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
-          }}
-        />
-      </Suspense>
+      <ErrorBoundary onReset={() => setViewMode('landing')} fallbackTitle="Agency Dashboard Error">
+        <Suspense fallback={<ViewLoadingFallback />}>
+          <RoleDashboardStage
+            role="agency"
+            brandName={currentBrand?.brand_name || 'Aurelle Skin'}
+            onBackToLanding={() => {
+              setViewMode('landing');
+              if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
+            }}
+          />
+        </Suspense>
+      </ErrorBoundary>
     );
   }
 
   // 5. DEDICATED INDEPENDENT REVIEWER DASHBOARD VIEW
   if (viewMode === 'reviewer-dashboard') {
     return (
-      <Suspense fallback={<ViewLoadingFallback />}>
-        <RoleDashboardStage
-          role="reviewer"
-          brandName={currentBrand?.brand_name || 'Aurelle Skin'}
-          onBackToLanding={() => {
-            setViewMode('landing');
-            if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
-          }}
-        />
-      </Suspense>
+      <ErrorBoundary onReset={() => setViewMode('landing')} fallbackTitle="Reviewer Dashboard Error">
+        <Suspense fallback={<ViewLoadingFallback />}>
+          <RoleDashboardStage
+            role="reviewer"
+            brandName={currentBrand?.brand_name || 'Aurelle Skin'}
+            onBackToLanding={() => {
+              setViewMode('landing');
+              if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
+            }}
+          />
+        </Suspense>
+      </ErrorBoundary>
     );
   }
 
   // 6. DEDICATED INDEPENDENT COMPLIANCE DASHBOARD VIEW
   if (viewMode === 'compliance-dashboard') {
     return (
-      <Suspense fallback={<ViewLoadingFallback />}>
-        <RoleDashboardStage
-          role="compliance"
-          brandName={currentBrand?.brand_name || 'Aurelle Skin'}
-          onBackToLanding={() => {
-            setViewMode('landing');
-            if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
-          }}
-        />
-      </Suspense>
+      <ErrorBoundary onReset={() => setViewMode('landing')} fallbackTitle="Compliance Dashboard Error">
+        <Suspense fallback={<ViewLoadingFallback />}>
+          <RoleDashboardStage
+            role="compliance"
+            brandName={currentBrand?.brand_name || 'Aurelle Skin'}
+            onBackToLanding={() => {
+              setViewMode('landing');
+              if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
+            }}
+          />
+        </Suspense>
+      </ErrorBoundary>
     );
   }
 
   // 7. DEDICATED INDEPENDENT BRAND OWNER DASHBOARD VIEW
   if (viewMode === 'brand-owner-dashboard') {
     return (
-      <Suspense fallback={<ViewLoadingFallback />}>
-        <RoleDashboardStage
-          role="brand-owner"
-          brandName={currentBrand?.brand_name || 'Aurelle Skin'}
-          onBackToLanding={() => {
-            setViewMode('landing');
-            if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
-          }}
-        />
-      </Suspense>
+      <ErrorBoundary onReset={() => setViewMode('landing')} fallbackTitle="Brand Owner Dashboard Error">
+        <Suspense fallback={<ViewLoadingFallback />}>
+          <RoleDashboardStage
+            role="brand-owner"
+            brandName={currentBrand?.brand_name || 'Aurelle Skin'}
+            onBackToLanding={() => {
+              setViewMode('landing');
+              if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
+            }}
+          />
+        </Suspense>
+      </ErrorBoundary>
     );
   }
 
@@ -358,42 +373,44 @@ export const App: React.FC = () => {
       <OfflineBanner isOnline={isOnline} />
 
       {/* Main Unified Product-First Landing Page Experience */}
-      <Suspense fallback={<ViewLoadingFallback />}>
-        <LandingPage
-          brandName={currentBrand?.brand_name || 'Aurelle Technologies'}
-          animateEntrance={justLoggedIn}
-          brands={brands}
-          selectedBrandId={selectedBrandId}
-          setSelectedBrandId={(id) => {
-            setSelectedBrandId(id);
-            setWorkspace(id);
-          }}
-          dbStatus={dbStatus}
-          onVerify={() => {
-            setViewMode('verify');
-            if (typeof window !== 'undefined') window.history.pushState({ view: 'verify' }, '', '/verify');
-          }}
-          onSignIn={() => {
-            setViewMode('login');
-            if (typeof window !== 'undefined') window.history.pushState({ view: 'login' }, '', '/login');
-          }}
-          onOpenCreatorDashboard={handleOpenCreatorDashboard}
-          onNavigateRole={handleNavigateRole}
-          onSignRelease={handleSignRelease}
-          onReseed={handleReseed}
-          isReseeding={isReseeding}
-          onOpenInstall={() => setIsInstallModalOpen(true)}
-          isInstalled={isInstalled}
-          onEnterApp={(targetTab) => {
-            if (targetTab === 'public-verification') {
+      <ErrorBoundary fallbackTitle="Landing Experience Error">
+        <Suspense fallback={<ViewLoadingFallback />}>
+          <LandingPage
+            brandName={currentBrand?.brand_name || 'Aurelle Technologies'}
+            animateEntrance={justLoggedIn}
+            brands={brands}
+            selectedBrandId={selectedBrandId}
+            setSelectedBrandId={(id) => {
+              setSelectedBrandId(id);
+              setWorkspace(id);
+            }}
+            dbStatus={dbStatus}
+            onVerify={() => {
               setViewMode('verify');
               if (typeof window !== 'undefined') window.history.pushState({ view: 'verify' }, '', '/verify');
-              return;
-            }
-            handleOpenCreatorDashboard();
-          }}
-        />
-      </Suspense>
+            }}
+            onSignIn={() => {
+              setViewMode('login');
+              if (typeof window !== 'undefined') window.history.pushState({ view: 'login' }, '', '/login');
+            }}
+            onOpenCreatorDashboard={handleOpenCreatorDashboard}
+            onNavigateRole={handleNavigateRole}
+            onSignRelease={handleSignRelease}
+            onReseed={handleReseed}
+            isReseeding={isReseeding}
+            onOpenInstall={() => setIsInstallModalOpen(true)}
+            isInstalled={isInstalled}
+            onEnterApp={(targetTab) => {
+              if (targetTab === 'public-verification') {
+                setViewMode('verify');
+                if (typeof window !== 'undefined') window.history.pushState({ view: 'verify' }, '', '/verify');
+                return;
+              }
+              handleOpenCreatorDashboard();
+            }}
+          />
+        </Suspense>
+      </ErrorBoundary>
 
       {/* Progressive Web App Install Modal (Lazy) */}
       <Suspense fallback={null}>

@@ -223,12 +223,13 @@ def validate_file_upload(filename: str, file_size: int, content_type: Optional[s
     Returns sanitized base filename or raises HTTPException.
     """
     # 1. Path traversal prevention
-    clean_name = os.path.basename(filename.replace("\\", "/").strip())
-    if ".." in clean_name or "/" in clean_name or "\\" in clean_name or not clean_name:
+    raw_name = filename.strip()
+    if ".." in raw_name or "/" in raw_name or "\\" in raw_name or not raw_name:
         raise HTTPException(
             status_code=400,
             detail="Security violation: Illegal file path characters or traversal detected."
         )
+    clean_name = os.path.basename(raw_name.replace("\\", "/"))
 
     # 1b. Empty file check
     if file_size <= 0:
