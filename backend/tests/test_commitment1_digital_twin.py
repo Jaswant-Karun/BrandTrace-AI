@@ -66,8 +66,9 @@ def test_commitment1_propose_price_mutation_aurelle_blast_radius():
 
     touchpoint_names = [tp["asset_name"].lower() for tp in report["affected_touchpoints"]]
     touchpoint_types = [tp["asset_type"].lower() for tp in report["affected_touchpoints"]]
-    # Touchpoints: Billboard, PR release, website hero banner, social ad
-    assert any("billboard" in n or "banner" in n or "web" in n or "press" in n or "social" in n for n in touchpoint_names)
+    # Touchpoints: Meta Feed Ad, B2B Rate Card, Pricing & Checkout Page, Google PPC Ad
+    assert any("ad" in n or "pricing" in n or "rate card" in n or "checkout" in n for n in touchpoint_names)
+    assert any("ad" in t or "doc" in t or "web" in t for t in touchpoint_types)
 
     # 3. Financial Liability Exposure: $320,000 in unbudgeted reprint/ad expenditure
     assert report["total_estimated_exposure_usd"] == 320000.0 or report["total_estimated_exposure_usd"] >= 250000.0
