@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { 
-  Lock, ShieldCheck, Download, Search, CheckCircle2, AlertTriangle, 
+  ShieldCheck, Download, Search, CheckCircle2, AlertTriangle, 
   AlertOctagon, RefreshCw, XCircle, Shield, FileCheck
 } from 'lucide-react';
 import { ReleaseLedgerEntry } from '../types';

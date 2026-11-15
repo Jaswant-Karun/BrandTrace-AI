@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  Sparkles, ArrowRight, ArrowLeft, X,
-  LayoutDashboard, BookOpen, Layers, GitFork,
-  Flame, AlertTriangle, CheckSquare, Lock
-} from 'lucide-react';
+import { ArrowRight, ArrowLeft, X } from 'lucide-react';
 import { NavigationTab } from './Sidebar';
 
 export interface TourStep {
