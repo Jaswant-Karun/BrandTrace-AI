@@ -15,6 +15,7 @@ import { usePWA } from './hooks/usePWA';
 import { useAuth } from './context/AuthContext';
 import { BrandProfile, DatabaseStatus, VerificationResult } from './types';
 import { ExternalLink, RefreshCw, Search, ShieldCheck } from 'lucide-react';
+import { ThemeToggle } from './components/ui/ThemeToggle';
 
 // Code-split heavy views via React.lazy for optimized initial bundle loading
 const KnowledgeGraphView = lazy(() => import('./components/KnowledgeGraphView').then(m => ({ default: m.KnowledgeGraphView })));
@@ -32,9 +33,9 @@ const SettingsView = lazy(() => import('./components/SettingsView').then(m => ({
 const PublicVerificationView = lazy(() => import('./components/PublicVerificationView').then(m => ({ default: m.PublicVerificationView })));
 
 const ViewLoadingFallback: React.FC = () => (
-  <div className="flex flex-col items-center justify-center py-24 space-y-3 bg-white">
-    <div className="w-8 h-8 rounded-full border-2 border-slate-200 border-t-slate-900 animate-spin" />
-    <span className="text-xs font-mono text-slate-500 tracking-wide">Loading module workspace...</span>
+  <div className="flex flex-col items-center justify-center py-24 space-y-3 bg-white dark:bg-slate-950 transition-colors duration-200">
+    <div className="w-8 h-8 rounded-full border-2 border-slate-200 dark:border-slate-800 border-t-slate-900 dark:border-t-indigo-500 animate-spin" />
+    <span className="text-xs font-mono text-slate-500 dark:text-slate-400 tracking-wide">Loading module workspace...</span>
   </div>
 );
 
@@ -49,7 +50,7 @@ export const App: React.FC = () => {
       if (params.get('view') === 'login') return 'login';
       if (params.get('view') === 'app' || params.get('demo') === 'true' || params.get('token')) return 'app';
     }
-    return localStorage.getItem('brandtrace_jwt_token') ? 'app' : 'login';
+    return localStorage.getItem('brandtrace_jwt_token') ? 'app' : 'landing';
   });
 
   const [currentTab, setCurrentTab] = useState<NavigationTab>(() => {
@@ -184,6 +185,7 @@ export const App: React.FC = () => {
           setViewMode(isAuthenticated ? 'app' : 'login');
         }}
         onVerify={() => setViewMode('verify')}
+        onSignIn={() => setViewMode('login')}
       />
     );
   }
@@ -219,7 +221,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 flex flex-col font-sans selection:bg-slate-900 selection:text-white overflow-x-hidden">
+    <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans selection:bg-slate-900 selection:text-white dark:selection:bg-indigo-600 dark:selection:text-white overflow-x-hidden transition-colors duration-200">
       {/* Offline Status Security Guardrail Banner */}
       <OfflineBanner isOnline={isOnline} />
 
@@ -243,13 +245,13 @@ export const App: React.FC = () => {
         />
 
         {/* Main App Workspace */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-white">
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-white dark:bg-slate-950 transition-colors duration-200">
           {/* Enterprise Tenant & Auth Header */}
           <AuthHeader
             onOpenDbStatus={() => setIsDbModalOpen(true)}
             onOpenDemoWalkthrough={() => setIsDemoModalOpen(true)}
             onStartTour={handleStartTour}
-            onLogout={() => setViewMode('login')}
+            onLogout={() => setViewMode('landing')}
             onToggleMobileMenu={() => setIsMobileNavOpen(!isMobileNavOpen)}
             onOpenInstallModal={() => setIsInstallModalOpen(true)}
             onOpenPublicVerification={() => setViewMode('verify')}
@@ -258,15 +260,15 @@ export const App: React.FC = () => {
           />
 
           {/* Top Control Bar */}
-          <header className="border-b border-slate-200 bg-white px-3 sm:px-6 py-2 sm:py-2.5 flex items-center justify-between sticky top-0 z-20">
+          <header className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/95 px-3 sm:px-6 py-2 sm:py-2.5 flex items-center justify-between sticky top-0 z-20 transition-colors duration-200">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-slate-500 font-medium truncate">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium truncate">
               <span className="hidden xs:inline">BrandTrace</span>
-              <span className="text-slate-300 hidden xs:inline">/</span>
-              <span className="text-slate-900 font-semibold truncate">{getTabTitle(currentTab)}</span>
+              <span className="text-slate-300 dark:text-slate-700 hidden xs:inline">/</span>
+              <span className="text-slate-900 dark:text-white font-semibold truncate">{getTabTitle(currentTab)}</span>
             </div>
-            <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-slate-300" />
-            <span className="hidden md:inline-block text-[11px] text-slate-600 font-mono bg-slate-50 border border-slate-200 px-2 py-0.5 rounded truncate max-w-[180px]">
+            <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+            <span className="hidden md:inline-block text-[11px] text-slate-600 dark:text-slate-300 font-mono bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded truncate max-w-[180px]">
               {currentBrand ? currentBrand.brand_name : 'Aurelle Technologies'}
             </span>
           </div>
@@ -274,32 +276,35 @@ export const App: React.FC = () => {
           <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             {/* Global Search Bar */}
             <div className="relative hidden md:block">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Search facts, rules, assets... (Ctrl+K)"
-                className="w-64 bg-slate-50 border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-900 focus:bg-white transition-all shadow-2xs"
+                className="w-64 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-slate-900 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all shadow-2xs"
                 readOnly
               />
             </div>
 
+            {/* Light / Dark Mode Toggle */}
+            <ThemeToggle variant="pill" />
+
             {/* View Public Verification Portal Button */}
             <button
               onClick={() => setViewMode('verify')}
-              className="text-xs text-indigo-700 hover:text-indigo-900 bg-indigo-50/80 hover:bg-indigo-100/80 px-2 sm:px-2.5 py-1.5 rounded-lg border border-indigo-200/80 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              className="text-xs text-indigo-700 dark:text-indigo-300 hover:text-indigo-900 dark:hover:text-white bg-indigo-50/80 dark:bg-indigo-950/60 hover:bg-indigo-100/80 dark:hover:bg-indigo-900/60 px-2 sm:px-2.5 py-1.5 rounded-lg border border-indigo-200/80 dark:border-indigo-800/80 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
               title="Open Public Verification Portal (Zero Authentication)"
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-indigo-700" />
+              <ShieldCheck className="w-3.5 h-3.5 text-indigo-700 dark:text-indigo-400" />
               <span className="hidden sm:inline">Verify Release</span>
             </button>
 
             {/* View Public Landing Page Button */}
             <button
               onClick={() => setViewMode('landing')}
-              className="text-xs text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-50 px-2 sm:px-2.5 py-1.5 rounded-lg border border-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              className="text-xs text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 px-2 sm:px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
               title="View Public Overview Landing Page"
             >
-              <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
+              <ExternalLink className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
               <span className="hidden sm:inline">Landing Page</span>
             </button>
 
@@ -308,15 +313,15 @@ export const App: React.FC = () => {
               onClick={handleReseed}
               disabled={isReseeding}
               title="Re-seed MongoDB and Graph Data"
-              className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
+              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-2xs cursor-pointer"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isReseeding ? 'animate-spin text-slate-900' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${isReseeding ? 'animate-spin text-slate-900 dark:text-white' : ''}`} />
             </button>
           </div>
         </header>
 
         {/* Viewport Canvas with Framer Motion */}
-        <main className="flex-1 p-3.5 sm:p-5 md:p-6 overflow-y-auto max-w-7xl w-full mx-auto bg-white">
+        <main className="flex-1 p-3.5 sm:p-5 md:p-6 overflow-y-auto max-w-7xl w-full mx-auto bg-white dark:bg-slate-950 transition-colors duration-200">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentTab}

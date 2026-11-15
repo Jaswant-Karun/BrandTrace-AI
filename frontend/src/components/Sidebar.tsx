@@ -116,7 +116,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       <aside
-        className={`border-r border-slate-200 bg-white flex flex-col justify-between transition-all duration-200 z-50 select-none ${
+        className={`border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col justify-between transition-all duration-200 z-50 select-none ${
           isMobileOpen
             ? 'fixed inset-y-0 left-0 w-64 max-w-[85vw] shadow-2xl translate-x-0'
             : 'hidden md:flex md:static'
@@ -124,7 +124,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       >
         {/* Top Header & Brand Switcher */}
         <div>
-          <div className="h-16 px-4 border-b border-slate-200 flex items-center justify-between">
+          <div className="h-16 px-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
             <button
               onClick={() => {
                 onOpenLanding();
@@ -133,18 +133,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
               className="flex items-center gap-2.5 text-left hover:opacity-85 transition-opacity"
               title="Return to Public Overview"
             >
-              <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white shrink-0 shadow-xs">
+              <div className="w-8 h-8 rounded-lg bg-slate-900 dark:bg-indigo-600 flex items-center justify-center text-white shrink-0 shadow-xs">
                 <ShieldCheck className="w-4 h-4 stroke-[2.2]" />
               </div>
               {(!isCollapsed || isMobileOpen) && (
                 <div className="overflow-hidden">
                   <div className="flex items-center gap-1.5">
-                    <span className="font-bold tracking-tight text-slate-900 text-sm">BRANDTRACE</span>
-                    <span className="text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200 px-1 py-0.2 rounded font-mono">
+                    <span className="font-bold tracking-tight text-slate-900 dark:text-white text-sm">BRANDTRACE</span>
+                    <span className="text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 px-1 py-0.2 rounded font-mono">
                       AI
                     </span>
                   </div>
-                  <p className="text-[10px] text-slate-500 truncate leading-none mt-0.5">Control Plane</p>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate leading-none mt-0.5">Control Plane</p>
                 </div>
               )}
             </button>
@@ -152,7 +152,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* Mobile Close Button */}
             <button
               onClick={() => setIsMobileOpen?.(false)}
-              className="p-2 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors md:hidden"
+              className="p-2 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors md:hidden"
               title="Close Navigation"
               aria-label="Close Navigation"
             >
@@ -162,7 +162,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* Desktop Collapse / Expand Toggle */}
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className="p-1.5 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors hidden md:block"
+              className="p-1.5 rounded-md text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors hidden md:block"
               title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
             >
               {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -171,30 +171,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {/* Workspace Selector */}
           {(!isCollapsed || isMobileOpen) && (
-            <div className="p-3 border-b border-slate-100 bg-slate-50/50">
-              <label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">
+            <div className="p-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40">
+              <label className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-1">
                 Active Workspace
               </label>
               <select
                 value={selectedBrandId}
                 onChange={(e) => setSelectedBrandId(e.target.value)}
-                className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 font-medium focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 cursor-pointer shadow-2xs"
+                className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-100 font-medium focus:outline-none focus:border-slate-900 dark:focus:border-indigo-500 cursor-pointer shadow-2xs"
               >
                 {brands.length > 0 ? (
                   brands.map((b) => (
-                    <option key={b.brand_id} value={b.brand_id}>
+                    <option key={b.brand_id} value={b.brand_id} className="dark:bg-slate-900 dark:text-white">
                       {b.brand_name}
                     </option>
                   ))
                 ) : (
                   <>
-                    <option value="aurelle-tech">Aurelle Technologies Inc.</option>
-                    <option value="apex-dynamics">Apex Dynamics</option>
-                    <option value="novus-health">Novus Health Solutions</option>
+                    <option value="aurelle-tech" className="dark:bg-slate-900 dark:text-white">Aurelle Technologies Inc.</option>
+                    <option value="apex-dynamics" className="dark:bg-slate-900 dark:text-white">Apex Dynamics</option>
+                    <option value="novus-health" className="dark:bg-slate-900 dark:text-white">Novus Health Solutions</option>
                   </>
                 )}
               </select>
-              <div className="text-[10px] text-slate-500 mt-1 truncate">
+              <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 truncate">
                 {currentBrand?.industry || 'Clean Mobility & Tech'}
               </div>
             </div>
@@ -205,7 +205,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {NAV_SECTIONS.map((section) => (
               <div key={section.title} className="space-y-1">
                 {(!isCollapsed || isMobileOpen) && (
-                  <div className="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                  <div className="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                     {section.title}
                   </div>
                 )}
@@ -218,11 +218,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       title={isCollapsed && !isMobileOpen ? item.label : undefined}
                       className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs transition-colors cursor-pointer ${
                         isActive
-                          ? 'bg-slate-900 text-white font-medium shadow-xs'
-                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 font-normal'
+                          ? 'bg-slate-900 dark:bg-indigo-600 text-white font-medium shadow-xs'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-800/80 font-normal'
                       } ${isCollapsed && !isMobileOpen ? 'justify-center px-0' : ''}`}
                     >
-                      <span className={isActive ? 'text-white' : 'text-slate-500'}>
+                      <span className={isActive ? 'text-white' : 'text-slate-500 dark:text-slate-400'}>
                         {item.icon}
                       </span>
                       {(!isCollapsed || isMobileOpen) && <span className="truncate">{item.label}</span>}
@@ -235,7 +235,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Bottom Telemetry Status */}
-        <div className="p-3 border-t border-slate-200 bg-white">
+        <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
           <div
             className={`flex items-center gap-2 text-xs ${
               isCollapsed && !isMobileOpen ? 'justify-center' : 'justify-between'
@@ -244,17 +244,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div className="flex items-center gap-2 overflow-hidden">
               <span
                 className={`w-2 h-2 rounded-full ${
-                  dbStatus?.connected ? 'bg-emerald-500 ring-4 ring-emerald-50' : 'bg-amber-500'
+                  dbStatus?.connected ? 'bg-emerald-500 ring-4 ring-emerald-50 dark:ring-emerald-950' : 'bg-amber-500'
                 }`}
               />
               {(!isCollapsed || isMobileOpen) && (
-                <span className="text-[11px] font-medium text-slate-600 truncate">
+                <span className="text-[11px] font-medium text-slate-600 dark:text-slate-400 truncate">
                   {dbStatus?.connected ? 'Atlas Connected' : 'Memory Mode'}
                 </span>
               )}
             </div>
             {(!isCollapsed || isMobileOpen) && (
-              <span className="text-[10px] font-mono text-slate-400">v2.0</span>
+              <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">v2.0</span>
             )}
           </div>
         </div>
