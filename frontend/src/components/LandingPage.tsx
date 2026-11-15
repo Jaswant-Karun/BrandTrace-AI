@@ -1595,8 +1595,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     }}
                     className={`w-full py-2.5 px-3 rounded-xl font-bold text-xs uppercase tracking-wider cursor-pointer transition-all duration-200 min-h-[44px] flex items-center justify-center active:scale-[0.98] ${
                       isPointed
-                        ? 'bg-[#544df2] hover:bg-blue-600 text-white shadow-lg shadow-blue-500/30'
-                        : 'bg-[#f0ede6] hover:bg-white text-neutral-900 group-hover:bg-[#544df2] group-hover:text-white group-hover:shadow-lg group-hover:shadow-blue-500/30 shadow-xs'
+                        ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/40'
+                        : 'bg-[#f0ede6] hover:bg-blue-600 hover:text-white text-neutral-900 group-hover:bg-blue-600 group-hover:text-white group-hover:shadow-lg group-hover:shadow-blue-600/40 shadow-xs'
                     }`}
                   >
                     {role.buttonText}

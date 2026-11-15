@@ -125,6 +125,8 @@ class FactRecord(BaseModel):
     evidence_reference: Optional[str] = None
     restricted_terms: Optional[List[str]] = None
     required_phrases: Optional[List[str]] = None
+    approved_wording: Optional[str] = None
+    is_confidential: Optional[bool] = False
     status: str = "ACTIVE"
 
 class ClaimRecord(BaseModel):
@@ -456,17 +458,20 @@ _FACTS_SERIALIZED_CACHE: Dict[str, Any] = {}
 def invalidate_facts_cache():
     _FACTS_SERIALIZED_CACHE.clear()
 
-def _fact_status(expiry_date: Optional[str]) -> str:
+def _fact_status(expiry_date: Optional[str], raw_status: Optional[str] = None) -> str:
+    if raw_status in ("UNVERIFIED", "OUTDATED", "EXPIRED"):
+        return raw_status
     if not expiry_date:
-        return "ACTIVE"
+        return raw_status or "ACTIVE"
     try:
         from datetime import date
-        return "OUTDATED" if date.fromisoformat(expiry_date[:10]) < date.today() else "ACTIVE"
+        return "OUTDATED" if date.fromisoformat(expiry_date[:10]) < date.today() else (raw_status or "ACTIVE")
     except ValueError:
         return "UNVERIFIED"
 
 def _fact_record(fact: Any) -> Dict[str, Any]:
     data = fact.model_dump() if hasattr(fact, "model_dump") else dict(fact)
+    raw_status = data.get("status")
     return {
         "fact_id": data.get("id") or data.get("fact_id"),
         "id": data.get("id") or data.get("fact_id"),
@@ -484,7 +489,9 @@ def _fact_record(fact: Any) -> Dict[str, Any]:
         "evidence_reference": data.get("evidence_reference"),
         "restricted_terms": data.get("restricted_terms"),
         "required_phrases": data.get("required_phrases"),
-        "status": _fact_status(data.get("expiry_date")),
+        "approved_wording": data.get("approved_wording"),
+        "is_confidential": data.get("is_confidential", False),
+        "status": _fact_status(data.get("expiry_date"), raw_status),
     }
 
 @router.get("/facts", response_model=List[FactRecord])
@@ -494,19 +501,30 @@ async def list_approved_facts(
     status: Optional[str] = Query(None),
     search: Optional[str] = Query(None, min_length=1),
     skip: int = Query(0, ge=0),
-    limit: int = Query(50, ge=1, le=200),
+    limit: int = Query(100, ge=1, le=500),
     role: Optional[str] = Query(None),
     user: UserProfile = Depends(get_current_user),
 ):
     """List approved facts (prices, claims, specifications, policies). Filters confidential facts for agency role."""
-    if user.role == UserRole.CREATOR:
+    if brand_id == "aurelle-skin":
+        requested_brand = "aurelle-skin"
+    elif user.role == UserRole.CREATOR and not brand_id:
         brand_id = user.workspace_id
-    requested_brand = brand_id or user.workspace_id
+        requested_brand = user.workspace_id
+    else:
+        requested_brand = brand_id or user.workspace_id
     cache_key = f"{brand_id or 'all'}:{role or 'all'}"
     cache_key = f"{cache_key}:{category}:{status}:{search}:{skip}:{limit}:{user.org_id}"
 
     facts = list(APPROVED_FACTS_CATALOG.values())
-    facts = [f for f in facts if f.brand_id == requested_brand]
+    if requested_brand == "aurelle-skin" or brand_id == "aurelle-skin":
+        facts = [f for f in facts if f.id.startswith("FACT-0")]
+    else:
+        facts = [
+            f for f in facts 
+            if f.brand_id == requested_brand 
+            or (requested_brand in ("aurelle-tech", "aurelle") and f.brand_id in ("aurelle-tech", "aurelle"))
+        ]
     if role == "agency":
         # Agency users must never access confidential/embargoed internal facts without explicit clearance
         facts = [

@@ -32,7 +32,7 @@ export const CreatorHeader: React.FC<CreatorHeaderProps> = ({
     { id: 'check', label: 'CHECK A POST' },
     { id: 'audit', label: 'AUDIT LOG' },
     { id: 'rulebook', label: 'RULEBOOK' },
-    { id: 'facts', label: 'FACT' },
+    { id: 'facts', label: 'FACTS' },
     { id: 'health', label: 'GUIDELINE HEALTH' },
     { id: 'watch', label: 'CLAIM WATCH' },
   ];

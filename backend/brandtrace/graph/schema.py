@@ -103,6 +103,14 @@ class ApprovedFact(BaseModel):
     source_citation: str
     department_owner: str
     last_verified: str
+    source_date: Optional[str] = None
+    expiry_date: Optional[str] = None
+    evidence_reference: Optional[str] = None
+    restricted_terms: Optional[List[str]] = None
+    required_phrases: Optional[List[str]] = None
+    status: Optional[str] = "ACTIVE"
+    approved_wording: Optional[str] = None
+    is_confidential: Optional[bool] = False
 
 class FactMutationRequest(BaseModel):
     brand_id: str
