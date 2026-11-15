@@ -33,7 +33,7 @@ def test_12_step_demo_lifecycle_execution():
     res_s4 = client.post("/api/demo/execute-step", json={"step_number": 4})
     assert res_s4.status_code == 200
     s4_data = res_s4.json()
-    assert s4_data["mutations_applied"]["score"] == 100.0
+    assert s4_data["mutations_applied"]["score"] == 0.0 # 0 composite risk
     assert s4_data["mutations_applied"]["decision"] == "APPROVED_FOR_RELEASE"
 
     # Step 5: Propose price change ₹499 -> ₹599
