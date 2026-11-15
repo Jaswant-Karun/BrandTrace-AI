@@ -86,6 +86,7 @@ class ApprovalStepModel(BaseModel):
     comments: Optional[str] = None
 
 class SubmissionCreateRequest(BaseModel):
+    submission_id: Optional[str] = None
     brand_id: str = "aurelle-tech"
     brand_name: str = "Aurelle Skin"
     title: str
