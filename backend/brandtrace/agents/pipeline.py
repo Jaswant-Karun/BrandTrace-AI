@@ -489,6 +489,7 @@ class AutonomousGovernancePipeline:
         """
         Executes complete multi-agent governance pipeline on an asset.
         """
+        t_start = time.perf_counter()
         t0 = int(time.time())
         t0_iso = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(t0))
         verification_id = f"VRF-{uuid.uuid4().hex[:10].upper()}"
@@ -544,6 +545,8 @@ class AutonomousGovernancePipeline:
             }
         )
 
+        latency_ms = round((time.perf_counter() - t_start) * 1000, 2)
+
         return VerificationResult(
             verification_id=verification_id,
             brand_id=request.brand_id,
@@ -562,6 +565,8 @@ class AutonomousGovernancePipeline:
             remediated_content=remediated_text,
             remediation_rationale=remediation_rationale,
             release_proof=proof,
+            latency_ms=latency_ms,
+            agents_count=3,
             timestamp=t0,
             timestamp_iso=t0_iso
         )

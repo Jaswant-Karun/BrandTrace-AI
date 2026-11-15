@@ -1,4 +1,5 @@
 import re
+import time
 from typing import Dict, List, Optional, Any
 from pydantic import BaseModel, Field
 from brandtrace.graph.engine import BrandKnowledgeGraph
@@ -34,6 +35,8 @@ class ExplainableReviewReport(BaseModel):
     retrieved_truth_nodes: List[Dict[str, Any]]
     suggested_full_rewrite: str
     deterministic_rule_count: int
+    latency_ms: float = 0.0
+    agents_executed: List[str] = Field(default_factory=list)
 
 class ExplainableReviewEngine:
     """
@@ -80,6 +83,7 @@ class ExplainableReviewEngine:
         Executes explainable claim assessment:
         Classifies each claim as SUPPORTED, CONTRADICTED, NEEDS_VERIFICATION, EXPIRED_SOURCE, or POTENTIALLY_MISLEADING.
         """
+        t_start = time.perf_counter()
         retrieved_nodes = self.retrieve_relevant_truth_nodes(text, bkg)
         assessments: List[ExplainableClaimAssessment] = []
         deterministic_rules = 0
@@ -281,6 +285,8 @@ class ExplainableReviewEngine:
             if a.classification in [ClaimClassification.CONTRADICTED, ClaimClassification.POTENTIALLY_MISLEADING, ClaimClassification.EXPIRED_SOURCE]:
                 remediated_text = remediated_text.replace(a.claim_text, a.minimal_change_rewrite)
 
+        latency_ms = round((time.perf_counter() - t_start) * 1000, 2)
+
         return ExplainableReviewReport(
             brand_id=brand_id,
             overall_confidence=overall_conf,
@@ -292,7 +298,9 @@ class ExplainableReviewEngine:
             assessments=assessments,
             retrieved_truth_nodes=retrieved_nodes,
             suggested_full_rewrite=remediated_text,
-            deterministic_rule_count=deterministic_rules
+            deterministic_rule_count=deterministic_rules,
+            latency_ms=latency_ms,
+            agents_executed=["Voice & Persona Agent", "Claim Substantiation Agent", "Regulatory Compliance Agent"]
         )
 
     def validate_source_references(

@@ -43,6 +43,8 @@ class VerificationResult(BaseModel):
     remediated_content: Optional[str] = None
     remediation_rationale: Optional[str] = None
     release_proof: Optional[Dict[str, Any]] = None
+    latency_ms: float = 0.0
+    agents_count: int = 3
     timestamp: int
     timestamp_iso: str
 
