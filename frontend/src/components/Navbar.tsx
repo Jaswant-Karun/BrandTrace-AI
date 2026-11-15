@@ -28,19 +28,21 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="border-b border-slate-200 bg-white/95 backdrop-blur-md px-6 py-3 flex flex-wrap items-center justify-between sticky top-0 z-50 gap-4 shadow-xs">
       {/* Brand & Identity */}
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center shadow-xs">
+      <div className="flex items-center gap-4 shrink-0">
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center shadow-xs shrink-0">
             <ShieldCheck className="w-5 h-5 text-white stroke-[2.2]" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-extrabold tracking-tight text-slate-900 text-base">BRANDTRACE</span>
-              <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200 px-1.5 py-0.5 rounded">
+          <div className="shrink-0">
+            <div className="flex items-center gap-2 whitespace-nowrap">
+              <span className="font-extrabold tracking-tight text-slate-900 text-base whitespace-nowrap select-none">
+                BRANDTRACE<span className="text-indigo-600">&nbsp;AI</span>
+              </span>
+              <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200 px-1.5 py-0.5 rounded shrink-0 whitespace-nowrap">
                 BDIG Engine
               </span>
             </div>
-            <p className="text-[11px] text-slate-500">Brand Dependency Intelligence &amp; Governance</p>
+            <p className="text-[11px] text-slate-500 whitespace-nowrap">Brand Dependency Intelligence &amp; Governance</p>
           </div>
         </div>
 

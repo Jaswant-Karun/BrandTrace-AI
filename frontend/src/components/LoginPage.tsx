@@ -160,20 +160,20 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onOpenLanding }
         {/* Top Header inside Left Pane */}
         <div>
           <div className="flex items-center justify-between gap-3 mb-8">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-slate-900 dark:bg-indigo-600 text-white flex items-center justify-center shadow-xs">
+            <div className="flex items-center gap-3 shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-slate-900 dark:bg-indigo-600 text-white flex items-center justify-center shadow-xs shrink-0">
                 <ShieldCheck className="w-5 h-5 stroke-[2.2]" />
               </div>
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <span className="font-extrabold tracking-tight text-slate-900 dark:text-white text-base">
-                    BRANDTRACE<span className="text-indigo-600 dark:text-indigo-400"> AI</span>
+              <div className="shrink-0">
+                <div className="flex items-center gap-1.5 whitespace-nowrap">
+                  <span className="font-extrabold tracking-tight text-slate-900 dark:text-white text-base whitespace-nowrap select-none">
+                    BRANDTRACE<span className="text-indigo-600 dark:text-indigo-400">&nbsp;AI</span>
                   </span>
-                  <span className="text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 px-1.5 py-0.2 rounded font-mono">
+                  <span className="text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 px-1.5 py-0.2 rounded font-mono shrink-0 whitespace-nowrap">
                     Control Plane
                   </span>
                 </div>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-mono whitespace-nowrap">
                   Autonomous Brand Governance
                 </p>
               </div>

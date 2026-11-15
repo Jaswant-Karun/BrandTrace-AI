@@ -41,31 +41,31 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ------------------------------------------------------------------- */}
       {/* SECTION 1 — TOP NAVIGATION                                          */}
       {/* ------------------------------------------------------------------- */}
-      <nav className="sticky top-0 z-50 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md transition-colors duration-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <nav className="sticky top-0 z-50 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md transition-colors duration-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3 sm:gap-4">
           
-          {/* Left: Brand Identity */}
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-slate-900 dark:bg-indigo-600 flex items-center justify-center shadow-xs">
+          {/* Left: Brand Identity (Guaranteed single-line with shrink-0 & whitespace-nowrap) */}
+          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-slate-900 dark:bg-indigo-600 flex items-center justify-center shadow-xs shrink-0">
               <ShieldCheck className="w-5 h-5 text-white stroke-[2.2]" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-extrabold tracking-tight text-slate-900 dark:text-white text-base">
-                  BRANDTRACE<span className="text-indigo-600 dark:text-indigo-400"> AI</span>
+            <div className="shrink-0">
+              <div className="flex items-center gap-2 whitespace-nowrap">
+                <span className="font-extrabold tracking-tight text-slate-900 dark:text-white text-base sm:text-lg whitespace-nowrap select-none">
+                  BRANDTRACE<span className="text-indigo-600 dark:text-indigo-400">&nbsp;AI</span>
                 </span>
-                <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 px-1.5 py-0.5 rounded">
+                <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 px-1.5 py-0.5 rounded shrink-0 whitespace-nowrap hidden sm:inline-block">
                   Control Plane
                 </span>
               </div>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-mono hidden sm:block">
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-mono hidden md:block whitespace-nowrap">
                 Autonomous Brand Intelligence &amp; Governance
               </p>
             </div>
           </div>
 
-          {/* Center Navigation Links (Desktop) */}
-          <div className="hidden lg:flex items-center gap-7 text-xs font-semibold text-slate-600 dark:text-slate-300">
+          {/* Center Navigation Links (Desktop - gap-3.5 on xl, gap-6 on 2xl for generous breathing room) */}
+          <div className="hidden xl:flex items-center gap-3.5 2xl:gap-6 text-xs font-semibold text-slate-600 dark:text-slate-300 shrink-0">
             <button onClick={() => scrollToSection('overview')} className="hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer">
               Overview
             </button>
@@ -87,11 +87,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           {/* Right Action Controls */}
-          <div className="flex items-center gap-2.5">
-            {/* Public Verification Link */}
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Public Verification Link (Shown when unauthenticated or on 2xl) */}
             <button
               onClick={onVerify || (() => onEnterApp('public-verification'))}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-colors cursor-pointer shadow-2xs"
+              className={`${isAuthenticated ? 'hidden 2xl:flex' : 'hidden lg:flex'} items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-colors cursor-pointer shadow-2xs shrink-0 whitespace-nowrap`}
               title="Verify Release Seals &amp; Content (Zero Authentication)"
             >
               <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
@@ -99,22 +99,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </button>
 
             {/* Theme Toggle Button */}
-            <ThemeToggle />
+            <div className="shrink-0">
+              <ThemeToggle />
+            </div>
 
             {/* If Authenticated: Show Account Indicator & Continue to Dashboard CTA */}
             {isAuthenticated ? (
-              <div className="flex items-center gap-2">
-                <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="font-semibold text-slate-800 dark:text-slate-200 max-w-[120px] truncate">
-                    {user?.name || 'Alex Mercer'}
+              <div className="flex items-center gap-2 shrink-0">
+                <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs shrink-0 whitespace-nowrap">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                  <span className="font-semibold text-slate-800 dark:text-slate-200 max-w-[100px] truncate">
+                    {user?.name?.split(',')[0] || 'Alex Mercer'}
                   </span>
-                  <span className="text-[10px] text-slate-400 font-mono">({user?.role || 'MANAGER'})</span>
+                  <span className="text-[10px] text-slate-400 font-mono hidden 2xl:inline">({user?.role?.replace('_', ' ') || 'MANAGER'})</span>
                 </div>
 
                 <button
                   onClick={() => onEnterApp('command-center')}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md hover:shadow-lg transition-all cursor-pointer ring-2 ring-indigo-500/20"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md hover:shadow-lg transition-all cursor-pointer ring-2 ring-indigo-500/20 shrink-0 whitespace-nowrap"
                 >
                   <span>Continue to Dashboard</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -125,7 +127,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     logout();
                     if (onSignIn) onSignIn();
                   }}
-                  className="text-xs text-rose-600 dark:text-rose-400 hover:text-rose-700 font-medium px-2 py-1 cursor-pointer"
+                  className="text-xs text-rose-600 dark:text-rose-400 hover:text-rose-700 font-medium px-2 py-1 cursor-pointer shrink-0 whitespace-nowrap"
                   title="Sign Out to Login Screen"
                 >
                   Sign Out
@@ -135,14 +137,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <>
                 <button
                   onClick={onSignIn || (() => onEnterApp('command-center'))}
-                  className="text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  className="text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0 whitespace-nowrap"
                 >
                   Sign In
                 </button>
 
                 <button
                   onClick={onSignIn || (() => onEnterApp('command-center'))}
-                  className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 shadow-xs hover:shadow-md transition-all cursor-pointer"
+                  className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 shadow-xs hover:shadow-md transition-all cursor-pointer shrink-0 whitespace-nowrap"
                 >
                   <span>Get Started</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -150,10 +152,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </>
             )}
 
-            {/* Mobile Menu Toggle Button */}
+            {/* Mobile Menu Toggle Button (shown on screens smaller than xl) */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 cursor-pointer"
+              className="xl:hidden p-2 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 cursor-pointer shrink-0"
               aria-label="Toggle Navigation Menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -168,7 +170,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="lg:hidden border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 px-4 pt-3 pb-6 space-y-3"
+              className="xl:hidden border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 px-4 pt-3 pb-6 space-y-3"
             >
               <div className="flex flex-col space-y-2 text-sm font-medium text-slate-700 dark:text-slate-200">
                 <button onClick={() => scrollToSection('overview')} className="text-left py-1.5 hover:text-indigo-600">Overview</button>
