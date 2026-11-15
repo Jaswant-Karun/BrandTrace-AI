@@ -47,6 +47,15 @@ PRESET_USERS: Dict[str, Dict] = {
         "org_id": "ORG-NOVUS",
         "workspace_id": "novus-health",
         "password_hash": hash_password("brandtrace2026")
+    },
+    "camille@aurelle.com": {
+        "user_id": "USR-AUR-01",
+        "email": "camille@aurelle.com",
+        "name": "Camille Laurent, Sustainability & Brand Integrity VP",
+        "role": UserRole.ADMIN,
+        "org_id": "ORG-AURELLE",
+        "workspace_id": "aurelle-maison",
+        "password_hash": hash_password("brandtrace2026")
     }
 }
 
