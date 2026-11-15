@@ -1,17 +1,30 @@
 import logging
 import time
 import datetime
-from fastapi import APIRouter, HTTPException, Depends
+import uuid
+import ipaddress
+import socket
+import urllib.parse
+from html.parser import HTMLParser
+import httpx
+from fastapi import APIRouter, HTTPException, Depends, File, UploadFile, Form
 from typing import List, Dict, Any, Optional
 from brandtrace.modules.knowledge_base.models import (
     VectorSearchQuery, VectorSearchResult, AtlasIndexConfigResponse,
     CreateFactRequest, ApprovedFactResponse, UpdateFactRequest,
-    CreateGuidelineRequest, GuidelineResponse
+    CreateGuidelineRequest, GuidelineResponse,
+    CreateDocumentRequest, UpdateDocumentRequest, WebsiteImportRequest,
+    WebsiteImportPreviewResponse, DocumentResponse, DocumentVersionResponse
 )
 from brandtrace.database.mongo import mongo_manager
-from brandtrace.database.schemas import ApprovedFactDoc, BrandGuidelineDoc
+from brandtrace.database.schemas import (
+    ApprovedFactDoc, BrandGuidelineDoc, BrandDocumentDoc,
+    DocumentCategory, DocumentProcessingStatus, DocumentSourceType, DocumentVersionDoc
+)
 from brandtrace.graph.schema import ApprovedFact, Node as GraphNode, NodeType
 from brandtrace.engine.ai_provider import ai_provider
+from brandtrace.core.security import validate_file_upload
+from brandtrace.engine.multimodal import multimodal_engine
 from brandtrace.data.seed_data import APPROVED_FACTS_CATALOG
 
 logger = logging.getLogger("brandtrace.knowledge_base")
