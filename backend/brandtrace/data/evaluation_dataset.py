@@ -428,3 +428,4 @@ def execute_empirical_benchmark(pipeline, bkg_loader_func) -> EvaluationMetrics:
         samples_per_organization=org_counts,
         sample_results=sample_results
     )
+

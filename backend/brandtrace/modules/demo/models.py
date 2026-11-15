@@ -52,3 +52,4 @@ class DemoCase(BaseModel):
 class RunCaseRequest(BaseModel):
     case_id: str
     custom_content: Optional[str] = None
+
