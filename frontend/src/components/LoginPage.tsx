@@ -3,10 +3,9 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   ShieldCheck, Lock, Mail, User,
   Eye, EyeOff, KeyRound, HelpCircle, X,
-  Zap, AlertCircle, CheckCircle2
+  Zap, AlertCircle, CheckCircle2, Sparkles
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { ThemeToggle } from './ui/ThemeToggle';
 
 interface LoginPageProps {
   onSuccess: () => void;
@@ -129,7 +128,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
     >
       
       {/* =================================================================== */}
-      {/* 2. 3D GEOMETRIC CONSTELLATION / POLYGONAL MESH OVERLAY              */}
+      {/* 1. 3D GEOMETRIC CONSTELLATION / POLYGONAL MESH OVERLAY              */}
       {/* =================================================================== */}
       <svg 
         className="absolute inset-0 w-full h-full z-0 pointer-events-none select-none opacity-90 sm:opacity-95"
@@ -246,34 +245,38 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
       </svg>
 
       {/* =================================================================== */}
-      {/* 3. SLEEK ENTERPRISE HEADER (BrandTrace AI & Theme Control)         */}
+      {/* 2. SLEEK ENTERPRISE HEADER (BrandTrace AI & Proverb / Welcome)      */}
       {/* =================================================================== */}
-      <header className="relative z-20 flex items-center justify-between px-5 sm:px-8 py-4 sm:py-5 max-w-7xl w-full mx-auto">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-teal-500/20 border border-teal-400/40 text-teal-300 flex items-center justify-center shadow-xs">
-            <ShieldCheck className="w-4 h-4 stroke-[2.2]" />
+      <header className="relative z-20 flex items-center justify-between px-4 sm:px-8 py-3.5 sm:py-5 max-w-7xl w-full mx-auto">
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-teal-500/20 border border-teal-400/40 text-teal-300 flex items-center justify-center shadow-xs">
+            <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.2]" />
           </div>
           <div>
             <div className="flex items-center gap-1.5 whitespace-nowrap">
-              <span className="font-extrabold tracking-tight text-white text-sm sm:text-base select-none">
+              <span className="font-extrabold tracking-tight text-white text-xs sm:text-base select-none">
                 BRANDTRACE<span className="text-teal-400">&nbsp;AI</span>
               </span>
-              <span className="text-[9px] font-bold bg-teal-950/80 text-teal-300 border border-teal-800/80 px-1.5 py-0.5 rounded font-mono shrink-0">
+              <span className="text-[8px] sm:text-[9px] font-bold bg-teal-950/80 text-teal-300 border border-teal-800/80 px-1.5 py-0.5 rounded font-mono shrink-0">
                 CONTROL PLANE
               </span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <ThemeToggle variant="pill" className="bg-slate-900/80 border-teal-900/60 text-teal-300 hover:border-teal-600/60" />
+        {/* Dark mode option removed per user request; Replaced with Welcome Proverb */}
+        <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-teal-950/80 border border-teal-700/60 text-teal-300 text-[10px] sm:text-xs shadow-xs font-mono select-none">
+          <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-teal-400 shrink-0" />
+          <span className="hidden sm:inline italic text-teal-200">“Silence is never clearance” &bull;</span>
+          <span className="text-teal-300 font-semibold">Welcome</span>
         </div>
       </header>
 
       {/* =================================================================== */}
-      {/* 4. CENTERPIECE FROSTED-GLASS CARD (Matching Reference Design)       */}
+      {/* 3. CENTERPIECE FROSTED-GLASS CARD (Matching Reference Design)       */}
       {/* =================================================================== */}
-      <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-4 sm:py-8">
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-4 sm:py-8">
+        
         <div 
           className="relative w-full max-w-[390px] sm:max-w-[420px] rounded-2xl overflow-hidden shadow-2xl backdrop-blur-xl border border-teal-300/40 dark:border-teal-400/30 transition-all"
         >
@@ -289,11 +292,16 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
           {/* Card Inner Content */}
           <div className="relative z-10 p-6 sm:p-8 space-y-4">
             
-            {/* Header: MEMBER LOGIN (Exact Typography & Deep Teal Contrast against radiant mint wash) */}
-            <div className="pt-1 pb-1 select-none">
-              <h1 className="text-center font-bold uppercase tracking-[0.25em] text-[#135750] text-base sm:text-lg select-none">
+            {/* Header: MEMBER LOGIN with Supporting Welcome Proverb */}
+            <div className="pt-1 pb-1 select-none text-center">
+              <h1 className="font-bold uppercase tracking-[0.25em] text-[#135750] text-base sm:text-lg select-none">
                 {authMode === 'login' ? 'MEMBER LOGIN' : 'CREATE ACCOUNT'}
               </h1>
+              <p className="text-[11px] font-semibold text-[#135750]/90 tracking-wide mt-1">
+                {authMode === 'login' 
+                  ? '“Silence is never clearance.” — Welcome to BrandTrace AI' 
+                  : '“Truth before publication.” — Create your enterprise account'}
+              </p>
             </div>
 
             {/* Error Message Feedback */}
@@ -398,7 +406,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
                 </button>
 
                 {/* ========================================================= */}
-                {/* 5. PRESERVED DEMO ACCOUNT (Requirement 5 Compliance)      */}
+                {/* 4. PRESERVED DEMO ACCOUNT (Requirement 5 Compliance)      */}
                 {/* ========================================================= */}
                 <div className="pt-2">
                   <button
@@ -524,7 +532,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
       </main>
 
       {/* =================================================================== */}
-      {/* 5. MINIMAL TELEMETRY FOOTER                                         */}
+      {/* 4. MINIMAL TELEMETRY FOOTER                                         */}
       {/* =================================================================== */}
       <footer className="relative z-20 px-5 sm:px-8 py-3 text-[11px] font-mono text-teal-200/60 flex items-center justify-between max-w-7xl w-full mx-auto border-t border-teal-950/40">
         <span>&copy; {new Date().getFullYear()} BRANDTRACE AI &bull; Autonomous Brand Intelligence</span>
@@ -536,7 +544,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
       </footer>
 
       {/* =================================================================== */}
-      {/* 6. FORGOT PASSWORD HELPER MODAL                                     */}
+      {/* 5. FORGOT PASSWORD HELPER MODAL                                     */}
       {/* =================================================================== */}
       <AnimatePresence>
         {isForgotPasswordOpen && (
