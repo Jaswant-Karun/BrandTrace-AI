@@ -346,107 +346,109 @@ export const App: React.FC = () => {
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.18, ease: 'easeOut' }}
             >
-              <Suspense fallback={<ViewLoadingFallback />}>
-                {currentTab === 'command-center' && (
-                  <CommandCenter
-                    brandId={selectedBrandId}
-                    onNavigate={setCurrentTab}
-                    onStartTour={handleStartTour}
-                  />
-                )}
+              <ErrorBoundary fallbackTitle="Module Render Issue" onReset={() => setCurrentTab('command-center')}>
+                <Suspense fallback={<ViewLoadingFallback />}>
+                  {currentTab === 'command-center' && (
+                    <CommandCenter
+                      brandId={selectedBrandId}
+                      onNavigate={setCurrentTab}
+                      onStartTour={handleStartTour}
+                    />
+                  )}
 
-                {currentTab === 'bdig' && (
-                  <div className="space-y-4">
-                    {/* BDIG Sub-Navigation */}
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between bg-slate-50 p-1 rounded-xl border border-slate-200 gap-1.5">
-                      <div className="flex items-center gap-1 overflow-x-auto w-full sm:w-auto">
-                        <button
-                          onClick={() => setBdigSubTab('canvas')}
-                          className={`flex-1 sm:flex-initial px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer ${
-                            bdigSubTab === 'canvas'
-                              ? 'bg-white text-slate-900 border border-slate-200 shadow-2xs font-semibold'
-                              : 'text-slate-600 hover:text-slate-900'
-                          }`}
-                        >
-                          Interactive Knowledge Graph
-                        </button>
-                        <button
-                          onClick={() => setBdigSubTab('workflow')}
-                          className={`flex-1 sm:flex-initial px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer ${
-                            bdigSubTab === 'workflow'
-                              ? 'bg-white text-slate-900 border border-slate-200 shadow-2xs font-semibold'
-                              : 'text-slate-600 hover:text-slate-900'
-                          }`}
-                        >
-                          Mutation Workflow
-                        </button>
+                  {currentTab === 'bdig' && (
+                    <div className="space-y-4">
+                      {/* BDIG Sub-Navigation */}
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between bg-slate-50 p-1 rounded-xl border border-slate-200 gap-1.5">
+                        <div className="flex items-center gap-1 overflow-x-auto w-full sm:w-auto">
+                          <button
+                            onClick={() => setBdigSubTab('canvas')}
+                            className={`flex-1 sm:flex-initial px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer ${
+                              bdigSubTab === 'canvas'
+                                ? 'bg-white text-slate-900 border border-slate-200 shadow-2xs font-semibold'
+                                : 'text-slate-600 hover:text-slate-900'
+                            }`}
+                          >
+                            Interactive Knowledge Graph
+                          </button>
+                          <button
+                            onClick={() => setBdigSubTab('workflow')}
+                            className={`flex-1 sm:flex-initial px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer ${
+                              bdigSubTab === 'workflow'
+                                ? 'bg-white text-slate-900 border border-slate-200 shadow-2xs font-semibold'
+                                : 'text-slate-600 hover:text-slate-900'
+                            }`}
+                          >
+                            Mutation Workflow
+                          </button>
+                        </div>
+                        <span className="text-[11px] font-mono text-slate-500 pr-3 hidden md:inline">
+                          Live MongoDB Graph Ontology
+                        </span>
                       </div>
-                      <span className="text-[11px] font-mono text-slate-500 pr-3 hidden md:inline">
-                        Live MongoDB Graph Ontology
-                      </span>
+
+                      {bdigSubTab === 'canvas' ? (
+                        <KnowledgeGraphView brandId={selectedBrandId} onNavigate={setCurrentTab} />
+                      ) : (
+                        <DependencyIntelligenceStudio brandId={selectedBrandId} />
+                      )}
                     </div>
+                  )}
 
-                    {bdigSubTab === 'canvas' ? (
-                      <KnowledgeGraphView brandId={selectedBrandId} onNavigate={setCurrentTab} />
-                    ) : (
-                      <DependencyIntelligenceStudio brandId={selectedBrandId} />
-                    )}
-                  </div>
-                )}
+                  {currentTab === 'content-studio' && (
+                    <AssetInspector brandId={selectedBrandId} onSignRelease={handleSignRelease} onNavigate={setCurrentTab} />
+                  )}
 
-                {currentTab === 'content-studio' && (
-                  <AssetInspector brandId={selectedBrandId} onSignRelease={handleSignRelease} onNavigate={setCurrentTab} />
-                )}
+                  {currentTab === 'impact-simulator' && (
+                    <BlastRadiusSimulator brandId={selectedBrandId} onNavigate={setCurrentTab} />
+                  )}
 
-                {currentTab === 'impact-simulator' && (
-                  <BlastRadiusSimulator brandId={selectedBrandId} onNavigate={setCurrentTab} />
-                )}
+                  {currentTab === 'multimodal' && (
+                    <MultimodalInspectionView brandId={selectedBrandId} onNavigate={setCurrentTab} />
+                  )}
 
-                {currentTab === 'multimodal' && (
-                  <MultimodalInspectionView brandId={selectedBrandId} onNavigate={setCurrentTab} />
-                )}
+                  {currentTab === 'campaigns' && (
+                    <CampaignIntelligenceView brandId={selectedBrandId} onNavigate={setCurrentTab} />
+                  )}
 
-                {currentTab === 'campaigns' && (
-                  <CampaignIntelligenceView brandId={selectedBrandId} onNavigate={setCurrentTab} />
-                )}
+                  {currentTab === 'risks' && (
+                    <RiskIntelligenceView brandId={selectedBrandId} onNavigate={setCurrentTab} />
+                  )}
 
-                {currentTab === 'risks' && (
-                  <RiskIntelligenceView brandId={selectedBrandId} onNavigate={setCurrentTab} />
-                )}
+                  {currentTab === 'approvals' && (
+                    <ApprovalCenterView brandId={selectedBrandId} onNavigate={setCurrentTab} />
+                  )}
 
-                {currentTab === 'approvals' && (
-                  <ApprovalCenterView brandId={selectedBrandId} onNavigate={setCurrentTab} />
-                )}
+                  {currentTab === 'knowledge-base' && (
+                    <BrandKnowledgeBaseView brandId={selectedBrandId} onNavigate={setCurrentTab} />
+                  )}
 
-                {currentTab === 'knowledge-base' && (
-                  <BrandKnowledgeBaseView brandId={selectedBrandId} onNavigate={setCurrentTab} />
-                )}
+                  {currentTab === 'analytics' && (
+                    <GovernanceAnalyticsView brandId={selectedBrandId} onNavigate={setCurrentTab} />
+                  )}
 
-                {currentTab === 'analytics' && (
-                  <GovernanceAnalyticsView brandId={selectedBrandId} onNavigate={setCurrentTab} />
-                )}
+                  {currentTab === 'audit-trust' && (
+                    <AuditTrustCenterView brandId={selectedBrandId} onNavigate={setCurrentTab} />
+                  )}
 
-                {currentTab === 'audit-trust' && (
-                  <AuditTrustCenterView brandId={selectedBrandId} onNavigate={setCurrentTab} />
-                )}
+                  {currentTab === 'public-verification' && (
+                    <PublicVerificationView
+                      initialBrand={currentBrand?.brand_name || 'Velora Money'}
+                      onBack={() => setCurrentTab('command-center')}
+                    />
+                  )}
 
-                {currentTab === 'public-verification' && (
-                  <PublicVerificationView
-                    initialBrand={currentBrand?.brand_name || 'Velora Money'}
-                    onBack={() => setCurrentTab('command-center')}
-                  />
-                )}
-
-                {currentTab === 'settings' && (
-                  <SettingsView
-                    brand={currentBrand}
-                    dbStatus={dbStatus}
-                    onReseed={handleReseed}
-                    isReseeding={isReseeding}
-                    onNavigate={setCurrentTab}
-                  />
-                )}
-              </Suspense>
+                  {currentTab === 'settings' && (
+                    <SettingsView
+                      brand={currentBrand}
+                      dbStatus={dbStatus}
+                      onReseed={handleReseed}
+                      isReseeding={isReseeding}
+                      onNavigate={setCurrentTab}
+                    />
+                  )}
+                </Suspense>
+              </ErrorBoundary>
             </motion.div>
           </AnimatePresence>
         </main>

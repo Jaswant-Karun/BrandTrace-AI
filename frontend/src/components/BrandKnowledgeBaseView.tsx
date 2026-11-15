@@ -1056,14 +1056,6 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
                 );
               })}
             </div>
-                          Simulate
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
           ) : (
             <EmptyState
               title="No Knowledge Nodes Match Your Filter"
