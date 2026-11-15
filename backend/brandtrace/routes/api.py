@@ -1,4 +1,5 @@
 import time
+import uuid
 from typing import Dict, Any, List, Optional
 from fastapi import APIRouter, HTTPException, Query, UploadFile, File, Form, Depends
 from pydantic import BaseModel
@@ -59,9 +60,23 @@ class ReleaseSignRequest(BaseModel):
 
 class TaskResolutionRequest(BaseModel):
     reviewer_name: str
-    decision: str = "APPROVED" # "APPROVED" or "REJECTED"
+    decision: str = "APPROVED" # "APPROVED", "REJECTED", or "CHANGES_REQUESTED"
     final_content: Optional[str] = None
     resolution_notes: Optional[str] = None
+
+class CreateTaskRequest(BaseModel):
+    brand_id: str = "aurelle-tech"
+    asset_name: str
+    asset_type: str = "ADVERTISEMENT"
+    campaign_id: str = "CAMP-CREATOR"
+    campaign_name: str = "Creator Content Submissions"
+    department: str = "Creator Marketing"
+    assigned_reviewer_role: str = "REVIEWER"
+    priority: SeverityLevel = SeverityLevel.MODERATE
+    current_content: str
+    proposed_content: str
+    diff_summary: Optional[str] = ""
+    creator_name: Optional[str] = "Creator Asha"
 
 class FactCreatePayload(BaseModel):
     brand_id: str = "aurelle-tech"
@@ -704,6 +719,42 @@ async def list_revision_tasks(brand_id: Optional[str] = Query(None)):
             memory_tasks = [t for t in memory_tasks if t.brand_id == brand_id]
         return [t.model_dump() for t in memory_tasks]
     return await mongo_manager.list_tasks(brand_id)
+
+@router.post("/tasks")
+async def create_revision_task(req: CreateTaskRequest):
+    """
+    Submits a checked content asset for human review.
+    Creates a revision task persisted in MongoDB Atlas and dependency_engine cache.
+    """
+    t_now = int(time.time())
+    task_id = f"REV-CREATOR-{uuid.uuid4().hex[:6].upper()}"
+    task = RevisionTask(
+        task_id=task_id,
+        brand_id=req.brand_id,
+        asset_id=f"AST-{uuid.uuid4().hex[:6].upper()}",
+        asset_name=req.asset_name,
+        asset_type=req.asset_type,
+        campaign_id=req.campaign_id,
+        campaign_name=req.campaign_name,
+        department=req.department,
+        assigned_reviewer_role=req.assigned_reviewer_role,
+        priority=req.priority,
+        status="PENDING_REVIEW",
+        old_value=req.current_content[:120],
+        new_value=req.proposed_content[:120],
+        current_content=req.current_content,
+        proposed_content=req.proposed_content,
+        diff_summary=req.diff_summary or f"Submitted by {req.creator_name} for formal human review",
+        created_at=t_now,
+        created_at_iso=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(t_now))
+    )
+    dependency_engine.revision_tasks[task_id] = task
+    await mongo_manager.save_task(task.model_dump())
+    return {
+        "status": "success",
+        "message": f"Review task '{task_id}' created successfully.",
+        "task": task.model_dump()
+    }
 
 @router.post("/tasks/{task_id}/resolve")
 async def resolve_revision_task(

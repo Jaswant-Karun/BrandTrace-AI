@@ -319,10 +319,17 @@ class BrandDependencyIntelligenceEngine:
                 self.version_history[asset_id].append(new_ver)
 
             return True, f"Revision Task {task_id} approved and sealed by {reviewer_name}.", task
+        elif decision == "CHANGES_REQUESTED":
+            task.status = "CHANGES_REQUESTED"
+            task.resolved_at = t_now
+            task.resolved_by = reviewer_name
+            task.diff_summary = f"Changes requested by {reviewer_name}: {resolution_notes}" if resolution_notes else f"Changes requested by {reviewer_name}"
+            return True, f"Revision Task {task_id}: changes requested by {reviewer_name}.", task
         else:
             task.status = "REJECTED"
             task.resolved_at = t_now
             task.resolved_by = reviewer_name
+            task.diff_summary = f"Rejected by {reviewer_name}: {resolution_notes}" if resolution_notes else f"Rejected by {reviewer_name}"
             return True, f"Revision Task {task_id} rejected by {reviewer_name}.", task
 
 dependency_engine = BrandDependencyIntelligenceEngine()
