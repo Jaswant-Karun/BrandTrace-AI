@@ -106,3 +106,68 @@ class GuidelineResponse(BaseModel):
     source_citation: Optional[str] = None
     status: str = "ACTIVE"
 
+# User Document Management Models
+class CreateDocumentRequest(BaseModel):
+    title: str
+    category: str = "BRAND_GUIDELINES" # BRAND_GUIDELINES, PRODUCT_FACTS, PRICING_POLICIES, BRAND_VOICE, REGULATORY_POLICIES, MARKETING_CLAIMS
+    description: str = ""
+    raw_content: str
+    workspace_id: str = "aurelle-tech"
+    org_id: Optional[str] = "ORG-AURELLE"
+    source_citation: Optional[str] = None
+
+class UpdateDocumentRequest(BaseModel):
+    title: Optional[str] = None
+    category: Optional[str] = None
+    description: Optional[str] = None
+    raw_content: Optional[str] = None
+    change_summary: Optional[str] = "Updated document content"
+
+class WebsiteImportRequest(BaseModel):
+    url: str
+    workspace_id: str = "aurelle-tech"
+    org_id: Optional[str] = "ORG-AURELLE"
+    category: str = "BRAND_GUIDELINES"
+
+class WebsiteImportPreviewResponse(BaseModel):
+    url: str
+    title: str
+    description: str
+    extracted_text: str
+    character_count: int
+    headings: List[str] = []
+    is_safe: bool = True
+
+class DocumentResponse(BaseModel):
+    doc_id: str
+    organisation_id: str
+    workspace_id: str
+    title: str
+    category: str
+    source_type: str
+    description: str
+    raw_content: str
+    version_number: str = "1.0"
+    processing_status: str # UPLOADED, PROCESSING, INDEXED, FAILED
+    processing_error: Optional[str] = None
+    is_demo: bool = False
+    file_metadata: Optional[Dict[str, Any]] = None
+    source_url: Optional[str] = None
+    extracted_facts: List[str] = []
+    indexed_nodes_count: int = 0
+    created_at: int
+    updated_at: int
+    created_by: str = "system"
+
+class DocumentVersionResponse(BaseModel):
+    version_id: str
+    doc_id: str
+    version_number: str
+    title: str
+    category: str
+    raw_content: str
+    change_summary: str
+    edited_by: str
+    archived_at: int
+
+

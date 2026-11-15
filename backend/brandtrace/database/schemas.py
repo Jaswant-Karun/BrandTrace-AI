@@ -276,3 +276,53 @@ class NotificationDoc(BaseMongoRecord):
     severity: str = "INFO"
     is_read: bool = False
     action_link: Optional[str] = None
+
+# 28. brand_documents
+class DocumentCategory(str, Enum):
+    BRAND_GUIDELINES = "BRAND_GUIDELINES"
+    PRODUCT_FACTS = "PRODUCT_FACTS"
+    PRICING_POLICIES = "PRICING_POLICIES"
+    BRAND_VOICE = "BRAND_VOICE"
+    REGULATORY_POLICIES = "REGULATORY_POLICIES"
+    MARKETING_CLAIMS = "MARKETING_CLAIMS"
+
+class DocumentProcessingStatus(str, Enum):
+    UPLOADED = "UPLOADED"
+    PROCESSING = "PROCESSING"
+    INDEXED = "INDEXED"
+    FAILED = "FAILED"
+
+class DocumentSourceType(str, Enum):
+    MANUAL_ENTRY = "MANUAL_ENTRY"
+    FILE_UPLOAD = "FILE_UPLOAD"
+    WEBSITE_IMPORT = "WEBSITE_IMPORT"
+
+class BrandDocumentDoc(BaseMongoRecord):
+    doc_id: str
+    title: str
+    category: str = DocumentCategory.BRAND_GUIDELINES.value
+    source_type: str = DocumentSourceType.MANUAL_ENTRY.value
+    description: str = ""
+    raw_content: str
+    version_number: str = "1.0"
+    processing_status: str = DocumentProcessingStatus.UPLOADED.value
+    processing_error: Optional[str] = None
+    is_demo: bool = False
+    file_metadata: Optional[Dict[str, Any]] = None
+    source_url: Optional[str] = None
+    extracted_facts: List[str] = Field(default_factory=list)
+    indexed_nodes_count: int = 0
+    embedding: Optional[List[float]] = None
+
+# 29. document_versions
+class DocumentVersionDoc(BaseMongoRecord):
+    version_id: str
+    doc_id: str
+    version_number: str
+    title: str
+    category: str
+    raw_content: str
+    change_summary: str
+    edited_by: str
+    archived_at: int = Field(default_factory=current_epoch_ms)
+

@@ -39,6 +39,8 @@ class MongoManager:
     _memory_files: Dict[str, Dict[str, Any]] = {}
     _memory_orgs: Dict[str, Dict[str, Any]] = {}
     _memory_embeddings: List[Dict[str, Any]] = []
+    _memory_documents: Dict[str, Dict[str, Any]] = {}
+    _memory_doc_versions: Dict[str, List[Dict[str, Any]]] = {}
 
     def __init__(self):
         from brandtrace.database.repository import BrandTraceRepository
@@ -545,5 +547,107 @@ class MongoManager:
             cursor = self.db.asset_versions.find({"asset_id": asset_id}, {"_id": 0}).sort("timestamp", 1)
             return await cursor.to_list(length=50)
         return self._memory_versions.get(asset_id, [])
+
+    # Brand Documents Management
+    async def save_document(self, doc_dict: Dict[str, Any]):
+        doc_id = doc_dict.get("doc_id")
+        if self.is_connected and self.db is not None:
+            await self.db.brand_documents.replace_one(
+                {"doc_id": doc_id},
+                dict(doc_dict),
+                upsert=True
+            )
+        if doc_id:
+            self._memory_documents[doc_id] = dict(doc_dict)
+
+    async def get_document(self, doc_id: str, org_id: Optional[str] = None, workspace_id: Optional[str] = None) -> Optional[Dict[str, Any]]:
+        if self.is_connected and self.db is not None:
+            query: Dict[str, Any] = {"doc_id": doc_id}
+            if org_id:
+                query["organisation_id"] = org_id
+            if workspace_id:
+                query["workspace_id"] = workspace_id
+            doc = await self.db.brand_documents.find_one(query, {"_id": 0})
+            if doc:
+                return doc
+        doc = self._memory_documents.get(doc_id)
+        if doc:
+            if org_id and doc.get("organisation_id") != org_id:
+                return None
+            if workspace_id and doc.get("workspace_id") != workspace_id:
+                return None
+            return doc
+        return None
+
+    async def list_documents(
+        self,
+        org_id: Optional[str] = None,
+        workspace_id: Optional[str] = None,
+        category: Optional[str] = None,
+        is_demo: Optional[bool] = None
+    ) -> List[Dict[str, Any]]:
+        query: Dict[str, Any] = {}
+        if org_id:
+            query["organisation_id"] = org_id
+        if workspace_id:
+            query["workspace_id"] = workspace_id
+        if category and category != "ALL":
+            query["category"] = category
+        if is_demo is not None:
+            query["is_demo"] = is_demo
+
+        if self.is_connected and self.db is not None:
+            cursor = self.db.brand_documents.find(query, {"_id": 0}).sort("updated_at", -1)
+            return await cursor.to_list(length=200)
+
+        results = list(self._memory_documents.values())
+        if org_id:
+            results = [d for d in results if d.get("organisation_id") == org_id]
+        if workspace_id:
+            results = [d for d in results if d.get("workspace_id") == workspace_id]
+        if category and category != "ALL":
+            results = [d for d in results if d.get("category") == category]
+        if is_demo is not None:
+            results = [d for d in results if d.get("is_demo") == is_demo]
+        return sorted(results, key=lambda x: x.get("updated_at", 0), reverse=True)
+
+    async def update_document(
+        self,
+        doc_id: str,
+        org_id: str,
+        workspace_id: str,
+        updates: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
+        existing = await self.get_document(doc_id, org_id, workspace_id)
+        if not existing:
+            return None
+        existing.update(updates)
+        existing["updated_at"] = int(time.time() * 1000)
+        await self.save_document(existing)
+        return existing
+
+    async def delete_document(self, doc_id: str, org_id: str, workspace_id: str) -> bool:
+        existing = await self.get_document(doc_id, org_id, workspace_id)
+        if not existing:
+            return False
+        if self.is_connected and self.db is not None:
+            await self.db.brand_documents.delete_one({"doc_id": doc_id, "organisation_id": org_id, "workspace_id": workspace_id})
+        self._memory_documents.pop(doc_id, None)
+        return True
+
+    async def record_document_version(self, version_doc: Dict[str, Any]):
+        doc_id = version_doc.get("doc_id")
+        if self.is_connected and self.db is not None:
+            await self.db.document_versions.insert_one(dict(version_doc))
+        if doc_id:
+            if doc_id not in self._memory_doc_versions:
+                self._memory_doc_versions[doc_id] = []
+            self._memory_doc_versions[doc_id].append(dict(version_doc))
+
+    async def get_document_versions(self, doc_id: str) -> List[Dict[str, Any]]:
+        if self.is_connected and self.db is not None:
+            cursor = self.db.document_versions.find({"doc_id": doc_id}, {"_id": 0}).sort("archived_at", -1)
+            return await cursor.to_list(length=50)
+        return sorted(self._memory_doc_versions.get(doc_id, []), key=lambda x: x.get("archived_at", 0), reverse=True)
 
 mongo_manager = MongoManager()
