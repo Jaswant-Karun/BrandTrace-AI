@@ -323,66 +323,70 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   {/* Step 1: EVERY CLAIM (always displayed first) */}
                   <span className="block">EVERY CLAIM</span>
 
-                  {/* Step 2: CLINICALLY and PROVEN on separate lines, then struck through */}
-                  <motion.div
-                    initial={false}
-                    animate={{
-                      opacity: motionStep >= 1 ? 1 : 0,
-                      height: motionStep >= 1 ? 'auto' : 0,
-                      y: motionStep >= 1 ? 0 : -8,
-                    }}
-                    transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                    className="overflow-hidden space-y-0.5 sm:space-y-1 py-0.5"
-                  >
-                    {/* Line 2: CLINICALLY with coral strikethrough */}
-                    <div className="leading-none">
-                      <span className="relative inline-block leading-none">
-                        <span className="text-[#ff6358] dark:text-[#ff6b6b] font-black">
-                          CLINICALLY
-                        </span>
-                        <motion.span 
-                          initial={false}
-                          animate={{ scaleX: motionStep >= 2 ? 1 : 0 }}
-                          transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                          className="absolute top-1/2 left-0 right-0 h-[4px] sm:h-[6px] lg:h-[7px] bg-[#ff6358] dark:bg-[#ff6b6b] -translate-y-1/2 origin-left rounded-full pointer-events-none" 
-                        />
-                      </span>
-                    </div>
+                  {/* Step 2: CLINICALLY and PROVEN appear on separate lines, then struck through */}
+                  <AnimatePresence>
+                    {motionStep >= 1 && (
+                      <motion.div
+                        key="clinically-proven-block"
+                        initial={{ opacity: 0, height: 0, y: -8 }}
+                        animate={{ opacity: 1, height: 'auto', y: 0 }}
+                        exit={{ opacity: 0, height: 0, y: -8 }}
+                        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                        className="overflow-hidden space-y-0.5 sm:space-y-1 py-0.5"
+                      >
+                        {/* Line 2: CLINICALLY with coral strikethrough */}
+                        <div className="leading-none">
+                          <span className="relative inline-block leading-none">
+                            <span className="text-[#ff6358] dark:text-[#ff6b6b] font-black">
+                              CLINICALLY
+                            </span>
+                            <motion.span 
+                              initial={{ scaleX: 0 }}
+                              animate={{ scaleX: motionStep >= 2 ? 1 : 0 }}
+                              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                              className="absolute top-1/2 left-0 right-0 h-[4px] sm:h-[6px] lg:h-[7px] bg-[#ff6358] dark:bg-[#ff6b6b] -translate-y-1/2 origin-left rounded-full pointer-events-none" 
+                            />
+                          </span>
+                        </div>
 
-                    {/* Line 3: PROVEN with coral strikethrough */}
-                    <div className="leading-none">
-                      <span className="relative inline-block leading-none">
-                        <span className="text-[#ff6358] dark:text-[#ff6b6b] font-black">
-                          PROVEN
-                        </span>
-                        <motion.span 
-                          initial={false}
-                          animate={{ scaleX: motionStep >= 2 ? 1 : 0 }}
-                          transition={{ duration: 0.45, delay: motionStep >= 2 ? 0.12 : 0, ease: [0.16, 1, 0.3, 1] }}
-                          className="absolute top-1/2 left-0 right-0 h-[4px] sm:h-[6px] lg:h-[7px] bg-[#ff6358] dark:bg-[#ff6b6b] -translate-y-1/2 origin-left rounded-full pointer-events-none" 
-                        />
-                      </span>
-                    </div>
-                  </motion.div>
+                        {/* Line 3: PROVEN with coral strikethrough */}
+                        <div className="leading-none">
+                          <span className="relative inline-block leading-none">
+                            <span className="text-[#ff6358] dark:text-[#ff6b6b] font-black">
+                              PROVEN
+                            </span>
+                            <motion.span 
+                              initial={{ scaleX: 0 }}
+                              animate={{ scaleX: motionStep >= 2 ? 1 : 0 }}
+                              transition={{ duration: 0.45, delay: motionStep >= 2 ? 0.12 : 0, ease: [0.16, 1, 0.3, 1] }}
+                              className="absolute top-1/2 left-0 right-0 h-[4px] sm:h-[6px] lg:h-[7px] bg-[#ff6358] dark:bg-[#ff6b6b] -translate-y-1/2 origin-left rounded-full pointer-events-none" 
+                            />
+                          </span>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
                   {/* Step 3: Green color font - noticeably smaller than parent headline */}
-                  <motion.div
-                    initial={false}
-                    animate={{
-                      opacity: motionStep >= 3 ? 1 : 0,
-                      height: motionStep >= 3 ? 'auto' : 0,
-                      y: motionStep >= 3 ? 0 : 8,
-                    }}
-                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                    className="overflow-hidden text-[#10b981] dark:text-[#34d399] py-0.5 text-2xl sm:text-4xl lg:text-5xl font-black leading-tight tracking-tight"
-                  >
-                    <span className="block my-0.5 sm:my-1">
-                      SHOWN TO VISIBLY
-                    </span>
-                    <span className="block my-0.5 sm:my-1">
-                      REDUCE*
-                    </span>
-                  </motion.div>
+                  <AnimatePresence>
+                    {motionStep >= 3 && (
+                      <motion.div
+                        key="shown-to-visibly-reduce-block"
+                        initial={{ opacity: 0, height: 0, y: 8 }}
+                        animate={{ opacity: 1, height: 'auto', y: 0 }}
+                        exit={{ opacity: 0, height: 0, y: 8 }}
+                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                        className="overflow-hidden text-[#10b981] dark:text-[#34d399] py-0.5 text-2xl sm:text-4xl lg:text-5xl font-black leading-tight tracking-tight"
+                      >
+                        <span className="block my-0.5 sm:my-1">
+                          SHOWN TO VISIBLY
+                        </span>
+                        <span className="block my-0.5 sm:my-1">
+                          REDUCE*
+                        </span>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
                   {/* Step 1 & Anchor: CHECKED. (always displayed first with EVERY CLAIM) */}
                   <div className="block text-slate-900 dark:text-white pt-1">
