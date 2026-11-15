@@ -128,3 +128,22 @@ async def get_security_audit_posture():
             "credential_masking": True
         }
     }
+
+@router.get("/evaluation-dataset")
+async def get_evaluation_dataset():
+    """Returns the complete ground-truth empirical evaluation dataset (22 labelled cases)."""
+    from brandtrace.data.evaluation_dataset import EVALUATION_DATASET
+    return EVALUATION_DATASET
+
+@router.post("/run-benchmark")
+async def run_empirical_benchmark():
+    """
+    Executes the 22-case ground truth benchmark across ORG-AURELLE, ORG-APEX, and ORG-NOVUS.
+    Computes mathematical TP, TN, FP, FN, Precision, Recall, and F1-Score in real time.
+    """
+    from brandtrace.data.evaluation_dataset import execute_empirical_benchmark
+    from brandtrace.agents.pipeline import governance_pipeline
+    from brandtrace.routes.api import get_or_load_graph
+    
+    metrics = execute_empirical_benchmark(governance_pipeline, get_or_load_graph)
+    return metrics
