@@ -1,78 +1,191 @@
-import React from 'react';
-import { ShieldCheck, Activity, Network, FileCheck, Layers } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Navbar } from './components/Navbar';
+import { AssetInspector } from './components/AssetInspector';
+import { KnowledgeGraphView } from './components/KnowledgeGraphView';
+import { BlastRadiusSimulator } from './components/BlastRadiusSimulator';
+import { ReleaseLedgerView } from './components/ReleaseLedgerView';
+import { DatabaseStatusModal } from './components/DatabaseStatusModal';
+import { BrandProfile, DatabaseStatus, VerificationResult } from './types';
+import { ShieldCheck, Network, Activity, Layers } from 'lucide-react';
 
 export const App: React.FC = () => {
-  return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
-      {/* Top Navigation */}
-      <header className="border-b border-slate-800 bg-slate-900/60 backdrop-blur-md px-6 py-3.5 flex items-center justify-between sticky top-0 z-50">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-tr from-brand-600 to-teal-400 flex items-center justify-center shadow-lg shadow-brand-500/20">
-            <ShieldCheck className="w-5 h-5 text-slate-950 font-bold" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold tracking-tight text-white text-base">BRANDTRACE</span>
-              <span className="text-[10px] font-semibold uppercase tracking-widest bg-brand-500/10 text-brand-400 border border-brand-500/30 px-1.5 py-0.5 rounded">Control Plane</span>
-            </div>
-            <p className="text-[11px] text-slate-400">Autonomous Brand Intelligence & Governance</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            Graph Engine Active
-          </span>
-        </div>
-      </header>
+  const [currentTab, setCurrentTab] = useState<string>('inspector');
+  const [brands, setBrands] = useState<BrandProfile[]>([]);
+  const [selectedBrandId, setSelectedBrandId] = useState<string>('apex-dynamics');
+  const [dbStatus, setDbStatus] = useState<DatabaseStatus | null>(null);
+  const [isDbModalOpen, setIsDbModalOpen] = useState<boolean>(false);
+  const [isReseeding, setIsReseeding] = useState<boolean>(false);
 
-      {/* Main Content Placeholder */}
-      <main className="flex-1 p-8 max-w-7xl mx-auto w-full">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-slate-900/70 border border-slate-800/80 p-5 rounded-xl">
-            <div className="flex items-center justify-between text-slate-400 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Active Entities</span>
-              <Network className="w-4 h-4 text-brand-400" />
+  // Load brands and DB status
+  const loadInitialData = async () => {
+    try {
+      const [brandsRes, statusRes] = await Promise.all([
+        fetch('/api/brands'),
+        fetch('/api/db/status')
+      ]);
+      if (brandsRes.ok) {
+        const brandData: BrandProfile[] = await brandsRes.json();
+        setBrands(brandData);
+        if (brandData.length > 0 && !selectedBrandId) {
+          setSelectedBrandId(brandData[0].brand_id);
+        }
+      }
+      if (statusRes.ok) {
+        const statusData: DatabaseStatus = await statusRes.json();
+        setDbStatus(statusData);
+      }
+    } catch (e) {
+      console.error('Failed to load initial metadata:', e);
+    }
+  };
+
+  useEffect(() => {
+    loadInitialData();
+  }, []);
+
+  const handleReseed = async () => {
+    setIsReseeding(true);
+    try {
+      await fetch('/api/seed', { method: 'POST' });
+      await loadInitialData();
+    } catch (e) {
+      console.error('Reseed error:', e);
+    } finally {
+      setIsReseeding(false);
+    }
+  };
+
+  const handleSignRelease = async (result: VerificationResult, reviewerName: string) => {
+    const payload = {
+      verification_id: result.verification_id,
+      brand_id: result.brand_id,
+      asset_id: result.asset_id || result.verification_id,
+      asset_title: result.asset_title || 'Marketing Asset',
+      channel: result.channel,
+      content: result.raw_content,
+      reviewer: reviewerName,
+      decision: result.governance_decision === 'APPROVED_FOR_RELEASE' ? 'APPROVED' : 'REVIEWED'
+    };
+
+    const res = await fetch('/api/releases/sign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) throw new Error('Failed to sign release');
+  };
+
+  const currentBrand = brands.find((b) => b.brand_id === selectedBrandId);
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-brand-500 selection:text-white">
+      {/* Top Enterprise Navbar */}
+      <Navbar
+        currentTab={currentTab}
+        setCurrentTab={setCurrentTab}
+        brands={brands}
+        selectedBrandId={selectedBrandId}
+        setSelectedBrandId={setSelectedBrandId}
+        dbStatus={dbStatus}
+        onOpenDbModal={() => setIsDbModalOpen(true)}
+        onReseed={handleReseed}
+        isReseeding={isReseeding}
+      />
+
+      {/* Main Container */}
+      <main className="flex-1 p-6 max-w-7xl mx-auto w-full space-y-6">
+        {/* Executive Stats Bar */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-slate-900/70 border border-slate-800/80 p-4 rounded-2xl shadow-lg">
+            <div className="flex items-center justify-between text-slate-400 mb-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider">Active Brand Profile</span>
+              <ShieldCheck className="w-4 h-4 text-brand-400" />
             </div>
-            <div className="text-2xl font-bold text-white">128</div>
-            <div className="text-xs text-slate-400 mt-1">Interconnected nodes in BKG</div>
+            <div className="text-base font-bold text-white truncate">
+              {currentBrand ? currentBrand.brand_name : 'Apex Dynamics'}
+            </div>
+            <div className="text-[11px] text-slate-400 truncate">
+              {currentBrand ? currentBrand.industry : 'Clean Electric Mobility'}
+            </div>
           </div>
-          <div className="bg-slate-900/70 border border-slate-800/80 p-5 rounded-xl">
-            <div className="flex items-center justify-between text-slate-400 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Governance Agents</span>
+
+          <div className="bg-slate-900/70 border border-slate-800/80 p-4 rounded-2xl shadow-lg">
+            <div className="flex items-center justify-between text-slate-400 mb-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider">Knowledge Graph Substrate</span>
+              <Network className="w-4 h-4 text-cyan-400" />
+            </div>
+            <div className="text-base font-bold text-white">
+              {currentBrand?.node_count || 32} Interconnected Nodes
+            </div>
+            <div className="text-[11px] text-slate-400">Claims, regulations, trademarks & assets</div>
+          </div>
+
+          <div className="bg-slate-900/70 border border-slate-800/80 p-4 rounded-2xl shadow-lg">
+            <div className="flex items-center justify-between text-slate-400 mb-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider">Governance Agents</span>
               <Activity className="w-4 h-4 text-indigo-400" />
             </div>
-            <div className="text-2xl font-bold text-white">4 Online</div>
-            <div className="text-xs text-slate-400 mt-1">Voice, Claim, Legal, Blast Radius</div>
-          </div>
-          <div className="bg-slate-900/70 border border-slate-800/80 p-5 rounded-xl">
-            <div className="flex items-center justify-between text-slate-400 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Release Gates</span>
-              <FileCheck className="w-4 h-4 text-emerald-400" />
+            <div className="text-base font-bold text-emerald-400 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              4 Agents Active
             </div>
-            <div className="text-2xl font-bold text-white">100% Gated</div>
-            <div className="text-xs text-slate-400 mt-1">Tamper-evident audit chain</div>
+            <div className="text-[11px] text-slate-400">Voice, Claim, Regulatory & Blast Radius</div>
           </div>
-          <div className="bg-slate-900/70 border border-slate-800/80 p-5 rounded-xl">
-            <div className="flex items-center justify-between text-slate-400 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Blast Radius Calc</span>
+
+          <div className="bg-slate-900/70 border border-slate-800/80 p-4 rounded-2xl shadow-lg">
+            <div className="flex items-center justify-between text-slate-400 mb-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider">Data Persistence</span>
               <Layers className="w-4 h-4 text-amber-400" />
             </div>
-            <div className="text-2xl font-bold text-white">Live DAG</div>
-            <div className="text-xs text-slate-400 mt-1">Sub-second policy mutation scan</div>
+            <div className="text-base font-bold text-white font-mono text-sm">
+              {dbStatus?.connected ? 'MongoDB Motor' : 'In-Memory Fallback'}
+            </div>
+            <div className="text-[11px] text-slate-400">
+              {dbStatus?.connected ? 'Live document store' : 'Offline judging resilience'}
+            </div>
           </div>
         </div>
 
-        <div className="border border-slate-800 bg-slate-900/40 rounded-2xl p-8 text-center">
-          <h2 className="text-xl font-bold text-white mb-2">BRANDTRACE AI Control Plane Ready</h2>
-          <p className="text-sm text-slate-400 max-w-xl mx-auto">
-            Phase 0 Discovery complete. Proceeding to Milestone 1: Brand Knowledge Graph (BKG) Engine & Multi-Agent Verification Architecture.
-          </p>
-        </div>
+        {/* Tab Views */}
+        {currentTab === 'inspector' && (
+          <AssetInspector
+            brandId={selectedBrandId}
+            onSignRelease={handleSignRelease}
+          />
+        )}
+
+        {currentTab === 'graph' && (
+          <KnowledgeGraphView brandId={selectedBrandId} />
+        )}
+
+        {currentTab === 'blast-radius' && (
+          <BlastRadiusSimulator brandId={selectedBrandId} />
+        )}
+
+        {currentTab === 'ledger' && (
+          <ReleaseLedgerView brandId={selectedBrandId} />
+        )}
       </main>
+
+      {/* Database Status Modal */}
+      <DatabaseStatusModal
+        isOpen={isDbModalOpen}
+        onClose={() => setIsDbModalOpen(false)}
+        status={dbStatus}
+      />
+
+      {/* Footer */}
+      <footer className="border-t border-slate-800/80 py-4 px-6 text-center text-xs text-slate-400 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <span className="font-bold text-slate-300">BRANDTRACE AI</span> — The Autonomous Brand Intelligence & Governance Control Plane
+        </div>
+        <div className="font-mono text-[11px] text-slate-400">
+          Every brand decision connected. Every risk traceable. Every release accountable.
+        </div>
+      </footer>
     </div>
   );
 };
 
 export default App;
-
