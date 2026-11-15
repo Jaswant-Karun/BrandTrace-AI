@@ -186,43 +186,177 @@ export const PublicVerificationView: React.FC<PublicVerificationViewProps> = ({
               </div>
             </div>
 
-            {/* Right circular status badges (3D Stitched Seal Discs inspired by reference) */}
-            <div className="flex items-center gap-3 sm:gap-4 self-center lg:self-auto shrink-0">
+            {/* Right circular status badges (Realistic 3D Stitched Seal Medallions) */}
+            <div className="flex items-center gap-3 sm:gap-5 self-center lg:self-auto shrink-0 py-1">
               
-              {/* APPROVED Circle */}
-              <div className={`relative flex flex-col items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full transition-all duration-300 shadow-md ${
-                result?.status === 'APPROVED' 
-                  ? 'bg-gradient-to-br from-emerald-400 to-emerald-600 text-white ring-4 ring-emerald-300 dark:ring-emerald-700 shadow-emerald-500/30 scale-105' 
-                  : 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-emerald-500/20 hover:scale-102'
-              }`}>
-                {/* Inner dashed ring styling */}
-                <div className="absolute inset-1.5 rounded-full border border-dashed border-white/50 pointer-events-none" />
-                <Check className="w-6 h-6 stroke-[3.5] mb-0.5 relative z-10 drop-shadow-xs" />
-                <span className="text-[10px] sm:text-[11px] font-black tracking-wider relative z-10 drop-shadow-xs">APPROVED</span>
+              {/* APPROVED 3D Medal */}
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={() => {
+                  setActiveTab('text');
+                  setTextInput('Experience the revolutionary Aurelle spatial sound with certified ultra-low latency under 12ms per IEC benchmark standards. General wellness device. Not intended for clinical diagnosis.');
+                  setResult({
+                    status: 'APPROVED',
+                    is_authentic: true,
+                    ledger_state: 'CONFIRMED_ON_CHAIN',
+                    seal_code: 'SEAL-AUR-2026-0881',
+                    brand_name: 'Aurelle Technologies',
+                    asset_title: 'Spatial Audio Latency Benchmark Statement',
+                    approved_version: 'v1.0',
+                    sealed_date: '2026-04-12',
+                    computed_hash: '9f83a21b4e05c87d6a2f4c1e09b8a7f2',
+                    recorded_hash: '9f83a21b4e05c87d6a2f4c1e09b8a7f2',
+                    verification_method: 'SHA-256 Cryptographic Merkle Seal Match',
+                    explanation: 'Content perfectly matches cryptographically approved corporate ground truth. All technical and regulatory claims substantiated.',
+                    disclaimer: 'Official certified release for public dissemination.'
+                  });
+                }}
+                title="Click to preview APPROVED certification state"
+                className={`group relative flex flex-col items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full cursor-pointer select-none transition-all duration-300 ease-out hover:-translate-y-1.5 hover:scale-105 active:translate-y-0.5 ${
+                  result?.status === 'APPROVED'
+                    ? 'scale-105 -translate-y-1 ring-4 ring-emerald-400 ring-offset-2 ring-offset-white dark:ring-offset-slate-900 shadow-[0_20px_35px_-5px_rgba(16,185,129,0.7),0_10px_15px_-3px_rgba(0,0,0,0.3)]'
+                    : 'shadow-[0_16px_28px_-6px_rgba(22,101,52,0.45),0_8px_14px_-3px_rgba(0,0,0,0.25)] hover:shadow-[0_22px_34px_-6px_rgba(22,101,52,0.6)]'
+                } bg-[radial-gradient(circle_at_34%_28%,#4ade80_0%,#22c55e_28%,#16a34a_58%,#15803d_82%,#14532d_100%)] border-[3px] border-emerald-200/50 dark:border-emerald-300/40`}
+                style={{
+                  boxShadow: result?.status === 'APPROVED'
+                    ? '0 20px 35px -5px rgba(16,185,129,0.7), inset 0 3px 4px rgba(255,255,255,0.85), inset 0 -5px 8px rgba(20,83,45,0.7)'
+                    : '0 16px 28px -6px rgba(22,101,52,0.45), 0 8px 14px -3px rgba(0,0,0,0.25), inset 0 3px 4px rgba(255,255,255,0.75), inset 0 -5px 8px rgba(20,83,45,0.6)'
+                }}
+              >
+                {/* Inner Dashed Guilloché Groove */}
+                <div className="absolute inset-1.5 sm:inset-2 rounded-full border-[1.5px] border-dashed border-white/70 pointer-events-none shadow-[inset_0_1px_2px_rgba(0,0,0,0.25)]" />
+                
+                {/* Glass Dome Specular Reflection (Top Arc) */}
+                <div className="absolute top-1 left-2 right-2 h-[40%] rounded-t-full bg-gradient-to-b from-white/55 via-white/15 to-transparent pointer-events-none" />
+                
+                {/* Light Pin Hotspot Highlight */}
+                <div className="absolute top-2 left-3 sm:top-2.5 sm:left-3.5 w-3.5 h-1.5 rounded-full bg-white/60 blur-[0.6px] -rotate-30 pointer-events-none" />
+                
+                {/* Bottom Bounce-Light Rim */}
+                <div className="absolute bottom-1.5 left-4 right-4 h-1 rounded-full bg-white/25 blur-[1px] pointer-events-none" />
+
+                {/* Stamped 3D Checkmark */}
+                <Check className="w-6 h-6 sm:w-7 sm:h-7 stroke-[3.8] text-white relative z-10 drop-shadow-[0_2px_3px_rgba(0,0,0,0.55)] group-hover:scale-110 transition-transform" />
+                
+                {/* Embossed Text */}
+                <span className="text-[10px] sm:text-[11px] font-black tracking-wider text-white uppercase relative z-10 select-none drop-shadow-[0_2px_3px_rgba(0,0,0,0.65)] mt-0.5">
+                  APPROVED
+                </span>
               </div>
 
-              {/* OUTDATED Circle */}
-              <div className={`relative flex flex-col items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full transition-all duration-300 shadow-md ${
-                result?.status === 'OUTDATED'
-                  ? 'bg-gradient-to-br from-amber-400 to-amber-600 text-white ring-4 ring-amber-300 dark:ring-amber-700 shadow-amber-500/30 scale-105'
-                  : 'bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-amber-500/20 hover:scale-102'
-              }`}>
-                {/* Inner dashed ring styling */}
-                <div className="absolute inset-1.5 rounded-full border border-dashed border-white/50 pointer-events-none" />
-                <RefreshCw className="w-5 h-5 stroke-[3] mb-1 relative z-10 drop-shadow-xs" />
-                <span className="text-[10px] sm:text-[11px] font-black tracking-wider relative z-10 drop-shadow-xs">OUTDATED</span>
+              {/* OUTDATED 3D Medal */}
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={() => {
+                  setActiveTab('text');
+                  setTextInput('Experience the revolutionary Aurelle spatial sound with certified ultra-low latency under 12ms per IEC benchmark standards. Claim your ₹0 Founder Trial before Dec 2025.');
+                  setResult({
+                    status: 'OUTDATED',
+                    is_authentic: false,
+                    ledger_state: 'DEPRECATED_SUPERSEDED',
+                    seal_code: 'SEAL-AUR-2025-0104',
+                    brand_name: 'Aurelle Technologies',
+                    asset_title: 'Founder Promotion Trial Offer',
+                    approved_version: 'v0.9 (Deprecated)',
+                    sealed_date: '2025-11-01',
+                    computed_hash: '3c7e10a8b92d6f1a4e5c8b2a1f09d8e7',
+                    recorded_hash: '3c7e10a8b92d6f1a4e5c8b2a1f09d8e7',
+                    verification_method: 'Temporal Policy Expiration Check',
+                    explanation: 'The seal and content were valid in 2025, but the ₹0 Founder Trial expired on December 31, 2025 per Pricing Policy #2026-AUR-PRC.',
+                    disclaimer: 'This marketing asset is legally outdated and should not be distributed.'
+                  });
+                }}
+                title="Click to preview OUTDATED certification state"
+                className={`group relative flex flex-col items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full cursor-pointer select-none transition-all duration-300 ease-out hover:-translate-y-1.5 hover:scale-105 active:translate-y-0.5 ${
+                  result?.status === 'OUTDATED'
+                    ? 'scale-105 -translate-y-1 ring-4 ring-amber-400 ring-offset-2 ring-offset-white dark:ring-offset-slate-900 shadow-[0_20px_35px_-5px_rgba(245,158,11,0.7),0_10px_15px_-3px_rgba(0,0,0,0.3)]'
+                    : 'shadow-[0_16px_28px_-6px_rgba(180,83,9,0.45),0_8px_14px_-3px_rgba(0,0,0,0.25)] hover:shadow-[0_22px_34px_-6px_rgba(180,83,9,0.6)]'
+                } bg-[radial-gradient(circle_at_34%_28%,#fde047_0%,#f59e0b_28%,#d97706_58%,#b45309_82%,#78350f_100%)] border-[3px] border-amber-200/50 dark:border-amber-300/40`}
+                style={{
+                  boxShadow: result?.status === 'OUTDATED'
+                    ? '0 20px 35px -5px rgba(245,158,11,0.7), inset 0 3px 4px rgba(255,255,255,0.85), inset 0 -5px 8px rgba(120,53,15,0.7)'
+                    : '0 16px 28px -6px rgba(180,83,9,0.45), 0 8px 14px -3px rgba(0,0,0,0.25), inset 0 3px 4px rgba(255,255,255,0.75), inset 0 -5px 8px rgba(120,53,15,0.6)'
+                }}
+              >
+                {/* Inner Dashed Guilloché Groove */}
+                <div className="absolute inset-1.5 sm:inset-2 rounded-full border-[1.5px] border-dashed border-white/70 pointer-events-none shadow-[inset_0_1px_2px_rgba(0,0,0,0.25)]" />
+                
+                {/* Glass Dome Specular Reflection (Top Arc) */}
+                <div className="absolute top-1 left-2 right-2 h-[40%] rounded-t-full bg-gradient-to-b from-white/55 via-white/15 to-transparent pointer-events-none" />
+                
+                {/* Light Pin Hotspot Highlight */}
+                <div className="absolute top-2 left-3 sm:top-2.5 sm:left-3.5 w-3.5 h-1.5 rounded-full bg-white/60 blur-[0.6px] -rotate-30 pointer-events-none" />
+                
+                {/* Bottom Bounce-Light Rim */}
+                <div className="absolute bottom-1.5 left-4 right-4 h-1 rounded-full bg-white/25 blur-[1px] pointer-events-none" />
+
+                {/* Stamped 3D Refresh/Cycle Arrows */}
+                <RefreshCw className="w-5 h-5 sm:w-6 sm:h-6 stroke-[3.2] text-white relative z-10 drop-shadow-[0_2px_3px_rgba(0,0,0,0.55)] group-hover:rotate-180 transition-transform duration-500" />
+                
+                {/* Embossed Text */}
+                <span className="text-[10px] sm:text-[11px] font-black tracking-wider text-white uppercase relative z-10 select-none drop-shadow-[0_2px_3px_rgba(0,0,0,0.65)] mt-0.5">
+                  OUTDATED
+                </span>
               </div>
 
-              {/* MODIFIED Circle */}
-              <div className={`relative flex flex-col items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full transition-all duration-300 shadow-md ${
-                result?.status === 'MODIFIED'
-                  ? 'bg-gradient-to-br from-rose-400 to-rose-600 text-white ring-4 ring-rose-300 dark:ring-rose-700 shadow-rose-500/30 scale-105'
-                  : 'bg-gradient-to-br from-rose-500 to-rose-600 text-white shadow-rose-500/20 hover:scale-102'
-              }`}>
-                {/* Inner dashed ring styling */}
-                <div className="absolute inset-1.5 rounded-full border border-dashed border-white/50 pointer-events-none" />
-                <span className="text-xl sm:text-2xl font-black leading-none mb-0.5 relative z-10 drop-shadow-xs">≠</span>
-                <span className="text-[10px] sm:text-[11px] font-black tracking-wider relative z-10 drop-shadow-xs">MODIFIED</span>
+              {/* MODIFIED 3D Medal */}
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={() => {
+                  setActiveTab('text');
+                  setTextInput('Experience the revolutionary Aurelle spatial sound with certified ultra-low latency under 12ms. Aurelle Cloud Studio is officially available at only ₹399/mo.');
+                  setResult({
+                    status: 'MODIFIED',
+                    is_authentic: false,
+                    ledger_state: 'TAMPER_ALERT',
+                    seal_code: 'SEAL-AUR-2026-0881',
+                    brand_name: 'Aurelle Technologies',
+                    asset_title: 'Cloud Studio Subscription Commercial Copy',
+                    approved_version: 'v1.0 (Altered)',
+                    sealed_date: '2026-04-15',
+                    computed_hash: '5d2a91e4b8f0c3a7e6b1d4c2a9f8e7b6',
+                    recorded_hash: '9f83a21b4e05c87d6a2f4c1e09b8a7f2',
+                    verification_method: 'Cryptographic Hash Mismatch (Integrity Breach)',
+                    explanation: 'The price claim was tampered from ₹499/mo to ₹399/mo after cryptographic authorization, failing the SHA-256 seal integrity check.',
+                    disclaimer: 'Unauthorized post-approval modification detected.'
+                  });
+                }}
+                title="Click to preview MODIFIED certification state"
+                className={`group relative flex flex-col items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full cursor-pointer select-none transition-all duration-300 ease-out hover:-translate-y-1.5 hover:scale-105 active:translate-y-0.5 ${
+                  result?.status === 'MODIFIED'
+                    ? 'scale-105 -translate-y-1 ring-4 ring-rose-400 ring-offset-2 ring-offset-white dark:ring-offset-slate-900 shadow-[0_20px_35px_-5px_rgba(244,63,94,0.7),0_10px_15px_-3px_rgba(0,0,0,0.3)]'
+                    : 'shadow-[0_16px_28px_-6px_rgba(190,18,60,0.45),0_8px_14px_-3px_rgba(0,0,0,0.25)] hover:shadow-[0_22px_34px_-6px_rgba(190,18,60,0.6)]'
+                } bg-[radial-gradient(circle_at_34%_28%,#fda4af_0%,#f43f5e_28%,#e11d48_58%,#be123c_82%,#881337_100%)] border-[3px] border-rose-200/50 dark:border-rose-300/40`}
+                style={{
+                  boxShadow: result?.status === 'MODIFIED'
+                    ? '0 20px 35px -5px rgba(244,63,94,0.7), inset 0 3px 4px rgba(255,255,255,0.85), inset 0 -5px 8px rgba(136,19,55,0.7)'
+                    : '0 16px 28px -6px rgba(190,18,60,0.45), 0 8px 14px -3px rgba(0,0,0,0.25), inset 0 3px 4px rgba(255,255,255,0.75), inset 0 -5px 8px rgba(136,19,55,0.6)'
+                }}
+              >
+                {/* Inner Dashed Guilloché Groove */}
+                <div className="absolute inset-1.5 sm:inset-2 rounded-full border-[1.5px] border-dashed border-white/70 pointer-events-none shadow-[inset_0_1px_2px_rgba(0,0,0,0.25)]" />
+                
+                {/* Glass Dome Specular Reflection (Top Arc) */}
+                <div className="absolute top-1 left-2 right-2 h-[40%] rounded-t-full bg-gradient-to-b from-white/55 via-white/15 to-transparent pointer-events-none" />
+                
+                {/* Light Pin Hotspot Highlight */}
+                <div className="absolute top-2 left-3 sm:top-2.5 sm:left-3.5 w-3.5 h-1.5 rounded-full bg-white/60 blur-[0.6px] -rotate-30 pointer-events-none" />
+                
+                {/* Bottom Bounce-Light Rim */}
+                <div className="absolute bottom-1.5 left-4 right-4 h-1 rounded-full bg-white/25 blur-[1px] pointer-events-none" />
+
+                {/* Stamped 3D Not-Equal Symbol */}
+                <span className="text-2xl sm:text-3xl font-black text-white leading-none relative z-10 drop-shadow-[0_2px_3px_rgba(0,0,0,0.55)] group-hover:scale-110 transition-transform">
+                  ≠
+                </span>
+                
+                {/* Embossed Text */}
+                <span className="text-[10px] sm:text-[11px] font-black tracking-wider text-white uppercase relative z-10 select-none drop-shadow-[0_2px_3px_rgba(0,0,0,0.65)] mt-0.5">
+                  MODIFIED
+                </span>
               </div>
             </div>
 
