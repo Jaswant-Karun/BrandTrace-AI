@@ -435,22 +435,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </button>
               </div>
 
-              {/* Trust Metric Pill */}
-              <div className="pt-4 flex flex-wrap items-center gap-6 text-xs text-slate-500 dark:text-slate-400 font-mono">
-                <div className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />
-                  <span>163 Automated Tests Passing</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                  <span>&lt;800ms Concurrent Multi-Agent SLA</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Hash className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
-                  <span>SHA-256 Chained Block Proofs</span>
-                </div>
-              </div>
-
             </div>
 
             {/* Right Column: Visual Product Inspection Mockup Card (Inspired by reference) */}
@@ -843,22 +827,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {
               id: 'content-intelligence',
               title: 'Content Intelligence Studio',
-              subtitle: '<800ms Multi-Agent Scan',
-              desc: 'Concurrent 3-agent orchestration (Voice & Lexicon, Claim Verification, Statutory Compliance). Audits pre-release copy, ads, and scripts with exact character-level risk spans in under 800ms.',
+              subtitle: 'Pre-Publication Review',
+              desc: 'Comprehensive multi-dimensional governance (Voice & Lexicon, Claim Verification, Statutory Compliance). Audits pre-release copy, ads, and scripts with precise character-level risk highlights in real time.',
               image: '/images/analytics_dashboard.jpg',
-              badge: 'CONCURRENT MULTI-AGENT SLA',
-              metric: '<800ms Monotonic Response SLA',
+              badge: 'PRE-RELEASE COPY AUDIT',
+              metric: 'Real-Time Governance Analysis',
               icon: Cpu,
               tab: 'ai-content-studio'
             },
             {
               id: 'vision-packaging',
               title: 'Multimodal Vision & Inspection',
-              subtitle: 'Aurelle Packaging & OCR',
-              desc: 'Physical cosmetic packaging and digital ad creative inspection. Performs sub-millimeter typography extraction and verifies clinical trial claims against master scientific study facts.',
+              subtitle: 'Packaging & Creative Vision',
+              desc: 'Physical packaging and digital ad creative inspection. Performs precision typography extraction and verifies clinical trial claims against master scientific study facts.',
               image: '/images/product_aurelle_serum.jpg',
-              badge: 'PACKAGING OCR & AD VISION',
-              metric: 'Sub-millimeter Visual OCR Accuracy',
+              badge: 'PACKAGING & CREATIVE VISION',
+              metric: 'High-Precision Visual Analysis',
               icon: ShieldCheck,
               tab: 'ai-content-studio'
             },
@@ -866,21 +850,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               id: 'digital-twin-cap',
               title: 'Brand Governance Digital Twin',
               subtitle: 'Dependency & Blast Radius',
-              desc: 'Non-destructive virtual sandbox simulating the cascading impact of commercial fact or price updates before commit. Traverses directed dependency graphs across campaigns, guidelines, and published assets.',
+              desc: 'Non-destructive virtual sandbox simulating the cascading impact of commercial fact or price updates before commit. Traverses enterprise dependency maps across campaigns, guidelines, and published assets.',
               image: '/images/digital_twin_network.jpg',
               badge: 'ORGANIZATIONAL SIMULATOR',
-              metric: 'Directed NetworkX Graph Traversal',
+              metric: 'Enterprise Dependency Mapping',
               icon: Network,
               tab: 'impact-simulator'
             },
             {
               id: 'cryptographic-ledger',
               title: 'Cryptographic Trust & Audit Ledger',
-              subtitle: 'SHA-256 Tamper-Evident Blocks',
-              desc: 'Every authorized release is permanently cryptographically sealed with SHA-256 chained block digest proofs. Binds author identity, reviewer sign-off, timestamp, and content hash into an immutable audit trail.',
+              subtitle: 'Immutable Release Records',
+              desc: 'Every authorized release is permanently sealed with tamper-evident cryptographic proofs, binding author identity, reviewer sign-off, timestamp, and verified content into an immutable audit trail.',
               image: '/images/cryptographic_ledger.jpg',
-              badge: 'TAMPER-EVIDENT MERKLE BLOCKS',
-              metric: 'SHA-256 Chained Block Proofs',
+              badge: 'TAMPER-EVIDENT RECORD',
+              metric: 'Immutable Cryptographic Verification',
               icon: Hash,
               tab: 'trust-ledger'
             },
@@ -1261,31 +1245,29 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               defaultIconColor: 'bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400',
               desc: (
                 <>
-                  Every document, fact, and verification query scopes strictly by{' '}
-                  <code className="font-mono text-indigo-600 dark:text-indigo-400 font-semibold">org_id</code> and{' '}
-                  <code className="font-mono text-indigo-600 dark:text-indigo-400 font-semibold">workspace_id</code>. Cross-tenant probes return 404.
+                  Strict organizational boundary isolation ensures brand facts, guidelines, and assets remain entirely confidential and segregated across enterprise teams.
                 </>
               )
             },
             {
               id: 'ssrf-defense',
-              title: 'SSRF Defense Engine',
+              title: 'Secure External Ingestion',
               icon: Globe,
               defaultIconColor: 'bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400',
               desc: (
                 <>
-                  Website import resolves DNS hostnames and strictly blocks loopback, private Class A/B/C spaces, and cloud metadata endpoints (169.254.169.254).
+                  Automated website and document ingestion operates through secure sandboxed fetchers, isolating internal corporate networks and infrastructure from external exposure.
                 </>
               )
             },
             {
               id: 'sha256-digests',
-              title: 'SHA-256 Chained Digests',
+              title: 'Cryptographic Accountability',
               icon: Hash,
               defaultIconColor: 'bg-cyan-50 dark:bg-cyan-950 text-cyan-600 dark:text-cyan-400',
               desc: (
                 <>
-                  Internal Merkle-style block digests immutably bind content payload, asset ID, approving user identity, and timestamp into a tamper-evident seal.
+                  Every approved release receives immutable cryptographic verification, permanently linking approved wording, reviewer credentials, and release timestamps.
                 </>
               )
             },

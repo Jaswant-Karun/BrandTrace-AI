@@ -219,7 +219,7 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
       verificationState: assessment.classification,
       suggestedCorrection: assessment.minimal_change_rewrite,
       reviewerNotes: '',
-      decisionHistory: `RAG retrieval verified against MongoDB BKG (Confidence: ${(assessment.confidence_score * 100).toFixed(0)}%)`
+      decisionHistory: `Verified against certified brand knowledge (Confidence: ${(assessment.confidence_score * 100).toFixed(0)}%)`
     });
     setIsFindingModalOpen(true);
   };
@@ -365,7 +365,7 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
     setIsSigning(true);
     try {
       await onSignRelease(result, "Chief Brand Governance Officer");
-      setSignedSuccess("Asset cryptographically sealed and recorded in MongoDB Release Ledger.");
+      setSignedSuccess("Asset cryptographically sealed and recorded in immutable Release Ledger.");
     } catch (e) {
       console.error(e);
     } finally {
@@ -881,7 +881,7 @@ export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignR
                           className="px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs flex items-center gap-2 transition-all disabled:opacity-40 cursor-pointer shadow-xs"
                         >
                           <Stamp className="w-4 h-4" />
-                          {isSigning ? 'Sealing in MongoDB...' : 'Sign & Seal Release'}
+                          {isSigning ? 'Sealing Release...' : 'Sign & Seal Release'}
                         </button>
                       )}
                     </div>

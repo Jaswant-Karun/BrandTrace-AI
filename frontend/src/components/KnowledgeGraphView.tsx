@@ -237,7 +237,7 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
                 Brand Dependency Intelligence Graph (BDIG)
               </span>
               <span className="text-[11px] text-slate-500">
-                Live MongoDB Atlas Knowledge Ontology
+                Enterprise Brand Knowledge Ontology
               </span>
             </div>
           </div>
@@ -489,7 +489,7 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ brandId:
             <div className="pt-4 border-t border-slate-200 mt-4 text-[11px] text-slate-500 flex items-center justify-between">
               <span className="flex items-center gap-1.5 text-slate-600 font-medium">
                 <Shield className="w-3.5 h-3.5 text-slate-700" />
-                Live MongoDB DAG Node
+                Certified Knowledge Node
               </span>
               <span className="font-mono text-[10px] text-slate-500">{activeBrandId}</span>
             </div>

@@ -383,7 +383,7 @@ export const App: React.FC = () => {
                           </button>
                         </div>
                         <span className="text-[11px] font-mono text-slate-500 pr-3 hidden md:inline">
-                          Live MongoDB Graph Ontology
+                          Enterprise Brand Knowledge Ontology
                         </span>
                       </div>
 

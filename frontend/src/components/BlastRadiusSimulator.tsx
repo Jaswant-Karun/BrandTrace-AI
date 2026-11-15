@@ -673,7 +673,7 @@ export const BlastRadiusSimulator: React.FC<BlastRadiusSimulatorProps> = ({ bran
                       Authorized Human Commit Gate
                     </h4>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Formal human authorization seals this amendment into MongoDB Atlas, updates the DAG, and spawns revision tasks.
+                      Formal human authorization seals this amendment into the verified knowledge base, updates dependency maps, and spawns revision tasks.
                     </p>
                   </div>
 

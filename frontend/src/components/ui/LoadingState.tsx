@@ -7,7 +7,7 @@ interface LoadingStateProps {
 
 export const LoadingState: React.FC<LoadingStateProps> = ({
   message = "Loading Governance Records...",
-  subtext = "Querying MongoDB Atlas with tenant isolation..."
+  subtext = "Retrieving certified records with secure workspace isolation..."
 }) => {
   return (
     <div className="bg-white border border-slate-200 rounded-xl p-12 text-center flex flex-col items-center justify-center min-h-[280px] space-y-3 shadow-xs">

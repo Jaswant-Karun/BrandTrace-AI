@@ -84,14 +84,15 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({
           </select>
         </div>
 
-        {/* MongoDB Atlas Indicator */}
+        {/* System Health / Operational Indicator */}
         <button
           onClick={onOpenDbStatus}
           className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200/80 dark:border-emerald-800/80 text-emerald-800 dark:text-emerald-300 text-xs font-medium hover:bg-emerald-100/60 dark:hover:bg-emerald-900/60 transition-colors cursor-pointer"
+          title="System Health & Connectivity"
         >
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <Database className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-          <span>MongoDB Atlas Active</span>
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+          <span>System Operational</span>
         </button>
 
         {/* Interactive Guided Tour Trigger */}
