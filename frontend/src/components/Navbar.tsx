@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Network, Flame, FileSpreadsheet, Database, RefreshCw, GitFork } from 'lucide-react';
+import { ShieldCheck, Network, Flame, FileSpreadsheet, RefreshCw, GitFork } from 'lucide-react';
 import { BrandProfile, DatabaseStatus } from '../types';
 
 interface NavbarProps {
@@ -26,32 +26,32 @@ export const Navbar: React.FC<NavbarProps> = ({
   isReseeding,
 }) => {
   return (
-    <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md px-6 py-3 flex flex-wrap items-center justify-between sticky top-0 z-50 gap-4">
+    <header className="border-b border-slate-200 bg-white/95 backdrop-blur-md px-6 py-3 flex flex-wrap items-center justify-between sticky top-0 z-50 gap-4 shadow-xs">
       {/* Brand & Identity */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-500 via-brand-500 to-teal-400 flex items-center justify-center shadow-lg shadow-brand-500/20">
-            <ShieldCheck className="w-5 h-5 text-slate-950 stroke-[2.5]" />
+          <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center shadow-xs">
+            <ShieldCheck className="w-5 h-5 text-white stroke-[2.2]" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-extrabold tracking-tight text-white text-base">BRANDTRACE</span>
-              <span className="text-[10px] font-bold uppercase tracking-wider bg-rose-500/20 text-rose-300 border border-rose-500/40 px-1.5 py-0.5 rounded">
+              <span className="font-extrabold tracking-tight text-slate-900 text-base">BRANDTRACE</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200 px-1.5 py-0.5 rounded">
                 BDIG Engine
               </span>
             </div>
-            <p className="text-[11px] text-slate-400">Brand Dependency Intelligence & Governance</p>
+            <p className="text-[11px] text-slate-500">Brand Dependency Intelligence &amp; Governance</p>
           </div>
         </div>
 
         {/* Brand Selector */}
-        <div className="h-6 w-px bg-slate-800 hidden sm:block" />
+        <div className="h-6 w-px bg-slate-200 hidden sm:block" />
         <div className="flex items-center gap-2">
-          <label className="text-xs text-slate-400 font-medium hidden sm:inline">Active Brand:</label>
+          <label className="text-xs text-slate-500 font-medium hidden sm:inline">Active Brand:</label>
           <select
             value={selectedBrandId}
             onChange={(e) => setSelectedBrandId(e.target.value)}
-            className="bg-slate-950 border border-slate-700 text-xs text-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-brand-500 transition-colors font-medium cursor-pointer"
+            className="bg-white border border-slate-200 text-xs text-slate-900 rounded-lg px-3 py-1.5 focus:outline-none focus:border-slate-400 transition-colors font-medium cursor-pointer shadow-xs"
           >
             {brands.map((b) => (
               <option key={b.brand_id} value={b.brand_id}>
@@ -63,13 +63,13 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {/* Navigation Tabs */}
-      <nav className="flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl border border-slate-800/80">
+      <nav className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
         <button
           onClick={() => setCurrentTab('bdig')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
             currentTab === 'bdig'
-              ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-white shadow-md shadow-rose-500/20'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+              ? 'bg-white text-slate-900 border border-slate-200 shadow-xs'
+              : 'text-slate-600 hover:text-slate-900'
           }`}
         >
           <GitFork className="w-3.5 h-3.5" />
@@ -78,10 +78,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         <button
           onClick={() => setCurrentTab('inspector')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
             currentTab === 'inspector'
-              ? 'bg-brand-600 text-white shadow-md shadow-brand-500/20'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+              ? 'bg-white text-slate-900 border border-slate-200 shadow-xs'
+              : 'text-slate-600 hover:text-slate-900'
           }`}
         >
           <ShieldCheck className="w-3.5 h-3.5" />
@@ -90,10 +90,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         <button
           onClick={() => setCurrentTab('graph')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
             currentTab === 'graph'
-              ? 'bg-brand-600 text-white shadow-md shadow-brand-500/20'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+              ? 'bg-white text-slate-900 border border-slate-200 shadow-xs'
+              : 'text-slate-600 hover:text-slate-900'
           }`}
         >
           <Network className="w-3.5 h-3.5" />
@@ -102,10 +102,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         <button
           onClick={() => setCurrentTab('blast-radius')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
             currentTab === 'blast-radius'
-              ? 'bg-brand-600 text-white shadow-md shadow-brand-500/20'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+              ? 'bg-white text-slate-900 border border-slate-200 shadow-xs'
+              : 'text-slate-600 hover:text-slate-900'
           }`}
         >
           <Flame className="w-3.5 h-3.5" />
@@ -114,10 +114,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         <button
           onClick={() => setCurrentTab('ledger')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
             currentTab === 'ledger'
-              ? 'bg-brand-600 text-white shadow-md shadow-brand-500/20'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+              ? 'bg-white text-slate-900 border border-slate-200 shadow-xs'
+              : 'text-slate-600 hover:text-slate-900'
           }`}
         >
           <FileSpreadsheet className="w-3.5 h-3.5" />
@@ -131,23 +131,19 @@ export const Navbar: React.FC<NavbarProps> = ({
           onClick={onReseed}
           disabled={isReseeding}
           title="Re-seed MongoDB & Knowledge Graph"
-          className="p-1.5 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-colors"
+          className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:border-slate-300 transition-colors shadow-xs cursor-pointer"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${isReseeding ? 'animate-spin text-brand-400' : ''}`} />
+          <RefreshCw className={`w-3.5 h-3.5 ${isReseeding ? 'animate-spin text-slate-900' : ''}`} />
         </button>
 
         <button
           onClick={onOpenDbModal}
-          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border bg-slate-950 transition-colors border-slate-800 hover:border-slate-700 cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border bg-white transition-colors border-slate-200 hover:border-slate-300 cursor-pointer shadow-xs text-slate-700"
         >
-          <Database className={`w-3.5 h-3.5 ${dbStatus?.connected ? 'text-emerald-400' : 'text-amber-400'}`} />
-          <span className="text-slate-300 font-mono text-[11px]">
-            {dbStatus?.connected ? 'MongoDB Live' : 'Memory Store'}
-          </span>
-          <span className={`w-1.5 h-1.5 rounded-full ${dbStatus?.connected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+          <span className={`w-2 h-2 rounded-full ${dbStatus?.connected ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+          <span>{dbStatus?.connected ? 'Atlas Connected' : 'Memory DB'}</span>
         </button>
       </div>
     </header>
   );
 };
-
