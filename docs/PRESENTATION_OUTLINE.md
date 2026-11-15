@@ -53,7 +53,7 @@
 
 ---
 
-### Slide 5: Core Features & End-to-End Workflow
+## Slide 5: Core Features & End-to-End Workflow
 
 - **Headline:** Six Seamless Steps from Policy to Verification
 - **The Workflow:**
