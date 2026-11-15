@@ -26,14 +26,25 @@ export interface FindingItem {
 }
 
 export type PostChannel = 
-  | 'Instagram' 
-  | 'Facebook' 
-  | 'LinkedIn' 
-  | 'X' 
-  | 'YouTube' 
-  | 'Website' 
-  | 'Email' 
-  | 'Paid Advertisement' 
+  | 'instagram' 
+  | 'Instagram'
+  | 'email' 
+  | 'Email'
+  | 'web' 
+  | 'Website'
+  | 'print' 
+  | 'Print'
+  | 'facebook' 
+  | 'Facebook'
+  | 'linkedin' 
+  | 'LinkedIn'
+  | 'x' 
+  | 'X'
+  | 'youtube' 
+  | 'YouTube'
+  | 'paid ad' 
+  | 'Paid Advertisement'
+  | 'other'
   | 'Other';
 
 interface ExamplePost {
@@ -56,7 +67,7 @@ const EXAMPLE_POSTS: ExamplePost[] = [
   {
     id: 'gifted-serum',
     label: 'Creator post, gifted serum',
-    channel: 'Instagram',
+    channel: 'instagram',
     keyPhrases: 'dark spots, skin barrier',
     cta: 'Shop',
     text: `Obsessed with the new Aurelle Radiant Glow Serum! ✨ Got this gifted by the team and honestly after just 2 weeks my skin barrier is completely healed. Visible results by 60% in just 2 weeks! Check link in bio to shop. #AurellePartner #GlowSkin`,
@@ -64,7 +75,7 @@ const EXAMPLE_POSTS: ExamplePost[] = [
   {
     id: 'diwali-email',
     label: 'Diwali sale email',
-    channel: 'Email',
+    channel: 'email',
     keyPhrases: 'Diwali, 50% off, ceramide formulations',
     cta: 'Claim offer',
     text: `Celebrate Diwali with radiant skin! 🪔 Exclusive festive offers on Aurelle's clinically tested hydration line. Buy one get one 50% off across all ceramide formulations. Limited stock available. Claim your festive glow today.`,
@@ -72,7 +83,7 @@ const EXAMPLE_POSTS: ExamplePost[] = [
   {
     id: 'ceramide-product',
     label: 'Ceramide cream product page',
-    channel: 'Website',
+    channel: 'web',
     keyPhrases: 'bio-identical ceramides, dermatologist tested',
     cta: 'Add to Cart',
     text: `Aurelle Barrier Repair Ceramide Cream. Formulated with 5 bio-identical ceramides and hyaluronic acid to restore lipid moisture for up to 48 hours. Dermatologist tested, fragrance-free, and non-comedogenic.`,
@@ -80,7 +91,7 @@ const EXAMPLE_POSTS: ExamplePost[] = [
   {
     id: 'agency-teaser',
     label: 'Agency teaser caption',
-    channel: 'Instagram',
+    channel: 'instagram',
     keyPhrases: 'launching Friday, glass skin',
     cta: 'Learn More',
     text: `Something game-changing is dropping this Friday. Aurelle Skin is launching the ultimate defense against environmental pollution and premature aging. 100% natural, zero toxins, guaranteed glass skin in 7 days.`,
@@ -88,7 +99,7 @@ const EXAMPLE_POSTS: ExamplePost[] = [
   {
     id: 'sunscreen-reel',
     label: 'Hinglish sunscreen reel caption',
-    channel: 'Instagram',
+    channel: 'instagram',
     keyPhrases: 'SPF 50+, no white cast',
     cta: 'Shop Now',
     text: `Sun protection jo bilkul chipchipa nahi hai! ☀️ Aurelle Ultra Light Invisible Sunscreen with SPF 50+ PA++++. No white cast, matte finish, pure magic. Grab yours before it sells out!`,
@@ -113,7 +124,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
     return '';
   });
 
-  const [channel, setChannel] = useState<PostChannel>('Instagram');
+  const [channel, setChannel] = useState<PostChannel>('instagram');
   const [keyPhrases, setKeyPhrases] = useState<string>('dark spots, skin barrier');
   const [callToAction, setCallToAction] = useState<string>('Shop');
   const [isAccordionOpen, setIsAccordionOpen] = useState<boolean>(true); // Open by default
@@ -196,7 +207,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
 
   const handleOpenSample = () => {
     setDraftContent(DEFAULT_SAMPLE_TEXT);
-    setChannel('Instagram');
+    setChannel('instagram');
     setKeyPhrases('dark spots, skin barrier');
     setCallToAction('Shop');
     setHasChecked(false);
@@ -644,15 +655,15 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
                         onChange={(e) => setChannel(e.target.value as PostChannel)}
                         className="w-full appearance-none px-3 py-2 rounded-lg bg-[#0d0d0f] border border-neutral-700/80 text-xs font-mono text-neutral-200 focus:outline-none focus:border-indigo-500 cursor-pointer pr-8"
                       >
-                        <option value="Instagram" className="bg-neutral-900 text-white">Instagram</option>
-                        <option value="Facebook" className="bg-neutral-900 text-white">Facebook</option>
-                        <option value="LinkedIn" className="bg-neutral-900 text-white">LinkedIn</option>
-                        <option value="X" className="bg-neutral-900 text-white">X</option>
-                        <option value="YouTube" className="bg-neutral-900 text-white">YouTube</option>
-                        <option value="Website" className="bg-neutral-900 text-white">Website</option>
-                        <option value="Email" className="bg-neutral-900 text-white">Email</option>
-                        <option value="Paid Advertisement" className="bg-neutral-900 text-white">Paid Advertisement</option>
-                        <option value="Other" className="bg-neutral-900 text-white">Other</option>
+                        <option value="instagram" className="bg-neutral-900 text-white">instagram</option>
+                        <option value="email" className="bg-neutral-900 text-white">email</option>
+                        <option value="web" className="bg-neutral-900 text-white">web</option>
+                        <option value="print" className="bg-neutral-900 text-white">print</option>
+                        <option value="other" className="bg-neutral-900 text-white">other</option>
+                        <option value="facebook" className="bg-neutral-900 text-white">facebook</option>
+                        <option value="linkedin" className="bg-neutral-900 text-white">linkedin</option>
+                        <option value="x" className="bg-neutral-900 text-white">x</option>
+                        <option value="youtube" className="bg-neutral-900 text-white">youtube</option>
                       </select>
                       <ChevronDown className="w-3.5 h-3.5 text-neutral-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     </div>

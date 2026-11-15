@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "BRANDTRACE AI — The Autonomous Brand Intelligence & Governance Control Plane",
   "private": true,
+  "packageManager": "pnpm@9.15.9",
   "scripts": {
+    "build": "cd frontend && npx pnpm install && npx pnpm run build",
     "dev": "npm run dev:all",
     "dev:all": "concurrently -n \"BACKEND,FRONTEND\" -c \"blue,green\" \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:frontend": "cd frontend && pnpm dev",
