@@ -29,3 +29,4 @@ def test_demo_account_token_generation_and_claims():
     assert payload.get("role") == "BRAND_MANAGER"
     assert payload.get("org_id") == "ORG-AURELLE"
     assert payload.get("workspace_id") == "aurelle-tech"
+
