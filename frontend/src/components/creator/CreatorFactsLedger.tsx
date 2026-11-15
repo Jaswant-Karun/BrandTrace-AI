@@ -74,7 +74,7 @@ const FACTS_DATA: FactCardItem[] = [
 ];
 
 const TIMELINE_FACTS = [
-  { code: 'FACT-029', status: 'expired', label: 'ended 30 Sept 2026', width: 24, start: 18 },
+  { code: 'FACT-029', status: 'expired', label: 'ended 30 Sept 2026', width: 35, start: 18 },
   { code: 'FACT-032', status: 'active', label: 'ends 30 Nov 2026', width: 14, start: 42 },
   { code: 'FACT-006', status: 'active', label: 'ends 31 Dec 2026', width: 26, start: 31 },
   { code: 'FACT-013', status: 'active', label: 'ends 31 Dec 2026', width: 44, start: 13 },

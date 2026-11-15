@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CreatorHeader, CreatorTab } from './CreatorHeader';
+import { CreatorHeader, CreatorTab, TabItem } from './CreatorHeader';
 import { CreatorCheckPost } from './CreatorCheckPost';
 import { CreatorAuditLog, AuditEvent } from './CreatorAuditLog';
 import { CreatorRulebook } from './CreatorRulebook';
 import { CreatorFactsLedger } from './CreatorFactsLedger';
 import { CreatorGuidelineHealth } from './CreatorGuidelineHealth';
 import { CreatorClaimWatch } from './CreatorClaimWatch';
+import { CreatorSubmissionsView } from './CreatorSubmissionsView';
 import { useAuth } from '../../context/AuthContext';
 
 interface CreatorDashboardProps {
@@ -14,6 +15,16 @@ interface CreatorDashboardProps {
   brandName?: string;
   initialTab?: CreatorTab;
 }
+
+const CREATOR_TABS: TabItem[] = [
+  { id: 'check', label: 'CHECK A POST' },
+  { id: 'submissions', label: 'MY SUBMISSIONS' },
+  { id: 'audit', label: 'AUDIT LOG' },
+  { id: 'rulebook', label: 'RULEBOOK' },
+  { id: 'facts', label: 'FACTS' },
+  { id: 'health', label: 'GUIDELINE HEALTH' },
+  { id: 'watch', label: 'CLAIM WATCH' },
+];
 
 export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
   onBackToLanding,
@@ -24,6 +35,15 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
   const [activeTab, setActiveTab] = useState<CreatorTab>(initialTab);
   const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([]);
   const [restoredDraft, setRestoredDraft] = useState<string | null>(null);
+  const [revisionData, setRevisionData] = useState<{
+    submissionId: string;
+    content: string;
+    channel: any;
+    version: number;
+    reviewerFeedback: string;
+    brandId?: string;
+    brandName?: string;
+  } | null>(null);
 
   // Automatically switch role/persona to Creator if user is in another role
   useEffect(() => {
@@ -56,13 +76,14 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
   return (
     <div className="min-h-screen bg-black text-slate-100 flex flex-col font-sans selection:bg-indigo-600 selection:text-white">
       
-      {/* Top Fixed Header with Plumbline Logo, 6 Tabs, User info & Hanging Plumb Bob */}
+      {/* Top Fixed Header with Plumbline Logo, 7 Tabs, User info & Hanging Plumb Bob */}
       <CreatorHeader
         activeTab={activeTab}
         onTabChange={setActiveTab}
         onSignOut={handleSignOut}
         userName={user?.name ? user.name.split(',')[0].toUpperCase() : 'CREATOR ASHA'}
         roleName="CREATOR"
+        customTabs={CREATOR_TABS}
       />
 
       {/* Main Tab Content View */}
@@ -79,7 +100,34 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
               <CreatorCheckPost
                 brandName={brandName}
                 initialContent={restoredDraft || undefined}
+                role="creator"
+                userName={user?.name || 'Creator Asha'}
+                orgId="ORG-AURELLE"
+                revisionData={revisionData}
+                onClearRevision={() => setRevisionData(null)}
+                onNavigateToSubmissions={() => setActiveTab('submissions')}
                 onSaveAuditVersion={handleSaveAuditVersion}
+              />
+            )}
+
+            {activeTab === 'submissions' && (
+              <CreatorSubmissionsView
+                role="creator"
+                userName={user?.name || 'Creator Asha'}
+                orgId="ORG-AURELLE"
+                brandName={brandName}
+                onEditAndResubmit={(sub) => {
+                  setRevisionData({
+                    submissionId: sub.submission_id,
+                    content: sub.current_content || sub.original_content,
+                    channel: sub.channel,
+                    version: (sub.version || 1) + 1,
+                    reviewerFeedback: sub.reviewer_feedback || '',
+                    brandId: sub.brand_id,
+                    brandName: sub.brand_name || brandName,
+                  });
+                  setActiveTab('check');
+                }}
               />
             )}
 

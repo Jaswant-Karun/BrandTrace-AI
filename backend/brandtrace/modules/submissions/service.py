@@ -82,6 +82,9 @@ _SEED_SUBMISSION_1 = {
     "channel": "instagram",
     "creator_id": "asha@aurelle.com",
     "creator_name": "Creator Asha",
+    "creator_type": "creator",
+    "org_id": "ORG-AURELLE",
+    "analysis_id": "VRF-F10B6DE0FB",
     "version": 2,
     "original_content": "Meet the NEW Aurelle Vitamin-C serum! 100% natural, completely eco-friendly and clinically proven to fade dark spots by 60% in just 2 weeks. Doctor approved with zero side effects. Shop today!",
     "current_content": "Meet the NEW Aurelle Vitamin-C serum! Formulated with 94% naturally derived ingredients and clinically shown to fade dark spots by 32% in 8 weeks (FACT-014). Dermatologist tested with clean ingredients. Shop now!",
@@ -174,6 +177,9 @@ _SEED_SUBMISSION_2 = {
     "channel": "web",
     "creator_id": "asha@aurelle.com",
     "creator_name": "Creator Asha",
+    "creator_type": "creator",
+    "org_id": "ORG-AURELLE",
+    "analysis_id": "VRF-SEED-02",
     "version": 1,
     "original_content": "Ceramide Barrier Cream is the treatment for eczema and dry, itchy skin. Doctor approved and guaranteed results in 48 hours. Buy now at ₹499!",
     "current_content": "Ceramide Barrier Cream is the treatment for eczema and dry, itchy skin. Doctor approved and guaranteed results in 48 hours. Buy now at ₹499!",
@@ -256,8 +262,86 @@ _SEED_SUBMISSION_2 = {
     ]
 }
 
+_SEED_SUBMISSION_AGENCY_1 = {
+    "submission_id": "SUB-AGENCY-001",
+    "task_id": "REV-AGENCY-01",
+    "brand_id": "aurelle-tech",
+    "brand_name": "Aurelle Skin",
+    "title": "Agency Teaser: Aurelle Next-Gen Environmental Defense Formulation",
+    "channel": "instagram",
+    "creator_id": "USR-AGENCY-001",
+    "creator_name": "Agency Sana",
+    "creator_type": "agency",
+    "org_id": "ORG-AGENCY-PULSE",
+    "analysis_id": "VRF-AGY-9021",
+    "version": 1,
+    "original_content": "Something game-changing is dropping this Friday. Aurelle Skin is launching the ultimate defense against environmental pollution and premature aging. 100% natural, zero toxins, guaranteed glass skin in 7 days.",
+    "current_content": "Something game-changing is dropping this Friday. Aurelle Skin is launching the ultimate defense against environmental pollution and premature aging. 100% natural, zero toxins, guaranteed glass skin in 7 days.",
+    "status": "CHANGES_REQUESTED",
+    "submitted_at": "Today, 11:20 am",
+    "updated_at": "Today, 11:45 am",
+    "reviewer_feedback": "Reviewer Meera: '100% natural, zero toxins' violates REG-01 (Greenwashing). Please replace with approved 94% naturally derived ingredients and remove 'guaranteed in 7 days'.",
+    "findings": [
+        {
+            "id": "f-301",
+            "number": 1,
+            "sentence_text": "100% natural, zero toxins, guaranteed glass skin in 7 days.",
+            "flagged_text": "100% natural, zero toxins",
+            "category": "Regulatory Greenwashing",
+            "severity": "BLOCKING",
+            "rule_id": "REG-01",
+            "rule_title": "ASCI Greenwashing Directive",
+            "explanation": "Absolute unquantified '100% natural' and 'zero toxins' claims are prohibited without certified lifecycle analysis documentation.",
+            "suggested_fix": "formulated with 94% naturally derived ingredients",
+            "suggested_sentence": "Formulated with 94% naturally derived ingredients for clinical barrier protection.",
+            "evidence_ref": "REG-01 / ASCI Guidelines 2024",
+            "needs_human_review": True,
+            "decision": "UPHELD",
+            "resolved": False,
+        },
+        {
+            "id": "f-302",
+            "number": 2,
+            "sentence_text": "guaranteed glass skin in 7 days.",
+            "flagged_text": "guaranteed glass skin in 7 days",
+            "category": "Approved Brand Claims",
+            "severity": "BLOCKING",
+            "rule_id": "GL-AUR-03",
+            "rule_title": "Prohibited Absolute Guarantees",
+            "explanation": "Time-bound cosmetic outcome guarantees ('guaranteed in 7 days') are prohibited by Aurelle Brand Book v1.3 §7.2.",
+            "suggested_fix": "visibly brighter skin over time",
+            "suggested_sentence": "visibly brighter skin with consistent daily use.",
+            "evidence_ref": "Aurelle Brand Book §7.2 Disclaimers",
+            "needs_human_review": False,
+            "decision": "UPHELD",
+            "resolved": False,
+        }
+    ],
+    "approval_history": [
+        {
+            "stage": "CREATOR_SUBMISSION",
+            "label": "Agency Submission",
+            "user": "Agency Sana",
+            "role": "Agency Partner",
+            "status": "COMPLETED",
+            "timestamp": "Today, 11:20 am",
+            "comments": "Teaser post submitted on behalf of Aurelle Skin client account."
+        },
+        {
+            "stage": "REVIEWER_APPROVAL",
+            "label": "Reviewer Feedback",
+            "user": "Reviewer Meera",
+            "role": "Reviewer",
+            "status": "REJECTED",
+            "timestamp": "Today, 11:45 am",
+            "comments": "Changes requested on environmental and 7-day guarantee claims. Please edit and resubmit."
+        }
+    ]
+}
+
 _SUBMISSIONS_STORE[_SEED_SUBMISSION_1["submission_id"]] = _SEED_SUBMISSION_1
 _SUBMISSIONS_STORE[_SEED_SUBMISSION_2["submission_id"]] = _SEED_SUBMISSION_2
+_SUBMISSIONS_STORE[_SEED_SUBMISSION_AGENCY_1["submission_id"]] = _SEED_SUBMISSION_AGENCY_1
 
 class SubmissionsService:
     """Centralized service managing Creator drafts, content verification, submissions, and review lifecycle."""
@@ -433,6 +517,7 @@ class SubmissionsService:
         findings_data = [f.model_dump() for f in req.findings]
 
         submission_doc = {
+            "id": sub_id,
             "submission_id": sub_id,
             "task_id": task_id,
             "brand_id": req.brand_id,
@@ -441,11 +526,15 @@ class SubmissionsService:
             "channel": req.channel,
             "creator_id": req.creator_id,
             "creator_name": req.creator_name,
-            "version": 1,
+            "creator_type": req.creator_type,
+            "org_id": req.org_id,
+            "analysis_id": req.analysis_id or f"VRF-{uuid.uuid4().hex[:8].upper()}",
+            "version": req.version or 1,
             "original_content": req.original_content,
             "current_content": req.current_content,
             "findings": findings_data,
             "status": "PENDING_REVIEW",
+            "submission_notes": req.submission_notes or "",
             "submitted_at": now_time,
             "updated_at": now_time,
             "approval_history": approval_history,
@@ -469,15 +558,19 @@ class SubmissionsService:
                 asset_id=sub_id,
                 asset_name=req.title,
                 asset_type="MARKETING_COPY",
-                campaign_id="CAMP-CREATOR",
-                campaign_name="Creator Content Submissions",
-                department="Creator Marketing",
+                campaign_id="CAMP-AGENCY" if req.creator_type == "agency" else "CAMP-CREATOR",
+                campaign_name="Agency Partner Submissions" if req.creator_type == "agency" else "Creator Content Submissions",
+                department="Agency Partner" if req.creator_type == "agency" else "Creator Marketing",
                 assigned_reviewer_role="REVIEWER",
                 priority=SeverityLevel.HIGH,
+                old_value=req.original_content[:100],
+                new_value=req.current_content[:100],
                 current_content=req.original_content,
                 proposed_content=req.current_content,
-                diff_summary=f"Creator submission by {req.creator_name} across {req.channel}",
-                status="PENDING_REVIEW"
+                diff_summary=f"{'Agency' if req.creator_type == 'agency' else 'Creator'} submission by {req.creator_name} ({req.org_id}) across {req.channel} (v{req.version or 1})",
+                status="PENDING_REVIEW",
+                created_at=int(time.time()),
+                created_at_iso=now_time
             )
             dependency_engine.revision_tasks[task_id] = rev_task
             await mongo_manager.save_revision_task(rev_task.model_dump())

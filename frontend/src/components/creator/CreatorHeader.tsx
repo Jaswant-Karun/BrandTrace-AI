@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-export type CreatorTab = 'check' | 'queue' | 'audit' | 'rulebook' | 'facts' | 'health' | 'watch';
+export type CreatorTab = 'check' | 'submissions' | 'queue' | 'audit' | 'rulebook' | 'facts' | 'health' | 'watch';
 
 export interface TabItem {
   id: CreatorTab;

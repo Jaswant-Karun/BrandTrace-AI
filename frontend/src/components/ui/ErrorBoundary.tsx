@@ -36,31 +36,49 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public render() {
     if (this.state.hasError) {
+      const isDynamicImportError = 
+        this.state.error?.message?.includes('dynamically imported module') ||
+        this.state.error?.message?.includes('Failed to fetch') ||
+        this.state.error?.message?.includes('loading chunk');
+
       return (
-        <div className="p-8 max-w-2xl mx-auto my-12 bg-white dark:bg-slate-900 border border-rose-200 dark:border-rose-900/50 rounded-2xl shadow-sm text-center space-y-4">
-          <div className="w-12 h-12 mx-auto rounded-full bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 flex items-center justify-center text-rose-600 dark:text-rose-400">
+        <div className="p-8 max-w-2xl mx-auto my-12 bg-neutral-950 border border-rose-900/50 rounded-2xl shadow-2xl text-center space-y-4">
+          <div className="w-12 h-12 mx-auto rounded-full bg-rose-950/60 border border-rose-800 flex items-center justify-center text-rose-400">
             <AlertTriangle className="w-6 h-6" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">
-              {this.props.fallbackTitle || 'Component Error Encountered'}
+            <h3 className="text-base font-bold text-white">
+              {isDynamicImportError ? 'New Version Available' : (this.props.fallbackTitle || 'Component Error Encountered')}
             </h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto">
-              An unexpected render issue occurred in this workspace module. The error details have been logged.
+            <p className="text-xs text-neutral-400 max-w-md mx-auto">
+              {isDynamicImportError 
+                ? 'A new deployment of BrandTrace AI has updated application assets. Please reload to load the latest verified build.'
+                : 'An unexpected render issue occurred in this workspace module. The error details have been logged.'}
             </p>
           </div>
           {this.state.error?.message && (
-            <div className="p-3 bg-slate-50 dark:bg-slate-950 rounded-lg text-left font-mono text-[11px] text-rose-700 dark:text-rose-400 border border-slate-200 dark:border-slate-800 overflow-x-auto max-h-32">
+            <div className="p-3 bg-black rounded-lg text-left font-mono text-[11px] text-rose-400 border border-neutral-800 overflow-x-auto max-h-32">
               {this.state.error.message}
             </div>
           )}
           <div className="flex items-center justify-center gap-3 pt-2">
-            <Button variant="outline" size="sm" onClick={this.handleReset} icon={<RefreshCw className="w-3.5 h-3.5" />}>
-              Retry View
-            </Button>
+            {isDynamicImportError ? (
+              <Button 
+                variant="primary" 
+                size="sm" 
+                onClick={() => window.location.reload()} 
+                icon={<RefreshCw className="w-3.5 h-3.5" />}
+              >
+                Reload Latest Version
+              </Button>
+            ) : (
+              <Button variant="outline" size="sm" onClick={this.handleReset} icon={<RefreshCw className="w-3.5 h-3.5" />}>
+                Retry View
+              </Button>
+            )}
             {this.props.onReset && (
-              <Button variant="primary" size="sm" onClick={this.props.onReset} icon={<Home className="w-3.5 h-3.5" />}>
-                Return to Home
+              <Button variant="outline" size="sm" onClick={this.props.onReset} icon={<Home className="w-3.5 h-3.5" />}>
+                Return to Command Center
               </Button>
             )}
           </div>

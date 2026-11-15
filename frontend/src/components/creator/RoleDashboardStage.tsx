@@ -7,6 +7,7 @@ import { CreatorRulebook } from './CreatorRulebook';
 import { CreatorFactsLedger } from './CreatorFactsLedger';
 import { CreatorGuidelineHealth } from './CreatorGuidelineHealth';
 import { CreatorClaimWatch } from './CreatorClaimWatch';
+import { CreatorSubmissionsView } from './CreatorSubmissionsView';
 import { 
   CheckCircle2, ExternalLink, X, 
   ShieldCheck, Check, Clock
@@ -26,8 +27,11 @@ interface QueueItem {
   content?: string;
   findings?: any[];
   creatorName?: string;
+  creatorType?: string;
+  orgId?: string;
   channel?: string;
   version?: number;
+  reviewerFeedback?: string;
 }
 
 const DEFAULT_QUEUE_POSTS: QueueItem[] = [
@@ -165,6 +169,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
       defaultTab: 'check' as CreatorTab,
       tabs: [
         { id: 'check' as CreatorTab, label: 'CHECK A POST' },
+        { id: 'submissions' as CreatorTab, label: 'MY SUBMISSIONS' },
         { id: 'audit' as CreatorTab, label: 'AUDIT LOG' },
         { id: 'rulebook' as CreatorTab, label: 'RULEBOOK' },
         { id: 'facts' as CreatorTab, label: 'FACTS' },
@@ -225,6 +230,15 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
   const [decisionNotes, setDecisionNotes] = useState<string>('');
   const [isSubmittingDecision, setIsSubmittingDecision] = useState<boolean>(false);
   const [feedbackToast, setFeedbackToast] = useState<string | null>(null);
+  const [revisionData, setRevisionData] = useState<{
+    submissionId: string;
+    content: string;
+    channel: any;
+    version: number;
+    reviewerFeedback: string;
+    brandId?: string;
+    brandName?: string;
+  } | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -255,8 +269,11 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
                 content: s.current_content || s.original_content || '',
                 findings: s.findings || [],
                 creatorName: s.creator_name || 'Creator Asha',
+                creatorType: s.creator_type || 'creator',
+                orgId: s.org_id || (s.creator_type === 'agency' ? 'ORG-AGENCY-PULSE' : 'ORG-AURELLE'),
                 channel: s.channel || 'instagram',
                 version: s.version || 1,
+                reviewerFeedback: s.reviewer_feedback || '',
               };
             });
 
@@ -365,7 +382,37 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
           <div className="space-y-6">
             <CreatorCheckPost
               brandName={brandName}
+              role={role}
+              userName={roleConfig.userName}
+              orgId={role === 'agency' ? 'ORG-AGENCY-PULSE' : 'ORG-AURELLE'}
+              revisionData={revisionData}
+              onClearRevision={() => setRevisionData(null)}
+              onNavigateToSubmissions={() => setActiveTab('submissions')}
               onSaveAuditVersion={() => {}}
+            />
+          </div>
+        )}
+
+        {/* MY SUBMISSIONS tab (for Agency) */}
+        {activeTab === 'submissions' && (
+          <div className="space-y-6">
+            <CreatorSubmissionsView
+              role={role as any}
+              userName={roleConfig.userName}
+              orgId={role === 'agency' ? 'ORG-AGENCY-PULSE' : 'ORG-AURELLE'}
+              brandName={brandName}
+              onEditAndResubmit={(sub) => {
+                setRevisionData({
+                  submissionId: sub.submission_id,
+                  content: sub.current_content || sub.original_content,
+                  channel: sub.channel,
+                  version: (sub.version || 1) + 1,
+                  reviewerFeedback: sub.reviewer_feedback || '',
+                  brandId: sub.brand_id,
+                  brandName: sub.brand_name || brandName,
+                });
+                setActiveTab('check');
+              }}
             />
           </div>
         )}
@@ -458,6 +505,15 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
                         }`}>
                           {item.status}
                         </span>
+                        {item.creatorType === 'agency' ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-cyan-300 bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-500/40">
+                            AGENCY PARTNER · {item.orgId || 'ORG-AGENCY-PULSE'}
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-purple-300 bg-purple-950/80 px-2 py-0.5 rounded border border-purple-500/40">
+                            INTERNAL CREATOR · {item.orgId || 'ORG-AURELLE'}
+                          </span>
+                        )}
                         {item.badges.map((b, idx) => (
                           <span key={idx} className="inline-flex items-center gap-1 text-[10px] font-mono text-neutral-400 bg-neutral-900 px-2 py-0.5 rounded border border-neutral-800">
                             {b.includes('REVIEW') && <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />}
@@ -595,8 +651,12 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
                       <div className="flex items-center gap-3 p-3 rounded-xl bg-neutral-900/80 border border-neutral-800 text-xs font-mono">
                         <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                         <div>
-                          <div className="text-white font-bold">1. CREATOR SUBMISSION</div>
-                          <div className="text-neutral-400 text-[10px]">Submitted by {selectedPost.creatorName || 'Creator Asha'}</div>
+                          <div className="text-white font-bold">
+                            1. {selectedPost.creatorType === 'agency' ? 'AGENCY PARTNER SUBMISSION' : 'CREATOR SUBMISSION'}
+                          </div>
+                          <div className="text-neutral-400 text-[10px]">
+                            Submitted by {selectedPost.creatorName || 'Creator Asha'} ({selectedPost.orgId || (selectedPost.creatorType === 'agency' ? 'ORG-AGENCY-PULSE' : 'ORG-AURELLE')})
+                          </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-3 p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/40 text-xs font-mono">

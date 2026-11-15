@@ -57,8 +57,8 @@ class DraftVersionResponse(BaseModel):
 # ==============================================================================
 
 class FindingModel(BaseModel):
-    id: str
-    number: int
+    id: str = "f-1"
+    number: int = 1
     sentence_text: str = ""
     flagged_text: str = ""
     category: str = "Brand Rules"
@@ -92,13 +92,19 @@ class SubmissionCreateRequest(BaseModel):
     channel: str = "instagram"
     creator_id: str = "creator-asha"
     creator_name: str = "Creator Asha"
+    creator_type: str = "creator"  # "creator" | "agency"
+    org_id: str = "ORG-AURELLE"
+    analysis_id: Optional[str] = None
+    version: int = 1
     original_content: str
     current_content: str
     findings: List[FindingModel] = Field(default_factory=list)
     key_phrases: Optional[str] = ""
     call_to_action: Optional[str] = ""
+    submission_notes: Optional[str] = ""
 
 class SubmissionResponse(BaseModel):
+    id: Optional[str] = None
     submission_id: str
     task_id: Optional[str] = None
     brand_id: str
@@ -107,6 +113,9 @@ class SubmissionResponse(BaseModel):
     channel: str
     creator_id: str
     creator_name: str
+    creator_type: str = "creator"  # "creator" | "agency"
+    org_id: str = "ORG-AURELLE"
+    analysis_id: Optional[str] = None
     version: int
     original_content: str
     current_content: str

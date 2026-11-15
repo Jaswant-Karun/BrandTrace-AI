@@ -392,12 +392,16 @@ class SubmissionDoc(BaseMongoRecord):
     channel: str = "instagram"
     creator_id: str
     creator_name: str
+    creator_type: str = "creator"  # "creator" | "agency"
+    org_id: str = "ORG-AURELLE"
+    analysis_id: Optional[str] = None
     version: int = 1
     original_content: str
     current_content: str
     findings: List[SubmissionFinding] = Field(default_factory=list)
     status: str = "PENDING_REVIEW"  # DRAFT, PENDING_REVIEW, CHANGES_REQUESTED, REVIEW_APPROVED, COMPLIANCE_APPROVED, APPROVED, REJECTED
     submitted_at: int = Field(default_factory=current_epoch_ms)
+    submission_notes: Optional[str] = None
     reviewer_feedback: Optional[str] = None
     compliance_notes: Optional[str] = None
     rejection_reason: Optional[str] = None

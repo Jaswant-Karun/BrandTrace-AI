@@ -342,11 +342,18 @@ async def seed_database():
 # ==============================================================================
 
 @router.get("/facts")
-async def list_approved_facts(brand_id: Optional[str] = Query(None)):
-    """List approved facts (prices, claims, specifications, policies)."""
+async def list_approved_facts(brand_id: Optional[str] = Query(None), role: Optional[str] = Query(None)):
+    """List approved facts (prices, claims, specifications, policies). Filters confidential facts for agency role."""
     facts = list(APPROVED_FACTS_CATALOG.values())
     if brand_id:
         facts = [f for f in facts if f.brand_id == brand_id]
+    if role == "agency":
+        # Agency users must never access confidential/embargoed internal facts without explicit clearance
+        facts = [
+            f for f in facts 
+            if getattr(f, "category", "") not in ("CONFIDENTIAL", "EMBARGOED") 
+            and not getattr(f, "is_confidential", False)
+        ]
     return [f.model_dump() for f in facts]
 
 @router.post("/facts")

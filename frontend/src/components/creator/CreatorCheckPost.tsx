@@ -56,12 +56,34 @@ interface ExamplePost {
   text: string;
 }
 
+export interface RevisionData {
+  submissionId: string;
+  version: number;
+  reviewerFeedback: string;
+  content: string;
+  channel?: PostChannel;
+  brandId?: string;
+  brandName?: string;
+}
+
 interface CreatorCheckPostProps {
   onSaveAuditVersion?: (event: { what: string; reason?: string; hash: string }) => void;
   brandName?: string;
   workspaceId?: string;
   initialContent?: string;
+  role?: 'creator' | 'agency' | string;
+  userName?: string;
+  orgId?: string;
+  revisionData?: RevisionData | null;
+  onClearRevision?: () => void;
+  onNavigateToSubmissions?: () => void;
 }
+
+const CLIENT_BRANDS = [
+  { id: 'aurelle-tech', name: 'Aurelle Skin', industry: 'Consumer Skincare & Cosmetics' },
+  { id: 'apex-dynamics', name: 'Apex Dynamics', industry: 'Tier-1 EV Automotive' },
+  { id: 'novus-health', name: 'Novus Health Solutions', industry: 'Precision Cardiovascular Therapeutics' },
+];
 
 const EXAMPLE_POSTS: ExamplePost[] = [
   {
@@ -113,9 +135,19 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
   brandName = 'Aurelle Skin',
   workspaceId = 'aurelle-tech',
   initialContent,
+  role = 'creator',
+  userName,
+  orgId,
+  revisionData,
+  onClearRevision,
+  onNavigateToSubmissions,
 }) => {
-  // Load draft from localStorage or fallback
+  const [activeWorkspaceId, setActiveWorkspaceId] = useState<string>(revisionData?.brandId || workspaceId || 'aurelle-tech');
+  const [activeBrandName, setActiveBrandName] = useState<string>(revisionData?.brandName || brandName || 'Aurelle Skin');
+
+  // Load draft from localStorage or fallback or revisionData
   const [draftContent, setDraftContent] = useState<string>(() => {
+    if (revisionData?.content) return revisionData.content;
     if (initialContent) return initialContent;
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('brandtrace_creator_draft');
@@ -124,7 +156,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
     return '';
   });
 
-  const [channel, setChannel] = useState<PostChannel>('instagram');
+  const [channel, setChannel] = useState<PostChannel>(revisionData?.channel || 'instagram');
   const [keyPhrases, setKeyPhrases] = useState<string>('dark spots, skin barrier');
   const [callToAction, setCallToAction] = useState<string>('Shop');
   const [isAccordionOpen, setIsAccordionOpen] = useState<boolean>(true); // Open by default
@@ -134,8 +166,32 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
   const [submissionStatus, setSubmissionStatus] = useState<string | null>(null);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
   const [reviewNote, setReviewNote] = useState<string>('');
-  const [privateVersionCount, setPrivateVersionCount] = useState<number>(1);
+  const [privateVersionCount, setPrivateVersionCount] = useState<number>(revisionData ? revisionData.version : 1);
   const [selectedFindingId, setSelectedFindingId] = useState<string | null>(null);
+
+  // Sync revision data if props update
+  useEffect(() => {
+    if (revisionData) {
+      setDraftContent(revisionData.content);
+      if (revisionData.channel) setChannel(revisionData.channel);
+      setPrivateVersionCount(revisionData.version);
+      if (revisionData.brandId) setActiveWorkspaceId(revisionData.brandId);
+      if (revisionData.brandName) setActiveBrandName(revisionData.brandName);
+      setHasChecked(false);
+      setSubmissionStatus(null);
+    }
+  }, [revisionData]);
+
+  // Handle client brand change (Agency)
+  const handleClientBrandChange = (brandId: string) => {
+    setActiveWorkspaceId(brandId);
+    const found = CLIENT_BRANDS.find((b) => b.id === brandId);
+    if (found) {
+      setActiveBrandName(found.name);
+    }
+    setHasChecked(false);
+    setSubmissionStatus(null);
+  };
   
   // Suggested version state
   const [suggestedContent, setSuggestedContent] = useState<string>('');
@@ -249,9 +305,9 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
     const res = await apiClient.request<any>('/api/verify', {
       method: 'POST',
       body: JSON.stringify({
-        brand_id: workspaceId || 'aurelle-tech',
+        brand_id: activeWorkspaceId,
         content: activeText,
-        campaign_name: `${brandName} Marketing Asset`,
+        campaign_name: `${activeBrandName} Marketing Asset`,
         channel: channel.toLowerCase(),
         key_phrases: keyPhrases,
         call_to_action: callToAction,
@@ -516,19 +572,28 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
 
     try {
       // 1. Submit to centralized submissions database (places draft in Reviewer Meera's queue)
-      let submissionId = `SUB-${Date.now().toString(36).toUpperCase()}`;
+      let submissionId = revisionData?.submissionId || `SUB-${Date.now().toString(36).toUpperCase()}`;
+      const subVersion = revisionData ? revisionData.version : privateVersionCount;
+      const subCreatorId = role === 'agency' ? 'USR-AGENCY-001' : 'USR-CREATOR-001';
+      const subCreatorName = userName || (role === 'agency' ? 'Agency Sana' : 'Creator Asha');
+      const subCreatorType = role === 'agency' ? 'agency' : 'creator';
+      const subOrgId = orgId || (role === 'agency' ? 'ORG-AGENCY-PULSE' : 'ORG-AURELLE');
+
       try {
         const subRes = await apiClient.request<any>('/api/submissions', {
           method: 'POST',
           body: JSON.stringify({
-            brand_id: workspaceId || 'aurelle-tech',
-            creator_id: 'USR-CREATOR-001',
-            creator_name: 'Creator Asha',
-            creator_type: 'employee',
+            brand_id: activeWorkspaceId,
+            brand_name: activeBrandName,
+            creator_id: subCreatorId,
+            creator_name: subCreatorName,
+            creator_type: subCreatorType,
+            org_id: subOrgId,
             channel: channel.toLowerCase(),
             title: draftContent.slice(0, 95) + (draftContent.length > 95 ? '...' : ''),
             original_content: draftContent,
             current_content: draftContent,
+            version: subVersion,
             status: 'PENDING_REVIEW',
             findings: findings.map((f) => ({
               number: f.number,
@@ -544,8 +609,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
               suggested_sentence: f.approvedText,
               status: f.accepted ? 'OVERRULED' : 'PENDING'
             })),
-            submission_notes: reviewNote || 'Submitted for review by Creator Asha',
-            version: privateVersionCount,
+            submission_notes: reviewNote || (revisionData ? `Revision v${subVersion} resubmitted addressing reviewer notes` : 'Submitted for review'),
           }),
         });
         if (subRes && subRes.id) {
@@ -563,12 +627,12 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
           method: 'POST',
           body: JSON.stringify({
             verification_id: submissionId,
-            brand_id: workspaceId || 'aurelle-tech',
-            asset_id: `AST-CREATOR-${Date.now().toString().slice(-4)}`,
-            asset_title: `${brandName} Marketing Asset (${channel})`,
+            brand_id: activeWorkspaceId,
+            asset_id: `AST-${subCreatorType.toUpperCase()}-${Date.now().toString().slice(-4)}`,
+            asset_title: `${activeBrandName} Marketing Asset (${channel})`,
             channel: channel.toLowerCase(),
             content: draftContent,
-            reviewer: 'Creator Asha',
+            reviewer: subCreatorName,
             decision: categoryCounts.blocking === 0 ? 'APPROVED' : 'REVIEWED',
           }),
         });
@@ -582,13 +646,16 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
 
       if (onSaveAuditVersion) {
         onSaveAuditVersion({
-          what: `submitted for human review (assigned: Reviewer Meera)`,
-          reason: reviewNote || `Handoff to review queue. Status: ${seal}`,
+          what: `submitted for human review (assigned: Reviewer Meera, v${subVersion})`,
+          reason: reviewNote || `Handoff to review queue by ${subCreatorName}. Status: ${seal}`,
           hash: `${hash.slice(0, 12)}...`,
         });
       }
 
-      setSubmissionStatus(`Draft submitted to Reviewer Meera (${submissionId}). Release Seal: ${seal}. Trackable in Review Queue & Audit Log.`);
+      setSubmissionStatus(`Draft v${subVersion} submitted to Reviewer Meera (${submissionId}) for client ${activeBrandName}. Trackable in Review Queue & Submissions Log.`);
+      if (onClearRevision) {
+        onClearRevision();
+      }
     } catch (err) {
       console.warn('Backend submission fallback:', err);
       if (onSaveAuditVersion) {
@@ -617,15 +684,69 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
       {/* Header matching Plumbline / BrandTrace */}
       <div className="space-y-2">
         <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
-          PLUMBLINE · {brandName.toUpperCase()}
+          PLUMBLINE · {activeBrandName.toUpperCase()}
         </div>
         <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white font-sans uppercase">
           CHECK A POST
         </h1>
         <p className="text-sm sm:text-base text-neutral-400 font-sans max-w-2xl leading-relaxed">
-          Paste a draft or upload a file. You'll see what breaks Aurelle's rules, which claims the evidence doesn't back, and the approved way to say it.
+          Paste a draft or upload a file. You'll see what breaks {activeBrandName}'s rules, which claims the evidence doesn't back, and the approved way to say it.
         </p>
       </div>
+
+      {/* Revision Mode Banner if reviewing returned draft */}
+      {revisionData && (
+        <div className="p-4 rounded-2xl bg-amber-950/40 border border-amber-600/70 text-xs font-mono text-amber-200 flex items-start justify-between gap-3 shadow-lg">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 font-bold text-amber-300 uppercase tracking-wider text-[11px]">
+              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>REVISION WORKFLOW (v{revisionData.version}) · FEEDBACK FROM REVIEWER MEERA</span>
+            </div>
+            <p className="font-sans text-amber-100 text-xs pl-6 leading-relaxed">
+              "{revisionData.reviewerFeedback}"
+            </p>
+            <div className="text-[10px] text-amber-400/80 pl-6">
+              Update the text below to address this guidance, run Check to re-validate, and submit your new revision.
+            </div>
+          </div>
+          {onClearRevision && (
+            <button
+              onClick={onClearRevision}
+              className="text-amber-400 hover:text-white cursor-pointer text-[10px] underline shrink-0"
+            >
+              Exit Revision
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Client Brand Selector for Agency */}
+      {role === 'agency' && (
+        <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-neutral-950 border border-neutral-800">
+          <div className="flex items-center gap-2.5">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400 font-bold">
+              ASSIGNED CLIENT BRAND:
+            </span>
+            <select
+              value={activeWorkspaceId}
+              onChange={(e) => handleClientBrandChange(e.target.value)}
+              className="px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-700 text-xs font-mono font-bold text-white focus:outline-none focus:border-indigo-500 cursor-pointer"
+            >
+              {CLIENT_BRANDS.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name} ({b.industry})
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex items-center gap-2 text-[10px] font-mono text-neutral-400">
+            <span>Agency Partner:</span>
+            <span className="px-2 py-0.5 rounded bg-neutral-900 border border-neutral-700 text-neutral-200 font-bold">
+              {orgId || 'ORG-AGENCY-PULSE'}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Main Lined Paper Document Card */}
       <div className="rounded-2xl border border-neutral-800 shadow-2xl overflow-hidden bg-neutral-950 transition-all">
@@ -820,6 +941,15 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
             <span>{submissionStatus}</span>
+            {onNavigateToSubmissions && (
+              <button
+                type="button"
+                onClick={onNavigateToSubmissions}
+                className="ml-2 text-indigo-400 hover:text-white underline font-bold cursor-pointer"
+              >
+                Track in Submissions →
+              </button>
+            )}
           </div>
           <button
             onClick={() => setSubmissionStatus(null)}
