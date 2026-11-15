@@ -14,6 +14,11 @@ from brandtrace.modules.content.router import router as content_router
 from brandtrace.modules.approvals.router import router as approvals_router
 # Phase 6 Demo Workflow Router
 from brandtrace.modules.demo.router import router as demo_router
+# Phase 7 Security, Governance & RBAC Router
+from brandtrace.modules.security.router import router as security_router
+from brandtrace.core.middleware import (
+    RateLimitMiddleware, SecurityHeadersMiddleware, ErrorSanitizationMiddleware
+)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -39,6 +44,9 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+app.add_middleware(ErrorSanitizationMiddleware)
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(RateLimitMiddleware, requests_per_minute=120)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -58,6 +66,7 @@ app.include_router(graph_router, prefix="/api")
 app.include_router(content_router, prefix="/api")
 app.include_router(approvals_router, prefix="/api")
 app.include_router(demo_router, prefix="/api")
+app.include_router(security_router, prefix="/api")
 
 @app.get("/health")
 async def health_check():

@@ -149,14 +149,14 @@ class MultimodalContentEngine:
         except Exception as e:
             findings.append(
                 MultimodalFinding(
-                    id="ERR-01",
-                    location="Image Decoder",
+                    id="ERR-IMG-CORRUPT",
+                    location="Image Stream Decoder",
                     category="VISUAL_INTELLIGENCE",
-                    severity=SeverityLevel.LOW,
-                    explanation=f"Image parsing note: {e}",
-                    rule_citation="Format Standards",
-                    verification_status=ClaimVerificationStatus.NEEDS_VERIFICATION,
-                    suggested_fix="Upload PNG or JPG format.",
+                    severity=SeverityLevel.CRITICAL,
+                    explanation=f"Corrupted image payload: {e}. Unable to decode valid bitmap.",
+                    rule_citation="Digital Asset Format Standards",
+                    verification_status=ClaimVerificationStatus.CONTRADICTED,
+                    suggested_fix="Re-export and upload a valid, uncorrupted PNG or JPEG file.",
                     confidence=1.0
                 )
             )
