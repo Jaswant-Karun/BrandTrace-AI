@@ -317,14 +317,16 @@ export const App: React.FC = () => {
   // 2. ULTRA-FAST LOGIN & REGISTRATION VIEW
   if (viewMode === 'login') {
     return (
-      <LoginPage
-        onSuccess={handleLoginSuccess}
-        onOpenLanding={() => {
-          setJustLoggedIn(false);
-          setViewMode('landing');
-          if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
-        }}
-      />
+      <Suspense fallback={<ViewLoadingFallback />}>
+        <LoginPage
+          onSuccess={handleLoginSuccess}
+          onOpenLanding={() => {
+            setJustLoggedIn(false);
+            setViewMode('landing');
+            if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
+          }}
+        />
+      </Suspense>
     );
   }
 
