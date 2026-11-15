@@ -62,7 +62,7 @@ export const CreatorFactsLedger: React.FC<CreatorFactsLedgerProps> = ({ brandNam
     <div className="space-y-8 max-w-5xl mx-auto py-6 px-4 sm:px-6">
       <div className="space-y-2">
         <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">BRANDTRACE · {brandName.toUpperCase()}</div>
-        <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white uppercase">FACTS</h1>
+        <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white uppercase">FACT</h1>
         <p className="text-xs sm:text-base text-neutral-400 max-w-2xl leading-relaxed">
           Approved brand facts and their evidence-backed source references.
         </p>

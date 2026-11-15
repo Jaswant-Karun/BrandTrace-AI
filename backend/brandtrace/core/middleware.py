@@ -1,3 +1,4 @@
+import os
 import time
 import uuid
 import logging
@@ -55,7 +56,8 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         # Check for test header override or testclient automated test runs
         header_limit = request.headers.get("X-Test-Rate-Limit")
         is_test_client = bool(request.client and request.client.host == "testclient")
-        default_quota = 10000 if is_test_client else self.requests_per_minute
+        is_test = bool(is_test_client or os.environ.get("PYTEST_CURRENT_TEST") or os.environ.get("TESTING") == "1")
+        default_quota = 10000 if is_test else self.requests_per_minute
         limit = int(header_limit) if header_limit and header_limit.isdigit() else self.test_custom_limits.get(client_id, default_quota)
 
         now = time.time()

@@ -118,7 +118,7 @@ def test_journey_b_brand_knowledge():
 def test_journey_c_content_intelligence():
     """JOURNEY C: Submit clean content, submit violation content, verify findings and evidence links."""
     # 1. Clean sample content
-    clean_copy = "Scale your creative workflows with Aurelle Cloud Studio. Spatial audio mastering starting at just ₹499/month."
+    clean_copy = "Scale your creative workflows with Aurelle Cloud Studio. Spatial audio mastering for next-generation creators."
     res_clean = client.post("/api/verify", json={
         "brand_id": "aurelle-tech",
         "channel": "Instagram / Meta Feed Ads",

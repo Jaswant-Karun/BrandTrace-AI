@@ -23,13 +23,15 @@ class AgentFinding(BaseModel):
 
 class VerificationRequest(BaseModel):
     brand_id: str
-    content: str
+    content: str = ""
     asset_id: Optional[str] = None
     asset_title: Optional[str] = None
     channel: str = "Digital"
     target_jurisdiction: str = "US"
     key_phrases: Optional[str] = None
     call_to_action: Optional[str] = None
+    image_file_id: Optional[str] = None
+    image_analysis: Optional[Dict[str, Any]] = None
 
 class VerificationResult(BaseModel):
     verification_id: str
@@ -52,4 +54,5 @@ class VerificationResult(BaseModel):
     sentence_findings: Optional[List[Dict[str, Any]]] = None
     summary_counts: Optional[Dict[str, int]] = None
     verdict_badge: Optional[str] = None
+    image_analysis: Optional[Dict[str, Any]] = None
 

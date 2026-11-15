@@ -11,14 +11,14 @@ async def get_current_user(authorization: Optional[str] = Header(None)) -> UserP
     if not authorization or not authorization.startswith("Bearer "):
         if settings.environment == "production":
             raise HTTPException(status_code=401, detail="Authentication credentials required")
-        # Return default authorized persona in unauthenticated requests for easy hackathon testing
+        # Return default authorized admin persona in unauthenticated requests for easy testing
         return UserProfile(
-            user_id="USR-CGO-01",
-            email="governance@apex.com",
-            name="David Sterling, Chief Governance Officer",
-            role="COMPLIANCE_REVIEWER", # type: ignore
-            org_id="ORG-APEX",
-            workspace_id="apex-dynamics"
+            user_id="USR-AUR-ADM",
+            email="admin@aurelle.com",
+            name="Sarah Chen, Chief Technology Officer & System Administrator",
+            role="ADMIN", # type: ignore
+            org_id="ORG-AURELLE",
+            workspace_id="aurelle-tech"
         )
     token = authorization.split(" ")[1]
     user = auth_service.get_user_from_token(token)

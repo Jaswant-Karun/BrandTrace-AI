@@ -491,8 +491,31 @@ class SubmissionsService:
         task_id = f"REV-TSK-{uuid.uuid4().hex[:6].upper()}"
         now_time = _now_str()
 
-        # Build initial approval history
+        # Build initial approval history based on submitter and routing rules
         is_agency_submitter = req.creator_type == "agency" or "agency" in req.creator_name.lower()
+        requires_agency = req.requires_agency_review
+
+        if is_agency_submitter:
+            agency_step_status = "COMPLETED"
+            agency_step_comments = "Pre-verified by agency partner."
+            agency_step_timestamp = now_time
+            reviewer_step_status = "ACTIVE"
+            initial_status = "PENDING_REVIEW"
+        elif requires_agency is True:
+            # Agency quality check explicitly required by campaign or workflow
+            agency_step_status = "ACTIVE"
+            agency_step_comments = "Awaiting agency quality review."
+            agency_step_timestamp = None
+            reviewer_step_status = "PENDING"
+            initial_status = "PENDING_AGENCY"
+        else:
+            # Standard creator submission; direct to reviewer (agency quality check optional/bypassed)
+            agency_step_status = "COMPLETED"
+            agency_step_comments = "Direct brand review (agency quality check optional/bypassed)."
+            agency_step_timestamp = now_time
+            reviewer_step_status = "ACTIVE"
+            initial_status = "PENDING_REVIEW"
+
         approval_history = [
             {
                 "stage": "CREATOR_SUBMISSION",
@@ -508,16 +531,16 @@ class SubmissionsService:
                 "label": "Agency Quality Check",
                 "user": "Agency Sana" if not is_agency_submitter else req.creator_name,
                 "role": "Agency",
-                "status": "COMPLETED" if is_agency_submitter else "ACTIVE",
-                "timestamp": now_time if is_agency_submitter else None,
-                "comments": "Pre-verified by agency partner." if is_agency_submitter else None
+                "status": agency_step_status,
+                "timestamp": agency_step_timestamp,
+                "comments": agency_step_comments
             },
             {
                 "stage": "REVIEWER_APPROVAL",
                 "label": "Reviewer Approval",
                 "user": "Reviewer Meera",
                 "role": "Reviewer",
-                "status": "ACTIVE" if is_agency_submitter else "PENDING",
+                "status": reviewer_step_status,
                 "timestamp": None,
                 "comments": None
             },
@@ -564,8 +587,10 @@ class SubmissionsService:
             "attachment_ids": req.attachment_ids,
             "inspection_report": req.inspection_report,
             "extracted_text": req.extracted_text,
-            "status": "PENDING_REVIEW",
+            "status": initial_status,
             "submission_notes": req.submission_notes or "",
+            "requires_agency_review": req.requires_agency_review,
+            "comments": req.comments or [],
             "submitted_at": now_time,
             "updated_at": now_time,
             "approval_history": approval_history,
@@ -673,15 +698,29 @@ class SubmissionsService:
         role: Optional[str] = None,
         status: Optional[str] = None,
         brand_id: Optional[str] = None,
+        search: Optional[str] = None,
         skip: int = 0,
         limit: int = 100
     ) -> List[Dict[str, Any]]:
         query: Dict[str, Any] = {}
         if creator_id and role == "creator":
             query["creator_id"] = creator_id
-        if status:
-            if status == "CHANGES_REQUESTED":
+        if status and status.upper() != "ALL":
+            s_upper = status.upper()
+            if s_upper in ["CHANGES_REQUESTED", "CHANGES"]:
                 query["status"] = {"$in": ["CHANGES_REQUESTED", "RETURNED_TO_CREATOR", "RETURNED_TO_AGENCY"]}
+            elif s_upper in ["UNDER_REVIEW", "PENDING"]:
+                query["status"] = {"$in": ["PENDING_REVIEW", "IN_REVIEW", "SUBMITTED"]}
+            elif s_upper in ["DRAFTS", "DRAFT"]:
+                query["status"] = "DRAFT"
+            elif s_upper in ["APPROVED"]:
+                query["status"] = {"$in": ["APPROVED", "REVIEW_APPROVED", "COMPLIANCE_APPROVED"]}
+            elif s_upper in ["RELEASED"]:
+                query["status"] = "RELEASED"
+            elif s_upper in ["REJECTED"]:
+                query["status"] = "REJECTED"
+            elif s_upper in ["SUBMITTED"]:
+                query["status"] = "SUBMITTED"
             else:
                 query["status"] = status
         elif role == "compliance":
@@ -692,12 +731,28 @@ class SubmissionsService:
             query["$or"] = [
                 {"creator_type": "agency"},
                 {"org_id": "ORG-AGENCY-PULSE"},
-                {"creator_name": {"$regex": "agency", "$options": "i"}}
+                {"creator_name": {"$regex": "agency", "$options": "i"}},
+                {"status": "PENDING_AGENCY"},
+                {"approval_history": {"$elemMatch": {"stage": "AGENCY_APPROVAL", "status": "ACTIVE"}}}
             ]
         elif role in ["brand-owner", "brand_owner"]:
             query["status"] = {"$in": ["COMPLIANCE_APPROVED", "RELEASED", "APPROVED"]}
         if brand_id:
             query["brand_id"] = brand_id
+
+        if search and search.strip():
+            s_term = search.strip()
+            search_clause = [
+                {"title": {"$regex": s_term, "$options": "i"}},
+                {"current_content": {"$regex": s_term, "$options": "i"}},
+                {"original_content": {"$regex": s_term, "$options": "i"}},
+                {"submission_id": {"$regex": s_term, "$options": "i"}},
+                {"creator_name": {"$regex": s_term, "$options": "i"}},
+            ]
+            if "$or" in query:
+                query["$and"] = [{"$or": query.pop("$or")}, {"$or": search_clause}]
+            else:
+                query["$or"] = search_clause
 
         safe_limit = max(1, min(limit, 500))
         safe_skip = max(0, skip)
@@ -711,9 +766,22 @@ class SubmissionsService:
         subs = list(_SUBMISSIONS_STORE.values())
         if creator_id and role == "creator":
             subs = [s for s in subs if s.get("creator_id") == creator_id]
-        if status:
-            if status == "CHANGES_REQUESTED":
+        if status and status.upper() != "ALL":
+            s_upper = status.upper()
+            if s_upper in ["CHANGES_REQUESTED", "CHANGES"]:
                 subs = [s for s in subs if s.get("status") in ["CHANGES_REQUESTED", "RETURNED_TO_CREATOR", "RETURNED_TO_AGENCY"]]
+            elif s_upper in ["UNDER_REVIEW", "PENDING"]:
+                subs = [s for s in subs if s.get("status") in ["PENDING_REVIEW", "IN_REVIEW", "SUBMITTED"]]
+            elif s_upper in ["DRAFTS", "DRAFT"]:
+                subs = [s for s in subs if s.get("status") == "DRAFT"]
+            elif s_upper in ["APPROVED"]:
+                subs = [s for s in subs if s.get("status") in ["APPROVED", "REVIEW_APPROVED", "COMPLIANCE_APPROVED"]]
+            elif s_upper in ["RELEASED"]:
+                subs = [s for s in subs if s.get("status") == "RELEASED"]
+            elif s_upper in ["REJECTED"]:
+                subs = [s for s in subs if s.get("status") == "REJECTED"]
+            elif s_upper in ["SUBMITTED"]:
+                subs = [s for s in subs if s.get("status") == "SUBMITTED"]
             else:
                 subs = [s for s in subs if s.get("status") == status]
         elif role == "compliance":
@@ -721,11 +789,30 @@ class SubmissionsService:
         elif role == "reviewer":
             subs = [s for s in subs if s.get("status") in ["PENDING_REVIEW", "SUBMITTED", "REVIEW_APPROVED", "CHANGES_REQUESTED", "RETURNED_TO_CREATOR", "RETURNED_TO_AGENCY"]]
         elif role == "agency":
-            subs = [s for s in subs if s.get("creator_type") == "agency" or s.get("org_id") == "ORG-AGENCY-PULSE" or "agency" in str(s.get("creator_name", "")).lower()]
+            subs = [
+                s for s in subs
+                if s.get("creator_type") == "agency"
+                or s.get("org_id") == "ORG-AGENCY-PULSE"
+                or "agency" in str(s.get("creator_name", "")).lower()
+                or s.get("status") == "PENDING_AGENCY"
+                or any(step.get("stage") == "AGENCY_APPROVAL" and step.get("status") == "ACTIVE" for step in s.get("approval_history", []))
+            ]
         elif role in ["brand-owner", "brand_owner"]:
             subs = [s for s in subs if s.get("status") in ["COMPLIANCE_APPROVED", "RELEASED", "APPROVED"]]
         if brand_id:
             subs = [s for s in subs if s.get("brand_id") == brand_id]
+
+        if search and search.strip():
+            s_term = search.strip().lower()
+            subs = [
+                s for s in subs
+                if s_term in s.get("title", "").lower()
+                or s_term in s.get("current_content", "").lower()
+                or s_term in s.get("original_content", "").lower()
+                or s_term in s.get("submission_id", "").lower()
+                or s_term in s.get("creator_name", "").lower()
+            ]
+
         return subs[safe_skip:safe_skip + safe_limit]
 
     # ==========================================================================
@@ -736,7 +823,9 @@ class SubmissionsService:
         submission_id: str,
         decision: str,
         agency_name: str,
-        feedback: Optional[str] = None
+        feedback: Optional[str] = None,
+        actor_id: Optional[str] = None,
+        org_id: Optional[str] = None
     ) -> Optional[Dict[str, Any]]:
         sub = await self.get_submission(submission_id)
         if not sub:
@@ -763,7 +852,7 @@ class SubmissionsService:
             )
 
         elif decision in ["REQUEST_CHANGES", "SEND_BACK"]:
-            sub["status"] = "RETURNED_TO_CREATOR"
+            sub["status"] = "CHANGES_REQUESTED"
             sub["reviewer_feedback"] = feedback or "Agency requested adjustments before client submission."
             for step in history:
                 if step.get("stage") == "AGENCY_APPROVAL":
@@ -810,7 +899,11 @@ class SubmissionsService:
             what=f"agency decision ({decision.lower()}): {sub.get('title', '')[:30]}",
             reason=feedback or f"Agency decision: {decision}",
             actor_name=agency_name,
-            event_hash=evt_hash
+            event_hash=evt_hash,
+            actor_id=actor_id or "USR-AUR-SANA",
+            org_id=org_id or sub.get("org_id", "ORG-AGENCY-PULSE"),
+            resource_id=submission_id,
+            action_type="AGENCY_DECISION",
         )
 
         return sub
@@ -824,7 +917,9 @@ class SubmissionsService:
         decision: str,
         reviewer_name: str,
         feedback: Optional[str] = None,
-        finding_decisions: Optional[Dict[str, Any]] = None
+        finding_decisions: Optional[Dict[str, Any]] = None,
+        actor_id: Optional[str] = None,
+        org_id: Optional[str] = None
     ) -> Optional[Dict[str, Any]]:
         sub = await self.get_submission(submission_id)
         if not sub:
@@ -944,8 +1039,60 @@ class SubmissionsService:
             what=f"reviewer decision ({decision.lower()}): {sub.get('title', '')[:30]}",
             reason=feedback or f"Decision: {decision}",
             actor_name=reviewer_name,
-            event_hash=evt_hash
+            event_hash=evt_hash,
+            actor_id=actor_id or "USR-AUR-MEERA",
+            org_id=org_id or sub.get("org_id", "ORG-AURELLE"),
+            resource_id=submission_id,
+            action_type="REVIEWER_DECISION",
         )
+
+        return sub
+
+    async def add_submission_comment(
+        self,
+        submission_id: str,
+        author_name: str,
+        text: str,
+        author_id: Optional[str] = None,
+        author_role: Optional[str] = None,
+        org_id: Optional[str] = None
+    ) -> Dict[str, Any]:
+        sub = await self.get_submission(submission_id)
+        if not sub:
+            raise ValueError(f"Submission {submission_id} not found.")
+        now_time = _now_str()
+        comment_id = f"comm-{uuid.uuid4().hex[:6]}"
+        comment_obj = {
+            "id": comment_id,
+            "author": author_name,
+            "author_id": author_id or "",
+            "role": author_role or "REVIEWER",
+            "time": now_time,
+            "text": text
+        }
+        if "comments" not in sub or not isinstance(sub["comments"], list):
+            sub["comments"] = []
+        sub["comments"].append(comment_obj)
+        sub["updated_at"] = now_time
+        if mongo_manager.is_connected and mongo_manager.db is not None:
+            await mongo_manager.db.submissions.update_one(
+                {"submission_id": submission_id},
+                {"$set": {"comments": sub["comments"], "updated_at": now_time}}
+            )
+        _SUBMISSIONS_STORE[submission_id] = sub
+        
+        evt_hash = _hash_str(f"comment:{submission_id}:{comment_id}:{now_time}")
+        await self.record_audit_event(
+            what=f"added comment on {sub.get('title', '')[:30]}: '{text[:30]}...'",
+            reason="Review Discussion Comment",
+            actor_name=author_name,
+            event_hash=evt_hash,
+            actor_id=author_id,
+            org_id=org_id or sub.get("org_id"),
+            resource_id=submission_id,
+            action_type="SUBMISSION_COMMENT"
+        )
+        return comment_obj
 
         return sub
 
@@ -959,7 +1106,9 @@ class SubmissionsService:
         compliance_name: str,
         notes: Optional[str] = None,
         finding_decisions: Optional[Dict[str, Any]] = None,
-        requested_evidence: Optional[str] = None
+        requested_evidence: Optional[str] = None,
+        actor_id: Optional[str] = None,
+        org_id: Optional[str] = None
     ) -> Optional[Dict[str, Any]]:
         sub = await self.get_submission(submission_id)
         if not sub:
@@ -1038,6 +1187,8 @@ class SubmissionsService:
             sub["status"] = "EVIDENCE_REQUESTED"
             ev_note = requested_evidence or notes or "Additional clinical trial or regulatory substantiation required."
             sub["evidence_requested_notes"] = ev_note
+            sub["requested_evidence"] = requested_evidence or ev_note
+            sub["compliance_notes"] = notes or ev_note
             for step in history:
                 if step.get("stage") == "COMPLIANCE_APPROVAL":
                     step["status"] = "ACTIVE"
@@ -1108,7 +1259,11 @@ class SubmissionsService:
             what=f"compliance sign-off ({decision.lower()}): {sub.get('title', '')[:30]}",
             reason=notes or requested_evidence or f"Compliance decision: {decision}",
             actor_name=compliance_name,
-            event_hash=h
+            event_hash=h,
+            actor_id=actor_id or "USR-AUR-ARJUN",
+            org_id=org_id or sub.get("org_id", "ORG-AURELLE"),
+            resource_id=submission_id,
+            action_type="COMPLIANCE_DECISION",
         )
 
         return sub
@@ -1122,7 +1277,9 @@ class SubmissionsService:
         decision: str,
         approver_name: str,
         notes: Optional[str] = None,
-        reason: Optional[str] = None
+        reason: Optional[str] = None,
+        actor_id: Optional[str] = None,
+        org_id: Optional[str] = None
     ) -> Optional[Dict[str, Any]]:
         sub = await self.get_submission(submission_id)
         if not sub:
@@ -1139,6 +1296,9 @@ class SubmissionsService:
             step.get("stage") == "COMPLIANCE_APPROVAL" and step.get("status") == "COMPLETED"
             for step in history
         ) or sub.get("status") in ["COMPLIANCE_APPROVED", "RELEASED", "APPROVED"]
+
+        if sub.get("status") == "REJECTED":
+            raise ValueError("Cannot grant final approval or seal a rejected submission.")
 
         if decision in ["APPROVE", "FINAL_APPROVE"]:
             if not has_reviewer_approval or not has_compliance_approval:
@@ -1194,6 +1354,8 @@ class SubmissionsService:
                 "approver_name": approver_name,
                 "timestamp_iso": now_time,
                 "seal_code": sub.get("release_seal") or release_id,
+                "tamper_evident_seal": sub.get("release_seal") or release_id,
+                "audit_stamp": release_id,
                 "is_superseded": False,
                 "is_revoked": False
             }
@@ -1291,8 +1453,14 @@ class SubmissionsService:
             what=f"brand owner final approval ({decision.lower()}): {sub.get('title', '')[:30]}",
             reason=notes or reason or f"Brand owner decision: {decision}",
             actor_name=approver_name,
-            event_hash=h
+            event_hash=h,
+            actor_id=actor_id or "USR-AUR-KABIR",
+            org_id=org_id or sub.get("org_id", "ORG-AURELLE"),
+            resource_id=release_id if decision in ["APPROVE", "FINAL_APPROVE"] else submission_id,
+            action_type="BRAND_OWNER_FINAL_APPROVAL",
         )
+
+        return sub
 
         return sub
 

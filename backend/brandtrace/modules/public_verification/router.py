@@ -194,8 +194,10 @@ async def find_release_record_by_seal(seal_code: str) -> Optional[Dict[str, Any]
                 "$or": [
                     {"audit_stamp": clean_seal},
                     {"tamper_evident_seal": clean_seal},
+                    {"seal_code": clean_seal},
                     {"release_id": clean_seal},
-                    {"asset_id": clean_seal}
+                    {"asset_id": clean_seal},
+                    {"submission_id": clean_seal}
                 ]
             })
             if doc:
@@ -204,7 +206,7 @@ async def find_release_record_by_seal(seal_code: str) -> Optional[Dict[str, Any]
                     "record_id": doc.get("release_id"),
                     "asset_id": doc.get("asset_id"),
                     "asset_title": doc.get("asset_title") or doc.get("asset_id"),
-                    "seal_code": doc.get("audit_stamp") or doc.get("tamper_evident_seal"),
+                    "seal_code": doc.get("seal_code") or doc.get("audit_stamp") or doc.get("tamper_evident_seal"),
                     "content": doc.get("content", ""),
                     "content_hash": doc.get("content_hash"),
                     "approved_version": doc.get("approved_version", "v1.0"),
@@ -222,14 +224,16 @@ async def find_release_record_by_seal(seal_code: str) -> Optional[Dict[str, Any]
     for r in mongo_manager._memory_releases:
         if (r.get("audit_stamp", "").lower() == clean_seal.lower() or
             r.get("tamper_evident_seal", "").lower() == clean_seal.lower() or
+            r.get("seal_code", "").lower() == clean_seal.lower() or
             r.get("release_id", "").lower() == clean_seal.lower() or
-            r.get("asset_id", "").lower() == clean_seal.lower()):
+            r.get("asset_id", "").lower() == clean_seal.lower() or
+            r.get("submission_id", "").lower() == clean_seal.lower()):
             return {
                 "source": "MEMORY_RELEASES",
                 "record_id": r.get("release_id"),
                 "asset_id": r.get("asset_id"),
                 "asset_title": r.get("asset_title") or r.get("asset_id"),
-                "seal_code": r.get("audit_stamp") or r.get("tamper_evident_seal"),
+                "seal_code": r.get("seal_code") or r.get("audit_stamp") or r.get("tamper_evident_seal"),
                 "content": r.get("content", ""),
                 "content_hash": r.get("content_hash"),
                 "approved_version": r.get("approved_version", "v1.0"),

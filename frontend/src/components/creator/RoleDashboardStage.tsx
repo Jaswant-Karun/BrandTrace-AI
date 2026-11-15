@@ -33,6 +33,11 @@ interface QueueItem {
   channel?: string;
   version?: number;
   reviewerFeedback?: string;
+  attachment_ids?: string[];
+  originalContent?: string;
+  currentContent?: string;
+  approvalHistory?: any[];
+  comments?: any[];
 }
 
 
@@ -174,6 +179,11 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
                 channel: s.channel || 'instagram',
                 version: s.version || 1,
                 reviewerFeedback: s.reviewer_feedback || '',
+                attachment_ids: s.attachment_ids || [],
+                originalContent: s.original_content || '',
+                currentContent: s.current_content || '',
+                approvalHistory: s.approval_history || [],
+                comments: s.comments || [],
               };
             });
 

@@ -16,6 +16,7 @@ router = APIRouter(prefix="/content", tags=["Content Management & Cloud File Pro
 @router.post("/upload")
 async def upload_and_process_multimodal_asset(
     file: UploadFile = File(...),
+    caption: Optional[str] = Form(None),
     org_id: Optional[str] = Form(None),
     workspace_id: Optional[str] = Form(None),
     uploaded_by: Optional[str] = Form(None),
@@ -26,7 +27,9 @@ async def upload_and_process_multimodal_asset(
     2. Enforces file size limit (<=25MB) and disallowed extensions.
     3. Stores binary in isolated cloud storage provider.
     4. Runs multimodal AST & media inspection (PDF, DOCX, TXT, MD, PNG, JPG, Video).
-    5. Persists metadata, ownership, and references into MongoDB Atlas 'file_storage_meta' collection.
+    5. Extracts visible packaging text and claims.
+    6. Runs cross-modal caption consistency checks if caption is provided.
+    7. Persists metadata, ownership, and references into MongoDB Atlas 'file_storage_meta' collection.
     """
     content_bytes = await file.read()
     filename = file.filename or "uploaded_content_asset"
@@ -47,16 +50,20 @@ async def upload_and_process_multimodal_asset(
         uploaded_by=user.name
     )
 
-    # Perform multimodal AST / frame-level inspection
+    # Perform multimodal AST / frame-level inspection with optional caption
     seed_graph_data = BRAND_SEEDS.get(tenant_workspace_id) or BRAND_SEEDS.get("aurelle-tech")
     bkg = BrandKnowledgeGraph.from_graph_data(seed_graph_data) if seed_graph_data else BrandKnowledgeGraph(tenant_workspace_id, tenant_workspace_id)
     
-    inspection_report = multimodal_engine.inspect_file(filename, content_bytes, bkg)
+    inspection_report = multimodal_engine.inspect_file(filename, content_bytes, bkg, caption=caption)
 
     return {
         "status": "PROCESSED_AND_INDEXED",
         "file_metadata": file_meta,
-        "inspection_report": inspection_report
+        "inspection_report": inspection_report,
+        "extracted_text": inspection_report.extracted_text_preview,
+        "packaging_claims": getattr(inspection_report, "packaging_claims", []),
+        "disclaimers": getattr(inspection_report, "disclaimers_detected", []),
+        "cross_modal_findings": getattr(inspection_report, "cross_modal_findings", []),
     }
 
 @router.get("/files")

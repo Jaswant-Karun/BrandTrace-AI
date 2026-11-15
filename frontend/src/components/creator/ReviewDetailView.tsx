@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { 
   ArrowLeft, AlertTriangle, ShieldCheck, 
-  Clock, Check, X
+  Clock, Check, X, Image as ImageIcon
 } from 'lucide-react';
+import { apiClient } from '../../services/apiClient';
 
 export interface FindingDetail {
   id: string;
@@ -43,6 +44,11 @@ export interface ReviewPostItem {
   version?: number;
   reviewerFeedback?: string;
   submittedAt?: string;
+  attachment_ids?: string[];
+  originalContent?: string;
+  currentContent?: string;
+  approvalHistory?: any[];
+  comments?: Array<{ id: string; author: string; time: string; text: string }>;
 }
 
 export type ReviewDecisionType = 'APPROVE' | 'REQUEST_CHANGES' | 'REJECT' | 'REQUEST_EVIDENCE';
@@ -85,22 +91,32 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Comments thread state
-  const [comments, setComments] = useState<Array<{ id: string; author: string; time: string; text: string }>>([]);
+  const [comments, setComments] = useState<Array<{ id: string; author: string; time: string; text: string }>>(
+    post.comments && post.comments.length > 0 ? post.comments : []
+  );
   const [newCommentText, setNewCommentText] = useState<string>('');
 
-  const handleAddComment = (e?: React.FormEvent) => {
+  const handleAddComment = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!newCommentText.trim()) return;
-    setComments((prev) => [
-      ...prev,
-      {
-        id: `c-${Date.now()}`,
-        author: userName || 'Reviewer Meera',
-        time: 'Just now',
-        text: newCommentText.trim(),
-      },
-    ]);
+    const textVal = newCommentText.trim();
+    if (!textVal) return;
+    const targetSubId = post.submission_id || post.id;
+    const newComment = {
+      id: `c-${Date.now()}`,
+      author: userName || 'Reviewer Meera',
+      time: 'Just now',
+      text: textVal,
+    };
+    setComments((prev) => [...prev, newComment]);
     setNewCommentText('');
+    try {
+      await apiClient.request(`/api/submissions/${targetSubId}/comments`, {
+        method: 'POST',
+        body: JSON.stringify({ text: textVal }),
+      });
+    } catch (err) {
+      console.error('Failed to save comment to backend:', err);
+    }
   };
 
   // Normalize findings list with full detail matching screenshots
@@ -438,6 +454,52 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
         {/* LEFT SECTION (5 Columns desktop): Paper Card, Approvals, Timeline, Comments */}
         {/* ========================================================================= */}
         <div className="lg:col-span-5 space-y-6">
+
+          {/* Uploaded Media / Packaging Assets Card */}
+          {post.attachment_ids && post.attachment_ids.length > 0 && (
+            <div className="rounded-2xl border border-neutral-800 bg-[#131316] p-5 space-y-3 shadow-xl">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-neutral-300 flex items-center gap-2">
+                  <ImageIcon className="w-4 h-4 text-cyan-400" />
+                  <span>UPLOADED ATTACHMENT ({post.attachment_ids.length})</span>
+                </span>
+                <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-800/50">
+                  VERIFIED ASSET
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                {post.attachment_ids.map((attId, attIdx) => (
+                  <div key={attIdx} className="rounded-xl border border-neutral-800 bg-neutral-900 overflow-hidden flex flex-col">
+                    <div className="relative aspect-video sm:aspect-square bg-neutral-950 flex items-center justify-center overflow-hidden">
+                      <img
+                        src={`/api/content/files/${attId}/download`}
+                        alt={`Attachment ${attId}`}
+                        className="object-contain w-full h-full max-h-48"
+                        onError={(e) => {
+                          (e.target as HTMLElement).style.display = 'none';
+                        }}
+                      />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center p-3 text-center pointer-events-none opacity-40">
+                        <ImageIcon className="w-8 h-8 text-neutral-400 mb-1" />
+                        <span className="text-[10px] font-mono text-neutral-400">{attId}</span>
+                      </div>
+                    </div>
+                    <div className="p-2.5 flex items-center justify-between bg-neutral-900 border-t border-neutral-800 text-[10px] font-mono">
+                      <span className="text-neutral-400 truncate max-w-[120px]">{attId}</span>
+                      <a
+                        href={`/api/content/files/${attId}/download`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-cyan-400 hover:text-cyan-300 underline"
+                      >
+                        Open Asset ↗
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           
           {/* Card 1: Cream Paper Container (Submitted Text) */}
           <div className="rounded-2xl border border-[#e5dfd5] bg-[#fbf9f5] p-6 text-[#1c1c1e] shadow-xl space-y-4">
@@ -599,13 +661,28 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
           {/* Card 3: Timeline Card */}
           <div className="rounded-2xl border border-neutral-800 bg-[#131316] p-5 space-y-4 shadow-xl">
             <div className="text-xs font-mono font-bold uppercase tracking-wider text-neutral-300">
-              TIMELINE
+              TIMELINE & AUDIT HISTORY
             </div>
 
             <div className="space-y-4 text-xs font-sans">
-              {DEFAULT_TIMELINE.map((item, idx) => (
+              {(post.approvalHistory && post.approvalHistory.length > 0
+                ? post.approvalHistory.map((step: any) => ({
+                    time: step.timestamp || 'Pending step',
+                    text: `${step.label} (${step.user || step.role}) — ${step.status}${step.comments ? `: "${step.comments}"` : ''}`,
+                    status: step.status,
+                  }))
+                : DEFAULT_TIMELINE
+              ).map((item: any, idx: number) => (
                 <div key={idx} className="flex items-start gap-3">
-                  <div className="w-2 h-2 rounded-full bg-neutral-500 mt-1.5 shrink-0" />
+                  <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${
+                    item.status === 'COMPLETED'
+                      ? 'bg-emerald-400'
+                      : item.status === 'REJECTED'
+                      ? 'bg-amber-400'
+                      : item.status === 'ACTIVE'
+                      ? 'bg-cyan-400 animate-pulse'
+                      : 'bg-neutral-500'
+                  }`} />
                   <div className="space-y-0.5">
                     <div className="text-[10px] font-mono text-neutral-500 uppercase tracking-tight">
                       {item.time}

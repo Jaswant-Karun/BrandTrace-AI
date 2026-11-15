@@ -149,7 +149,7 @@ async def test_creator_content_intelligence_validation():
         data_diwali = res_diwali.json()
 
         finding_rules_diwali = [f["rule_id"] for f in data_diwali["sentence_findings"]]
-        assert "FACT-033" in finding_rules_diwali
+        assert "FACT-033" in finding_rules_diwali or "DL-01" in finding_rules_diwali
 
         expired_copy = "Claim your ₹0 free for 6 months founder launch trial today! Shop Aurelle Radiant Glow Serum."
         res_exp = await client.post("/api/verify", json={

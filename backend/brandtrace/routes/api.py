@@ -215,8 +215,26 @@ async def verify_asset(request: VerificationRequest, current_user: UserProfile =
     Executes the Autonomous Multi-Agent Governance Pipeline on marketing content.
     Returns token-level risk spans, citations, scores, remediation, and release proof.
     """
+    if request.image_file_id and not request.image_analysis:
+        file_meta = await mongo_manager.get_file_meta(request.image_file_id)
+        if file_meta:
+            from brandtrace.engine.storage_provider import storage_provider
+            res_tuple = await storage_provider.retrieve_file(request.image_file_id)
+            if res_tuple and res_tuple[1]:
+                rep = multimodal_engine.inspect_file(
+                    file_meta.get("filename", "image.jpg"),
+                    res_tuple[1],
+                    get_or_load_graph(request.brand_id),
+                    caption=request.content or None
+                )
+                request.image_analysis = rep.model_dump()
+                if not request.content or not request.content.strip():
+                    request.content = rep.extracted_text_preview
+    elif not request.content or not request.content.strip():
+        if request.image_analysis and (request.image_analysis.get("extracted_text") or request.image_analysis.get("extracted_text_preview")):
+            request.content = request.image_analysis.get("extracted_text") or request.image_analysis.get("extracted_text_preview")
     if not request.content or not request.content.strip():
-        raise HTTPException(status_code=400, detail="Content cannot be empty for governance inspection.")
+        raise HTTPException(status_code=400, detail="Content cannot be empty. Content or uploaded image is required for governance inspection.")
     if len(request.content) > 50000:
         raise HTTPException(status_code=413, detail=f"Content length ({len(request.content)} chars) exceeds maximum permitted limit of 50,000 characters.")
     if not request.brand_id or not request.brand_id.strip():

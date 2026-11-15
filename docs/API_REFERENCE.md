@@ -310,3 +310,74 @@ Executes a discrete step in the demonstration sequence (1 to 12).
 ### `POST /api/demo/reset`
 
 Restores the AURELLE demonstration workspace to pristine factory state without affecting production settings. Requires `BRAND_MANAGER` or `ADMIN` role.
+
+---
+
+## 9. Creator Submissions & 5-Stage Governance Workflow (`/api/submissions`)
+
+### `GET /api/submissions`
+
+Retrieves workspace submissions filtered by current workflow status (`stage`), brand ID, or assigned reviewer.
+
+- Query parameters: `brand_id`, `stage` (e.g. `PENDING_AGENCY`, `PENDING_REVIEW`, `PENDING_COMPLIANCE`, `PENDING_FINAL_APPROVAL`, `APPROVED_RELEASED`, `REVISION_REQUESTED`), `assigned_to`.
+
+### `POST /api/submissions`
+
+Persists a new content submission with full audit findings, image references, and version snapshot.
+
+**Request Body:**
+
+```json
+{
+  "brand_id": "aurelle-tech",
+  "title": "Diwali Festive Glow Campaign",
+  "content": "Subject: Your Diwali glow, sorted...",
+  "channel": "email",
+  "content_version": 1,
+  "audit_report": { ... },
+  "risk_findings": [ ... ],
+  "image_file_id": "img-014-sha256",
+  "requires_agency": false
+}
+```
+
+### `POST /api/submissions/{submission_id}/decision`
+
+Records an authenticated, role-verified decision across Agency, Reviewer, Compliance Reviewer, or Brand Owner.
+
+**Request Body:**
+
+```json
+{
+  "decision": "APPROVE",
+  "stage": "REVIEWER",
+  "comments": "Claim facts verified against FACT-014. Editorial compliance confirmed.",
+  "requested_evidence": null
+}
+```
+
+### `POST /api/submissions/{submission_id}/revisions`
+
+Submits a corrected content revision following feedback or re-audit. Increments version counter, logs word diff, and re-triggers validation checks.
+
+---
+
+## 10. Content & Multimodal Asset Ingestion (`/api/content`)
+
+### `POST /api/content/upload`
+
+Uploads and processes image assets (PNG, JPEG, WebP) up to 25 MB. Performs magic byte signature validation, EXIF stripping, OCR text extraction, visual claim detection, and packaging disclaimer inspection.
+
+- Multipart Form: `file` (image binary), `caption` (optional marketing text), `workspace_id`.
+- Returns: `file_metadata` (file_id, dimensions, sha256_hash, storage_path) and `inspection_report` (extracted_text_preview, packaging_claims, findings).
+
+---
+
+## 11. Public Trust & Verification Portal (`/api/public`)
+
+### `POST /api/public/verify-seal`
+
+Unauthenticated public portal endpoint for consumers, journalists, and compliance bodies to cryptographically verify live marketing assets against the immutable audit ledger.
+
+- Verifies SHA-256 release hash, detects post-approval tampering, and returns release certificate status (`VALID_UNCHANGED`, `MODIFIED_AFTER_APPROVAL`, `SUPERSEDED`, `REVOKED`, `UNKNOWN_RECORD`).
+

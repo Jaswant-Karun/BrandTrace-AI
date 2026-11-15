@@ -32,7 +32,7 @@ export const CreatorHeader: React.FC<CreatorHeaderProps> = ({
     { id: 'check', label: 'CHECK A POST' },
     { id: 'audit', label: 'AUDIT LOG' },
     { id: 'rulebook', label: 'RULEBOOK' },
-    { id: 'facts', label: 'FACTS' },
+    { id: 'facts', label: 'FACT' },
     { id: 'health', label: 'GUIDELINE HEALTH' },
     { id: 'watch', label: 'CLAIM WATCH' },
   ];
@@ -78,7 +78,7 @@ export const CreatorHeader: React.FC<CreatorHeaderProps> = ({
               </svg>
             </div>
             <span className="font-extrabold text-sm sm:text-base tracking-wider text-white font-mono select-none">
-              BRANDTRACE
+              PLUMBLINE
             </span>
           </div>
 

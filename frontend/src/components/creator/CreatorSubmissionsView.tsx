@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { 
   CheckCircle2, AlertTriangle, Clock, RefreshCw, 
-  Edit3, ShieldCheck, ChevronDown, ChevronUp, FileText
+  Edit3, ShieldCheck, ChevronDown, ChevronUp, FileText,
+  Search, ArrowUpDown, ChevronLeft, ChevronRight, Eye, X, Image as ImageIcon
 } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 import { useAuth } from '../../context/AuthContext';
@@ -23,6 +24,9 @@ export interface SubmissionItem {
   original_content: string;
   current_content: string;
   findings: any[];
+  attachment_ids?: string[];
+  inspection_report?: any;
+  extracted_text?: string;
   status: string;
   submitted_at: string;
   updated_at: string;
@@ -31,6 +35,7 @@ export interface SubmissionItem {
   rejection_reason?: string;
   approval_history: any[];
   release_seal?: string;
+  release_id?: string;
 }
 
 interface CreatorSubmissionsViewProps {
@@ -42,120 +47,17 @@ interface CreatorSubmissionsViewProps {
   onEditAndResubmit?: (submission: SubmissionItem) => void;
 }
 
-const DEFAULT_SUBMISSIONS: SubmissionItem[] = [
-  {
-    submission_id: 'SUB-AGENCY-001',
-    task_id: 'REV-AGENCY-01',
-    brand_id: 'aurelle-tech',
-    brand_name: 'Aurelle Skin',
-    title: 'Agency Teaser: Aurelle Next-Gen Environmental Defense Formulation',
-    channel: 'instagram',
-    creator_id: 'USR-AGENCY-001',
-    creator_name: 'Agency Sana',
-    creator_type: 'agency',
-    org_id: 'ORG-AGENCY-PULSE',
-    analysis_id: 'VRF-AGY-9021',
-    version: 1,
-    original_content: 'Something game-changing is dropping this Friday. Aurelle Skin is launching the ultimate defense against environmental pollution and premature aging. 100% natural, zero toxins, guaranteed glass skin in 7 days.',
-    current_content: 'Something game-changing is dropping this Friday. Aurelle Skin is launching the ultimate defense against environmental pollution and premature aging. 100% natural, zero toxins, guaranteed glass skin in 7 days.',
-    status: 'CHANGES_REQUESTED',
-    submitted_at: 'Today, 11:20 am',
-    updated_at: 'Today, 11:45 am',
-    reviewer_feedback: "Reviewer Meera: '100% natural, zero toxins' violates REG-01 (Greenwashing). Please replace with approved 94% naturally derived ingredients and remove 'guaranteed in 7 days'.",
-    findings: [
-      {
-        number: 1,
-        rule_id: 'REG-01',
-        rule_title: 'ASCI Greenwashing Directive',
-        flagged_text: '100% natural, zero toxins',
-        severity: 'BLOCKING',
-        suggested_fix: 'formulated with 94% naturally derived ingredients',
-        explanation: 'Absolute unquantified 100% natural claims are prohibited without lifecycle documentation.'
-      },
-      {
-        number: 2,
-        rule_id: 'GL-AUR-03',
-        rule_title: 'Prohibited Absolute Guarantees',
-        flagged_text: 'guaranteed glass skin in 7 days',
-        severity: 'BLOCKING',
-        suggested_fix: 'visibly brighter skin with daily use',
-        explanation: 'Time-bound cosmetic outcome guarantees are prohibited by Aurelle Brand Book.'
-      }
-    ],
-    approval_history: [
-      {
-        stage: 'CREATOR_SUBMISSION',
-        label: 'Agency Submission',
-        user: 'Agency Sana',
-        role: 'Agency Partner',
-        status: 'COMPLETED',
-        timestamp: 'Today, 11:20 am',
-        comments: 'Campaign teaser draft submitted for client Aurelle Skin.'
-      },
-      {
-        stage: 'REVIEWER_APPROVAL',
-        label: 'Reviewer Feedback',
-        user: 'Reviewer Meera',
-        role: 'Reviewer',
-        status: 'REJECTED',
-        timestamp: 'Today, 11:45 am',
-        comments: 'Changes requested on greenwashing and outcome guarantee claims.'
-      }
-    ]
-  },
-  {
-    submission_id: 'SUB-SEED-001',
-    task_id: 'REV-SEED-01',
-    brand_id: 'aurelle-tech',
-    brand_name: 'Aurelle Skin',
-    title: 'Meet the NEW Aurelle Vitamin-C serum! 100% natural, eco-friendly and clinically proven to fade dark spot...',
-    channel: 'instagram',
-    creator_id: 'asha@aurelle.com',
-    creator_name: 'Creator Asha',
-    creator_type: 'creator',
-    org_id: 'ORG-AURELLE',
-    analysis_id: 'VRF-F10B6DE0FB',
-    version: 2,
-    original_content: 'Meet the NEW Aurelle Vitamin-C serum! 100% natural, completely eco-friendly and clinically proven to fade dark spots by 60% in just 2 weeks. Doctor approved with zero side effects. Shop today!',
-    current_content: 'Meet the NEW Aurelle Vitamin-C serum! Formulated with 94% naturally derived ingredients and clinically shown to fade dark spots by 32% in 8 weeks (FACT-014). Dermatologist tested with clean ingredients. Shop now!',
-    status: 'APPROVED',
-    submitted_at: '12 Nov 2026, 9:01 am',
-    updated_at: '12 Nov 2026, 11:30 am',
-    findings: [],
-    approval_history: [
-      {
-        stage: 'CREATOR_SUBMISSION',
-        label: 'Creator Submission',
-        user: 'Creator Asha',
-        role: 'Creator',
-        status: 'COMPLETED',
-        timestamp: '12 Nov 2026, 9:01 am',
-        comments: 'Revision v2 submitted with approved clinical benchmark citations.'
-      },
-      {
-        stage: 'REVIEWER_APPROVAL',
-        label: 'Reviewer Approval',
-        user: 'Reviewer Meera',
-        role: 'Reviewer',
-        status: 'COMPLETED',
-        timestamp: '12 Nov 2026, 10:15 am',
-        comments: 'Verified protocol AUR-LAB-014 citations. Approved.'
-      },
-      {
-        stage: 'COMPLIANCE_APPROVAL',
-        label: 'Compliance Sign-off',
-        user: 'Compliance Arjun',
-        role: 'Compliance Officer',
-        status: 'COMPLETED',
-        timestamp: '12 Nov 2026, 11:30 am',
-        comments: 'Statutory fair-balance compliance verified.'
-      }
-    ],
-    release_seal: 'BT-SEAL-78FA91'
-  }
-];
+export type SubmissionFilter = 
+  | 'ALL' 
+  | 'DRAFT' 
+  | 'SUBMITTED' 
+  | 'UNDER_REVIEW' 
+  | 'CHANGES_REQUESTED' 
+  | 'APPROVED' 
+  | 'REJECTED' 
+  | 'RELEASED';
 
-void DEFAULT_SUBMISSIONS;
+export type SortOrder = 'NEWEST' | 'OLDEST' | 'VERSION' | 'RISK';
 
 export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
   role = 'creator',
@@ -168,8 +70,14 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
   const shouldReduceMotion = useReducedMotion();
   const { user } = useAuth();
   const [submissions, setSubmissions] = useState<SubmissionItem[]>([]);
-  const [filter, setFilter] = useState<'ALL' | 'CHANGES_REQUESTED' | 'PENDING' | 'APPROVED'>('ALL');
+  const [filter, setFilter] = useState<SubmissionFilter>('ALL');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('NEWEST');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(5);
+
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [detailModalSubmission, setDetailModalSubmission] = useState<SubmissionItem | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -194,17 +102,17 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
     try {
       const apiRole = getApiRole();
       const params = new URLSearchParams({ role: apiRole });
-      // Always scope to this user's brand workspace
       const brandId = user?.workspace_id || 'aurelle-tech';
       params.set('brand_id', brandId);
-      // For creator/agency roles, also scope to this user's own submissions
       if ((apiRole === 'creator' || apiRole === 'agency') && effectiveUserId) {
         params.set('creator_id', effectiveUserId);
+      }
+      if (searchQuery.trim()) {
+        params.set('search', searchQuery.trim());
       }
       const data = await apiClient.request<SubmissionItem[]>(`/api/submissions?${params.toString()}`, { skipCache: true });
       setSubmissions(Array.isArray(data) ? data : []);
     } catch (error: any) {
-      // 403 means role mismatch — show a clear, helpful message rather than the raw backend error
       if (error?.status === 403) {
         setLoadError('Your account role does not have access to this submission workspace. Please sign in with a Creator account.');
       } else if (error?.status === 0) {
@@ -222,22 +130,82 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [role, effectiveUserId, user?.role]);
 
-  const filteredSubmissions = submissions.filter((sub) => {
-    if (filter === 'ALL') return true;
-    if (filter === 'CHANGES_REQUESTED') return sub.status === 'CHANGES_REQUESTED' || sub.status === 'RETURNED_TO_CREATOR' || sub.status === 'RETURNED_TO_AGENCY';
-    if (filter === 'PENDING') return sub.status === 'PENDING_REVIEW' || sub.status === 'SUBMITTED' || sub.status === 'IN_REVIEW';
-    if (filter === 'APPROVED') return sub.status === 'APPROVED' || sub.status === 'RELEASED' || sub.status === 'REVIEW_APPROVED' || sub.status === 'COMPLIANCE_APPROVED';
-    return true;
-  });
+  // Compute filter counts
+  const filterCounts = useMemo(() => {
+    return {
+      ALL: submissions.length,
+      DRAFT: submissions.filter((s) => s.status === 'DRAFT').length,
+      SUBMITTED: submissions.filter((s) => s.status === 'SUBMITTED').length,
+      UNDER_REVIEW: submissions.filter((s) => s.status === 'PENDING_REVIEW' || s.status === 'IN_REVIEW' || s.status === 'SUBMITTED').length,
+      CHANGES_REQUESTED: submissions.filter((s) => 
+        s.status === 'CHANGES_REQUESTED' || s.status === 'RETURNED_TO_CREATOR' || s.status === 'RETURNED_TO_AGENCY'
+      ).length,
+      APPROVED: submissions.filter((s) => 
+        s.status === 'APPROVED' || s.status === 'REVIEW_APPROVED' || s.status === 'COMPLIANCE_APPROVED'
+      ).length,
+      REJECTED: submissions.filter((s) => s.status === 'REJECTED').length,
+      RELEASED: submissions.filter((s) => s.status === 'RELEASED').length,
+    };
+  }, [submissions]);
 
-  const changesRequestedCount = submissions.filter(
-    (s) => s.status === 'CHANGES_REQUESTED' || s.status === 'RETURNED_TO_CREATOR' || s.status === 'RETURNED_TO_AGENCY'
-  ).length;
+  // Filter and Search logic
+  const filteredSubmissions = useMemo(() => {
+    return submissions.filter((sub) => {
+      // 1. Status Filter
+      if (filter === 'DRAFT' && sub.status !== 'DRAFT') return false;
+      if (filter === 'SUBMITTED' && sub.status !== 'SUBMITTED') return false;
+      if (filter === 'UNDER_REVIEW' && !['PENDING_REVIEW', 'IN_REVIEW', 'SUBMITTED'].includes(sub.status)) return false;
+      if (filter === 'CHANGES_REQUESTED' && !['CHANGES_REQUESTED', 'RETURNED_TO_CREATOR', 'RETURNED_TO_AGENCY'].includes(sub.status)) return false;
+      if (filter === 'APPROVED' && !['APPROVED', 'REVIEW_APPROVED', 'COMPLIANCE_APPROVED'].includes(sub.status)) return false;
+      if (filter === 'REJECTED' && sub.status !== 'REJECTED') return false;
+      if (filter === 'RELEASED' && sub.status !== 'RELEASED') return false;
+
+      // 2. Client-side Search Query filter
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim();
+        const matchesTitle = sub.title?.toLowerCase().includes(q);
+        const matchesContent = sub.current_content?.toLowerCase().includes(q) || sub.original_content?.toLowerCase().includes(q);
+        const matchesId = sub.submission_id?.toLowerCase().includes(q);
+        const matchesBrand = sub.brand_name?.toLowerCase().includes(q);
+        if (!matchesTitle && !matchesContent && !matchesId && !matchesBrand) return false;
+      }
+
+      return true;
+    });
+  }, [submissions, filter, searchQuery]);
+
+  // Sorting logic
+  const sortedSubmissions = useMemo(() => {
+    const list = [...filteredSubmissions];
+    if (sortOrder === 'NEWEST') {
+      list.sort((a, b) => (b.updated_at || b.submitted_at || '').localeCompare(a.updated_at || a.submitted_at || ''));
+    } else if (sortOrder === 'OLDEST') {
+      list.sort((a, b) => (a.submitted_at || '').localeCompare(b.submitted_at || ''));
+    } else if (sortOrder === 'VERSION') {
+      list.sort((a, b) => (b.version || 1) - (a.version || 1));
+    } else if (sortOrder === 'RISK') {
+      const getBlocking = (s: SubmissionItem) => (s.findings || []).filter((f: any) => f.severity === 'BLOCKING').length;
+      list.sort((a, b) => getBlocking(b) - getBlocking(a));
+    }
+    return list;
+  }, [filteredSubmissions, sortOrder]);
+
+  // Pagination logic
+  const totalPages = Math.max(1, Math.ceil(sortedSubmissions.length / pageSize));
+  const paginatedSubmissions = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return sortedSubmissions.slice(start, start + pageSize);
+  }, [sortedSubmissions, currentPage, pageSize]);
+
+  // Reset page when filter or search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter, searchQuery, sortOrder]);
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto py-6 px-4 sm:px-6">
       
-      {/* Breadcrumb & Section Header */}
+      {/* 1. Breadcrumb & Section Header */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
@@ -248,8 +216,8 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
             disabled={isLoading}
             className="flex items-center gap-1.5 text-[11px] font-mono text-neutral-400 hover:text-white transition-colors cursor-pointer"
           >
-            <RefreshCw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
-            <span>Refresh Submissions</span>
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+            <span>Refresh</span>
           </button>
         </div>
         <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white font-sans uppercase">
@@ -278,66 +246,183 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
         </div>
       )}
 
-      {/* Filter Tabs: Horizontal Swipe on Mobile */}
-      <div className="flex items-center gap-2 pt-2 border-b border-neutral-800 pb-4 overflow-x-auto no-scrollbar flex-nowrap sm:flex-wrap">
+      {/* 2. Search & Sort Controls Bar */}
+      <div className="p-4 rounded-2xl bg-neutral-950 border border-neutral-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-md">
+        
+        {/* Search Input */}
+        <div className="relative flex-1">
+          <Search className="w-4 h-4 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by title, ID (e.g. SUB-001), or copy keywords..."
+            className="w-full pl-9 pr-8 py-2 rounded-xl bg-neutral-900 border border-neutral-800 text-xs font-sans text-white placeholder-neutral-500 focus:outline-none focus:border-indigo-500"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+
+        {/* Sort Dropdown */}
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 text-xs font-mono text-neutral-400">
+            <ArrowUpDown className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Sort:</span>
+          </div>
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value as SortOrder)}
+            className="px-3 py-2 rounded-xl bg-neutral-900 border border-neutral-800 text-xs font-mono text-white focus:outline-none focus:border-indigo-500 cursor-pointer"
+          >
+            <option value="NEWEST">Newest First</option>
+            <option value="OLDEST">Oldest First</option>
+            <option value="VERSION">Highest Version</option>
+            <option value="RISK">Highest Risk</option>
+          </select>
+
+          {/* Page Size */}
+          <select
+            value={pageSize}
+            onChange={(e) => setPageSize(Number(e.target.value))}
+            className="px-2.5 py-2 rounded-xl bg-neutral-900 border border-neutral-800 text-xs font-mono text-neutral-300 focus:outline-none focus:border-indigo-500 cursor-pointer"
+          >
+            <option value={5}>5 / page</option>
+            <option value={10}>10 / page</option>
+            <option value={20}>20 / page</option>
+          </select>
+        </div>
+
+      </div>
+
+      {/* 3. Comprehensive Filter Tabs */}
+      <div className="flex items-center gap-1.5 pt-1 border-b border-neutral-800 pb-3 overflow-x-auto no-scrollbar flex-nowrap">
+        
+        {/* All */}
         <button
           onClick={() => setFilter('ALL')}
-          className={`px-3.5 py-2 rounded-xl text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer border whitespace-nowrap min-h-[40px] shrink-0 ${
+          className={`px-3 py-1.5 rounded-xl text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer border whitespace-nowrap shrink-0 ${
             filter === 'ALL'
               ? 'bg-neutral-800 border-neutral-600 text-white font-bold'
               : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
           }`}
         >
-          All Submissions ({submissions.length})
+          All ({filterCounts.ALL})
         </button>
 
+        {/* Changes Requested */}
         <button
           onClick={() => setFilter('CHANGES_REQUESTED')}
-          className={`px-3.5 py-2 rounded-xl text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer border flex items-center gap-1.5 whitespace-nowrap min-h-[40px] shrink-0 ${
+          className={`px-3 py-1.5 rounded-xl text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer border flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
             filter === 'CHANGES_REQUESTED'
-              ? 'bg-amber-950/80 border-amber-600 text-amber-300 font-bold'
+              ? 'bg-amber-950 border-amber-600 text-amber-300 font-bold'
               : 'bg-neutral-950 border-neutral-800 text-amber-400 hover:border-amber-700'
           }`}
         >
           <AlertTriangle className="w-3.5 h-3.5" />
-          <span>Changes Requested ({changesRequestedCount})</span>
+          <span>Changes Requested ({filterCounts.CHANGES_REQUESTED})</span>
         </button>
 
+        {/* Under Review */}
         <button
-          onClick={() => setFilter('PENDING')}
-          className={`px-3.5 py-2 rounded-xl text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer border whitespace-nowrap min-h-[40px] shrink-0 ${
-            filter === 'PENDING'
-              ? 'bg-purple-950/80 border-purple-600 text-purple-300 font-bold'
+          onClick={() => setFilter('UNDER_REVIEW')}
+          className={`px-3 py-1.5 rounded-xl text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer border whitespace-nowrap shrink-0 ${
+            filter === 'UNDER_REVIEW'
+              ? 'bg-purple-950 border-purple-600 text-purple-300 font-bold'
               : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
           }`}
         >
-          Waiting for Review
+          Under Review ({filterCounts.UNDER_REVIEW})
         </button>
 
+        {/* Submitted */}
+        <button
+          onClick={() => setFilter('SUBMITTED')}
+          className={`px-3 py-1.5 rounded-xl text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer border whitespace-nowrap shrink-0 ${
+            filter === 'SUBMITTED'
+              ? 'bg-blue-950 border-blue-600 text-blue-300 font-bold'
+              : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
+          }`}
+        >
+          Submitted ({filterCounts.SUBMITTED})
+        </button>
+
+        {/* Approved */}
         <button
           onClick={() => setFilter('APPROVED')}
-          className={`px-3.5 py-2 rounded-xl text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer border whitespace-nowrap min-h-[40px] shrink-0 ${
+          className={`px-3 py-1.5 rounded-xl text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer border whitespace-nowrap shrink-0 ${
             filter === 'APPROVED'
-              ? 'bg-emerald-950/80 border-emerald-600 text-emerald-300 font-bold'
+              ? 'bg-emerald-950 border-emerald-600 text-emerald-300 font-bold'
               : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
           }`}
         >
-          Approved & Released
+          Approved ({filterCounts.APPROVED})
         </button>
+
+        {/* Released */}
+        <button
+          onClick={() => setFilter('RELEASED')}
+          className={`px-3 py-1.5 rounded-xl text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer border flex items-center gap-1 whitespace-nowrap shrink-0 ${
+            filter === 'RELEASED'
+              ? 'bg-cyan-950 border-cyan-600 text-cyan-300 font-bold'
+              : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
+          }`}
+        >
+          <ShieldCheck className="w-3.5 h-3.5" />
+          <span>Released ({filterCounts.RELEASED})</span>
+        </button>
+
+        {/* Rejected */}
+        <button
+          onClick={() => setFilter('REJECTED')}
+          className={`px-3 py-1.5 rounded-xl text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer border whitespace-nowrap shrink-0 ${
+            filter === 'REJECTED'
+              ? 'bg-rose-950 border-rose-600 text-rose-300 font-bold'
+              : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
+          }`}
+        >
+          Rejected ({filterCounts.REJECTED})
+        </button>
+
+        {/* Drafts */}
+        <button
+          onClick={() => setFilter('DRAFT')}
+          className={`px-3 py-1.5 rounded-xl text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer border whitespace-nowrap shrink-0 ${
+            filter === 'DRAFT'
+              ? 'bg-neutral-800 border-neutral-600 text-white font-bold'
+              : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
+          }`}
+        >
+          Drafts ({filterCounts.DRAFT})
+        </button>
+
       </div>
 
-      {/* Submissions List */}
+      {/* 4. Submissions Feed */}
       <div className="space-y-4">
-        {filteredSubmissions.length === 0 ? (
-          <div className="p-8 rounded-2xl bg-neutral-950 border border-neutral-800 text-center space-y-2">
-            <FileText className="w-8 h-8 text-neutral-500 mx-auto" />
+        {paginatedSubmissions.length === 0 ? (
+          <div className="p-10 rounded-2xl bg-neutral-950 border border-neutral-800 text-center space-y-2.5">
+            <FileText className="w-8 h-8 text-neutral-600 mx-auto" />
             <div className="text-sm font-mono font-bold text-white uppercase">No matching submissions</div>
-            <p className="text-xs text-neutral-400 font-sans">
-              There are no submissions matching the selected filter state.
+            <p className="text-xs text-neutral-400 font-sans max-w-sm mx-auto">
+              {searchQuery ? `No records match search "${searchQuery}".` : 'No submissions found under this filter.'}
             </p>
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="text-xs font-mono text-indigo-400 hover:underline cursor-pointer pt-1"
+              >
+                Clear Search
+              </button>
+            )}
           </div>
         ) : (
-          filteredSubmissions.map((sub, idx) => {
+          paginatedSubmissions.map((sub, idx) => {
             const isExpanded = expandedId === sub.submission_id;
             const isChangesReq =
               sub.status === 'CHANGES_REQUESTED' ||
@@ -349,6 +434,10 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
               sub.status === 'COMPLIANCE_APPROVED' ||
               sub.status === 'REVIEW_APPROVED';
             const isRejected = sub.status === 'REJECTED';
+            const hasAttachments = Boolean(sub.attachment_ids && sub.attachment_ids.length > 0);
+
+            const blockingCount = (sub.findings || []).filter((f: any) => f.severity === 'BLOCKING' && !f.resolved).length;
+            const advisoryCount = (sub.findings || []).filter((f: any) => f.severity === 'ADVISORY' && !f.resolved).length;
 
             return (
               <motion.div
@@ -356,20 +445,22 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
                 layout
                 initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.22, delay: shouldReduceMotion ? 0 : Math.min(idx * 0.05, 0.2) }}
-                className={`bg-neutral-950 border rounded-2xl p-5 space-y-4 transition-all duration-200 ${
+                transition={{ duration: 0.22, delay: shouldReduceMotion ? 0 : Math.min(idx * 0.04, 0.2) }}
+                className={`bg-neutral-950 border rounded-2xl p-5 space-y-4 transition-all duration-200 shadow-xl ${
                   isChangesReq
-                    ? 'border-amber-600/60 shadow-lg shadow-amber-950/20'
+                    ? 'border-amber-600/70 shadow-amber-950/20'
                     : isRejected
-                    ? 'border-rose-600/60 shadow-lg shadow-rose-950/20'
+                    ? 'border-rose-600/60 shadow-rose-950/20'
                     : isApproved
                     ? 'border-emerald-700/50'
-                    : 'border-neutral-800 hover:border-blue-500/40 hover:bg-[#121217]'
+                    : 'border-neutral-800 hover:border-neutral-700 hover:bg-[#121217]'
                 }`}
               >
-                {/* Header: Status, Channel, Version, ID, Date */}
+                {/* Header Line */}
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex flex-wrap items-center gap-2">
+                    
+                    {/* Status Badge */}
                     <span
                       className={`px-2.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider ${
                         isChangesReq
@@ -384,27 +475,40 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
                       {sub.status.replace(/_/g, ' ')}
                     </span>
 
+                    {/* Version Badge */}
                     <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-neutral-900 border border-neutral-800 text-neutral-300 uppercase">
-                      VERSION {sub.version}
+                      v{sub.version || 1}
                     </span>
 
+                    {/* Channel */}
                     <span className="px-2 py-0.5 rounded text-[10px] font-mono text-neutral-400 bg-neutral-900 border border-neutral-800 uppercase">
                       {sub.channel}
                     </span>
 
-                    <span className="text-[10px] font-mono text-neutral-500">
+                    {/* Image Attachment indicator */}
+                    {hasAttachments && (
+                      <span className="px-2 py-0.5 rounded text-[10px] font-mono text-cyan-300 bg-cyan-950/50 border border-cyan-800/50 flex items-center gap-1">
+                        <ImageIcon className="w-3 h-3" />
+                        <span>Image Attached</span>
+                      </span>
+                    )}
+
+                    {/* Submission ID */}
+                    <span className="text-[10px] font-mono text-neutral-400">
                       ID: {sub.submission_id}
                     </span>
+
                   </div>
 
+                  {/* Submission Timestamp */}
                   <div className="text-[10px] font-mono text-neutral-400 flex items-center gap-2">
                     <Clock className="w-3 h-3 text-neutral-500" />
-                    <span>Submitted: {sub.submitted_at}</span>
+                    <span>Submitted: {sub.submitted_at || 'Recently'}</span>
                   </div>
                 </div>
 
                 {/* Submitter & Organization Info */}
-                <div className="flex items-center gap-2 text-xs font-mono text-neutral-400">
+                <div className="flex flex-wrap items-center gap-2 text-xs font-mono text-neutral-400">
                   <span>Submitter:</span>
                   <strong className="text-white">{sub.creator_name}</strong>
                   <span>·</span>
@@ -412,9 +516,19 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
                     {sub.org_id || orgId}
                   </span>
                   <span>·</span>
-                  <span className="text-neutral-500">
-                    Client: <strong className="text-neutral-300">{sub.brand_name}</strong>
+                  <span className="text-neutral-400">
+                    Client: <strong className="text-neutral-200">{sub.brand_name}</strong>
                   </span>
+                  {blockingCount > 0 && (
+                    <span className="text-rose-400 text-[10.5px] font-mono">
+                      ({blockingCount} blocking risk)
+                    </span>
+                  )}
+                  {advisoryCount > 0 && (
+                    <span className="text-neutral-400 text-[10.5px] font-mono">
+                      ({advisoryCount} advisory)
+                    </span>
+                  )}
                 </div>
 
                 {/* Title */}
@@ -422,12 +536,13 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
                   {sub.title}
                 </h3>
 
-                {/* Content Box */}
-                <div className="p-4 rounded-xl bg-neutral-900/80 border border-neutral-800 text-xs sm:text-sm font-sans text-neutral-200 leading-relaxed whitespace-pre-wrap">
-                  {sub.current_content || sub.original_content}
+                {/* Content Preview Box */}
+                <div className="p-3.5 rounded-xl bg-neutral-900/80 border border-neutral-800 text-xs sm:text-sm font-sans text-neutral-200 leading-relaxed whitespace-pre-wrap">
+                  {(sub.current_content || sub.original_content || '').slice(0, 240)}
+                  {(sub.current_content || sub.original_content || '').length > 240 ? '...' : ''}
                 </div>
 
-                {/* CRITICAL REVISION WORKFLOW: Reviewer Feedback Box for CHANGES_REQUESTED */}
+                {/* Reviewer Feedback Banner (Active when Changes Requested) */}
                 {isChangesReq && (
                   <div className="p-4 rounded-xl bg-amber-950/40 border border-amber-600/70 space-y-3">
                     <div className="flex items-center justify-between">
@@ -440,50 +555,69 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
                       </span>
                     </div>
 
-                    <p className="text-xs sm:text-sm text-amber-100 font-sans leading-relaxed pl-0 sm:pl-6">
-                      {sub.reviewer_feedback ||
-                        "Changes requested on draft claims. Please revise and align with certified brand facts before re-submission."}
+                    <p className="text-xs sm:text-sm text-amber-100 font-sans leading-relaxed">
+                      "{sub.reviewer_feedback || "Changes requested on draft copy. Please update and re-submit."}"
                     </p>
 
-                    {/* Action: Edit & Resubmit Button */}
-                    <div className="pt-1 pl-0 sm:pl-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                    <div className="pt-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
                       <button
                         onClick={() => {
                           if (onEditAndResubmit) {
                             onEditAndResubmit(sub);
                           }
                         }}
-                        className="w-full sm:w-auto px-5 py-3 sm:py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-mono font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md flex items-center justify-center gap-2 min-h-[46px] active:scale-[0.98]"
+                        className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-mono font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md flex items-center justify-center gap-2 min-h-[44px]"
                       >
                         <Edit3 className="w-4 h-4" />
-                        <span>Edit & Resubmit (v{sub.version + 1})</span>
+                        <span>Edit & Resubmit (v{(sub.version || 1) + 1})</span>
                       </button>
                       <span className="text-[11px] font-mono text-amber-300/80">
-                        Loads draft in Content Checker to revise and re-verify.
+                        Loads into Check a Post editor to revise and re-verify.
                       </span>
                     </div>
                   </div>
                 )}
 
-                {/* Approval Lifecycle Accordion Toggle */}
-                <div className="pt-2 border-t border-neutral-800/80 flex items-center justify-between">
-                  <button
-                    onClick={() => setExpandedId(isExpanded ? null : sub.submission_id)}
-                    className="flex items-center gap-1.5 text-xs font-mono text-neutral-400 hover:text-white transition-colors cursor-pointer"
-                  >
-                    {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                    <span>{isExpanded ? 'Hide Approval Trail' : 'View Approval Trail & Findings'}</span>
-                  </button>
+                {/* Card Action Controls */}
+                <div className="pt-2 border-t border-neutral-800/80 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+                  
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setDetailModalSubmission(sub)}
+                      className="px-3 py-1.5 rounded-lg border border-neutral-700 bg-neutral-900 hover:bg-neutral-800 text-neutral-200 hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>View Full Details</span>
+                    </button>
+
+                    <button
+                      onClick={() => setExpandedId(isExpanded ? null : sub.submission_id)}
+                      className="px-3 py-1.5 rounded-lg text-neutral-400 hover:text-white flex items-center gap-1 transition-colors cursor-pointer"
+                    >
+                      {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                      <span>{isExpanded ? 'Hide Approval Trail' : 'Approval Trail'}</span>
+                    </button>
+                  </div>
 
                   {isApproved && sub.release_seal && (
-                    <div className="flex items-center gap-1.5 text-emerald-400 text-xs font-mono font-bold">
+                    <div className="flex items-center gap-1.5 text-emerald-400 font-bold">
                       <ShieldCheck className="w-4 h-4" />
                       <span>SEAL: {sub.release_seal}</span>
                     </div>
                   )}
+
+                  {!isChangesReq && onEditAndResubmit && (
+                    <button
+                      onClick={() => onEditAndResubmit(sub)}
+                      className="text-neutral-400 hover:text-indigo-400 underline underline-offset-2 transition-colors cursor-pointer"
+                    >
+                      Revise Content →
+                    </button>
+                  )}
+
                 </div>
 
-                {/* Expanded Approval Trail */}
+                {/* Inline Expanded Approval Trail */}
                 <AnimatePresence>
                   {isExpanded && (
                     <motion.div
@@ -493,9 +627,9 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
                       className="pt-2 space-y-3"
                     >
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                        {(sub.approval_history || []).map((step: any, idx: number) => (
+                        {(sub.approval_history || []).map((step: any, sIdx: number) => (
                           <div
-                            key={idx}
+                            key={sIdx}
                             className={`p-3 rounded-xl border text-xs font-mono space-y-1 ${
                               step.status === 'COMPLETED'
                                 ? 'bg-neutral-900/90 border-emerald-900/50 text-neutral-200'
@@ -533,6 +667,246 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
           })
         )}
       </div>
+
+      {/* 5. Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="pt-4 border-t border-neutral-800 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+          <div className="text-neutral-400">
+            Showing {((currentPage - 1) * pageSize) + 1}–{Math.min(currentPage * pageSize, sortedSubmissions.length)} of {sortedSubmissions.length} submissions
+          </div>
+
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="p-2 rounded-lg border border-neutral-800 bg-neutral-950 hover:bg-neutral-900 disabled:opacity-30 disabled:cursor-not-allowed text-white cursor-pointer"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`w-8 h-8 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer ${
+                  currentPage === page
+                    ? 'bg-indigo-600 text-white shadow-md'
+                    : 'bg-neutral-950 border border-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-900'
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="p-2 rounded-lg border border-neutral-800 bg-neutral-950 hover:bg-neutral-900 disabled:opacity-30 disabled:cursor-not-allowed text-white cursor-pointer"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 6. Comprehensive Submission Detail Modal */}
+      {detailModalSubmission && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-3xl bg-neutral-950 border border-neutral-800 rounded-3xl p-5 sm:p-7 space-y-5 shadow-2xl my-auto max-h-[90vh] overflow-y-auto"
+          >
+            {/* Modal Header */}
+            <div className="flex items-start justify-between gap-3 border-b border-neutral-800 pb-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-mono text-neutral-400 uppercase tracking-widest">
+                    SUBMISSION DETAILS · {detailModalSubmission.submission_id}
+                  </span>
+                  <span className="px-2 py-0.5 rounded text-[9.5px] font-mono font-bold uppercase bg-indigo-950 text-indigo-300 border border-indigo-700/50">
+                    v{detailModalSubmission.version || 1}
+                  </span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-bold font-sans text-white">
+                  {detailModalSubmission.title}
+                </h2>
+              </div>
+              <button
+                onClick={() => setDetailModalSubmission(null)}
+                className="p-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-400 hover:text-white cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Meta Attributes Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
+              <div className="p-3 rounded-xl bg-neutral-900/80 border border-neutral-800 space-y-0.5">
+                <div className="text-[10px] text-neutral-500 uppercase">Workflow Status</div>
+                <div className="font-bold text-white uppercase">{detailModalSubmission.status.replace(/_/g, ' ')}</div>
+              </div>
+              <div className="p-3 rounded-xl bg-neutral-900/80 border border-neutral-800 space-y-0.5">
+                <div className="text-[10px] text-neutral-500 uppercase">Target Channel</div>
+                <div className="font-bold text-white uppercase">{detailModalSubmission.channel}</div>
+              </div>
+              <div className="p-3 rounded-xl bg-neutral-900/80 border border-neutral-800 space-y-0.5">
+                <div className="text-[10px] text-neutral-500 uppercase">Submitted By</div>
+                <div className="font-bold text-white truncate">{detailModalSubmission.creator_name}</div>
+              </div>
+              <div className="p-3 rounded-xl bg-neutral-900/80 border border-neutral-800 space-y-0.5">
+                <div className="text-[10px] text-neutral-500 uppercase">Submitted At</div>
+                <div className="font-bold text-white">{detailModalSubmission.submitted_at || 'Recent'}</div>
+              </div>
+            </div>
+
+            {/* Content Display: Original vs Current Content */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs font-mono font-bold text-neutral-300 uppercase tracking-wider">
+                  Post Copy (Version {detailModalSubmission.version || 1})
+                </h4>
+                {detailModalSubmission.original_content && detailModalSubmission.original_content !== detailModalSubmission.current_content && (
+                  <span className="text-[10.5px] font-mono text-emerald-400">
+                    Revised from original draft
+                  </span>
+                )}
+              </div>
+
+              <div className="p-4 rounded-2xl bg-neutral-900 border border-neutral-800 text-xs sm:text-sm font-sans text-white whitespace-pre-wrap leading-relaxed">
+                {detailModalSubmission.current_content || detailModalSubmission.original_content}
+              </div>
+
+              {detailModalSubmission.original_content && detailModalSubmission.original_content !== detailModalSubmission.current_content && (
+                <div className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-1">
+                  <div className="text-[10px] font-mono text-neutral-400 uppercase font-bold">Original Draft (v1):</div>
+                  <p className="text-xs font-sans text-neutral-400 line-through opacity-75">
+                    {detailModalSubmission.original_content}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Reviewer Feedback Box if present */}
+            {detailModalSubmission.reviewer_feedback && (
+              <div className="p-4 rounded-2xl bg-amber-950/40 border border-amber-600/70 space-y-1.5">
+                <div className="flex items-center gap-2 text-amber-300 font-mono text-xs font-bold uppercase tracking-wider">
+                  <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>Reviewer Feedback</span>
+                </div>
+                <p className="text-xs sm:text-sm font-sans text-amber-100">
+                  "{detailModalSubmission.reviewer_feedback}"
+                </p>
+              </div>
+            )}
+
+            {/* Finding-by-finding report */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-mono font-bold text-neutral-300 uppercase tracking-wider">
+                Audited Findings ({(detailModalSubmission.findings || []).length})
+              </h4>
+              {(detailModalSubmission.findings || []).length === 0 ? (
+                <div className="p-3 rounded-xl bg-neutral-900 border border-neutral-800 text-xs font-mono text-emerald-400 flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span>All policy, brand, and fact checks resolved.</span>
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                  {(detailModalSubmission.findings || []).map((f: any, fIdx: number) => (
+                    <div
+                      key={fIdx}
+                      className="p-3 rounded-xl bg-neutral-900 border border-neutral-800 text-xs font-sans flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+                    >
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase ${
+                            f.severity === 'BLOCKING' ? 'bg-rose-950 text-rose-300 border border-rose-800' : 'bg-neutral-800 text-neutral-300'
+                          }`}>
+                            {f.severity || 'BLOCKING'}
+                          </span>
+                          <span className="font-mono text-neutral-400 text-[10px]">{f.rule_id || f.id}</span>
+                          <span className="font-bold text-white text-xs">{f.rule_title || 'Finding'}</span>
+                        </div>
+                        <div className="text-neutral-400 text-[11px]">
+                          Flagged: <strong className="text-rose-300">"{f.flagged_text || f.sentence_text}"</strong>
+                        </div>
+                      </div>
+                      <span className={`text-[10px] font-mono uppercase px-2 py-1 rounded shrink-0 ${
+                        f.resolved ? 'bg-emerald-950 text-emerald-300' : 'bg-neutral-800 text-neutral-400'
+                      }`}>
+                        {f.resolved ? '✓ Resolved' : (f.decision || 'Undecided')}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Approval Lifecycle Trail */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-mono font-bold text-neutral-300 uppercase tracking-wider">
+                Governance Approval Lifecycle
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                {(detailModalSubmission.approval_history || []).map((step: any, idx: number) => (
+                  <div
+                    key={idx}
+                    className={`p-3 rounded-xl border text-xs font-mono space-y-1 ${
+                      step.status === 'COMPLETED'
+                        ? 'bg-neutral-900 border-emerald-900/50 text-neutral-200'
+                        : step.status === 'REJECTED'
+                        ? 'bg-amber-950/30 border-amber-900/50 text-amber-200'
+                        : 'bg-neutral-900/40 border-neutral-800 text-neutral-500'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="font-bold">{step.label}</span>
+                      {step.status === 'COMPLETED' ? (
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                      ) : step.status === 'REJECTED' ? (
+                        <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                      ) : (
+                        <Clock className="w-3.5 h-3.5" />
+                      )}
+                    </div>
+                    <div className="text-[11px] font-bold text-white">{step.user}</div>
+                    {step.comments && (
+                      <div className="text-[10px] text-neutral-300 font-sans italic pt-0.5">
+                        "{step.comments}"
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Modal Bottom Actions */}
+            <div className="pt-3 border-t border-neutral-800 flex items-center justify-between gap-3">
+              <button
+                onClick={() => setDetailModalSubmission(null)}
+                className="px-4 py-2 rounded-xl border border-neutral-800 hover:border-neutral-700 text-neutral-400 hover:text-white text-xs font-mono uppercase cursor-pointer"
+              >
+                Close
+              </button>
+
+              {onEditAndResubmit && (
+                <button
+                  onClick={() => {
+                    const subToEdit = detailModalSubmission;
+                    setDetailModalSubmission(null);
+                    onEditAndResubmit(subToEdit);
+                  }}
+                  className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-mono font-bold text-xs uppercase tracking-wider flex items-center gap-2 cursor-pointer shadow-lg"
+                >
+                  <Edit3 className="w-4 h-4" />
+                  <span>Revise in Check a Post</span>
+                </button>
+              )}
+            </div>
+
+          </motion.div>
+        </div>
+      )}
 
     </div>
   );

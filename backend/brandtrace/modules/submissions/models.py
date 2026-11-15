@@ -106,6 +106,8 @@ class SubmissionCreateRequest(BaseModel):
     key_phrases: Optional[str] = ""
     call_to_action: Optional[str] = ""
     submission_notes: Optional[str] = ""
+    requires_agency_review: Optional[bool] = None
+    comments: List[Dict[str, Any]] = Field(default_factory=list)
 
 class SubmissionResponse(BaseModel):
     id: Optional[str] = None
@@ -127,12 +129,13 @@ class SubmissionResponse(BaseModel):
     attachment_ids: List[str] = Field(default_factory=list)
     inspection_report: Optional[Dict[str, Any]] = None
     extracted_text: Optional[str] = None
-    status: str  # DRAFT, PENDING_REVIEW, CHANGES_REQUESTED, REVIEW_APPROVED, COMPLIANCE_APPROVED, APPROVED, REJECTED
+    status: str  # DRAFT, PENDING_AGENCY, PENDING_REVIEW, CHANGES_REQUESTED, RETURNED_TO_CREATOR, RETURNED_TO_AGENCY, REVIEW_APPROVED, COMPLIANCE_APPROVED, APPROVED, REJECTED
     submitted_at: str
     updated_at: str
     reviewer_feedback: Optional[str] = None
     compliance_notes: Optional[str] = None
     evidence_requested_notes: Optional[str] = None
+    requested_evidence: Optional[str] = None
     brand_owner_notes: Optional[str] = None
     rejection_reason: Optional[str] = None
     approval_history: List[ApprovalStepModel]
@@ -140,6 +143,11 @@ class SubmissionResponse(BaseModel):
     release_seal: Optional[str] = None
     release_digest: Optional[str] = None
     released_at: Optional[str] = None
+    requires_agency_review: Optional[bool] = None
+    comments: List[Dict[str, Any]] = Field(default_factory=list)
+
+class CommentCreateRequest(BaseModel):
+    text: str
 
 class AgencyDecisionRequest(BaseModel):
     decision: str = "APPROVE"  # APPROVE, FORWARD, REQUEST_CHANGES, REJECT

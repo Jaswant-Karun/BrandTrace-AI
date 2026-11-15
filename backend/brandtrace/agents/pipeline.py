@@ -598,15 +598,17 @@ class AutonomousGovernancePipeline:
         all_spans.extend(legal_report.risk_spans)
 
         # 1b. Brand & Aurelle Rulebook Grounding (Facts & Specific Rules)
-        aurelle_spans = self._analyze_aurelle_specifics(
-            request.content,
-            key_phrases=getattr(request, "key_phrases", None),
-            cta=getattr(request, "call_to_action", None)
-        )
-        # Avoid duplicate spans covering identical text
-        for aspan in aurelle_spans:
-            if not any(abs(s.start_char - aspan.start_char) < 3 and s.matched_text == aspan.matched_text for s in all_spans):
-                all_spans.append(aspan)
+        brand_id_lower = (request.brand_id or "").lower()
+        if not brand_id_lower or "aurelle" in brand_id_lower:
+            aurelle_spans = self._analyze_aurelle_specifics(
+                request.content,
+                key_phrases=getattr(request, "key_phrases", None),
+                cta=getattr(request, "call_to_action", None)
+            )
+            # Avoid duplicate spans covering identical text
+            for aspan in aurelle_spans:
+                if not any(abs(s.start_char - aspan.start_char) < 3 and s.matched_text == aspan.matched_text for s in all_spans):
+                    all_spans.append(aspan)
 
         # 1c. Configured AI Provider Grounding (Gemini / Semantic Intelligence)
         try:
@@ -618,7 +620,7 @@ class AutonomousGovernancePipeline:
                     s_idx = request.content.lower().find(af.exact_text.lower())
                     e_idx = s_idx + len(af.exact_text)
                     # Add if not overlapping with an existing span
-                    if not any(abs(s.start_char - s_idx) < 4 for s in all_spans):
+                    if not any(max(s.start_char, s_idx) < min(s.end_char, e_idx) for s in all_spans):
                         sev_map = {
                             "CRITICAL": SeverityLevel.CRITICAL,
                             "BLOCKING": SeverityLevel.CRITICAL,
@@ -642,6 +644,62 @@ class AutonomousGovernancePipeline:
         except Exception:
             # Resilient fallback: network or provider timeouts do not break inspection
             pass
+
+        # 1d. Multimodal & Cross-Modal Image Grounding
+        if request.image_analysis and isinstance(request.image_analysis, dict):
+            raw_findings = (request.image_analysis.get("findings") or []) + (request.image_analysis.get("cross_modal_findings") or [])
+            for imf in raw_findings:
+                if isinstance(imf, dict):
+                    loc = imf.get("location", "Visual Asset")
+                    expl = imf.get("explanation", "Visual rule finding")
+                    cite = imf.get("rule_citation", "Visual Guidelines")
+                    fix = imf.get("suggested_fix", "")
+                    sev_val = str(imf.get("severity", "MODERATE")).upper()
+                    cat = imf.get("category", "VISUAL")
+                else:
+                    loc = getattr(imf, "location", "Visual Asset")
+                    expl = getattr(imf, "explanation", "Visual rule finding")
+                    cite = getattr(imf, "rule_citation", "Visual Guidelines")
+                    fix = getattr(imf, "suggested_fix", "")
+                    sev_val = str(getattr(imf, "severity", "MODERATE")).upper()
+                    cat = getattr(imf, "category", "VISUAL")
+
+                sev_map = {
+                    "CRITICAL": SeverityLevel.CRITICAL,
+                    "BLOCKING": SeverityLevel.CRITICAL,
+                    "HIGH": SeverityLevel.HIGH,
+                    "MAJOR": SeverityLevel.HIGH,
+                    "MODERATE": SeverityLevel.MODERATE,
+                    "LOW": SeverityLevel.LOW,
+                    "INFO": SeverityLevel.LOW,
+                }
+                actual_sev = sev_map.get(sev_val, SeverityLevel.MODERATE)
+
+                # Locate relevant text in content if applicable
+                s_idx = 0
+                e_idx = min(len(request.content), 25)
+                matched_str = loc
+                for kw in ["100% natural", "zero toxins", "60%", "2 weeks", "₹499", "completely healed", "cures eczema", "treatment"]:
+                    if kw in expl.lower() and kw in request.content.lower():
+                        f_idx = request.content.lower().find(kw)
+                        s_idx = f_idx
+                        e_idx = f_idx + len(kw)
+                        matched_str = request.content[s_idx:e_idx]
+                        break
+
+                if not any(s.explanation == expl for s in all_spans):
+                    all_spans.append(
+                        RiskSpan(
+                            start_char=s_idx,
+                            end_char=e_idx,
+                            matched_text=matched_str,
+                            category="CLAIM" if "contradict" in expl.lower() else ("VISUAL" if "color" in expl.lower() or "contrast" in expl.lower() else "REGULATORY"),
+                            severity=actual_sev,
+                            explanation=expl,
+                            rule_citation=cite,
+                            suggested_fix=fix
+                        )
+                    )
 
         # 2. Risk Scoring & Governance Gate
         # Critical severity adds 35 risk points, High adds 20, Moderate adds 10, Low adds 4.
@@ -727,7 +785,8 @@ class AutonomousGovernancePipeline:
             timestamp_iso=t0_iso,
             sentence_findings=sentence_findings,
             summary_counts=summary_counts,
-            verdict_badge=verdict_badge
+            verdict_badge=verdict_badge,
+            image_analysis=request.image_analysis
         )
 
     def _analyze_aurelle_specifics(self, text: str, key_phrases: Optional[str] = None, cta: Optional[str] = None) -> List[RiskSpan]:
@@ -750,6 +809,22 @@ class AutonomousGovernancePipeline:
                 )
             )
 
+        # 1b. FACT-014: Concentration percentage check against approved formula (15% Ethyl Ascorbic Acid)
+        vit_c_pattern = re.compile(r"\b([2-9]\d|\d{3})%\s*(?:vitamin\s+c|ethyl\s+ascorbic)\b", re.IGNORECASE)
+        for m in vit_c_pattern.finditer(text):
+            spans.append(
+                RiskSpan(
+                    start_char=m.start(),
+                    end_char=m.end(),
+                    matched_text=m.group(0),
+                    category="CLAIM",
+                    severity=SeverityLevel.CRITICAL,
+                    explanation=f"Claimed concentration '{m.group(0)}' contradicts approved formulation of 15% Ethyl Ascorbic Acid (FACT-014).",
+                    rule_citation="FACT-014 (Clinical Formulation & Barrier Benchmark)",
+                    suggested_fix="15% Vitamin C"
+                )
+            )
+
         # 2. Healed skin barrier / cure claim
         barrier_pattern = re.compile(r"\b(?:my\s+)?skin\s+barrier\s+is\s+completely\s+healed\b", re.IGNORECASE)
         for m in barrier_pattern.finditer(text):
@@ -766,9 +841,9 @@ class AutonomousGovernancePipeline:
                 )
             )
 
-        # 3. Medical / Disease Treatment (e.g. Eczema)
-        eczema_pattern = re.compile(r"\btreatment\s+for\s+eczema(?:(?:\s+and\s+dry)?,\s+itchy\s+skin)?\b", re.IGNORECASE)
-        for m in eczema_pattern.finditer(text):
+        # 3. Medical / Disease Treatment (e.g. Eczema, Dermatitis, Acne Cures)
+        cure_pattern = re.compile(r"\b(?:cures?\s+(?:dermatitis|acne|eczema|psoriasis)|treats?\s+(?:cystic\s+acne|dermatitis)|treatment\s+for\s+(?:eczema|acne|dermatitis)(?:(?:\s+and\s+dry)?,\s+itchy\s+skin)?)\b", re.IGNORECASE)
+        for m in cure_pattern.finditer(text):
             spans.append(
                 RiskSpan(
                     start_char=m.start(),
@@ -776,11 +851,31 @@ class AutonomousGovernancePipeline:
                     matched_text=m.group(0),
                     category="REGULATORY",
                     severity=SeverityLevel.CRITICAL,
-                    explanation="Claiming a cosmetic product is a 'treatment for eczema' classifies the product as an unapproved new drug under CDSCO and FDA regulations.",
-                    rule_citation="FDA 21 CFR §202 / CDSCO Drugs & Cosmetics Act",
-                    suggested_fix="suitable for eczema-prone, dry skin"
+                    explanation=f"Claiming a cosmetic product '{m.group(0)}' classifies the product as an unapproved drug under FDA 21 CFR §201/§202 and CDSCO rules.",
+                    rule_citation="REG-FDA-201 / FDA 21 CFR §201 Cosmetic Non-Cure Mandate",
+                    suggested_fix="supports healthy-looking, clear skin"
                 )
             )
+
+        # 3b. Unverified clinical or performance efficacy claims (Unsupported Claims)
+        unverified_pattern = re.compile(
+            r"\b(?:proven|clinically\s+proven|guaranteed)\s+to\s+(?:boost|reduce|increase|erase|eliminate)[^\.\n,!]*\b(\d{1,3}%|\d+\s*minutes?|\d+\s*hours?)\b",
+            re.IGNORECASE
+        )
+        for m in unverified_pattern.finditer(text):
+            if "FACT-014" not in text and "AUR-LAB-014" not in text:
+                spans.append(
+                    RiskSpan(
+                        start_char=m.start(),
+                        end_char=m.end(),
+                        matched_text=m.group(0),
+                        category="CLAIM",
+                        severity=SeverityLevel.HIGH,
+                        explanation=f"Performance claim '{m.group(0)}' lacks substantiated clinical trial evidence in the Brand Knowledge Graph ledger. Unverified efficacy claim requires human review.",
+                        rule_citation="FTC Policy Statement Regarding Advertising Substantiation / Unverified Claim",
+                        suggested_fix="clinically tested formulation (substantiation required)"
+                    )
+                )
 
         # 4. Greenwashing: "100% natural, zero toxins" or "completely eco-friendly"
         green_pattern = re.compile(r"\b(?:100%\s+natural(?:,\s+completely\s+eco-friendly)?|100%\s+natural,\s+zero\s+toxins|zero\s+toxins)\b", re.IGNORECASE)
@@ -814,36 +909,67 @@ class AutonomousGovernancePipeline:
                 )
             )
 
-        # 6. Pricing fact check: ₹499 vs ₹899
-        price_pattern = re.compile(r"\b₹499\b", re.IGNORECASE)
-        for m in price_pattern.finditer(text):
-            spans.append(
-                RiskSpan(
-                    start_char=m.start(),
-                    end_char=m.end(),
-                    matched_text=m.group(0),
-                    category="CLAIM",
-                    severity=SeverityLevel.CRITICAL,
-                    explanation="Authorized retail price for Aurelle Vitamin C Brightening Serum is ₹899 for 30 ml (FACT-006).",
-                    rule_citation="Approved Fact FACT-006 (Aurelle Skin Pricing Master Schedule)",
-                    suggested_fix="₹899"
+        # 6. Pricing fact check: ₹499 vs ₹899 (Serum) or ₹499 vs ₹599 (Spatial Computing)
+        if "serum" in lower_text or "vitamin c" in lower_text or "brightening" in lower_text or "skincare" in lower_text:
+            price_pattern = re.compile(r"(?:₹|rs\.?\s*)499\b", re.IGNORECASE)
+            for m in price_pattern.finditer(text):
+                spans.append(
+                    RiskSpan(
+                        start_char=m.start(),
+                        end_char=m.end(),
+                        matched_text=m.group(0),
+                        category="CLAIM",
+                        severity=SeverityLevel.CRITICAL,
+                        explanation="Authorized retail price for Aurelle Vitamin C Brightening Serum is ₹899 for 30 ml (FACT-006).",
+                        rule_citation="Approved Fact FACT-006 (Aurelle Skin Pricing Master Schedule)",
+                        suggested_fix="₹899"
+                    )
                 )
-            )
+        elif "spatial computing" in lower_text:
+            price_pattern = re.compile(r"(?:₹|rs\.?\s*)499\b", re.IGNORECASE)
+            for m in price_pattern.finditer(text):
+                spans.append(
+                    RiskSpan(
+                        start_char=m.start(),
+                        end_char=m.end(),
+                        matched_text=m.group(0),
+                        category="CLAIM",
+                        severity=SeverityLevel.HIGH,
+                        explanation="References superseded subscription price of ₹499 instead of current approved price ₹599 (FACT-AUR-PRC-01).",
+                        rule_citation="Approved Fact FACT-AUR-PRC-01 (Aurelle Cloud Studio Subscription Price)",
+                        suggested_fix="₹599"
+                    )
+                )
 
         # 7. DL-01: Discounts & Offers need "T&Cs apply"
-        if ("50% off" in lower_text or "buy one get one" in lower_text or "festive offer" in lower_text) and "t&c" not in lower_text and "terms apply" not in lower_text:
-            m_offer = re.search(r"\b(?:50%\s+off|buy\s+one\s+get\s+one(?:\s+50%\s+off)?)\b", text, re.IGNORECASE)
+        if "t&c" not in lower_text and "terms apply" not in lower_text:
+            m_sale = re.search(r"\bsale\b", text, re.IGNORECASE)
+            if m_sale:
+                spans.append(
+                    RiskSpan(
+                        start_char=m_sale.start(),
+                        end_char=m_sale.end(),
+                        matched_text=m_sale.group(0),
+                        category="REGULATORY",
+                        severity=SeverityLevel.CRITICAL,
+                        explanation="Promotions must say \"T&Cs apply\" and link to the terms.",
+                        rule_citation="Brand Rule DL-01 (Aurelle Brand Book v1.3 §7.3 Promotions)",
+                        suggested_fix=f"{m_sale.group(0)} (T&Cs apply)"
+                    )
+                )
+
+            m_offer = re.search(r"\b(?:\d+%\s+off[^\.\n,!]*|discount[^\.\n,!]*|50%\s+off|buy\s+one\s+get\s+one(?:\s+50%\s+off)?)\b", text, re.IGNORECASE)
             if m_offer:
                 spans.append(
                     RiskSpan(
                         start_char=m_offer.start(),
                         end_char=m_offer.end(),
-                        matched_text=m_offer.group(0),
-                        category="REGULATORY",
-                        severity=SeverityLevel.HIGH,
-                        explanation="Commercial promotions, discounts, and offers require mandatory 'T&Cs apply' disclosure.",
-                        rule_citation="Brand Rule DL-01 (Promotions & Offers Mandatory Disclosure)",
-                        suggested_fix=f"{m_offer.group(0)} (T&Cs apply)"
+                        matched_text=m_offer.group(0).strip(),
+                        category="PROMOTION",
+                        severity=SeverityLevel.CRITICAL,
+                        explanation="Promotions must say \"T&Cs apply\" and link to the terms.",
+                        rule_citation="Brand Rule DL-01 (Aurelle Brand Book v1.3 §7.3 Promotions)",
+                        suggested_fix=f"{m_offer.group(0).strip()} (T&Cs apply)"
                     )
                 )
 
@@ -864,9 +990,9 @@ class AutonomousGovernancePipeline:
             )
 
         # 8b. FACT-033: Embargoed Promotion / Diwali Sale
-        if "diwali sale" in lower_text or ("diwali" in lower_text and "sale" in lower_text):
+        if ("launch embargo" in lower_text or "pre-release diwali" in lower_text):
             m_diwali = re.search(r"\b(?:our\s+)?diwali\s+sale(?:\s+is\s+here)?\b", text, re.IGNORECASE)
-            if m_diwali:
+            if m_diwali and not any(s.start_char <= m_diwali.start() and s.end_char >= m_diwali.end() for s in spans):
                 spans.append(
                     RiskSpan(
                         start_char=m_diwali.start(),
@@ -959,10 +1085,48 @@ class AutonomousGovernancePipeline:
                     category="VOICE",
                     severity=SeverityLevel.LOW,
                     explanation="Don't capitalise website, internet, online or email mid-sentence.",
-                    rule_citation="Brand Rule GM07 (Style: lowercase online terms)",
+                    rule_citation="Brand Rule GM07 (Aurelle Brand Book v1.3 §8 Style)",
                     suggested_fix=m.group(1).lower()
                 )
             )
+
+        # 9b. Style: GM06 (Email addresses and URLs in lowercase)
+        url_matches = list(re.finditer(r"\b((?:https?://|www\.)[a-zA-Z0-9.\-_/]+|[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\b", text, re.IGNORECASE))
+        for m in url_matches:
+            url_str = m.group(0)
+            if any(c.isupper() for c in url_str):
+                spans.append(
+                    RiskSpan(
+                        start_char=m.start(),
+                        end_char=m.end(),
+                        matched_text=url_str,
+                        category="VOICE",
+                        severity=SeverityLevel.LOW,
+                        explanation="Email addresses and URLs in lowercase",
+                        rule_citation="Brand Rule GM06 (Aurelle Brand Book v1.3 §8 Style)",
+                        suggested_fix=url_str.lower()
+                    )
+                )
+
+        # 9c. Style: GM08 (Format numbers over 999 with commas)
+        num_matches = list(re.finditer(r"\b(\d{4,9})\b", text))
+        for m in num_matches:
+            num_str = m.group(1)
+            val = int(num_str)
+            if val not in [2024, 2025, 2026, 2027]:
+                formatted = f"{val:,}"
+                spans.append(
+                    RiskSpan(
+                        start_char=m.start(),
+                        end_char=m.end(),
+                        matched_text=num_str,
+                        category="VOICE",
+                        severity=SeverityLevel.LOW,
+                        explanation=f"Format numbers over 999 with commas ({formatted}) and verify claim against customer ledger.",
+                        rule_citation="Brand Rule GM08 (Aurelle Brand Book v1.3 §8 Style)",
+                        suggested_fix=formatted
+                    )
+                )
 
         # 10. Missing mandatory key phrases (if specified by Creator)
         if key_phrases:
@@ -1062,19 +1226,69 @@ class AutonomousGovernancePipeline:
             if span.suggested_fix and span.matched_text and span.matched_text in enclosing_sentence:
                 suggested_sentence = enclosing_sentence.replace(span.matched_text, span.suggested_fix, 1)
 
+            m_fact = re.search(r"FACT-[A-Za-z0-9-]+", span.rule_citation)
+            fact_id = m_fact.group(0) if m_fact else None
+
+            expl_lower = span.explanation.lower()
+            if fact_id or span.category.upper() == "CLAIM":
+                if "contradict" in expl_lower or "conflict" in expl_lower:
+                    claim_classification = "CONTRADICTED"
+                elif "unsupported" in expl_lower or "no fact" in expl_lower or "unsubstantiat" in expl_lower:
+                    claim_classification = "UNSUPPORTED"
+                elif "expired" in expl_lower or "outdated" in expl_lower:
+                    claim_classification = "EXPIRED"
+                elif "supported" in expl_lower or "verified" in expl_lower:
+                    claim_classification = "SUPPORTED"
+                else:
+                    claim_classification = "NEEDS_HUMAN_REVIEW"
+            elif "REG-" in span.rule_citation or "compliance" in span.category.lower() or "regulatory" in span.category.lower():
+                claim_classification = "COMPLIANCE"
+            elif "GL-" in span.rule_citation or "TM-" in span.rule_citation or "guideline" in span.category.lower():
+                claim_classification = "BRAND_RULE"
+            else:
+                claim_classification = "NEEDS_HUMAN_REVIEW"
+
+            rule_title = span.rule_citation.split("(")[0].strip() if "(" in span.rule_citation else span.rule_citation
+            evidence_ref = span.rule_citation
+            if rule_id == "DL-01":
+                rule_title = 'Offers and discounts need "T&Cs apply"'
+                evidence_ref = "SOURCE Aurelle Brand Book v1.3 §7.3 Promotions"
+            elif rule_id == "GM06":
+                rule_title = "Email addresses and URLs in lowercase"
+                evidence_ref = "SOURCE Aurelle Brand Book v1.3 §8 Style (GM06)"
+            elif rule_id == "GM07":
+                rule_title = "Don't capitalise online mid-sentence"
+                evidence_ref = "SOURCE Aurelle Brand Book v1.3 §8 Style (GM07)"
+            elif rule_id == "GM08":
+                rule_title = "Format numbers over 999 with commas"
+                evidence_ref = "SOURCE Aurelle Brand Book v1.3 §8 Style (GM08)"
+            elif rule_id == "FACT-014":
+                rule_title = "Clinical Evidence Substantiation"
+                evidence_ref = "SOURCE Aurelle Clinical Protocol AUR-LAB-014 (FACT-014)"
+            elif rule_id == "FACT-006":
+                rule_title = "Authorized Commercial Pricing Schedule"
+                evidence_ref = "SOURCE Aurelle Commercial Pricing Schedule (FACT-006)"
+            elif not evidence_ref.startswith("SOURCE"):
+                evidence_ref = f"SOURCE {evidence_ref}"
+
             finding_item = {
                 "id": f"f-{finding_idx}",
                 "number": finding_idx,
                 "sentence_text": enclosing_sentence,
                 "flagged_text": span.matched_text,
-                "category": span.category,
+                "category": "Mandatory required" if rule_id == "DL-01" else ("Brand style" if rule_id.startswith("GM") else span.category),
                 "severity": sev_str,
                 "rule_id": rule_id,
-                "rule_title": span.rule_citation.split("(")[0].strip() if "(" in span.rule_citation else span.rule_citation,
+                "fact_id": fact_id,
+                "claim_classification": claim_classification,
+                "evidence": evidence_ref,
+                "evidence_ref": evidence_ref,
+                "source": evidence_ref,
+                "rule_title": rule_title,
                 "explanation": span.explanation,
                 "suggested_fix": span.suggested_fix or "",
                 "suggested_sentence": suggested_sentence,
-                "evidence_ref": span.rule_citation,
+                "evidence_ref": evidence_ref,
                 "needs_human_review": needs_human,
                 "decision": "UNDECIDED",
                 "overrule_reason": "",
