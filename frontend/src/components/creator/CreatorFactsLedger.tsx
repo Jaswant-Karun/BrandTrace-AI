@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { ShieldAlert, CheckCircle2, AlertCircle, Info, Sparkles } from 'lucide-react';
 
 interface FactCardItem {
   id: string;

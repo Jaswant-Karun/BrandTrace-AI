@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Download, Copy, Check, ShieldCheck, Clock } from 'lucide-react';
+import { Download, Copy, Check } from 'lucide-react';
 
 export interface AuditEvent {
   id: string;

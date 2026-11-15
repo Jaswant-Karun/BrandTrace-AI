@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { AlertTriangle, ShieldCheck, CheckCircle2, Search, Filter } from 'lucide-react';
+import { AlertTriangle, Search } from 'lucide-react';
 
 interface RuleItem {
   code: string;
@@ -127,7 +126,6 @@ export const CreatorRulebook: React.FC<CreatorRulebookProps> = ({
   brandName = 'Aurelle Skin',
 }) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
 
   const filteredRules = RULES_DATA.filter((r) => {
     const matchesSearch =

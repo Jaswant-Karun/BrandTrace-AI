@@ -1,6 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { CheckCircle2, TrendingUp, Info } from 'lucide-react';
 
 interface GuidelineRuleStat {
   code: string;

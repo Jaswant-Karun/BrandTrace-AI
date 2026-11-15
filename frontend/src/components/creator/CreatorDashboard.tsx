@@ -8,7 +8,6 @@ import { CreatorFactsLedger } from './CreatorFactsLedger';
 import { CreatorGuidelineHealth } from './CreatorGuidelineHealth';
 import { CreatorClaimWatch } from './CreatorClaimWatch';
 import { useAuth } from '../../context/AuthContext';
-import { ArrowLeft, ShieldAlert } from 'lucide-react';
 
 interface CreatorDashboardProps {
   onBackToLanding?: () => void;
@@ -21,7 +20,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
   brandName = 'Aurelle Skin',
   initialTab = 'check',
 }) => {
-  const { user, switchPersona, personas } = useAuth();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<CreatorTab>(initialTab);
   const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([]);
 
@@ -81,7 +80,6 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
               <CreatorAuditLog
                 brandName={brandName}
                 customEvents={auditEvents}
-                brandName={brandName}
               />
             )}
 

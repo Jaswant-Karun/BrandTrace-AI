@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  CheckCircle2, AlertTriangle, FileUp, Sparkles, 
-  Send, ChevronDown, ChevronRight, RefreshCw, Check, ArrowRight, ShieldCheck, X
+  CheckCircle2, 
+  Send, ChevronDown, ChevronRight, RefreshCw, Check, ArrowRight, X
 } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 

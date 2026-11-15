@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Globe, Eye, CheckCircle2, ChevronRight, ChevronDown, RefreshCw, Plus, ExternalLink } from 'lucide-react';
+import { Globe, Eye, CheckCircle2, ChevronRight, ChevronDown, RefreshCw, ExternalLink } from 'lucide-react';
 
 interface LivePageItem {
   id: string;
