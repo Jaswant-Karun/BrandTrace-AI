@@ -8,7 +8,8 @@ import {
   X, Menu,
   Hash, Sliders,
   Heart, MessageCircle, Send, Bookmark,
-  PenTool, Building2, ClipboardCheck, Megaphone
+  PenTool, Building2, ClipboardCheck, Megaphone,
+  Download
 } from 'lucide-react';
 
 import { PlumbBob } from './ui/PlumbBob';
@@ -30,6 +31,8 @@ interface LandingPageProps {
   isReseeding?: boolean;
   onOpenCreatorDashboard?: () => void;
   onNavigateRole?: (role: RoleType) => void;
+  onOpenInstall?: () => void;
+  isInstalled?: boolean;
 }
 
 export type RoleType = 'creator' | 'agency' | 'reviewer' | 'compliance' | 'brand-owner';
@@ -48,7 +51,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onReseed: _onReseed = () => { },
   isReseeding: _isReseeding = false,
   onOpenCreatorDashboard,
-  onNavigateRole
+  onNavigateRole,
+  onOpenInstall,
+  isInstalled = false
 }) => {
   const { user, isAuthenticated, logout } = useAuth();
   const shouldReduceMotion = useReducedMotion();
@@ -158,6 +163,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <span>Verify Release</span>
             </button>
 
+            {/* Install App Action Button (Available when not already installed in standalone mode) */}
+            {!isInstalled && onOpenInstall && (
+              <button
+                type="button"
+                onClick={onOpenInstall}
+                className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-neutral-900 border border-neutral-700/80 text-neutral-200 hover:text-white hover:bg-neutral-800 hover:border-neutral-600 transition-colors cursor-pointer shadow-2xs shrink-0 whitespace-nowrap"
+                title="Install BrandTrace AI Application"
+              >
+                <Download className="w-3.5 h-3.5 text-indigo-400" />
+                <span>Install App</span>
+              </button>
+            )}
+
 
 
             {/* If Authenticated: Show Account Indicator & Sign Out */}
@@ -231,6 +249,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <CheckCircle2 className="w-4 h-4" />
                   <span>Public Verification Portal</span>
                 </button>
+                {!isInstalled && onOpenInstall && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      onOpenInstall();
+                    }}
+                    className="text-left py-1.5 text-indigo-400 font-semibold flex items-center gap-1.5"
+                  >
+                    <Download className="w-4 h-4 text-indigo-400" />
+                    <span>Install BrandTrace App</span>
+                  </button>
+                )}
               </div>
 
               <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2">
@@ -1615,6 +1646,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               >
                 HOW I KNOW IT WORKS
               </button>
+              {!isInstalled && onOpenInstall && (
+                <button
+                  type="button"
+                  onClick={onOpenInstall}
+                  className="hover:text-indigo-400 font-bold transition-colors cursor-pointer"
+                >
+                  INSTALL APP
+                </button>
+              )}
             </div>
 
             <div className="flex items-center gap-3 sm:gap-4 shrink-0 text-center md:text-right text-[10px] sm:text-[11px] text-neutral-500 whitespace-nowrap">

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { OfflineBanner } from './components/OfflineBanner';
+import { InstallRecommendationBanner } from './components/InstallRecommendationBanner';
 import { usePWA } from './hooks/usePWA';
 import { useAuth, UserPersona } from './context/AuthContext';
 import { BrandProfile, DatabaseStatus, VerificationResult } from './types';
@@ -381,6 +382,8 @@ export const App: React.FC = () => {
           onSignRelease={handleSignRelease}
           onReseed={handleReseed}
           isReseeding={isReseeding}
+          onOpenInstall={() => setIsInstallModalOpen(true)}
+          isInstalled={isInstalled}
           onEnterApp={(targetTab) => {
             if (targetTab === 'public-verification') {
               setViewMode('verify');
@@ -404,6 +407,14 @@ export const App: React.FC = () => {
           />
         )}
       </Suspense>
+
+      {/* Progressive Web App Non-Intrusive Floating Recommendation Banner */}
+      <InstallRecommendationBanner
+        isInstallable={isInstallable}
+        isInstalled={isInstalled}
+        onPromptInstall={promptInstall}
+        onOpenModal={() => setIsInstallModalOpen(true)}
+      />
 
       {/* Database Telemetry Modal (Lazy) */}
       <Suspense fallback={null}>

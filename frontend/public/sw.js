@@ -6,7 +6,7 @@
    4. Offline fallback page is served on network disconnection.
 */
 
-const CACHE_NAME = 'brandtrace-static-v1';
+const CACHE_NAME = 'brandtrace-static-v2';
 const PRECACHE_ASSETS = [
   '/',
   '/offline.html',
