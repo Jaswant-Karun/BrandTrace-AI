@@ -4,7 +4,7 @@ import {
   ShieldCheck, GitFork, ArrowRight, Lock, 
   CheckCircle2, ChevronRight,
   Network, RotateCcw,
-  FileText, Globe, Cpu,
+  Globe,
   X, Menu,
   Hash, Sliders, BookOpen, Sparkles, ShieldAlert
 } from 'lucide-react';
@@ -29,12 +29,14 @@ interface LandingPageProps {
   onCloseWorkspace?: () => void;
   onSignRelease?: (result: VerificationResult, reviewerName: string) => Promise<void>;
   initialSubTab?: string;
+  onReseed?: () => void;
+  isReseeding?: boolean;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ 
-  onEnterApp, 
-  onVerify, 
-  onSignIn,
+  onEnterApp = () => {}, 
+  onVerify = () => {}, 
+  onSignIn = () => {}, 
   brandName: _brandName = 'Apex Dynamics',
   animateEntrance,
   brands = [],
@@ -45,7 +47,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onSelectWorkspaceCategory,
   onCloseWorkspace,
   onSignRelease,
-  initialSubTab
+  initialSubTab,
+  onReseed: _onReseed = () => {},
+  isReseeding: _isReseeding = false
 }) => {
   const { user, isAuthenticated, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

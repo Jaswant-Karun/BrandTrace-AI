@@ -1,8 +1,7 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   BookOpen, Sparkles, ShieldAlert, GitFork, CheckCircle2, Lock,
-  X, ChevronRight, Layers, Sliders, ExternalLink, RefreshCw
+  X
 } from 'lucide-react';
 import { BrandProfile, VerificationResult } from '../types';
 import { ErrorBoundary } from './ui/ErrorBoundary';
