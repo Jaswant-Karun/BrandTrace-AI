@@ -188,7 +188,13 @@ class MongoManager:
     async def save_organization(self, org_doc: Dict[str, Any]):
         org_id = org_doc["org_id"]
         if self.is_connected and self.db is not None:
-            await self.db.organizations.update_one({"org_id": org_id}, {"$set": org_doc}, upsert=True)
+            update_data = {k: v for k, v in org_doc.items() if k != "_id"}
+            set_on_insert = {"_id": org_doc["_id"]} if "_id" in org_doc else {"_id": str(ObjectId())}
+            await self.db.organizations.update_one(
+                {"org_id": org_id},
+                {"$set": update_data, "$setOnInsert": set_on_insert},
+                upsert=True
+            )
         self._memory_orgs[org_id] = org_doc
 
     # ==============================================================================
@@ -209,9 +215,11 @@ class MongoManager:
     async def save_brand(self, brand_data: Dict[str, Any]):
         brand_id = brand_data["brand_id"]
         if self.is_connected and self.db is not None:
+            update_data = {k: v for k, v in brand_data.items() if k != "_id"}
+            set_on_insert = {"_id": brand_data["_id"]} if "_id" in brand_data else {"_id": str(ObjectId())}
             await self.db.brands.update_one(
                 {"brand_id": brand_id},
-                {"$set": brand_data},
+                {"$set": update_data, "$setOnInsert": set_on_insert},
                 upsert=True
             )
         self._memory_brands[brand_id] = brand_data
@@ -228,9 +236,11 @@ class MongoManager:
                 node_copy["org_id"] = org_id
                 node_copy["workspace_id"] = brand_id
                 node_copy["node_id"] = node.get("id")
+                node_update = {k: v for k, v in node_copy.items() if k != "_id"}
+                node_set_on_insert = {"_id": node_copy["_id"]} if "_id" in node_copy else {"_id": str(ObjectId())}
                 await self.db.knowledge_nodes.update_one(
                     {"org_id": org_id, "node_id": node["id"]},
-                    {"$set": node_copy},
+                    {"$set": node_update, "$setOnInsert": node_set_on_insert},
                     upsert=True
                 )
             for edge in edges:
@@ -243,9 +253,11 @@ class MongoManager:
                 edge_copy["relationship_type"] = edge.get("type", "DEPENDS_ON")
                 edge_key = f"{edge['source']}->{edge['target']}:{edge.get('type')}"
                 edge_copy["edge_key"] = edge_key
+                edge_update = {k: v for k, v in edge_copy.items() if k != "_id"}
+                edge_set_on_insert = {"_id": edge_copy["_id"]} if "_id" in edge_copy else {"_id": str(ObjectId())}
                 await self.db.graph_relationships.update_one(
                     {"org_id": org_id, "edge_key": edge_key},
-                    {"$set": edge_copy},
+                    {"$set": edge_update, "$setOnInsert": edge_set_on_insert},
                     upsert=True
                 )
         self._memory_nodes[brand_id] = nodes
@@ -441,9 +453,11 @@ class MongoManager:
     async def save_file_meta(self, file_meta: Dict[str, Any]):
         file_id = file_meta["file_id"]
         if self.is_connected and self.db is not None:
+            update_data = {k: v for k, v in file_meta.items() if k != "_id"}
+            set_on_insert = {"_id": file_meta["_id"]} if "_id" in file_meta else {"_id": str(ObjectId())}
             await self.db.file_storage_meta.update_one(
                 {"file_id": file_id},
-                {"$set": file_meta},
+                {"$set": update_data, "$setOnInsert": set_on_insert},
                 upsert=True
             )
         self._memory_files[file_id] = file_meta
@@ -499,9 +513,11 @@ class MongoManager:
     async def save_task(self, task_doc: Dict[str, Any]):
         task_id = task_doc["task_id"]
         if self.is_connected and self.db is not None:
+            update_data = {k: v for k, v in task_doc.items() if k != "_id"}
+            set_on_insert = {"_id": task_doc["_id"]} if "_id" in task_doc else {"_id": str(ObjectId())}
             await self.db.revision_tasks.update_one(
                 {"task_id": task_id},
-                {"$set": task_doc},
+                {"$set": update_data, "$setOnInsert": set_on_insert},
                 upsert=True
             )
         self._memory_tasks[task_id] = task_doc
