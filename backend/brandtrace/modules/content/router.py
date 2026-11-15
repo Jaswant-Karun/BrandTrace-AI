@@ -41,8 +41,8 @@ async def upload_and_process_multimodal_asset(
     )
 
     # Perform multimodal AST / frame-level inspection
-    seed_graph_data = BRAND_SEEDS.get(workspace_id)
-    bkg = BrandKnowledgeGraph.from_graph_data(seed_graph_data) if seed_graph_data else None
+    seed_graph_data = BRAND_SEEDS.get(workspace_id) or BRAND_SEEDS.get("aurelle-tech")
+    bkg = BrandKnowledgeGraph.from_graph_data(seed_graph_data) if seed_graph_data else BrandKnowledgeGraph(workspace_id, workspace_id)
     
     inspection_report = multimodal_engine.inspect_file(filename, content_bytes, bkg)
 

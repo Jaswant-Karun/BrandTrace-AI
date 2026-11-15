@@ -9,7 +9,7 @@ from brandtrace.modules.knowledge_base.models import (
 )
 from brandtrace.database.mongo import mongo_manager
 from brandtrace.database.schemas import ApprovedFactDoc
-from brandtrace.graph.schema import ApprovedFact, Node as GraphNode
+from brandtrace.graph.schema import ApprovedFact, Node as GraphNode, NodeType
 from brandtrace.engine.ai_provider import ai_provider
 from brandtrace.data.seed_data import APPROVED_FACTS_CATALOG
 
@@ -172,8 +172,7 @@ async def create_approved_fact(req: CreateFactRequest):
         description=req.description,
         source_citation=req.source_citation,
         department_owner=req.department_owner,
-        last_verified=now_iso,
-        effective_from=now_iso
+        last_verified=now_iso
     )
     APPROVED_FACTS_CATALOG[fact_id] = fact_obj
     
@@ -182,7 +181,7 @@ async def create_approved_fact(req: CreateFactRequest):
         node = GraphNode(
             id=fact_id,
             label=f"{req.name}: {req.current_value}",
-            type="APPROVED_FACT",
+            type=NodeType.APPROVED_FACT,
             description=req.description,
             properties={
                 "current_value": req.current_value,

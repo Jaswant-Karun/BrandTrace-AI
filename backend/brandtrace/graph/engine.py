@@ -6,9 +6,11 @@ from brandtrace.graph.schema import (
 )
 
 class BrandKnowledgeGraph:
-    def __init__(self, brand_id: str, brand_name: str):
+    def __init__(self, brand_id: str, brand_name: str, industry: Optional[str] = None, description: Optional[str] = None):
         self.brand_id = brand_id
         self.brand_name = brand_name
+        self.industry: Optional[str] = industry
+        self.description: Optional[str] = description
         self.graph = nx.DiGraph()
         self.node_meta: Dict[str, Node] = {}
         self.edge_meta: List[Edge] = []

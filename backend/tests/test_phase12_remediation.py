@@ -201,6 +201,7 @@ async def test_repo_add_approved_fact_immutable_id_preserved():
         retrieved_raw = await mongo_manager.db.approved_facts.find_one(
             {"organisation_id": org_id, "fact_id": "FACT-DEF02-01"}
         )
+        assert retrieved_raw is not None
         assert retrieved_raw["_id"] == initial_id
         # 6. Confirm updated field
         assert retrieved_raw["current_value"] == "4.51 g/cm³"
@@ -217,6 +218,7 @@ async def test_repo_add_approved_fact_immutable_id_preserved():
         final_raw = await mongo_manager.db.approved_facts.find_one(
             {"organisation_id": org_id, "fact_id": "FACT-DEF02-01"}
         )
+        assert final_raw is not None
         assert final_raw["_id"] == initial_id
         assert final_raw["current_value"] == "4.54 g/cm³"
 
@@ -267,6 +269,7 @@ async def test_repo_add_brand_guideline_immutable_id_preserved():
         updated_doc = await mongo_manager.db.brand_guidelines.find_one(
             {"organisation_id": org_id, "guideline_id": "GL-DEF02-01"}
         )
+        assert updated_doc is not None
         assert updated_doc["_id"] == orig_id
         assert updated_doc["severity"] == "CRITICAL"
         assert updated_doc["rule_statement"] == "Updated strict tracking rule"
@@ -319,6 +322,7 @@ async def test_repo_save_content_asset_immutable_id_preserved():
         updated_doc = await mongo_manager.db.content_assets.find_one(
             {"organisation_id": org_id, "asset_id": "AST-DEF02-01"}
         )
+        assert updated_doc is not None
         assert updated_doc["_id"] == orig_id
         assert updated_doc["status"] == "IN_REVIEW"
         assert updated_doc["raw_content"] == "Updated: Discover titanium craftsmanship."
@@ -359,5 +363,6 @@ async def test_repo_other_upserts_immutable_id_preserved():
         updated_ws = await mongo_manager.db.brand_workspaces.find_one(
             {"organisation_id": org_id, "workspace_id": ws_id}
         )
+        assert updated_ws is not None
         assert updated_ws["_id"] == orig_ws_id
         assert updated_ws["name"] == "Renamed Staging Workspace"

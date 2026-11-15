@@ -244,6 +244,7 @@ async def test_phase5_atomic_approval_decision():
 
     # Check asset status was atomically updated
     updated_asset = await repo.get_content_asset(org_id, asset_id)
+    assert updated_asset is not None
     assert updated_asset["status"] == "APPROVED"
 
 @pytest.mark.anyio
