@@ -23,10 +23,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       if (savedTheme === 'light' || savedTheme === 'dark') {
         return savedTheme;
       }
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        return 'dark';
-      }
     }
+    // Mandatory: First-time visitors always get Light Mode by default
     return 'light';
   });
 
@@ -41,18 +39,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
     localStorage.setItem('brandtrace_theme', theme);
   }, [theme]);
-
-  // Listen to system preference changes if user hasn't explicitly set a preference in this session
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return;
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e: MediaQueryListEvent) => {
-      const hasExplicit = localStorage.getItem('brandtrace_theme');
-      if (!hasExplicit) {
-        setThemeState(e.matches ? 'dark' : 'light');
-      }
-    };
-    mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
