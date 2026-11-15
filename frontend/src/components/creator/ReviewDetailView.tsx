@@ -375,7 +375,7 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
 
         <div className="flex items-center gap-3 text-xs font-mono">
           <span className="text-neutral-500 uppercase">
-            PLUMBLINE · {brandName.toUpperCase()} · REVIEW WORKSPACE
+            BRANDTRACE · {brandName.toUpperCase()} · REVIEW WORKSPACE
           </span>
           <span className="px-2 py-0.5 rounded bg-neutral-900 border border-neutral-700 text-neutral-200 font-bold">
             {post.id}
@@ -403,7 +403,7 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
       {/* Header Area matching screenshot */}
       <div className="space-y-3">
         <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
-          PLUMBLINE · {brandName.toUpperCase()}
+          BRANDTRACE · {brandName.toUpperCase()}
         </div>
         <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white font-sans uppercase">
           {roleName === 'BRAND OWNER' ? 'FINAL RELEASE' : roleName === 'COMPLIANCE' ? 'COMPLIANCE' : 'REVIEW'}

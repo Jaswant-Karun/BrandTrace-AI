@@ -682,7 +682,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
       {/* Header matching Plumbline / BrandTrace */}
       <div className="space-y-2">
         <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
-          PLUMBLINE · {activeBrandName.toUpperCase()}
+          BRANDTRACE · {activeBrandName.toUpperCase()}
         </div>
         <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white font-sans uppercase">
           CHECK A POST
