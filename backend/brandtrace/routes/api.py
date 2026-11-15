@@ -137,6 +137,8 @@ async def verify_asset(request: VerificationRequest):
     Executes the Autonomous Multi-Agent Governance Pipeline on marketing content.
     Returns token-level risk spans, citations, scores, remediation, and release proof.
     """
+    if not request.content or not request.content.strip():
+        raise HTTPException(status_code=400, detail="Content cannot be empty for governance inspection.")
     bkg = get_or_load_graph(request.brand_id)
     result = governance_pipeline.verify_asset(request, bkg)
     
@@ -671,6 +673,8 @@ async def explainable_claims_review(req: ExplainableReviewRequest):
     Hybrid Explainable AI Review:
     Classifies claims as SUPPORTED, CONTRADICTED, NEEDS_VERIFICATION, EXPIRED_SOURCE, or POTENTIALLY_MISLEADING.
     """
+    if not req.content or not req.content.strip():
+        raise HTTPException(status_code=400, detail="Content cannot be empty for explainable review.")
     bkg = get_or_load_graph(req.brand_id)
     report = explainable_engine.analyze_claims_explainable(req.content, bkg, req.brand_id)
     return report

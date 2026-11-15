@@ -50,6 +50,8 @@ export interface VerificationResult {
   remediated_content?: string;
   remediation_rationale?: string;
   release_proof?: ReleaseProof;
+  latency_ms?: number;
+  agents_count?: number;
   timestamp: number;
   timestamp_iso: string;
 }
