@@ -5,7 +5,6 @@ import {
   Database, Sparkles, LogOut, Compass,
   Menu, Download, CheckCircle2
 } from 'lucide-react';
-import { ThemeToggle } from './ui/ThemeToggle';
 
 interface AuthHeaderProps {
   onOpenDbStatus: () => void;
@@ -158,9 +157,6 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({
 
       {/* Right: Authenticated User & Persona Switcher */}
       <div className="flex items-center gap-2 sm:gap-3 relative">
-        {/* Sun / Moon Theme Toggle */}
-        <ThemeToggle />
-
         <div className="text-right hidden sm:block">
           <div className="text-xs font-semibold text-slate-900 dark:text-white flex items-center justify-end gap-1.5">
             <span>{user?.name || 'Enterprise Persona'}</span>
