@@ -101,6 +101,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
                 brandName={brandName}
                 initialContent={restoredDraft || undefined}
                 role="creator"
+                userId={user?.email || 'creator@aurelle.com'}
                 userName={user?.name || 'Creator Asha'}
                 orgId="ORG-AURELLE"
                 revisionData={revisionData}
@@ -113,6 +114,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
             {activeTab === 'submissions' && (
               <CreatorSubmissionsView
                 role="creator"
+                userId={user?.email || 'creator@aurelle.com'}
                 userName={user?.name || 'Creator Asha'}
                 orgId="ORG-AURELLE"
                 brandName={brandName}
@@ -176,4 +178,3 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
     </div>
   );
 };
-

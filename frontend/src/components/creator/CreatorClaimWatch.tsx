@@ -24,38 +24,14 @@ export const CreatorClaimWatch: React.FC<CreatorClaimWatchProps> = ({
   const [isRegistering, setIsRegistering] = useState<boolean>(false);
   const [feedbackMsg, setFeedbackMsg] = useState<string | null>(null);
 
-  const [livePages, setLivePages] = useState<LivePageItem[]>([
-    {
-      id: 'lp-1',
-      approvedPostTitle: 'Aurelle Vitamin C Launch Post (Approved 12 Nov)',
-      url: 'https://shop.example.com/serum',
-      registeredDate: '12 Nov 2026',
-      status: '100% MATCH',
-      lastChecked: '5 mins ago',
-    },
-  ]);
+  const [livePages] = useState<LivePageItem[]>([]);
 
   const handleRegisterAndRead = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!liveUrl.trim()) return;
 
-    setIsRegistering(true);
-    setFeedbackMsg(null);
-
-    // Simulate scanning and sentence-by-sentence comparison
-    setTimeout(() => {
-      const newPage: LivePageItem = {
-        id: `lp-${Date.now()}`,
-        approvedPostTitle: selectedPost || 'Aurelle Diwali Campaign Draft (Approved)',
-        url: liveUrl,
-        registeredDate: 'Today',
-        status: '100% MATCH',
-        lastChecked: 'Just now',
-      };
-      setLivePages((prev) => [newPage, ...prev]);
-      setIsRegistering(false);
-      setFeedbackMsg(`Successfully registered ${liveUrl}. Page content verified against approved claims with zero drift.`);
-    }, 900);
+    setIsRegistering(false);
+    setFeedbackMsg('Claim Watch registration is unavailable because no backend claim-monitoring endpoint is configured.');
   };
 
   return (
@@ -231,4 +207,3 @@ export const CreatorClaimWatch: React.FC<CreatorClaimWatchProps> = ({
     </div>
   );
 };
-

@@ -81,6 +81,14 @@ async def create_submission(req: SubmissionCreateRequest, user: UserProfile = De
     """Submits draft marketing content into the Reviewer Queue."""
     if not req.original_content.strip():
         raise HTTPException(status_code=400, detail="Cannot submit empty content")
+    if user.role.value == "CREATOR":
+        req = req.model_copy(update={
+            "creator_id": user.user_id,
+            "creator_name": user.name,
+            "creator_type": "creator",
+            "org_id": user.org_id,
+            "brand_id": user.workspace_id,
+        })
     return await submissions_service.create_submission(req)
 
 @router.get("/submissions", response_model=List[SubmissionResponse])
@@ -95,6 +103,8 @@ async def list_submissions(
 ):
     """Lists submissions filtered by user role, brand, or review state with pagination."""
     active_creator_id = creator_id
+    if user.role.value == "CREATOR" and role == "creator":
+        active_creator_id = user.user_id
     return await submissions_service.list_submissions(
         creator_id=active_creator_id,
         role=role,
@@ -125,6 +135,10 @@ async def get_submission(submission_id: str, user: UserProfile = Depends(get_cur
     """Retrieves full details, finding-by-finding status, and approval history for a submission."""
     sub = await submissions_service.get_submission(submission_id)
     if not sub:
+        raise HTTPException(status_code=404, detail="Submission not found")
+    if user.role.value == "CREATOR" and (
+        sub.get("creator_id") != user.user_id or sub.get("org_id") != user.org_id
+    ):
         raise HTTPException(status_code=404, detail="Submission not found")
     return sub
 

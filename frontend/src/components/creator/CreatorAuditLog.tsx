@@ -68,6 +68,8 @@ const DEFAULT_AUDIT_EVENTS: AuditEvent[] = [
   },
 ];
 
+void DEFAULT_AUDIT_EVENTS;
+
 export const CreatorAuditLog: React.FC<CreatorAuditLogProps> = ({
   customEvents = [],
   brandName = 'Aurelle Skin',
@@ -95,13 +97,7 @@ export const CreatorAuditLog: React.FC<CreatorAuditLogProps> = ({
     loadAuditEvents();
   }, []);
 
-  const allEvents = [
-    ...customEvents,
-    ...backendEvents,
-    ...DEFAULT_AUDIT_EVENTS.filter(
-      (de) => !backendEvents.some((be) => be.hash === de.hash || be.id === de.id)
-    ),
-  ];
+  const allEvents = [...customEvents, ...backendEvents];
 
   const handleCopy = (fullHash: string) => {
     navigator.clipboard.writeText(fullHash);
@@ -163,7 +159,7 @@ export const CreatorAuditLog: React.FC<CreatorAuditLogProps> = ({
       <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-6 sm:p-7 space-y-2 shadow-xl">
         <h3 className="text-base sm:text-lg font-bold font-mono text-white uppercase tracking-wider flex items-center gap-2">
           <span>EVENTS ABOUT YOUR WORK</span>
-          <span className="text-neutral-400 font-normal">({1409 + customEvents.length})</span>
+          <span className="text-neutral-400 font-normal">({allEvents.length})</span>
         </h3>
         <p className="text-xs sm:text-sm text-neutral-400 font-sans leading-relaxed max-w-3xl">
           You see the decisions, approvals and status changes on your own content. Verifying the chain and exporting it need every event in the organisation, so reviewers, compliance, the brand owner and auditors do that.
@@ -174,7 +170,7 @@ export const CreatorAuditLog: React.FC<CreatorAuditLogProps> = ({
       <div className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-neutral-300">
-            NEWEST EVENTS (LATEST 200 OF {1409 + customEvents.length}; EXPORT FOR ALL)
+            NEWEST EVENTS ({allEvents.length} LOADED; EXPORT FOR ALL)
           </h4>
           <button
             onClick={handleExportCSV}
@@ -302,4 +298,3 @@ export const CreatorAuditLog: React.FC<CreatorAuditLogProps> = ({
     </div>
   );
 };
-

@@ -34,6 +34,7 @@ export interface SubmissionItem {
 
 interface CreatorSubmissionsViewProps {
   role?: 'creator' | 'agency';
+  userId?: string;
   userName?: string;
   orgId?: string;
   brandName?: string;
@@ -153,31 +154,33 @@ const DEFAULT_SUBMISSIONS: SubmissionItem[] = [
   }
 ];
 
+void DEFAULT_SUBMISSIONS;
+
 export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
   role = 'agency',
+  userId,
   userName = 'Agency Sana',
   orgId = 'ORG-AGENCY-PULSE',
   brandName = 'Aurelle Skin',
   onEditAndResubmit,
 }) => {
   const shouldReduceMotion = useReducedMotion();
-  const [submissions, setSubmissions] = useState<SubmissionItem[]>(DEFAULT_SUBMISSIONS);
+  const [submissions, setSubmissions] = useState<SubmissionItem[]>([]);
   const [filter, setFilter] = useState<'ALL' | 'CHANGES_REQUESTED' | 'PENDING' | 'APPROVED'>('ALL');
-  const [expandedId, setExpandedId] = useState<string | null>('SUB-AGENCY-001');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const loadSubmissions = async () => {
     setIsLoading(true);
+    setLoadError(null);
     try {
-      const data = await apiClient.request<SubmissionItem[]>('/api/submissions');
-      if (Array.isArray(data) && data.length > 0) {
-        // Merge with defaults to ensure full richness
-        const existingIds = new Set(data.map((d) => d.submission_id));
-        const combined = [...data, ...DEFAULT_SUBMISSIONS.filter((dp) => !existingIds.has(dp.submission_id))];
-        setSubmissions(combined);
-      }
-    } catch {
-      // Fallback to in-memory state on offline or mock mode
+      const params = new URLSearchParams({ role, brand_id: 'aurelle-tech' });
+      if (role === 'creator' && userId) params.set('creator_id', userId);
+      const data = await apiClient.request<SubmissionItem[]>(`/api/submissions?${params.toString()}`, { skipCache: true });
+      setSubmissions(Array.isArray(data) ? data : []);
+    } catch (error: any) {
+      setLoadError(error?.message || 'Unable to load persisted submissions.');
     } finally {
       setIsLoading(false);
     }
@@ -185,7 +188,7 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
 
   useEffect(() => {
     loadSubmissions();
-  }, []);
+  }, [role, userId]);
 
   const filteredSubmissions = submissions.filter((sub) => {
     if (filter === 'ALL') return true;
@@ -226,6 +229,12 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
             : 'Track the status of your submitted posts. View reviewer comments, revise drafts, and track releases.'}
         </p>
       </div>
+
+      {loadError && (
+        <div className="rounded-xl border border-rose-800/60 bg-rose-950/30 p-4 text-sm text-rose-200">
+          {loadError}
+        </div>
+      )}
 
       {/* Filter Tabs: Horizontal Swipe on Mobile */}
       <div className="flex items-center gap-2 pt-2 border-b border-neutral-800 pb-4 overflow-x-auto no-scrollbar flex-nowrap sm:flex-wrap">

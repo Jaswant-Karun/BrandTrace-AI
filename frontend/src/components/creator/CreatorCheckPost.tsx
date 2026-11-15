@@ -72,6 +72,7 @@ interface CreatorCheckPostProps {
   workspaceId?: string;
   initialContent?: string;
   role?: 'creator' | 'agency' | string;
+  userId?: string;
   userName?: string;
   orgId?: string;
   revisionData?: RevisionData | null;
@@ -136,6 +137,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
   workspaceId = 'aurelle-tech',
   initialContent,
   role = 'creator',
+  userId = 'USR-CREATOR-001',
   userName,
   orgId,
   revisionData,
@@ -470,8 +472,8 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
 
     try {
       await executeAnalysis(draftContent);
-    } catch (e) {
-      console.log('AI verification note:', e);
+    } catch (e: any) {
+      setSubmissionStatus(`Check failed: ${e?.message || 'The content analysis service is unavailable.'}`);
     } finally {
       setIsChecking(false);
       setHasChecked(true);
@@ -527,9 +529,9 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
       }
       setPrivateVersionCount((c) => c + 1);
       setSubmissionStatus('Corrections applied. New inspection completed successfully.');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Re-inspection error:', err);
-      setSubmissionStatus('Re-inspection completed with local rules.');
+      setSubmissionStatus(`Re-inspection failed: ${err?.message || 'The content analysis service is unavailable.'}`);
     } finally {
       setIsChecking(false);
     }
@@ -571,15 +573,15 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
       // 1. Submit to centralized submissions database (places draft in Reviewer Meera's queue)
       let submissionId = revisionData?.submissionId || `SUB-${Date.now().toString(36).toUpperCase()}`;
       const subVersion = revisionData ? revisionData.version : privateVersionCount;
-      const subCreatorId = role === 'agency' ? 'USR-AGENCY-001' : 'USR-CREATOR-001';
+      const subCreatorId = userId;
       const subCreatorName = userName || (role === 'agency' ? 'Agency Sana' : 'Creator Asha');
       const subCreatorType = role === 'agency' ? 'agency' : 'creator';
       const subOrgId = orgId || (role === 'agency' ? 'ORG-AGENCY-PULSE' : 'ORG-AURELLE');
 
-      try {
-        const subRes = await apiClient.request<any>('/api/submissions', {
-          method: 'POST',
-          body: JSON.stringify({
+      const subRes = await apiClient.request<any>('/api/submissions', {
+        method: 'POST',
+        body: JSON.stringify({
+            submission_id: revisionData?.submissionId,
             brand_id: activeWorkspaceId,
             brand_name: activeBrandName,
             creator_id: subCreatorId,
@@ -591,7 +593,6 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
             original_content: draftContent,
             current_content: draftContent,
             version: subVersion,
-            status: 'PENDING_REVIEW',
             findings: findings.map((f, idx) => ({
               id: f.id || `f-${f.number || idx + 1}`,
               number: f.number || idx + 1,
@@ -608,45 +609,18 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
               resolved: Boolean(f.accepted),
             })),
             submission_notes: reviewNote || (revisionData ? `Revision v${subVersion} resubmitted addressing reviewer notes` : 'Submitted for review'),
-          }),
-        });
-        if (subRes && subRes.id) {
-          submissionId = subRes.id;
-        }
-      } catch (subErr) {
-        console.warn('Submissions API notice:', subErr);
+        }),
+      });
+      if (!subRes?.submission_id) {
+        throw new Error('Submission was not acknowledged by the backend.');
       }
-
-      // 2. Also register tamper-evident release seal
-      let seal = 'BT-SEAL-VERIFIED';
-      let hash = `${Date.now().toString(16)}...`;
-      try {
-        const signRes = await apiClient.request<any>('/api/releases/sign', {
-          method: 'POST',
-          body: JSON.stringify({
-            verification_id: submissionId,
-            brand_id: activeWorkspaceId,
-            asset_id: `AST-${subCreatorType.toUpperCase()}-${Date.now().toString().slice(-4)}`,
-            asset_title: `${activeBrandName} Marketing Asset (${channel})`,
-            channel: channel.toLowerCase(),
-            content: draftContent,
-            reviewer: subCreatorName,
-            decision: categoryCounts.blocking === 0 ? 'APPROVED' : 'REVIEWED',
-          }),
-        });
-        if (signRes?.release) {
-          hash = signRes.release.content_hash || hash;
-          seal = signRes.release.tamper_evident_seal || seal;
-        }
-      } catch (signErr) {
-        console.warn('Sign API notice:', signErr);
-      }
+      submissionId = subRes.submission_id;
 
       if (onSaveAuditVersion) {
         onSaveAuditVersion({
           what: `submitted for human review (assigned: Reviewer Meera, v${subVersion})`,
-          reason: reviewNote || `Handoff to review queue by ${subCreatorName}. Status: ${seal}`,
-          hash: `${hash.slice(0, 12)}...`,
+          reason: reviewNote || `Handoff to review queue by ${subCreatorName}.`,
+          hash: `submission:${submissionId}`,
         });
       }
 
@@ -654,16 +628,8 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
       if (onClearRevision) {
         onClearRevision();
       }
-    } catch (err) {
-      console.warn('Backend submission fallback:', err);
-      if (onSaveAuditVersion) {
-        onSaveAuditVersion({
-          what: `submitted for human review (assigned: Reviewer Meera)`,
-          reason: reviewNote || 'Sent to Meera (Reviewer queue)',
-          hash: '91d85d9334ef...',
-        });
-      }
-      setSubmissionStatus('Post successfully submitted to Reviewer Meera for formal review.');
+    } catch (err: any) {
+      setSubmissionStatus(`Submission failed: ${err?.message || 'The backend could not persist this submission.'}`);
     }
   };
 
