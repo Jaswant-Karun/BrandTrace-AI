@@ -798,11 +798,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
 
                 {/* Visual Body with Real Serum Image & Live Scanning Effect */}
-                <div className="relative w-full h-[320px] sm:h-[350px] overflow-hidden bg-stone-100 flex items-center justify-center group">
+                <div className="relative w-full h-[320px] sm:h-[350px] overflow-hidden bg-stone-100 flex items-center justify-center group cursor-crosshair">
                   <img
                     src="/images/instagram_serum_pedestal.jpg"
                     alt="Aurelle Skin Vitamin C Serum on Pedestal"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   />
                   
                   {/* Multimodal AI Scanning Laser Line (Smooth top-to-bottom sweep) */}
@@ -814,16 +814,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     <div className="h-12 -mt-12 bg-gradient-to-t from-cyan-400/20 to-transparent pointer-events-none" />
                   </motion.div>
 
-                  {/* Red dashed detection bounding box */}
-                  <div className="absolute bottom-6 left-6 right-6 border-2 border-dashed border-rose-500 rounded p-1.5 pointer-events-none z-10 bg-rose-500/10">
+                  {/* Red dashed detection bounding box - Appears on Hover */}
+                  <div className="absolute bottom-6 left-6 right-6 border-2 border-dashed border-rose-500 rounded p-1.5 pointer-events-none z-10 bg-rose-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div className="absolute -top-1 -left-1 w-2.5 h-2.5 border-t-2 border-l-2 border-rose-500" />
                     <div className="absolute -top-1 -right-1 w-2.5 h-2.5 border-t-2 border-r-2 border-rose-500" />
                     <div className="absolute -bottom-1 -left-1 w-2.5 h-2.5 border-b-2 border-l-2 border-rose-500" />
                     <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 border-b-2 border-r-2 border-rose-500" />
                   </div>
 
-                  {/* Floating Inspection Chip */}
-                  <div className="absolute top-4 right-4 bg-black/85 backdrop-blur-md border border-rose-500/60 shadow-xl rounded-xl p-2.5 max-w-[210px] text-left z-20 pointer-events-none">
+                  {/* Floating Inspection Chip - Appears only when pointing pointer in that image */}
+                  <div className="absolute top-4 right-4 bg-black/90 backdrop-blur-md border border-rose-500/70 shadow-2xl rounded-xl p-2.5 max-w-[210px] text-left z-20 pointer-events-none opacity-0 group-hover:opacity-100 translate-y-1.5 group-hover:translate-y-0 transition-all duration-300 ease-out">
                     <div className="text-[9.5px] font-mono font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
                       <span>BLOCKS · VLM EVIDENCE</span>
@@ -878,11 +878,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
 
                 {/* Banner Body with Real Uploaded Serum Image & Live Scanning Effect */}
-                <div className="relative w-full h-[280px] sm:h-[300px] overflow-hidden bg-amber-50 group">
+                <div className="relative w-full h-[280px] sm:h-[300px] overflow-hidden bg-amber-50 group cursor-crosshair">
                   <img
                     src="/images/serum_scan_glow.jpg"
                     alt="Aurelle Glow In 2 Weeks Banner"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
                   />
                   
                   {/* Scanning Laser Beam */}
@@ -894,16 +894,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     <div className="h-10 -mt-10 bg-gradient-to-t from-rose-400/20 to-transparent pointer-events-none" />
                   </motion.div>
 
-                  {/* Red dashed detection bounding box around "GLOW IN 2 WEEKS" */}
-                  <div className="absolute top-3 left-3 w-40 h-16 border-2 border-dashed border-rose-500 rounded p-1 pointer-events-none z-10 bg-rose-500/10">
+                  {/* Red dashed detection bounding box around "GLOW IN 2 WEEKS" - Appears on Hover */}
+                  <div className="absolute top-3 left-3 w-40 h-16 border-2 border-dashed border-rose-500 rounded p-1 pointer-events-none z-10 bg-rose-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div className="absolute -top-1 -left-1 w-2.5 h-2.5 border-t-2 border-l-2 border-rose-500" />
                     <div className="absolute -top-1 -right-1 w-2.5 h-2.5 border-t-2 border-r-2 border-rose-500" />
                     <div className="absolute -bottom-1 -left-1 w-2.5 h-2.5 border-b-2 border-l-2 border-rose-500" />
                     <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 border-b-2 border-r-2 border-rose-500" />
                   </div>
 
-                  {/* Floating Inspection Chip matching User Reference */}
-                  <div className="absolute top-3 right-3 bg-black/85 backdrop-blur-md border border-rose-500/60 shadow-xl rounded-xl p-2 max-w-[165px] text-left z-20 pointer-events-none">
+                  {/* Floating Inspection Chip - Appears only when pointing pointer in that image */}
+                  <div className="absolute top-3 right-3 bg-black/90 backdrop-blur-md border border-rose-500/70 shadow-2xl rounded-xl p-2 max-w-[165px] text-left z-20 pointer-events-none opacity-0 group-hover:opacity-100 translate-y-1.5 group-hover:translate-y-0 transition-all duration-300 ease-out">
                     <div className="text-[9px] font-mono font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
                       <span>BLOCKS · A11Y</span>
@@ -943,11 +943,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
 
                 {/* Email Visual with Live Scanning Effect */}
-                <div className="relative w-full h-[180px] sm:h-[195px] overflow-hidden bg-stone-100 flex items-center justify-center group">
+                <div className="relative w-full h-[180px] sm:h-[195px] overflow-hidden bg-stone-100 flex items-center justify-center group cursor-crosshair">
                   <img
                     src="/images/email_swatches_leaves.jpg"
                     alt="Diwali Campaign Swatches"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   />
                   
                   {/* Scanning Laser Beam */}
@@ -959,8 +959,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     <div className="h-8 -mt-8 bg-gradient-to-t from-cyan-400/20 to-transparent pointer-events-none" />
                   </motion.div>
 
-                  {/* Floating Inspection Chip */}
-                  <div className="absolute top-3 right-3 bg-black/85 backdrop-blur-md border border-rose-500/60 shadow-xl rounded-xl p-2 max-w-[190px] text-left z-20 pointer-events-none">
+                  {/* Red dashed detection bounding box around swatches - Appears on Hover */}
+                  <div className="absolute inset-x-6 top-3 bottom-3 border-2 border-dashed border-rose-500 rounded p-1.5 pointer-events-none z-10 bg-rose-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="absolute -top-1 -left-1 w-2.5 h-2.5 border-t-2 border-l-2 border-rose-500" />
+                    <div className="absolute -top-1 -right-1 w-2.5 h-2.5 border-t-2 border-r-2 border-rose-500" />
+                    <div className="absolute -bottom-1 -left-1 w-2.5 h-2.5 border-b-2 border-l-2 border-rose-500" />
+                    <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 border-b-2 border-r-2 border-rose-500" />
+                  </div>
+
+                  {/* Floating Inspection Chip - Appears only when pointing pointer in that image */}
+                  <div className="absolute top-3 right-3 bg-black/90 backdrop-blur-md border border-rose-500/70 shadow-2xl rounded-xl p-2 max-w-[190px] text-left z-20 pointer-events-none opacity-0 group-hover:opacity-100 translate-y-1.5 group-hover:translate-y-0 transition-all duration-300 ease-out">
                     <div className="text-[9px] font-mono font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
                       <span>BLOCKS · EMBARGO</span>
