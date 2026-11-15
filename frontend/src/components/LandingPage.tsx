@@ -9,6 +9,7 @@ import {
   Hash, ArrowUpRight, Scale, Clock, Sliders
 } from 'lucide-react';
 import { ThemeToggle } from './ui/ThemeToggle';
+import { PlumbBob } from './ui/PlumbBob';
 import { useAuth } from '../context/AuthContext';
 
 interface LandingPageProps {
@@ -252,15 +253,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
-          {/* Top Hanging Plumb Bob Motif inspired by reference */}
-          <div className="flex justify-end pr-12 lg:pr-24 -mt-4 mb-2 pointer-events-none select-none">
-            <div className="flex flex-col items-center">
-              <div className="w-[1.5px] h-14 bg-gradient-to-b from-purple-400/20 via-purple-400/80 to-purple-500" />
-              <div className="w-3.5 h-3.5 rotate-45 bg-purple-500 border border-purple-300 shadow-md shadow-purple-500/50 mt-[-2px]" />
-              <span className="text-[9px] font-mono uppercase tracking-widest text-slate-400 dark:text-slate-500 mt-1 rotate-90 origin-left translate-x-3 translate-y-2">
-                TRUE VERTICAL
-              </span>
-            </div>
+          {/* Top Hanging Plumb Bob Motif with Natural Physics & Scroll Shake Motion */}
+          <div className="flex justify-end pr-8 sm:pr-16 lg:pr-24 -mt-6 sm:-mt-8 mb-2 pointer-events-none select-none z-20">
+            <PlumbBob stringLength={110} />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
