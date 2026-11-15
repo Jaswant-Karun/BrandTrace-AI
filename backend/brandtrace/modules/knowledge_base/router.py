@@ -9,7 +9,7 @@ from brandtrace.modules.knowledge_base.models import (
 )
 from brandtrace.database.mongo import mongo_manager
 from brandtrace.database.schemas import ApprovedFactDoc
-from brandtrace.graph.schema import ApprovedFact, GraphNode
+from brandtrace.graph.schema import ApprovedFact, Node as GraphNode
 from brandtrace.engine.ai_provider import ai_provider
 from brandtrace.data.seed_data import APPROVED_FACTS_CATALOG
 
