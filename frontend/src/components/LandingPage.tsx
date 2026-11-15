@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ShieldCheck, GitFork, ArrowRight, Lock,
-  CheckCircle2, ChevronRight,
+  CheckCircle2,
   Network, RotateCcw,
   Globe,
   X, Menu,
-  Hash, Sliders, BookOpen, Sparkles, ShieldAlert,
+  Hash, Sliders,
   Heart, MessageCircle, Send, Bookmark,
   PenTool, Building2, ClipboardCheck, Megaphone
 } from 'lucide-react';
@@ -58,7 +58,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const { user, isAuthenticated, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSecurityIndex, setActiveSecurityIndex] = useState<number | null>(null);
-  const [activeCapabilityId, setActiveCapabilityId] = useState<string | null>(null);
   const [activeStepIndex, setActiveStepIndex] = useState<number>(3);
 
   // Check if entrance animation was requested (either via prop or URL param ?fromLogin=true)
@@ -96,7 +95,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   }, [shouldAnimate]);
 
   const handleSelectCapability = (catId: WorkspaceCategory, targetSubTab?: string) => {
-    setActiveCapabilityId(catId);
     if (onSelectWorkspaceCategory) {
       onSelectWorkspaceCategory(catId, targetSubTab);
     }
@@ -150,8 +148,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <button onClick={() => scrollToSection('overview')} className="hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer">
               Overview
             </button>
-            <button onClick={() => scrollToSection('features')} className="hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer">
-              Capabilities
+            <button onClick={() => scrollToSection('roles')} className="hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer">
+              Roles
             </button>
             {activeWorkspaceCategory && (
               <button
@@ -250,7 +248,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             >
               <div className="flex flex-col space-y-2 text-sm font-medium text-slate-700 dark:text-slate-200">
                 <button onClick={() => scrollToSection('overview')} className="text-left py-1.5 hover:text-blue-600">Overview</button>
-                <button onClick={() => scrollToSection('features')} className="text-left py-1.5 hover:text-blue-600">Capabilities</button>
+                <button onClick={() => scrollToSection('roles')} className="text-left py-1.5 hover:text-blue-600">Roles</button>
                 {activeWorkspaceCategory && (
                   <button onClick={() => scrollToSection('workspace')} className="text-left py-1.5 text-blue-600 dark:text-blue-400 font-bold flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
@@ -467,10 +465,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </button>
 
                 <button
-                  onClick={() => scrollToSection('features')}
+                  onClick={() => scrollToSection('roles')}
                   className="px-5 py-3.5 rounded-xl text-sm font-semibold text-neutral-200 bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 transition-all flex items-center gap-2 cursor-pointer"
                 >
-                  <span>Explore Capabilities</span>
+                  <span>Explore Roles</span>
                 </button>
 
                 <button
@@ -1012,206 +1010,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* ------------------------------------------------------------------- */}
-      {/* SECTION 3 — CORE CAPABILITIES (Unified, Aligned & Realistic Visuals) */}
-      {/* ------------------------------------------------------------------- */}
-      <section id="platform" className="py-20 sm:py-28 bg-black text-white border-b border-neutral-900 relative">
-        {/* Anchor for features nav link */}
-        <div id="features" className="absolute -top-24 left-0 pointer-events-none" />
-
-        <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:pl-6 xl:pl-8 lg:pr-6 xl:pr-8 space-y-16">
-          <div className="text-center max-w-3xl mx-auto space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-indigo-950/80 border border-indigo-800 text-indigo-300">
-              <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-              <span>Autonomous Brand Intelligence &amp; Governance</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
-              Six Enterprise Capabilities. Grounded In Real Evidence.
-            </h2>
-            <p className="text-sm sm:text-base text-neutral-400">
-              From raw packaging inspection and brand fact curation to multi-agent risk gating, Digital Twin simulation, and cryptographic audit proofs.
-            </p>
-          </div>
-
-          {/* Aligned 6-Card Grid with Blue Hover & Keyboard Focus Highlights */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-            {[
-              {
-                id: 'brand-knowledge' as WorkspaceCategory,
-                title: 'Brand Knowledge',
-                subtitle: 'Ground Truth & Guidelines',
-                desc: 'Centralized repository for brand guidelines, master facts, product claims, and terminology rules. Ingests PDFs, DOCX, and regulatory rules into immutable truth nodes with interactive knowledge graph traversal.',
-                image: '/images/product_truth_bottle.jpg',
-                badge: 'GROUND TRUTH REPOSITORY',
-                metric: '100% Deterministic Fact Matching',
-                icon: BookOpen,
-                subTab: 'guidelines'
-              },
-              {
-                id: 'content-intelligence' as WorkspaceCategory,
-                title: 'Content Intelligence',
-                subtitle: 'Pre-Publication Multi-Agent Review',
-                desc: 'Multi-agent governance scanning marketing copy, social ads, packaging, and digital creatives. Evaluates tone of voice, checks claim substantiation against ground-truth facts, and generates instant reverse corrections.',
-                image: '/images/analytics_dashboard.jpg',
-                badge: 'PRE-RELEASE COPY AUDIT',
-                metric: 'Sub-800ms Multi-Agent Latency',
-                icon: Sparkles,
-                subTab: 'inspector'
-              },
-              {
-                id: 'risk-intelligence' as WorkspaceCategory,
-                title: 'Risk Intelligence',
-                subtitle: 'Compliance & Exposure Analytics',
-                desc: 'Cross-channel regulatory risk scoring and exposure detection. Identifies FTC Green Guide violations, unauthorized superlative claims, trademark non-compliance, and NHTSA autonomous restrictions across campaigns.',
-                image: '/images/campaign_approval.jpg',
-                badge: 'REGULATORY EXPOSURE GATE',
-                metric: 'Cross-Channel Risk Heatmap',
-                icon: ShieldAlert,
-                subTab: 'risks'
-              },
-              {
-                id: 'impact-simulation' as WorkspaceCategory,
-                title: 'Impact Simulation',
-                subtitle: 'Digital Twin Blast Radius',
-                desc: 'Virtual sandbox simulating the cascading consequences of proposed commercial fact, claim, or price revisions before commit. Traverses enterprise dependency maps across published assets, rate cards, and partner touchpoints.',
-                image: '/images/digital_twin_network.jpg',
-                badge: 'ORGANIZATIONAL SIMULATOR',
-                metric: 'Real-Time Blast Radius Tracing',
-                icon: GitFork,
-                subTab: 'simulator'
-              },
-              {
-                id: 'governance-approval' as WorkspaceCategory,
-                title: 'Governance & Approval',
-                subtitle: 'Human-in-the-Loop Sign-Off',
-                desc: 'Strict human-in-the-loop governance with zero autonomous publishing. Multi-tier review queue with role-based sign-offs, SLA tracking, audit notes, and statutory approval status transitions.',
-                image: '/images/campaign_approval.jpg',
-                badge: 'HUMAN-IN-THE-LOOP CONTROL',
-                metric: 'Zero Autonomous Publishing Gate',
-                icon: CheckCircle2,
-                subTab: 'approvals'
-              },
-              {
-                id: 'trust-verification' as WorkspaceCategory,
-                title: 'Trust & Verification',
-                subtitle: 'SHA-256 Release Digest & Public Portal',
-                desc: 'Tamper-evident SHA-256 cryptographic release digest chain permanently linking approved content, reviewer credentials, and timestamps. Public zero-auth comparison portal enables external consumer and partner verification.',
-                image: '/images/cryptographic_ledger.jpg',
-                badge: 'CRYPTOGRAPHIC ACCOUNTABILITY',
-                metric: '177 Automated Tests Passing',
-                icon: Lock,
-                subTab: 'ledger'
-              },
-            ].map((cap) => {
-              const isSelected = activeWorkspaceCategory === cap.id;
-              const isHovered = activeCapabilityId === cap.id;
-              const isHighlighted = isSelected || isHovered;
-              const Icon = cap.icon;
-
-              return (
-                <div
-                  key={cap.id}
-                  tabIndex={0}
-                  role="button"
-                  aria-label={`Open ${cap.title} Workspace`}
-                  onMouseEnter={() => setActiveCapabilityId(cap.id)}
-                  onMouseLeave={() => {
-                    if (activeCapabilityId === cap.id) setActiveCapabilityId(null);
-                  }}
-                  onFocus={() => setActiveCapabilityId(cap.id)}
-                  onBlur={() => {
-                    if (activeCapabilityId === cap.id) setActiveCapabilityId(null);
-                  }}
-                  onClick={() => handleSelectCapability(cap.id, cap.subTab)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleSelectCapability(cap.id, cap.subTab);
-                    }
-                  }}
-                  className={`bg-neutral-950 rounded-2xl border overflow-hidden flex flex-col justify-between transition-all duration-200 ease-out select-none cursor-pointer outline-none group ${isHighlighted
-                    ? 'border-2 border-[#2563EB] ring-2 ring-[#2563EB]/25 shadow-xl shadow-blue-500/15 -translate-y-1'
-                    : 'border-neutral-800 shadow-xs hover:border-neutral-700 translate-y-0'
-                    }`}
-                >
-                  <div>
-                    {/* Realistic Photographic Header with Aspect Ratio & Badges */}
-                    <div className="h-48 sm:h-52 w-full overflow-hidden relative bg-neutral-900">
-                      <img
-                        src={cap.image}
-                        alt={cap.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/30 to-transparent pointer-events-none" />
-
-                      {/* Floating Badges */}
-                      <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
-                        <span className={`text-[10px] font-mono font-bold uppercase tracking-wider backdrop-blur-md px-2 py-0.5 rounded border transition-colors duration-200 ${isHighlighted
-                          ? 'bg-[#2563EB] text-white border-blue-400'
-                          : 'bg-neutral-900/80 text-emerald-300 border-emerald-500/30'
-                          }`}>
-                          {isSelected ? 'ACTIVE WORKSPACE' : cap.badge}
-                        </span>
-                        <div className={`w-8 h-8 rounded-lg backdrop-blur-md flex items-center justify-center border shadow-xs transition-colors duration-200 ${isHighlighted
-                          ? 'bg-[#2563EB] text-white border-blue-400'
-                          : 'bg-neutral-900/80 text-white border-white/20'
-                          }`}>
-                          <Icon className={`w-4 h-4 ${isHighlighted ? 'text-white' : 'text-blue-400'}`} />
-                        </div>
-                      </div>
-
-                      <div className="absolute bottom-3 left-4 right-4 pointer-events-none">
-                        <span className={`text-[11px] font-mono font-semibold block transition-colors duration-200 ${isHighlighted ? 'text-blue-200' : 'text-neutral-400'
-                          }`}>
-                          {cap.subtitle}
-                        </span>
-                        <h3 className={`text-base sm:text-lg font-bold tracking-tight truncate transition-colors duration-200 ${isHighlighted ? 'text-blue-100' : 'text-white'
-                          }`}>
-                          {cap.title}
-                        </h3>
-                      </div>
-                    </div>
-
-                    {/* Card Body Description */}
-                    <div className={`p-6 space-y-3 transition-colors duration-200 ${isHighlighted ? 'bg-blue-950/20' : ''
-                      }`}>
-                      <p className="text-xs text-neutral-400 leading-relaxed min-h-[58px]">
-                        {cap.desc}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Card Footer with Metrics & Action Button */}
-                  <div className={`px-6 pb-5 pt-3 border-t flex items-center justify-between mt-auto transition-colors duration-200 ${isHighlighted
-                    ? 'border-blue-900/40 bg-blue-950/40'
-                    : 'border-neutral-800/80 bg-neutral-900/60'
-                    }`}>
-                    <span className={`text-[11px] font-mono truncate max-w-[170px] transition-colors duration-200 ${isHighlighted ? 'text-blue-300 font-semibold' : 'text-neutral-400'
-                      }`} title={cap.metric}>
-                      {cap.metric}
-                    </span>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSelectCapability(cap.id, cap.subTab);
-                      }}
-                      className={`inline-flex items-center gap-1 text-xs font-bold transition-colors cursor-pointer shrink-0 ${isHighlighted
-                        ? 'text-blue-400'
-                        : 'text-blue-400 hover:text-blue-300'
-                        }`}
-                    >
-                      <span>{isSelected ? 'Open Workspace' : 'Explore'}</span>
-                      <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ------------------------------------------------------------------- */}
       {/* SECTION 5 — ON-DEMAND CONTEXTUAL PRODUCT WORKSPACE                  */}
       {/* ------------------------------------------------------------------- */}
       <AnimatePresence>
@@ -1227,7 +1025,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               activeCategory={activeWorkspaceCategory}
               onClose={() => {
                 if (onCloseWorkspace) onCloseWorkspace();
-                setActiveCapabilityId(null);
               }}
               selectedBrandId={selectedBrandId}
               setSelectedBrandId={setSelectedBrandId}
@@ -1613,7 +1410,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ------------------------------------------------------------------- */}
       {/* SECTION 9 — ROLE PERSONAS (Matching Reference Image 5)              */}
       {/* ------------------------------------------------------------------- */}
-      <section className="py-20 sm:py-28 bg-black text-white relative overflow-hidden border-b border-neutral-900">
+      <section id="roles" className="py-20 sm:py-28 bg-black text-white relative overflow-hidden border-b border-neutral-900">
         <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:pl-6 xl:pl-8 lg:pr-6 xl:pr-8 space-y-12">
 
           <div className="text-center max-w-3xl mx-auto space-y-3">
