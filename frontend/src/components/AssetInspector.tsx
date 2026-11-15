@@ -14,7 +14,7 @@ interface AssetInspectorProps {
   onNavigate?: (tab: any) => void;
 }
 
-export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignRelease }) => {
+export const AssetInspector: React.FC<AssetInspectorProps> = ({ brandId, onSignRelease, onNavigate }) => {
   const [content, setContent] = useState<string>(
     "520 miles EPA-estimated range with QuantumCell™ Architecture. The Apex GT arrives."
   );
