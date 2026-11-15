@@ -102,12 +102,20 @@ async def list_submissions(
 @router.get("/submissions/queue", response_model=List[SubmissionResponse])
 async def get_reviewer_queue(
     brand_id: Optional[str] = Query(None),
+    role: Optional[str] = Query(None),
     user: UserProfile = Depends(get_current_user)
 ):
-    """Retrieves all submissions in the Review Queue awaiting review or compliance."""
-    all_subs = await submissions_service.list_submissions(brand_id=brand_id)
-    # Filter to active items that are in review or pending
-    return all_subs
+    """Retrieves submissions queue filtered by role (reviewer vs compliance)."""
+    filter_role = role
+    if not filter_role and user and getattr(user, "role", None):
+        user_role_str = str(user.role).upper()
+        if user_role_str in ["COMPLIANCE_REVIEWER", "COMPLIANCE"]:
+            filter_role = "compliance"
+    
+    return await submissions_service.list_submissions(
+        brand_id=brand_id,
+        role=filter_role
+    )
 
 @router.get("/submissions/{submission_id}", response_model=SubmissionResponse)
 async def get_submission(submission_id: str, user: UserProfile = Depends(get_current_user)):
@@ -124,6 +132,11 @@ async def review_submission(
     user: UserProfile = Depends(get_current_user)
 ):
     """Reviewer decision: upholds/overrules findings and marks APPROVE, REQUEST_CHANGES, or REJECT."""
+    if user and getattr(user, "role", None):
+        user_role_str = (user.role.value if hasattr(user.role, "value") else str(user.role)).upper()
+        if user_role_str in ["CREATOR"]:
+            raise HTTPException(status_code=403, detail="Creators are not authorized to record review decisions.")
+
     sub = await submissions_service.record_reviewer_decision(
         submission_id=submission_id,
         decision=req.decision,
@@ -141,12 +154,21 @@ async def compliance_submission(
     req: ComplianceDecisionRequest,
     user: UserProfile = Depends(get_current_user)
 ):
-    """Compliance officer decision: checks statutory findings and issues statutory sign-off."""
+    """Compliance officer decision: checks statutory findings, requests evidence, or signs off."""
+    if user and getattr(user, "role", None):
+        user_role_str = (user.role.value if hasattr(user.role, "value") else str(user.role)).upper()
+        if user_role_str in ["CREATOR"]:
+            raise HTTPException(status_code=403, detail="Creators are not authorized to record compliance decisions.")
+        if user_role_str in ["REVIEWER"]:
+            raise HTTPException(status_code=403, detail="Reviewers are not authorized to sign off on statutory compliance.")
+
     sub = await submissions_service.record_compliance_decision(
         submission_id=submission_id,
         decision=req.decision,
         compliance_name=req.compliance_name or user.name,
-        notes=req.notes
+        notes=req.notes,
+        finding_decisions=req.finding_decisions,
+        requested_evidence=req.requested_evidence
     )
     if not sub:
         raise HTTPException(status_code=404, detail="Submission not found")

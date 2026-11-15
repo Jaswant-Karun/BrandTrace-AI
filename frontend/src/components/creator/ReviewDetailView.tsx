@@ -41,6 +41,8 @@ export interface ReviewPostItem {
   submittedAt?: string;
 }
 
+export type ReviewDecisionType = 'APPROVE' | 'REQUEST_CHANGES' | 'REJECT' | 'REQUEST_EVIDENCE';
+
 interface ReviewDetailViewProps {
   post: ReviewPostItem;
   roleName?: string;
@@ -48,7 +50,7 @@ interface ReviewDetailViewProps {
   brandName?: string;
   onBack: () => void;
   onSubmitDecision: (
-    decision: 'APPROVE' | 'REQUEST_CHANGES' | 'REJECT',
+    decision: ReviewDecisionType,
     feedback: string,
     findingDecisions: Record<string, { decision: 'UPHELD' | 'OVERRULED'; overrule_reason?: string; comment?: string }>
   ) => Promise<void>;
@@ -56,6 +58,7 @@ interface ReviewDetailViewProps {
 
 export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
   post,
+  roleName = 'REVIEWER',
   userName = 'REVIEWER MEERA',
   brandName = 'Aurelle Skin',
   onBack,
@@ -170,7 +173,7 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
   };
 
   // Execute review decision with validation
-  const handleTriggerDecision = async (decisionType: 'APPROVE' | 'REQUEST_CHANGES' | 'REJECT') => {
+  const handleTriggerDecision = async (decisionType: ReviewDecisionType) => {
     setErrorMessage(null);
 
     // Validation: if overturning, require reason
@@ -188,6 +191,11 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
 
     if (decisionType === 'REQUEST_CHANGES' && !overallFeedback.trim()) {
       setErrorMessage('Please provide review feedback explaining the revisions required before sending back.');
+      return;
+    }
+
+    if (decisionType === 'REQUEST_EVIDENCE' && !overallFeedback.trim()) {
+      setErrorMessage('Please specify the exact clinical trials, lab reports, or regulatory documentation required.');
       return;
     }
 
@@ -255,18 +263,35 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
         {/* ========================================================================= */}
         <div className="lg:col-span-5 space-y-6">
           
-          {/* Main Large REVIEW Heading */}
+          {/* Main Large REVIEW / COMPLIANCE Heading */}
           <div className="space-y-2">
             <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
-              PLUMBLINE · {brandName.toUpperCase()}
+              PLUMBLINE · {brandName.toUpperCase()} · {roleName.toUpperCase()}
             </div>
             <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white font-sans uppercase">
-              REVIEW
+              {roleName === 'COMPLIANCE' ? 'COMPLIANCE' : 'REVIEW'}
             </h1>
             <p className="text-sm text-neutral-400 font-sans leading-relaxed">
-              Agree or disagree with each blocking problem, then approve the post or send it back. Every step is recorded.
+              {roleName === 'COMPLIANCE'
+                ? 'Statutory validation against FTC Green Guides §260, FDA 21 CFR §201, and clinical evidence. Approve, request evidence, or return for revision.'
+                : 'Agree or disagree with each blocking problem, then approve the post or send it back. Every step is recorded.'}
             </p>
           </div>
+
+          {/* Prior Reviewer Sign-off Banner (shown for Compliance role or when prior reviewer feedback exists) */}
+          {(roleName === 'COMPLIANCE' || post.reviewerFeedback) && (
+            <div className="p-3.5 rounded-xl bg-indigo-950/40 border border-indigo-700/50 flex items-start gap-3">
+              <ShieldCheck className="w-4 h-4 text-indigo-400 mt-0.5 shrink-0" />
+              <div className="text-xs space-y-0.5">
+                <div className="font-mono font-bold text-indigo-300 uppercase tracking-wide">
+                  Prior Reviewer Approval · Reviewer Meera
+                </div>
+                <p className="text-neutral-300 font-sans">
+                  {post.reviewerFeedback || 'Reviewer Meera approved this copy version. Ready for statutory compliance audit.'}
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Submitter & Metadata Card */}
           <div className="p-4 rounded-2xl bg-neutral-950 border border-neutral-800 space-y-2.5 shadow-md">
@@ -641,7 +666,7 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
             />
           </div>
 
-          {/* Final Review Actions Bar */}
+          {/* Final Actions Bar */}
           <div className="p-5 rounded-2xl bg-[#0f0f12] border border-neutral-800 flex flex-wrap items-center justify-between gap-3 shadow-2xl">
             <button
               onClick={onBack}
@@ -651,32 +676,70 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
               Cancel / Back to Queue
             </button>
 
-            <div className="flex flex-wrap items-center gap-2.5">
-              <button
-                disabled={isSubmitting}
-                onClick={() => handleTriggerDecision('REQUEST_CHANGES')}
-                className="px-4 py-2.5 rounded-xl bg-neutral-900 border border-amber-600/70 hover:bg-neutral-800 text-amber-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer"
-              >
-                Send Back for Revision
-              </button>
+            {roleName === 'COMPLIANCE' ? (
+              <div className="flex flex-wrap items-center gap-2.5">
+                <button
+                  disabled={isSubmitting}
+                  onClick={() => handleTriggerDecision('REJECT')}
+                  className="px-4 py-2.5 rounded-xl bg-rose-950/60 border border-rose-600/70 hover:bg-rose-900 text-rose-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer"
+                >
+                  Reject Compliance
+                </button>
 
-              <button
-                disabled={isSubmitting}
-                onClick={() => handleTriggerDecision('REJECT')}
-                className="px-4 py-2.5 rounded-xl bg-rose-950/60 border border-rose-600/70 hover:bg-rose-900 text-rose-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer"
-              >
-                Reject
-              </button>
+                <button
+                  disabled={isSubmitting}
+                  onClick={() => handleTriggerDecision('REQUEST_CHANGES')}
+                  className="px-4 py-2.5 rounded-xl bg-neutral-900 border border-amber-600/70 hover:bg-neutral-800 text-amber-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer"
+                >
+                  Return for Revision
+                </button>
 
-              <button
-                disabled={isSubmitting}
-                onClick={() => handleTriggerDecision('APPROVE')}
-                className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold uppercase shadow-lg transition-colors cursor-pointer flex items-center gap-1.5"
-              >
-                <Check className="w-4 h-4" />
-                <span>Approve Review</span>
-              </button>
-            </div>
+                <button
+                  disabled={isSubmitting}
+                  onClick={() => handleTriggerDecision('REQUEST_EVIDENCE')}
+                  className="px-4 py-2.5 rounded-xl bg-sky-950/60 border border-sky-500/70 hover:bg-sky-900 text-sky-200 text-xs font-mono font-bold uppercase transition-colors cursor-pointer flex items-center gap-1.5"
+                >
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>Request Evidence</span>
+                </button>
+
+                <button
+                  disabled={isSubmitting}
+                  onClick={() => handleTriggerDecision('APPROVE')}
+                  className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold uppercase shadow-lg transition-colors cursor-pointer flex items-center gap-1.5"
+                >
+                  <Check className="w-4 h-4" />
+                  <span>Approve Compliance</span>
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-wrap items-center gap-2.5">
+                <button
+                  disabled={isSubmitting}
+                  onClick={() => handleTriggerDecision('REQUEST_CHANGES')}
+                  className="px-4 py-2.5 rounded-xl bg-neutral-900 border border-amber-600/70 hover:bg-neutral-800 text-amber-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer"
+                >
+                  Send Back for Revision
+                </button>
+
+                <button
+                  disabled={isSubmitting}
+                  onClick={() => handleTriggerDecision('REJECT')}
+                  className="px-4 py-2.5 rounded-xl bg-rose-950/60 border border-rose-600/70 hover:bg-rose-900 text-rose-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer"
+                >
+                  Reject
+                </button>
+
+                <button
+                  disabled={isSubmitting}
+                  onClick={() => handleTriggerDecision('APPROVE')}
+                  className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold uppercase shadow-lg transition-colors cursor-pointer flex items-center gap-1.5"
+                >
+                  <Check className="w-4 h-4" />
+                  <span>Approve Review</span>
+                </button>
+              </div>
+            )}
           </div>
 
         </div>

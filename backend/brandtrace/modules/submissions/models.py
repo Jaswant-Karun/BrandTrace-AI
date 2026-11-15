@@ -125,6 +125,7 @@ class SubmissionResponse(BaseModel):
     updated_at: str
     reviewer_feedback: Optional[str] = None
     compliance_notes: Optional[str] = None
+    evidence_requested_notes: Optional[str] = None
     rejection_reason: Optional[str] = None
     approval_history: List[ApprovalStepModel]
     release_seal: Optional[str] = None
@@ -137,9 +138,11 @@ class ReviewDecisionRequest(BaseModel):
     finding_decisions: Optional[Dict[str, Any]] = None
 
 class ComplianceDecisionRequest(BaseModel):
-    decision: str  # APPROVE, REQUEST_CHANGES, REJECT
+    decision: str  # APPROVE, APPROVE_COMPLIANCE, REQUEST_EVIDENCE, REQUEST_CHANGES, RETURN_FOR_REVISION, REJECT
     compliance_name: str = "Compliance Arjun"
+    compliance_role: str = "COMPLIANCE"
     notes: Optional[str] = None
+    requested_evidence: Optional[str] = None
     finding_decisions: Optional[Dict[str, Any]] = None
 
 class FinalApprovalRequest(BaseModel):

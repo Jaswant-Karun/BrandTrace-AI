@@ -618,6 +618,10 @@ class SubmissionsService:
                 query["status"] = {"$in": ["CHANGES_REQUESTED", "RETURNED_TO_CREATOR", "RETURNED_TO_AGENCY"]}
             else:
                 query["status"] = status
+        elif role == "compliance":
+            query["status"] = {"$in": ["REVIEW_APPROVED", "COMPLIANCE_APPROVED", "EVIDENCE_REQUESTED"]}
+        elif role == "reviewer":
+            query["status"] = {"$in": ["PENDING_REVIEW", "SUBMITTED", "REVIEW_APPROVED", "CHANGES_REQUESTED", "RETURNED_TO_CREATOR", "RETURNED_TO_AGENCY"]}
         if brand_id:
             query["brand_id"] = brand_id
 
@@ -635,6 +639,10 @@ class SubmissionsService:
                 subs = [s for s in subs if s.get("status") in ["CHANGES_REQUESTED", "RETURNED_TO_CREATOR", "RETURNED_TO_AGENCY"]]
             else:
                 subs = [s for s in subs if s.get("status") == status]
+        elif role == "compliance":
+            subs = [s for s in subs if s.get("status") in ["REVIEW_APPROVED", "COMPLIANCE_APPROVED", "EVIDENCE_REQUESTED"]]
+        elif role == "reviewer":
+            subs = [s for s in subs if s.get("status") in ["PENDING_REVIEW", "SUBMITTED", "REVIEW_APPROVED", "CHANGES_REQUESTED", "RETURNED_TO_CREATOR", "RETURNED_TO_AGENCY"]]
         if brand_id:
             subs = [s for s in subs if s.get("brand_id") == brand_id]
         return subs
@@ -688,6 +696,7 @@ class SubmissionsService:
         if decision in ["APPROVE", "APPROVE_REVIEW"]:
             # Advance to Compliance queue
             sub["status"] = "REVIEW_APPROVED"
+            sub["reviewer_feedback"] = feedback or f"Reviewer approved by {reviewer_name}. Ready for compliance sign-off."
             for step in history:
                 if step.get("stage") == "REVIEWER_APPROVAL":
                     step["status"] = "COMPLETED"
@@ -780,26 +789,55 @@ class SubmissionsService:
         submission_id: str,
         decision: str,
         compliance_name: str,
-        notes: Optional[str] = None
+        notes: Optional[str] = None,
+        finding_decisions: Optional[Dict[str, Any]] = None,
+        requested_evidence: Optional[str] = None
     ) -> Optional[Dict[str, Any]]:
         sub = await self.get_submission(submission_id)
         if not sub:
             return None
 
         now_time = _now_str()
+        is_agency = sub.get("creator_type") == "agency"
+
+        # Update finding decisions if provided
+        if finding_decisions and "findings" in sub:
+            for f in sub["findings"]:
+                f_id = f.get("id")
+                f_num_str = str(f.get("number", ""))
+                lookup_key = None
+                if f_id and f_id in finding_decisions:
+                    lookup_key = f_id
+                elif f_num_str and f_num_str in finding_decisions:
+                    lookup_key = f_num_str
+
+                if lookup_key:
+                    d_info = finding_decisions[lookup_key]
+                    if isinstance(d_info, dict):
+                        f["decision"] = d_info.get("decision", f.get("decision", "UNDECIDED"))
+                        if "overrule_reason" in d_info:
+                            f["overrule_reason"] = d_info["overrule_reason"]
+                        elif "reason" in d_info:
+                            f["overrule_reason"] = d_info["reason"]
+                        if "comment" in d_info:
+                            f["compliance_comment"] = d_info["comment"]
+                    elif isinstance(d_info, str):
+                        f["decision"] = d_info
+                    if f["decision"] in ["UPHELD", "OVERRULED"]:
+                        f["resolved"] = True
+
         history = sub.get("approval_history", [])
 
-        if decision == "APPROVE":
-            sub["status"] = "APPROVED"
+        if decision in ["APPROVE", "APPROVE_COMPLIANCE"]:
+            sub["status"] = "COMPLIANCE_APPROVED"
             for step in history:
                 if step.get("stage") == "COMPLIANCE_APPROVAL":
                     step["status"] = "COMPLETED"
                     step["timestamp"] = now_time
                     step["comments"] = notes or "Statutory compliance verified."
                 elif step.get("stage") == "FINAL_RELEASE":
-                    step["status"] = "COMPLETED"
-                    step["timestamp"] = now_time
-                    step["comments"] = "Released with compliance authorization."
+                    step["status"] = "ACTIVE"
+                    step["comments"] = "Awaiting final Brand Owner release sign-off."
 
             # Generate Cryptographic Release Seal
             seal_code = f"BT-SEAL-{uuid.uuid4().hex[:6].upper()}-{_hash_str(sub['current_content'])[:8].upper()}"
@@ -818,21 +856,71 @@ class SubmissionsService:
             except Exception as e:
                 print(f"[SubmissionsService] Audit ledger seal note: {e}")
 
-        elif decision == "REQUEST_CHANGES":
-            sub["status"] = "CHANGES_REQUESTED"
+            self.add_notification(
+                recipient_role="BRAND_OWNER",
+                title=f"Compliance Approved: {sub.get('title', '')[:35]}",
+                message=f"Signed off by {compliance_name}. Ready for final Brand Owner release.",
+                submission_id=submission_id
+            )
+
+        elif decision in ["REQUEST_EVIDENCE"]:
+            sub["status"] = "EVIDENCE_REQUESTED"
+            ev_note = requested_evidence or notes or "Additional clinical trial or regulatory substantiation required."
+            sub["evidence_requested_notes"] = ev_note
+            for step in history:
+                if step.get("stage") == "COMPLIANCE_APPROVAL":
+                    step["status"] = "ACTIVE"
+                    step["comments"] = f"Compliance requested evidence: {ev_note}"
+
+            self.add_notification(
+                recipient_role="AGENCY" if is_agency else "CREATOR",
+                title=f"Evidence Requested: {sub.get('title', '')[:35]}",
+                message=f"Compliance officer {compliance_name} requested additional evidence: {ev_note}",
+                submission_id=submission_id
+            )
+            self.add_notification(
+                recipient_role="REVIEWER",
+                title=f"Evidence Requested: {sub.get('title', '')[:35]}",
+                message=f"Compliance officer {compliance_name} requested additional evidence.",
+                submission_id=submission_id
+            )
+
+        elif decision in ["REQUEST_CHANGES", "RETURN_FOR_REVISION", "SEND_BACK"]:
+            sub["status"] = "RETURNED_TO_AGENCY" if is_agency else "RETURNED_TO_CREATOR"
             sub["compliance_notes"] = notes or "Compliance corrections requested."
             for step in history:
                 if step.get("stage") == "COMPLIANCE_APPROVAL":
                     step["status"] = "ACTIVE"
                     step["comments"] = f"Compliance requested changes: {notes}"
 
+            self.add_notification(
+                recipient_role="AGENCY" if is_agency else "CREATOR",
+                title=f"Revision Requested by Compliance: {sub.get('title', '')[:35]}",
+                message=f"Compliance officer {compliance_name} returned submission for revision: {notes}",
+                submission_id=submission_id
+            )
+
         elif decision == "REJECT":
             sub["status"] = "REJECTED"
-            sub["rejection_reason"] = notes or "Rejected by compliance officer."
+            sub["rejection_reason"] = notes or "Rejected by compliance officer due to statutory non-compliance."
             for step in history:
                 if step.get("stage") == "COMPLIANCE_APPROVAL":
                     step["status"] = "REJECTED"
                     step["timestamp"] = now_time
+                    step["comments"] = notes or "Statutory non-compliance rejection."
+
+            self.add_notification(
+                recipient_role="AGENCY" if is_agency else "CREATOR",
+                title=f"Submission Rejected by Compliance: {sub.get('title', '')[:35]}",
+                message=f"Compliance rejection: {notes}",
+                submission_id=submission_id
+            )
+            self.add_notification(
+                recipient_role="REVIEWER",
+                title=f"Submission Rejected by Compliance: {sub.get('title', '')[:35]}",
+                message=f"Compliance rejection: {notes}",
+                submission_id=submission_id
+            )
 
         sub["updated_at"] = now_time
         sub["approval_history"] = history
@@ -847,7 +935,7 @@ class SubmissionsService:
         h = _hash_str(f"compliance:{submission_id}:{decision}:{now_time}")
         await self.record_audit_event(
             what=f"compliance sign-off ({decision.lower()}): {sub.get('title', '')[:30]}",
-            reason=notes or f"Compliance decision: {decision}",
+            reason=notes or requested_evidence or f"Compliance decision: {decision}",
             actor_name=compliance_name,
             event_hash=h
         )

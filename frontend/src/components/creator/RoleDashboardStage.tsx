@@ -7,7 +7,7 @@ import { CreatorFactsLedger } from './CreatorFactsLedger';
 import { CreatorGuidelineHealth } from './CreatorGuidelineHealth';
 import { CreatorClaimWatch } from './CreatorClaimWatch';
 import { CreatorSubmissionsView } from './CreatorSubmissionsView';
-import { ReviewDetailView } from './ReviewDetailView';
+import { ReviewDetailView, ReviewDecisionType } from './ReviewDetailView';
 import { CheckCircle2, ExternalLink, X } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 
@@ -192,11 +192,11 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
     compliance: {
       userName: 'COMPLIANCE ARJUN',
       roleName: 'COMPLIANCE',
-      title: 'REVIEW QUEUE',
+      title: 'COMPLIANCE QUEUE',
       defaultTab: 'queue' as CreatorTab,
       tabs: [
         { id: 'check' as CreatorTab, label: 'CHECK A POST' },
-        { id: 'queue' as CreatorTab, label: 'REVIEW QUEUE' },
+        { id: 'queue' as CreatorTab, label: 'COMPLIANCE QUEUE' },
         { id: 'audit' as CreatorTab, label: 'AUDIT LOG' },
         { id: 'rulebook' as CreatorTab, label: 'RULEBOOK' },
         { id: 'facts' as CreatorTab, label: 'FACTS' },
@@ -241,21 +241,24 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
   // Load dynamic submissions from backend queue endpoint
   useEffect(() => {
     if (activeTab === 'queue') {
+      const qUrl = role === 'compliance' ? '/api/submissions/queue?role=compliance' : '/api/submissions/queue?role=reviewer';
       apiClient
-        .request<any[]>('/api/submissions/queue')
+        .request<any[]>(qUrl)
         .then((subs) => {
-          if (Array.isArray(subs) && subs.length > 0) {
+          if (Array.isArray(subs)) {
             const mapped: QueueItem[] = subs.map((s) => {
               const blocking = (s.findings || []).filter((f: any) => f.severity === 'BLOCKING' && f.status !== 'OVERRULED').length;
               let sColor: 'emerald' | 'purple' | 'amber' | 'rose' = 'amber';
-              if (s.status === 'APPROVED') sColor = 'emerald';
+              if (s.status === 'APPROVED' || s.status === 'COMPLIANCE_APPROVED') sColor = 'emerald';
               else if (s.status === 'PENDING_REVIEW' || s.status === 'SUBMITTED') sColor = 'purple';
+              else if (s.status === 'EVIDENCE_REQUESTED') sColor = 'amber';
               else if (s.status === 'REJECTED') sColor = 'rose';
 
               return {
-                id: s.id,
+                id: s.id || s.submission_id,
+                submission_id: s.submission_id,
                 blockingCount: blocking,
-                status: s.status?.replace('_', ' ') || 'IN REVIEW',
+                status: s.status?.replace(/_/g, ' ') || 'IN REVIEW',
                 statusColor: sColor,
                 title: s.title || (s.original_content ? s.original_content.slice(0, 80) + '...' : 'Submission'),
                 meta: `${s.creator_name || 'Creator Asha'} · ${s.creator_type || 'employee'} · ${s.channel || 'instagram'} · version ${s.version || 1}`,
@@ -271,9 +274,14 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
               };
             });
 
+            // For compliance, only include reviewer-approved default posts
+            const allowedDefaults = role === 'compliance'
+              ? DEFAULT_QUEUE_POSTS.filter((dp) => dp.status === 'APPROVED' || dp.status === 'REVIEW APPROVED')
+              : DEFAULT_QUEUE_POSTS;
+
             // Merge with default posts to guarantee richness
             const existingIds = new Set(mapped.map((m) => m.id));
-            const combined = [...mapped, ...DEFAULT_QUEUE_POSTS.filter((dp) => !existingIds.has(dp.id))];
+            const combined = [...mapped, ...allowedDefaults.filter((dp) => !existingIds.has(dp.id))];
             setQueuePosts(combined);
           }
         })
@@ -281,14 +289,14 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
           // Use default posts on network drop
         });
     }
-  }, [activeTab]);
+  }, [activeTab, role]);
 
   const handleOpenReview = (item: QueueItem) => {
     setSelectedPost(item);
   };
 
   const handleReviewDetailSubmit = async (
-    decision: 'APPROVE' | 'REQUEST_CHANGES' | 'REJECT',
+    decision: ReviewDecisionType,
     feedback: string,
     decisionsMap: Record<string, { decision: 'UPHELD' | 'OVERRULED'; overrule_reason?: string; comment?: string }>
   ) => {
@@ -299,31 +307,43 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
         await apiClient.request(`/api/submissions/${selectedPost.id}/compliance`, {
           method: 'POST',
           body: JSON.stringify({
-            compliance_officer_name: roleConfig.userName,
+            compliance_name: roleConfig.userName,
+            compliance_role: 'COMPLIANCE',
             decision: decision,
             notes: feedback || `Compliance review signed off by ${roleConfig.userName}`,
+            requested_evidence: decision === 'REQUEST_EVIDENCE' ? feedback : undefined,
             finding_decisions: decisionsMap,
           }),
         });
+
+        const toastMsg =
+          decision === 'APPROVE'
+            ? `Compliance sign-off issued. Advanced to Brand Owner final release.`
+            : decision === 'REQUEST_EVIDENCE'
+            ? `Additional evidence requested. Notification sent to submitter & reviewer.`
+            : decision === 'REQUEST_CHANGES'
+            ? `Changes requested by Compliance. Returned to submitter.`
+            : `Compliance rejection recorded.`;
+        setFeedbackToast(toastMsg);
       } else {
         await apiClient.request(`/api/submissions/${selectedPost.id}/review`, {
           method: 'POST',
           body: JSON.stringify({
             reviewer_name: roleConfig.userName,
-            decision: decision,
+            decision: decision === 'REQUEST_EVIDENCE' ? 'REQUEST_CHANGES' : decision,
             feedback: feedback || `Review completed by ${roleConfig.userName}`,
             finding_decisions: decisionsMap,
           }),
         });
-      }
 
-      setFeedbackToast(
-        decision === 'APPROVE'
-          ? `Post approved and advanced to Compliance Queue by ${roleConfig.userName}.`
-          : decision === 'REQUEST_CHANGES'
-          ? `Changes requested. Post returned to ${selectedPost.creatorType === 'agency' ? 'Agency Sana' : 'Creator Asha'}.`
-          : `Post marked as rejected.`
-      );
+        setFeedbackToast(
+          decision === 'APPROVE'
+            ? `Post approved and advanced to Compliance Queue by ${roleConfig.userName}.`
+            : decision === 'REQUEST_CHANGES'
+            ? `Changes requested. Post returned to ${selectedPost.creatorType === 'agency' ? 'Agency Sana' : 'Creator Asha'}.`
+            : `Post marked as rejected.`
+        );
+      }
 
       // Update local state
       setQueuePosts((prev) =>
@@ -331,8 +351,20 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
           p.id === selectedPost.id
             ? {
                 ...p,
-                status: decision === 'APPROVE' ? 'REVIEW APPROVED' : decision === 'REQUEST_CHANGES' ? 'CHANGES REQ' : 'REJECTED',
-                statusColor: decision === 'APPROVE' ? 'emerald' : decision === 'REQUEST_CHANGES' ? 'amber' : 'rose',
+                status:
+                  decision === 'APPROVE'
+                    ? role === 'compliance' ? 'COMPLIANCE APPROVED' : 'REVIEW APPROVED'
+                    : decision === 'REQUEST_EVIDENCE'
+                    ? 'EVIDENCE REQUESTED'
+                    : decision === 'REQUEST_CHANGES'
+                    ? 'CHANGES REQ'
+                    : 'REJECTED',
+                statusColor:
+                  decision === 'APPROVE'
+                    ? 'emerald'
+                    : decision === 'REQUEST_EVIDENCE' || decision === 'REQUEST_CHANGES'
+                    ? 'amber'
+                    : 'rose',
                 reviewerFeedback: feedback,
               }
             : p
@@ -419,10 +451,12 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
                 BRANDTRACE · {brandName.toUpperCase()}
               </div>
               <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-white font-sans uppercase">
-                REVIEW QUEUE
+                {role === 'compliance' ? 'COMPLIANCE AUDIT QUEUE' : 'REVIEW QUEUE'}
               </h1>
               <p className="text-xs sm:text-sm text-neutral-400 font-sans max-w-2xl leading-relaxed">
-                Posts sent for review, riskiest first. Drafts people check privately never appear here.
+                {role === 'compliance'
+                  ? 'Submissions approved by Content Review, prioritized for statutory validation (FTC, FDA, NHTSA). Only Reviewer-approved content enters this queue.'
+                  : 'Posts sent for review, riskiest first. Drafts people check privately never appear here.'}
               </p>
             </div>
 
@@ -445,23 +479,35 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
                 <div className="text-3xl sm:text-4xl font-extrabold text-white font-mono">
                   {queuePosts.length}
                 </div>
-                <div className="text-xs font-mono text-neutral-400 uppercase font-semibold">WAITING</div>
+                <div className="text-xs font-mono text-neutral-400 uppercase font-semibold">
+                  {role === 'compliance' ? 'AWAITING AUDIT' : 'WAITING'}
+                </div>
               </div>
               <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 space-y-1">
                 <div className="text-3xl sm:text-4xl font-extrabold text-[#ff6358] font-mono">
                   {queuePosts.filter((p) => p.blockingCount > 0).length}
                 </div>
-                <div className="text-xs font-mono text-neutral-400 uppercase font-semibold">BLOCKING, STILL WAITING</div>
+                <div className="text-xs font-mono text-neutral-400 uppercase font-semibold">
+                  {role === 'compliance' ? 'STATUTORY BLOCKERS' : 'BLOCKING, STILL WAITING'}
+                </div>
               </div>
               <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 space-y-1">
-                <div className="text-3xl sm:text-4xl font-extrabold text-purple-400 font-mono">5</div>
-                <div className="text-xs font-mono text-neutral-400 uppercase font-semibold">NEED COMPLIANCE</div>
+                <div className="text-3xl sm:text-4xl font-extrabold text-sky-400 font-mono">
+                  {role === 'compliance'
+                    ? queuePosts.filter((p) => p.status.includes('EVIDENCE')).length
+                    : 5}
+                </div>
+                <div className="text-xs font-mono text-neutral-400 uppercase font-semibold">
+                  {role === 'compliance' ? 'EVIDENCE REQUESTED' : 'NEED COMPLIANCE'}
+                </div>
               </div>
               <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 space-y-1">
                 <div className="text-3xl sm:text-4xl font-extrabold text-emerald-400 font-mono">
-                  {queuePosts.filter((p) => p.status === 'APPROVED').length}
+                  {queuePosts.filter((p) => p.status.includes('APPROVED')).length}
                 </div>
-                <div className="text-xs font-mono text-neutral-400 uppercase font-semibold">APPROVED</div>
+                <div className="text-xs font-mono text-neutral-400 uppercase font-semibold">
+                  {role === 'compliance' ? 'COMPLIANCE APPROVED' : 'APPROVED'}
+                </div>
               </div>
             </div>
 
