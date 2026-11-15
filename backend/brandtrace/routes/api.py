@@ -1,8 +1,10 @@
 import time
 from typing import Dict, Any, List, Optional
-from fastapi import APIRouter, HTTPException, Query, UploadFile, File, Form
+from fastapi import APIRouter, HTTPException, Query, UploadFile, File, Form, Depends
 from pydantic import BaseModel
 
+from brandtrace.modules.auth.router import get_current_user
+from brandtrace.modules.auth.models import UserProfile, UserRole
 from brandtrace.database.mongo import mongo_manager
 from brandtrace.data.seed_data import BRAND_SEEDS, APPROVED_FACTS_CATALOG
 from brandtrace.graph.engine import BrandKnowledgeGraph
