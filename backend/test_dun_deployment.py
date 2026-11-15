@@ -117,3 +117,4 @@ if token:
             elif "email" in b: summary = f"email={b['email']}, role={b.get('role')}"
             else: summary = f"keys={list(b.keys())[:3]}"
         print(f"  {m:4s} {p:45s} -> Status: {s} ({t:.2f}s) {summary}")
+
