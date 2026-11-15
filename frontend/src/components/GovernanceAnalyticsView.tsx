@@ -26,65 +26,67 @@ export const GovernanceAnalyticsView: React.FC<GovernanceAnalyticsViewProps> = (
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-[#0B0F19] border border-slate-800/80 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-white border border-slate-200 rounded-xl p-5 flex flex-wrap items-center justify-between gap-4 shadow-xs">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <BarChart3 className="w-5 h-5 text-cyan-400" />
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider">
+            <BarChart3 className="w-5 h-5 text-slate-800" />
+            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
               Governance Analytics &amp; Velocity Telemetry
             </h2>
           </div>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-500">
             Quantitative metrics: Compliance rate trends, release gate velocity, and violation type distribution across brand assets.
           </p>
         </div>
       </div>
 
       {isLoading ? (
-        <div className="p-12 text-center text-xs text-slate-400">Loading analytics telemetry...</div>
+        <div className="p-12 text-center text-xs text-slate-500 bg-white border border-slate-200 rounded-xl shadow-xs">
+          Loading analytics telemetry...
+        </div>
       ) : (
         <div className="space-y-6">
           {/* Top 3 KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-2xl bg-[#0B0F19] border border-slate-800/80 space-y-2">
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-xs space-y-2">
+              <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                 Overall Brand Compliance Rate
               </div>
-              <div className="text-3xl font-extrabold text-emerald-400 font-mono flex items-center gap-2">
+              <div className="text-3xl font-extrabold text-slate-900 font-mono flex items-center gap-2">
                 {analytics?.compliance_rate_percent}%
-                <span className="text-xs font-sans font-semibold text-emerald-400 flex items-center">
-                  <ArrowUpRight className="w-4 h-4" /> +2.4% MoM
+                <span className="text-xs font-sans font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full flex items-center border border-emerald-200">
+                  <ArrowUpRight className="w-3.5 h-3.5" /> +2.4% MoM
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400">Governing 142 digital and print releases</p>
+              <p className="text-[11px] text-slate-500">Governing 142 digital and print releases</p>
             </div>
 
-            <div className="p-6 rounded-2xl bg-[#0B0F19] border border-slate-800/80 space-y-2">
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-xs space-y-2">
+              <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                 Release Gate Latency
               </div>
-              <div className="text-3xl font-extrabold text-cyan-400 font-mono">
+              <div className="text-3xl font-extrabold text-slate-900 font-mono">
                 {analytics?.average_release_time_hours} Hours
               </div>
-              <p className="text-[11px] text-slate-400">Autonomous gating vs 14-day manual PR reviews</p>
+              <p className="text-[11px] text-slate-500">Autonomous gating vs 14-day manual PR reviews</p>
             </div>
 
-            <div className="p-6 rounded-2xl bg-[#0B0F19] border border-slate-800/80 space-y-2">
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-xs space-y-2">
+              <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                 Prevented Statutory Violations
               </div>
-              <div className="text-3xl font-extrabold text-white font-mono">
+              <div className="text-3xl font-extrabold text-slate-900 font-mono">
                 {analytics?.prevented_violations_count}
               </div>
-              <p className="text-[11px] text-slate-400">Pre-release claims remediated before public launch</p>
+              <p className="text-[11px] text-slate-500">Pre-release claims remediated before public launch</p>
             </div>
           </div>
 
           {/* Violation Distribution & Weekly Velocity */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Violation Types Distribution (6 Cols) */}
-            <div className="lg:col-span-6 bg-[#0B0F19] border border-slate-800/80 rounded-2xl p-6 shadow-xl space-y-4">
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+            <div className="lg:col-span-6 bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
+              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider pb-2 border-b border-slate-100">
                 Violation Types Intercepted
               </h3>
 
@@ -92,12 +94,12 @@ export const GovernanceAnalyticsView: React.FC<GovernanceAnalyticsViewProps> = (
                 {analytics?.violation_types_distribution.map((v: any, i: number) => (
                   <div key={i} className="space-y-1">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-300 font-medium">{v.category}</span>
-                      <span className="font-mono text-cyan-400 font-bold">{v.frequency}%</span>
+                      <span className="text-slate-700 font-medium">{v.category}</span>
+                      <span className="font-mono text-slate-900 font-bold">{v.frequency}%</span>
                     </div>
-                    <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
+                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200">
                       <div
-                        className="bg-gradient-to-r from-blue-600 to-cyan-400 h-full rounded-full"
+                        className="bg-slate-900 h-full rounded-full"
                         style={{ width: `${v.frequency}%` }}
                       />
                     </div>
@@ -107,8 +109,8 @@ export const GovernanceAnalyticsView: React.FC<GovernanceAnalyticsViewProps> = (
             </div>
 
             {/* Weekly Velocity Trend (6 Cols) */}
-            <div className="lg:col-span-6 bg-[#0B0F19] border border-slate-800/80 rounded-2xl p-6 shadow-xl space-y-4">
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+            <div className="lg:col-span-6 bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
+              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider pb-2 border-b border-slate-100">
                 Weekly Release Velocity &amp; Remediations
               </h3>
 
@@ -117,25 +119,25 @@ export const GovernanceAnalyticsView: React.FC<GovernanceAnalyticsViewProps> = (
                   <div key={idx} className="text-center space-y-2">
                     <div className="h-32 flex flex-col justify-end items-center gap-1">
                       <div
-                        className="w-full bg-cyan-500/80 rounded-t transition-all hover:bg-cyan-400"
+                        className="w-full bg-slate-900 rounded-t transition-all hover:bg-slate-800"
                         style={{ height: `${(w.scanned / 40) * 100}%` }}
                         title={`Scanned: ${w.scanned}`}
                       />
                       <div
-                        className="w-full bg-rose-500/80 rounded-t"
+                        className="w-full bg-rose-500 rounded-t"
                         style={{ height: `${(w.remediated / 40) * 100}%` }}
                         title={`Remediated: ${w.remediated}`}
                       />
                     </div>
-                    <div className="text-[10px] font-mono text-slate-400">{w.week}</div>
-                    <div className="text-[10px] font-bold text-white font-mono">{w.approved} pass</div>
+                    <div className="text-[10px] font-mono text-slate-500">{w.week}</div>
+                    <div className="text-[10px] font-bold text-slate-900 font-mono">{w.approved} pass</div>
                   </div>
                 ))}
               </div>
 
-              <div className="flex items-center justify-center gap-6 pt-2 text-[11px] text-slate-400 font-sans">
+              <div className="flex items-center justify-center gap-6 pt-2 text-[11px] text-slate-500 font-sans border-t border-slate-100">
                 <span className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded bg-cyan-500" /> Total Releases
+                  <span className="w-2.5 h-2.5 rounded bg-slate-900" /> Total Releases
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded bg-rose-500" /> Remediations Applied
