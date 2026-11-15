@@ -1,58 +1,36 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 
-export type Theme = 'light' | 'dark';
+export type Theme = 'dark';
 
 interface ThemeContextType {
-  theme: Theme;
+  theme: 'dark';
   toggleTheme: () => void;
-  setTheme: (theme: Theme) => void;
+  setTheme: (theme: string) => void;
   isDark: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const urlTheme = params.get('theme') as Theme;
-      if (urlTheme === 'light' || urlTheme === 'dark') {
-        return urlTheme;
-      }
-      // Temporary session check: Light mode is session-only (temporary)
-      const sessionTheme = sessionStorage.getItem('brandtrace_theme') as Theme;
-      if (sessionTheme === 'light' || sessionTheme === 'dark') {
-        return sessionTheme;
-      }
-    }
-    // Permanent baseline: Dark Mode is the permanent default for BrandTrace AI
-    return 'dark';
-  });
-
   useEffect(() => {
     const root = document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-      root.style.colorScheme = 'dark';
-    } else {
-      root.classList.remove('dark');
-      root.style.colorScheme = 'light';
+    root.classList.add('dark');
+    root.classList.remove('light');
+    root.style.colorScheme = 'dark';
+    try {
+      localStorage.setItem('brandtrace_theme', 'dark');
+      sessionStorage.setItem('brandtrace_theme', 'dark');
+    } catch {
+      // Ignore storage restrictions if any
     }
-    // Store in sessionStorage so Light mode is temporary for this session only; Dark mode is permanent
-    sessionStorage.setItem('brandtrace_theme', theme);
-    localStorage.setItem('brandtrace_theme', 'dark');
-  }, [theme]);
+  }, []);
 
-  const toggleTheme = () => {
-    setThemeState(prev => (prev === 'dark' ? 'light' : 'dark'));
-  };
-
-  const setTheme = (t: Theme) => {
-    setThemeState(t);
-  };
+  // Permanent Dark Mode: Light mode option is disabled across the platform
+  const toggleTheme = () => {};
+  const setTheme = () => {};
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme, isDark: theme === 'dark' }}>
+    <ThemeContext.Provider value={{ theme: 'dark', toggleTheme, setTheme, isDark: true }}>
       {children}
     </ThemeContext.Provider>
   );

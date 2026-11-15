@@ -9,7 +9,7 @@ import {
   Hash, Sliders, BookOpen, Sparkles, ShieldAlert,
   Heart, MessageCircle, Send, Bookmark
 } from 'lucide-react';
-import { ThemeToggle } from './ui/ThemeToggle';
+
 import { PlumbBob } from './ui/PlumbBob';
 import { useAuth } from '../context/AuthContext';
 import { ContextualWorkspace, WorkspaceCategory } from './ContextualWorkspace';
@@ -182,10 +182,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <span>Verify Release</span>
             </button>
 
-            {/* Theme Toggle Button */}
-            <div className="shrink-0">
-              <ThemeToggle />
-            </div>
+
 
             {/* If Authenticated: Show Account Indicator & Sign Out */}
             {isAuthenticated ? (

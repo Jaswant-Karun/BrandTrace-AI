@@ -6,7 +6,7 @@ import {
   Search, Lock, Check, AlertCircle, Copy
 } from 'lucide-react';
 import { apiClient } from '../services/apiClient';
-import { ThemeToggle } from './ui/ThemeToggle';
+
 
 interface PublicVerificationViewProps {
   initialBrand?: string;
@@ -132,19 +132,17 @@ export const PublicVerificationView: React.FC<PublicVerificationViewProps> = ({
     <div className="min-h-screen bg-slate-50/60 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans selection:bg-slate-900 selection:text-white dark:selection:bg-indigo-600 dark:selection:text-white p-3 sm:p-6 md:p-8 transition-colors duration-200">
       <div className="max-w-5xl mx-auto space-y-6">
         
-        {/* Navigation & Theme Bar */}
+        {/* Navigation Bar */}
         <div className="flex items-center justify-between">
           {onBack ? (
             <button
               onClick={onBack}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white bg-slate-900 border border-slate-800 shadow-2xs transition-colors cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               Back to Overview
             </button>
           ) : <div />}
-
-          <ThemeToggle />
         </div>
 
         {/* Top Reference Header Banner */}
