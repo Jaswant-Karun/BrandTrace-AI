@@ -95,7 +95,7 @@
 
 ---
 
-### Slide 8: Real-World Impact, Limitations & Future Roadmap
+## Slide 8: Real-World Impact, Limitations & Future Roadmap
 
 - **Headline:** Practical Enterprise Value with Responsible AI Guardrails
 - **Measurable Value:**
