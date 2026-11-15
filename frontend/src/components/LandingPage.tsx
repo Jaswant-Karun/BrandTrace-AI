@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ShieldCheck, GitFork, ArrowRight, Lock, 
   CheckCircle2, ChevronRight,
-  Network,
+  Network, RotateCcw,
   FileText, Globe, Cpu,
   Check, AlertCircle, X, Menu,
   Hash, Clock, Sliders
@@ -30,6 +30,42 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const [activeSecurityIndex, setActiveSecurityIndex] = useState<number | null>(null);
   const [activeCapabilityId, setActiveCapabilityId] = useState<string | null>(null);
   const [activeStepIndex, setActiveStepIndex] = useState<number>(3);
+
+  // Motion choreography state for hero headline:
+  // Step 0: "EVERY CLAIM" and "CHECKED." displayed first
+  // Step 1: "CLINICALLY PROVEN" appears
+  // Step 2: Strike line strikes through "CLINICALLY PROVEN"
+  // Step 3: Green "SHOWN TO VISIBLY REDUCE*" appears (smaller font)
+  const [motionStep, setMotionStep] = useState<number>(0);
+  const [isHeroHovered, setIsHeroHovered] = useState<boolean>(false);
+
+  useEffect(() => {
+    let t1: any;
+    let t2: any;
+    let t3: any;
+    let tReset: any;
+
+    const runSequence = () => {
+      setMotionStep(0);
+      t1 = setTimeout(() => setMotionStep(1), 900);
+      t2 = setTimeout(() => setMotionStep(2), 1900);
+      t3 = setTimeout(() => setMotionStep(3), 2900);
+      tReset = setTimeout(() => {
+        if (!isHeroHovered) {
+          runSequence();
+        }
+      }, 9500);
+    };
+
+    runSequence();
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      clearTimeout(tReset);
+    };
+  }, [isHeroHovered]);
 
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false);
@@ -253,59 +289,102 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Left Column: Bold Editorial Typography & CTA */}
             <div className="lg:col-span-7 space-y-6 text-left">
               
-              <div className="space-y-3 select-none">
+              <div 
+                onMouseEnter={() => setIsHeroHovered(true)}
+                onMouseLeave={() => setIsHeroHovered(false)}
+                className="space-y-3 select-none"
+              >
                 
                 {/* Meta Tag & Brand Context Pill */}
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2.5 flex-wrap">
                   <span className="text-xs font-mono font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 block">
                     BEFORE IT'S PUBLISHED
                   </span>
                   <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-0.5 rounded-full">
                     AURELLE SKIN
                   </span>
+                  <button
+                    onClick={() => {
+                      setMotionStep(0);
+                      setTimeout(() => setMotionStep(1), 800);
+                      setTimeout(() => setMotionStep(2), 1700);
+                      setTimeout(() => setMotionStep(3), 2600);
+                    }}
+                    className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 px-2 py-0.5 rounded-full transition-colors cursor-pointer"
+                    title="Replay Motion Sequence"
+                  >
+                    <RotateCcw className="w-2.5 h-2.5" />
+                    <span>Replay Motion</span>
+                  </button>
                 </div>
                 
-                {/* Typography Headline: Single canonical claim kept permanently alone */}
+                {/* Typography Headline: Animated Motion Sequence */}
                 <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 dark:text-white leading-[1.02] uppercase font-sans">
+                  {/* Step 1: EVERY CLAIM (always displayed first) */}
                   <span className="block">EVERY CLAIM</span>
 
-                  {/* CLINICALLY PROVEN with coral strikethrough bounded strictly to each word */}
-                  <div className="py-1">
-                    <span className="relative inline-block mr-3 sm:mr-4 leading-none">
-                      <span className="text-[#ff6358] dark:text-[#ff6b6b] font-black">
-                        CLINICALLY
+                  {/* Step 2: CLINICALLY and PROVEN on separate lines, then struck through */}
+                  <motion.div
+                    initial={false}
+                    animate={{
+                      opacity: motionStep >= 1 ? 1 : 0,
+                      height: motionStep >= 1 ? 'auto' : 0,
+                      y: motionStep >= 1 ? 0 : -8,
+                    }}
+                    transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                    className="overflow-hidden space-y-0.5 sm:space-y-1 py-0.5"
+                  >
+                    {/* Line 2: CLINICALLY with coral strikethrough */}
+                    <div className="leading-none">
+                      <span className="relative inline-block leading-none">
+                        <span className="text-[#ff6358] dark:text-[#ff6b6b] font-black">
+                          CLINICALLY
+                        </span>
+                        <motion.span 
+                          initial={false}
+                          animate={{ scaleX: motionStep >= 2 ? 1 : 0 }}
+                          transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                          className="absolute top-1/2 left-0 right-0 h-[4px] sm:h-[6px] lg:h-[7px] bg-[#ff6358] dark:bg-[#ff6b6b] -translate-y-1/2 origin-left rounded-full pointer-events-none" 
+                        />
                       </span>
-                      <motion.span 
-                        initial={{ scaleX: 0 }}
-                        animate={{ scaleX: 1 }}
-                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                        className="absolute top-1/2 left-0 right-0 h-[4px] sm:h-[6px] lg:h-[7px] bg-[#ff6358] dark:bg-[#ff6b6b] -translate-y-1/2 origin-left rounded-full pointer-events-none" 
-                      />
-                    </span>
-                    <span className="relative inline-block leading-none">
-                      <span className="text-[#ff6358] dark:text-[#ff6b6b] font-black">
-                        PROVEN
-                      </span>
-                      <motion.span 
-                        initial={{ scaleX: 0 }}
-                        animate={{ scaleX: 1 }}
-                        transition={{ duration: 0.5, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
-                        className="absolute top-1/2 left-0 right-0 h-[4px] sm:h-[6px] lg:h-[7px] bg-[#ff6358] dark:bg-[#ff6b6b] -translate-y-1/2 origin-left rounded-full pointer-events-none" 
-                      />
-                    </span>
-                  </div>
+                    </div>
 
-                  {/* Approved verified claim permanently visible */}
-                  <div className="text-[#10b981] dark:text-[#34d399] py-1">
-                    <span className="block font-black leading-none my-1">
+                    {/* Line 3: PROVEN with coral strikethrough */}
+                    <div className="leading-none">
+                      <span className="relative inline-block leading-none">
+                        <span className="text-[#ff6358] dark:text-[#ff6b6b] font-black">
+                          PROVEN
+                        </span>
+                        <motion.span 
+                          initial={false}
+                          animate={{ scaleX: motionStep >= 2 ? 1 : 0 }}
+                          transition={{ duration: 0.45, delay: motionStep >= 2 ? 0.12 : 0, ease: [0.16, 1, 0.3, 1] }}
+                          className="absolute top-1/2 left-0 right-0 h-[4px] sm:h-[6px] lg:h-[7px] bg-[#ff6358] dark:bg-[#ff6b6b] -translate-y-1/2 origin-left rounded-full pointer-events-none" 
+                        />
+                      </span>
+                    </div>
+                  </motion.div>
+
+                  {/* Step 3: Green color font - noticeably smaller than parent headline */}
+                  <motion.div
+                    initial={false}
+                    animate={{
+                      opacity: motionStep >= 3 ? 1 : 0,
+                      height: motionStep >= 3 ? 'auto' : 0,
+                      y: motionStep >= 3 ? 0 : 8,
+                    }}
+                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    className="overflow-hidden text-[#10b981] dark:text-[#34d399] py-0.5 text-2xl sm:text-4xl lg:text-5xl font-black leading-tight tracking-tight"
+                  >
+                    <span className="block my-0.5 sm:my-1">
                       SHOWN TO VISIBLY
                     </span>
-                    <span className="block font-black leading-none my-1">
+                    <span className="block my-0.5 sm:my-1">
                       REDUCE*
                     </span>
-                  </div>
+                  </motion.div>
 
-                  {/* CHECKED. Grounded Anchor Word */}
+                  {/* Step 1 & Anchor: CHECKED. (always displayed first with EVERY CLAIM) */}
                   <div className="block text-slate-900 dark:text-white pt-1">
                     CHECKED.
                   </div>
@@ -313,9 +392,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
 
               {/* Substantiation Footnote directly matching reference */}
-              <p className="text-[11px] sm:text-xs font-mono text-slate-500 dark:text-slate-400 pt-1">
+              <motion.p 
+                animate={{ opacity: motionStep >= 3 ? 1 : 0, y: motionStep >= 3 ? 0 : 4 }}
+                transition={{ duration: 0.4 }}
+                className="text-[11px] sm:text-xs font-mono text-slate-500 dark:text-slate-400 pt-1"
+              >
                 *FACT-014 · 32% fewer visible dark spots in 8 weeks · in-house study, 48 participants
-              </p>
+              </motion.p>
 
               {/* Subtitle Statement */}
               <p className="text-base sm:text-lg font-bold text-slate-800 dark:text-slate-200 uppercase tracking-tight max-w-xl leading-snug">
