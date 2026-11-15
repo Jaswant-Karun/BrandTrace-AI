@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ShieldCheck, GitFork, ArrowRight, Lock, 
+  ShieldCheck, GitFork, ArrowRight, Lock,
   CheckCircle2, ChevronRight,
   Network, RotateCcw,
   Globe,
@@ -36,22 +36,22 @@ interface LandingPageProps {
   onOpenCreatorDashboard?: () => void;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ 
-  onEnterApp = () => {}, 
-  onVerify = () => {}, 
-  onSignIn = () => {}, 
+export const LandingPage: React.FC<LandingPageProps> = ({
+  onEnterApp = () => { },
+  onVerify = () => { },
+  onSignIn = () => { },
   brandName: _brandName = 'Apex Dynamics',
   animateEntrance,
   brands = [],
   selectedBrandId = 'aurelle-tech',
-  setSelectedBrandId = () => {},
+  setSelectedBrandId = () => { },
   dbStatus: _dbStatus = null,
   activeWorkspaceCategory = null,
   onSelectWorkspaceCategory,
   onCloseWorkspace,
   onSignRelease,
   initialSubTab,
-  onReseed: _onReseed = () => {},
+  onReseed: _onReseed = () => { },
   isReseeding: _isReseeding = false,
   onOpenCreatorDashboard
 }) => {
@@ -62,8 +62,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const [activeStepIndex, setActiveStepIndex] = useState<number>(3);
 
   // Check if entrance animation was requested (either via prop or URL param ?fromLogin=true)
-  const shouldAnimate = typeof animateEntrance === 'boolean' 
-    ? animateEntrance 
+  const shouldAnimate = typeof animateEntrance === 'boolean'
+    ? animateEntrance
     : (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('fromLogin') === 'true');
 
   // Motion choreography state for hero headline:
@@ -118,13 +118,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col font-sans selection:bg-indigo-600 selection:text-white transition-colors duration-200">
-      
+
       {/* ------------------------------------------------------------------- */}
       {/* SECTION 1 — TOP NAVIGATION                                          */}
       {/* ------------------------------------------------------------------- */}
       <nav className="sticky top-0 z-50 border-b border-white/10 bg-black/90 backdrop-blur-md transition-colors duration-200">
         <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:pl-6 xl:pl-8 lg:pr-6 xl:pr-8 h-16 flex items-center justify-between gap-3 sm:gap-4">
-          
+
           {/* Left: Brand Identity (Guaranteed single-line with shrink-0 & whitespace-nowrap) */}
           <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
             <div className="w-9 h-9 rounded-xl bg-slate-900 dark:bg-indigo-600 flex items-center justify-center shadow-xs shrink-0">
@@ -334,14 +334,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </svg>
 
         <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:pl-6 xl:pl-8 lg:pr-6 xl:pr-8 relative z-10">
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 xl:gap-12 items-start pt-1 sm:pt-2">
-            
+
             {/* Left Column: Bold Editorial Typography & CTA */}
             <div className="lg:col-span-7 xl:col-span-7 space-y-6 text-left pl-0">
-              
+
               <div className="space-y-3 select-none">
-                
+
                 {/* Meta Tag & Brand Context Pill */}
                 <div className="flex items-center gap-2.5 flex-wrap">
                   <span className="text-xs sm:text-sm font-mono font-bold uppercase tracking-widest text-neutral-400 block">
@@ -364,7 +364,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     <span>Replay Motion</span>
                   </button>
                 </div>
-                
+
                 {/* Typography Headline: Animated Motion Sequence */}
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-[70px] 2xl:text-[76px] font-black tracking-tight text-white leading-[0.98] uppercase font-sans">
                   {/* Step 1: EVERY CLAIM (always displayed first) */}
@@ -387,11 +387,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                             <span className="text-[#ff6358] font-black whitespace-nowrap">
                               CLINICALLY
                             </span>
-                            <motion.span 
+                            <motion.span
                               initial={{ scaleX: 0 }}
                               animate={{ scaleX: motionStep >= 2 ? 1 : 0 }}
                               transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                              className="absolute top-1/2 left-0 right-0 h-[5px] sm:h-[6px] lg:h-[7px] xl:h-[8px] bg-[#ff6358] -translate-y-1/2 origin-left rounded-full pointer-events-none" 
+                              className="absolute top-1/2 left-0 right-0 h-[5px] sm:h-[6px] lg:h-[7px] xl:h-[8px] bg-[#ff6358] -translate-y-1/2 origin-left rounded-full pointer-events-none"
                             />
                           </span>
                         </div>
@@ -402,11 +402,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                             <span className="text-[#ff6358] font-black whitespace-nowrap">
                               PROVEN
                             </span>
-                            <motion.span 
+                            <motion.span
                               initial={{ scaleX: 0 }}
                               animate={{ scaleX: motionStep >= 2 ? 1 : 0 }}
                               transition={{ duration: 0.45, delay: motionStep >= 2 ? 0.12 : 0, ease: [0.16, 1, 0.3, 1] }}
-                              className="absolute top-1/2 left-0 right-0 h-[5px] sm:h-[6px] lg:h-[7px] xl:h-[8px] bg-[#ff6358] -translate-y-1/2 origin-left rounded-full pointer-events-none" 
+                              className="absolute top-1/2 left-0 right-0 h-[5px] sm:h-[6px] lg:h-[7px] xl:h-[8px] bg-[#ff6358] -translate-y-1/2 origin-left rounded-full pointer-events-none"
                             />
                           </span>
                         </div>
@@ -443,7 +443,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
 
               {/* Substantiation Footnote directly matching reference */}
-              <motion.p 
+              <motion.p
                 animate={{ opacity: motionStep >= 3 ? 1 : 0, y: motionStep >= 3 ? 0 : 4 }}
                 transition={{ duration: 0.4 }}
                 className="text-xs sm:text-sm font-mono text-neutral-400 pt-2"
@@ -493,13 +493,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
               {/* Composition Container with subtle dark blueprint / glow background */}
               <div className="relative w-full max-w-[560px] lg:max-w-[620px] ml-auto p-2.5 sm:p-3 pb-0 rounded-2xl sm:rounded-3xl bg-neutral-950/80 border border-neutral-800 shadow-2xl backdrop-blur-md overflow-visible">
-                
+
                 {/* Background ambient lighting */}
                 <div className="absolute top-1/4 right-1/4 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
                 <div className="absolute bottom-10 left-10 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
                 <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-2.5 lg:gap-3 items-start">
-                  
+
                   {/* Left Sheet: Main UI Book Document Sheet with Subtle Slanted Layered-Paper Appearance */}
                   <div className="md:col-span-7 relative group">
                     {/* Subtle stacked under-paper edge shadow creating authentic editorial book folio depth */}
@@ -507,7 +507,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
                     {/* Main White Paper Surface */}
                     <div className="bg-white dark:bg-[#fcfbf9] text-slate-900 rounded-2xl p-3 sm:p-3.5 shadow-xl border border-slate-200/80 relative overflow-hidden -rotate-[0.75deg] sm:-rotate-[0.9deg] transition-transform duration-300">
-                      
+
                       {/* Orange Vertical Accent Margin Line */}
                       <div className="absolute top-3 left-0 w-1 sm:w-1.5 h-7 bg-amber-500 rounded-r" />
 
@@ -569,7 +569,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
                   {/* Right Side: Stacked Floating Issue Cards with Subtle Contrasting Book Slant */}
                   <div className="md:col-span-5 space-y-1.5 sm:space-y-2 relative flex flex-col justify-start rotate-[0.4deg] sm:rotate-[0.6deg]">
-                    
+
                     {/* Dotted connecting line behind cards */}
                     <div className="hidden md:block absolute -left-2 top-3 bottom-2 border-l border-dashed border-slate-700/50 pointer-events-none" />
 
@@ -760,7 +760,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
 
         <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:pl-6 xl:pl-8 lg:pr-6 xl:pr-8 space-y-16 relative z-10">
-          
+
           <div className="text-center max-w-3xl mx-auto space-y-4">
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-rose-500">
               THE PROBLEM
@@ -776,7 +776,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* 3 Staggered, Non-Formal Editorial Image Cards with Live AI Scanning Effect */}
           <div className="flex flex-col lg:flex-row items-center lg:items-start justify-center gap-8 lg:gap-8 xl:gap-10">
-            
+
             {/* Card 1: INSTAGRAM POST (BIG & TALL on Left) */}
             <div className="w-full max-w-[420px] lg:max-w-[440px] shrink-0 bg-[#fbf9f5] text-slate-900 rounded-2xl border border-neutral-800 shadow-2xl overflow-hidden flex flex-col justify-between">
               <div>
@@ -807,7 +807,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     alt="Aurelle Skin Vitamin C Serum on Pedestal"
                     className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   />
-                  
+
                   {/* Multimodal AI Scanning Laser Line (Smooth top-to-bottom sweep) */}
                   <motion.div
                     animate={{ y: [-10, 320, -10] }}
@@ -887,7 +887,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     alt="Aurelle Glow In 2 Weeks Banner"
                     className="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
                   />
-                  
+
                   {/* Scanning Laser Beam */}
                   <motion.div
                     animate={{ y: [-10, 270, -10] }}
@@ -952,7 +952,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     alt="Diwali Campaign Swatches"
                     className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   />
-                  
+
                   {/* Scanning Laser Beam */}
                   <motion.div
                     animate={{ y: [-10, 180, -10] }}
@@ -1017,7 +1017,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <section id="platform" className="py-20 sm:py-28 bg-black text-white border-b border-neutral-900 relative">
         {/* Anchor for features nav link */}
         <div id="features" className="absolute -top-24 left-0 pointer-events-none" />
-        
+
         <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:pl-6 xl:pl-8 lg:pr-6 xl:pr-8 space-y-16">
           <div className="text-center max-w-3xl mx-auto space-y-4">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-indigo-950/80 border border-indigo-800 text-indigo-300">
@@ -1108,7 +1108,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               const Icon = cap.icon;
 
               return (
-                <div 
+                <div
                   key={cap.id}
                   tabIndex={0}
                   role="button"
@@ -1128,11 +1128,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                       handleSelectCapability(cap.id, cap.subTab);
                     }
                   }}
-                  className={`bg-neutral-950 rounded-2xl border overflow-hidden flex flex-col justify-between transition-all duration-200 ease-out select-none cursor-pointer outline-none group ${
-                    isHighlighted
-                      ? 'border-2 border-[#2563EB] ring-2 ring-[#2563EB]/25 shadow-xl shadow-blue-500/15 -translate-y-1'
-                      : 'border-neutral-800 shadow-xs hover:border-neutral-700 translate-y-0'
-                  }`}
+                  className={`bg-neutral-950 rounded-2xl border overflow-hidden flex flex-col justify-between transition-all duration-200 ease-out select-none cursor-pointer outline-none group ${isHighlighted
+                    ? 'border-2 border-[#2563EB] ring-2 ring-[#2563EB]/25 shadow-xl shadow-blue-500/15 -translate-y-1'
+                    : 'border-neutral-800 shadow-xs hover:border-neutral-700 translate-y-0'
+                    }`}
                 >
                   <div>
                     {/* Realistic Photographic Header with Aspect Ratio & Badges */}
@@ -1144,43 +1143,38 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                         loading="lazy"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/30 to-transparent pointer-events-none" />
-                      
+
                       {/* Floating Badges */}
                       <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
-                        <span className={`text-[10px] font-mono font-bold uppercase tracking-wider backdrop-blur-md px-2 py-0.5 rounded border transition-colors duration-200 ${
-                          isHighlighted
-                            ? 'bg-[#2563EB] text-white border-blue-400'
-                            : 'bg-neutral-900/80 text-emerald-300 border-emerald-500/30'
-                        }`}>
+                        <span className={`text-[10px] font-mono font-bold uppercase tracking-wider backdrop-blur-md px-2 py-0.5 rounded border transition-colors duration-200 ${isHighlighted
+                          ? 'bg-[#2563EB] text-white border-blue-400'
+                          : 'bg-neutral-900/80 text-emerald-300 border-emerald-500/30'
+                          }`}>
                           {isSelected ? 'ACTIVE WORKSPACE' : cap.badge}
                         </span>
-                        <div className={`w-8 h-8 rounded-lg backdrop-blur-md flex items-center justify-center border shadow-xs transition-colors duration-200 ${
-                          isHighlighted
-                            ? 'bg-[#2563EB] text-white border-blue-400'
-                            : 'bg-neutral-900/80 text-white border-white/20'
-                        }`}>
+                        <div className={`w-8 h-8 rounded-lg backdrop-blur-md flex items-center justify-center border shadow-xs transition-colors duration-200 ${isHighlighted
+                          ? 'bg-[#2563EB] text-white border-blue-400'
+                          : 'bg-neutral-900/80 text-white border-white/20'
+                          }`}>
                           <Icon className={`w-4 h-4 ${isHighlighted ? 'text-white' : 'text-blue-400'}`} />
                         </div>
                       </div>
 
                       <div className="absolute bottom-3 left-4 right-4 pointer-events-none">
-                        <span className={`text-[11px] font-mono font-semibold block transition-colors duration-200 ${
-                          isHighlighted ? 'text-blue-200' : 'text-neutral-400'
-                        }`}>
+                        <span className={`text-[11px] font-mono font-semibold block transition-colors duration-200 ${isHighlighted ? 'text-blue-200' : 'text-neutral-400'
+                          }`}>
                           {cap.subtitle}
                         </span>
-                        <h3 className={`text-base sm:text-lg font-bold tracking-tight truncate transition-colors duration-200 ${
-                          isHighlighted ? 'text-blue-100' : 'text-white'
-                        }`}>
+                        <h3 className={`text-base sm:text-lg font-bold tracking-tight truncate transition-colors duration-200 ${isHighlighted ? 'text-blue-100' : 'text-white'
+                          }`}>
                           {cap.title}
                         </h3>
                       </div>
                     </div>
 
                     {/* Card Body Description */}
-                    <div className={`p-6 space-y-3 transition-colors duration-200 ${
-                      isHighlighted ? 'bg-blue-950/20' : ''
-                    }`}>
+                    <div className={`p-6 space-y-3 transition-colors duration-200 ${isHighlighted ? 'bg-blue-950/20' : ''
+                      }`}>
                       <p className="text-xs text-neutral-400 leading-relaxed min-h-[58px]">
                         {cap.desc}
                       </p>
@@ -1188,14 +1182,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   </div>
 
                   {/* Card Footer with Metrics & Action Button */}
-                  <div className={`px-6 pb-5 pt-3 border-t flex items-center justify-between mt-auto transition-colors duration-200 ${
-                    isHighlighted
-                      ? 'border-blue-900/40 bg-blue-950/40'
-                      : 'border-neutral-800/80 bg-neutral-900/60'
-                  }`}>
-                    <span className={`text-[11px] font-mono truncate max-w-[170px] transition-colors duration-200 ${
-                      isHighlighted ? 'text-blue-300 font-semibold' : 'text-neutral-400'
-                    }`} title={cap.metric}>
+                  <div className={`px-6 pb-5 pt-3 border-t flex items-center justify-between mt-auto transition-colors duration-200 ${isHighlighted
+                    ? 'border-blue-900/40 bg-blue-950/40'
+                    : 'border-neutral-800/80 bg-neutral-900/60'
+                    }`}>
+                    <span className={`text-[11px] font-mono truncate max-w-[170px] transition-colors duration-200 ${isHighlighted ? 'text-blue-300 font-semibold' : 'text-neutral-400'
+                      }`} title={cap.metric}>
                       {cap.metric}
                     </span>
                     <button
@@ -1203,11 +1195,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                         e.stopPropagation();
                         handleSelectCapability(cap.id, cap.subTab);
                       }}
-                      className={`inline-flex items-center gap-1 text-xs font-bold transition-colors cursor-pointer shrink-0 ${
-                        isHighlighted
-                          ? 'text-blue-400'
-                          : 'text-blue-400 hover:text-blue-300'
-                      }`}
+                      className={`inline-flex items-center gap-1 text-xs font-bold transition-colors cursor-pointer shrink-0 ${isHighlighted
+                        ? 'text-blue-400'
+                        : 'text-blue-400 hover:text-blue-300'
+                        }`}
                     >
                       <span>{isSelected ? 'Open Workspace' : 'Explore'}</span>
                       <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
@@ -1252,7 +1243,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* SECTION 6 — HOW IT WORKS (Homage to reference 6-step cards)         */}
       {/* ------------------------------------------------------------------- */}
       <section id="how-it-works" className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        
+
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
             Explainable Methodology
@@ -1266,7 +1257,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
 
         {/* Continuous 6-Step Bento Grid Matching Reference Image 1 */}
-        <div 
+        <div
           className="rounded-2xl sm:rounded-3xl border border-neutral-800 bg-[#0e0e11] overflow-hidden shadow-2xl grid grid-cols-1 md:grid-cols-3 select-none"
           onMouseLeave={() => setActiveStepIndex(3)}
         >
@@ -1310,32 +1301,28 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           ].map((item, i) => {
             const isStepActive = activeStepIndex === i;
             return (
-              <div 
-                key={i} 
+              <div
+                key={i}
                 tabIndex={0}
                 role="article"
                 aria-label={`${item.step}: ${item.title}`}
                 onMouseEnter={() => setActiveStepIndex(i)}
                 onFocus={() => setActiveStepIndex(i)}
-                className={`p-7 sm:p-9 lg:p-10 flex flex-col justify-start space-y-3.5 transition-all duration-200 ease-out cursor-pointer outline-none ${item.borderClasses} ${
-                  isStepActive
-                    ? 'bg-[#f4f2ea] text-neutral-900 shadow-inner'
-                    : 'bg-[#121215] text-white hover:bg-[#18181c]'
-                }`}
+                className={`p-7 sm:p-9 lg:p-10 flex flex-col justify-start space-y-3.5 transition-all duration-200 ease-out cursor-pointer outline-none ${item.borderClasses} ${isStepActive
+                  ? 'bg-[#f4f2ea] text-neutral-900 shadow-inner'
+                  : 'bg-[#121215] text-white hover:bg-[#18181c]'
+                  }`}
               >
-                <span className={`text-[11px] sm:text-xs font-mono font-semibold tracking-wider uppercase block transition-colors duration-200 ${
-                  isStepActive ? 'text-neutral-500' : 'text-neutral-400'
-                }`}>
+                <span className={`text-[11px] sm:text-xs font-mono font-semibold tracking-wider uppercase block transition-colors duration-200 ${isStepActive ? 'text-neutral-500' : 'text-neutral-400'
+                  }`}>
                   {item.step}
                 </span>
-                <h3 className={`text-lg sm:text-xl font-extrabold tracking-tight uppercase leading-snug transition-colors duration-200 ${
-                  isStepActive ? 'text-neutral-950 font-sans' : 'text-white font-sans'
-                }`}>
+                <h3 className={`text-lg sm:text-xl font-extrabold tracking-tight uppercase leading-snug transition-colors duration-200 ${isStepActive ? 'text-neutral-950 font-sans' : 'text-white font-sans'
+                  }`}>
                   {item.title}
                 </h3>
-                <p className={`text-xs sm:text-sm leading-relaxed font-sans transition-colors duration-200 ${
-                  isStepActive ? 'text-neutral-700' : 'text-neutral-300'
-                }`}>
+                <p className={`text-xs sm:text-sm leading-relaxed font-sans transition-colors duration-200 ${isStepActive ? 'text-neutral-700' : 'text-neutral-300'
+                  }`}>
                   {item.desc}
                 </p>
               </div>
@@ -1350,9 +1337,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ------------------------------------------------------------------- */}
       <section id="digital-twin" className="py-20 sm:py-28 bg-black text-white overflow-hidden relative border-b border-neutral-900">
         <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:pl-6 xl:pl-8 lg:pr-6 xl:pr-8 space-y-12">
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            
+
             {/* Left text */}
             <div className="lg:col-span-6 space-y-6 text-left">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-indigo-950 border border-indigo-700 text-indigo-300">
@@ -1376,7 +1363,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-neutral-400">
                   Illustrative Simulation Scenario (Synthetic Demo Data)
                 </span>
-                
+
                 <div className="grid grid-cols-2 gap-4 text-xs font-mono">
                   <div className="p-2.5 bg-neutral-900 rounded-lg border border-neutral-800">
                     <span className="text-neutral-400 text-[10px] block">APPROVED PRICE</span>
@@ -1484,7 +1471,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ------------------------------------------------------------------- */}
       <section id="security" className="py-20 sm:py-28 bg-black text-white border-b border-neutral-900 space-y-12">
         <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:pl-6 xl:pl-8 lg:pr-6 xl:pr-8 space-y-12">
-        
+
           <div className="text-center max-w-3xl mx-auto space-y-4">
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-400">
               Enterprise Integrity
@@ -1497,7 +1484,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </p>
           </div>
 
-          <div 
+          <div
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             onMouseLeave={() => setActiveSecurityIndex(null)}
           >
@@ -1590,18 +1577,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     }
                   }}
                   onTouchStart={() => setActiveSecurityIndex(index)}
-                  className={`p-6 rounded-2xl space-y-3 cursor-pointer outline-none transition-all duration-200 ease-out select-none ${
-                    isActive
-                      ? 'bg-blue-950/20 border-2 border-[#2563EB] shadow-lg shadow-blue-500/15 -translate-y-1 ring-2 ring-[#2563EB]/20'
-                      : 'bg-neutral-950 border border-neutral-800 text-white shadow-xs hover:border-neutral-700 translate-y-0'
-                  }`}
+                  className={`p-6 rounded-2xl space-y-3 cursor-pointer outline-none transition-all duration-200 ease-out select-none ${isActive
+                    ? 'bg-blue-950/20 border-2 border-[#2563EB] shadow-lg shadow-blue-500/15 -translate-y-1 ring-2 ring-[#2563EB]/20'
+                    : 'bg-neutral-950 border border-neutral-800 text-white shadow-xs hover:border-neutral-700 translate-y-0'
+                    }`}
                 >
                   <div className="flex items-center justify-between">
-                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 ${
-                      isActive
-                        ? 'bg-[#2563EB] text-white shadow-md shadow-blue-500/30 scale-105'
-                        : feature.defaultIconColor
-                    }`}>
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 ${isActive
+                      ? 'bg-[#2563EB] text-white shadow-md shadow-blue-500/30 scale-105'
+                      : feature.defaultIconColor
+                      }`}>
                       <Icon className="w-4 h-4" />
                     </div>
                     {isActive && (
@@ -1610,9 +1595,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                       </span>
                     )}
                   </div>
-                  <h3 className={`text-base font-bold transition-colors duration-200 ${
-                    isActive ? 'text-blue-400' : 'text-white'
-                  }`}>
+                  <h3 className={`text-base font-bold transition-colors duration-200 ${isActive ? 'text-blue-400' : 'text-white'
+                    }`}>
                     {feature.title}
                   </h3>
                   <p className="text-xs text-neutral-400 leading-relaxed">
@@ -1631,7 +1615,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ------------------------------------------------------------------- */}
       <section className="py-20 sm:py-28 bg-black text-white relative overflow-hidden border-b border-neutral-900">
         <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:pl-6 xl:pl-8 lg:pr-6 xl:pr-8 space-y-12">
-          
+
           <div className="text-center max-w-3xl mx-auto space-y-3">
             <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white font-sans uppercase">
               PICK A ROLE, NO SIGN UP.
@@ -1643,7 +1627,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* 5 Persona Cards Row (Directly matching Reference Image 1) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            
+
             {/* Card 1: CREATOR */}
             <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4">
               <div className="space-y-3">
@@ -1773,7 +1757,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Hanging Plumb Bob & Grand Statement directly matching Reference Image 1 */}
           <div className="pt-20 pb-12 text-center space-y-6 flex flex-col items-center">
-            
+
             {/* Hanging Plumb Bob wire with horizontal T-bar and purple diamond */}
             <div className="flex flex-col items-center pointer-events-none select-none">
               <div className="w-8 h-[2px] bg-neutral-600 rounded-full" />
@@ -1807,7 +1791,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <footer id="about" className="border-t border-neutral-900 bg-black py-6 transition-colors text-neutral-400">
         <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:pl-6 xl:pl-8 lg:pr-6 xl:pr-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-x-6 gap-y-3 text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-neutral-400 w-full">
-            
+
             <div className="flex items-center gap-4 sm:gap-6 shrink-0 whitespace-nowrap">
               <span className="font-bold text-white tracking-wider">
                 EVIDENCE OR SILENCE.
