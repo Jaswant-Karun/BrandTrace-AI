@@ -57,6 +57,16 @@ PRESET_USERS: Dict[str, Dict] = {
         "workspace_id": "aurelle-maison",
         "password_hash": hash_password("brandtrace2026")
     },
+    # Phase 7 & 8 Dedicated Demo User for AURELLE Hackathon Evaluation
+    "demo@brandtrace.ai": {
+        "user_id": "USR-DEMO-AURELLE",
+        "email": "demo@brandtrace.ai",
+        "name": "Alex Mercer, VP Global Brand Governance",
+        "role": UserRole.BRAND_MANAGER,
+        "org_id": "ORG-AURELLE",
+        "workspace_id": "aurelle-tech",
+        "password_hash": hash_password("DemoAurelle2026!")
+    },
     # Phase 6 AURELLE Consumer Technology Enterprise Demo Users
     "admin@aurelle.com": {
         "user_id": "USR-AUR-ADM",
