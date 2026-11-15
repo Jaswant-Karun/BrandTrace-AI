@@ -326,3 +326,149 @@ class DocumentVersionDoc(BaseMongoRecord):
     edited_by: str
     archived_at: int = Field(default_factory=current_epoch_ms)
 
+# ==============================================================================
+# PHASE 2 CENTRALIZED WORKFLOW & GOVERNANCE MODELS
+# ==============================================================================
+
+# 30. drafts
+class DraftDoc(BaseMongoRecord):
+    draft_id: str
+    user_id: str
+    author_name: str = "Creator Asha"
+    title: str = "Untitled Draft"
+    content: str = ""
+    channel: str = "instagram"
+    key_phrases: str = ""
+    call_to_action: str = ""
+    version: int = 1
+    last_checked_at: Optional[int] = None
+    last_analysis: Optional[Dict[str, Any]] = None
+    is_submitted: bool = False
+
+# 31. draft_versions
+class DraftVersionDoc(BaseMongoRecord):
+    version_id: str
+    draft_id: str
+    version_number: int
+    content: str
+    saved_by: str
+    reason: Optional[str] = ""
+    content_hash: str
+    created_at: int = Field(default_factory=current_epoch_ms)
+
+# 32. submissions
+class SubmissionFinding(BaseModel):
+    id: str
+    number: int
+    sentence_text: str = ""
+    flagged_text: str = ""
+    category: str = "Brand Rules"
+    severity: str = "BLOCKING"  # BLOCKING, MAJOR, MINOR, NEEDS_HUMAN, ADVISORY
+    rule_id: str
+    rule_title: str = ""
+    explanation: str = ""
+    suggested_fix: str = ""
+    evidence_ref: Optional[str] = None
+    needs_human_review: bool = False
+    decision: str = "UNDECIDED"  # UNDECIDED, UPHELD, OVERRULED
+    overrule_reason: Optional[str] = None
+    resolved: bool = False
+
+class ApprovalStepDoc(BaseModel):
+    stage: str  # CREATOR_SUBMISSION, REVIEWER_APPROVAL, COMPLIANCE_APPROVAL, FINAL_RELEASE
+    label: str
+    user: str
+    role: str
+    status: str  # COMPLETED, ACTIVE, PENDING, REJECTED
+    timestamp: Optional[str] = None
+    comments: Optional[str] = None
+
+class SubmissionDoc(BaseMongoRecord):
+    submission_id: str
+    task_id: Optional[str] = None
+    brand_id: str = "aurelle-tech"
+    brand_name: str = "Aurelle Skin"
+    title: str
+    channel: str = "instagram"
+    creator_id: str
+    creator_name: str
+    version: int = 1
+    original_content: str
+    current_content: str
+    findings: List[SubmissionFinding] = Field(default_factory=list)
+    status: str = "PENDING_REVIEW"  # DRAFT, PENDING_REVIEW, CHANGES_REQUESTED, REVIEW_APPROVED, COMPLIANCE_APPROVED, APPROVED, REJECTED
+    submitted_at: int = Field(default_factory=current_epoch_ms)
+    reviewer_feedback: Optional[str] = None
+    compliance_notes: Optional[str] = None
+    rejection_reason: Optional[str] = None
+    assigned_reviewer: str = "Reviewer Meera"
+    assigned_compliance: str = "Compliance Arjun"
+    approval_history: List[ApprovalStepDoc] = Field(default_factory=list)
+    release_seal: Optional[str] = None
+
+# 33. review_decisions (granular finding-by-finding audit)
+class ReviewDecisionDoc(BaseMongoRecord):
+    decision_id: str
+    submission_id: str
+    reviewer_id: str
+    reviewer_name: str
+    reviewer_role: str = "REVIEWER"
+    decision: str  # APPROVE, REQUEST_CHANGES, REJECT
+    findings_decisions: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
+    feedback: Optional[str] = None
+    decided_at: int = Field(default_factory=current_epoch_ms)
+
+# 34. compliance_decisions
+class ComplianceDecisionDoc(BaseMongoRecord):
+    decision_id: str
+    submission_id: str
+    compliance_officer_id: str
+    compliance_officer_name: str
+    decision: str  # APPROVE, REQUEST_CHANGES, REJECT
+    statutory_findings_decisions: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
+    compliance_notes: Optional[str] = None
+    decided_at: int = Field(default_factory=current_epoch_ms)
+
+# 35. final_approvals
+class FinalApprovalDoc(BaseMongoRecord):
+    approval_id: str
+    submission_id: str
+    approver_id: str
+    approver_name: str
+    approver_role: str = "BRAND_OWNER"
+    release_seal: str
+    approved_at: int = Field(default_factory=current_epoch_ms)
+
+# 36. release_records
+class ReleaseRecordDoc(BaseMongoRecord):
+    release_id: str
+    submission_id: str
+    brand_id: str = "aurelle-tech"
+    brand_name: str = "Aurelle Skin"
+    asset_title: str
+    channel: str
+    approved_content: str
+    content_hash: str
+    seal_code: str
+    creator_name: str
+    reviewer_name: str
+    compliance_officer: str
+    final_approver: str
+    released_at: int = Field(default_factory=current_epoch_ms)
+    release_status: str = "SEALED"  # SEALED, REVOKED, SUPERSEDED
+
+# 37. audit_logs
+class AuditLogDoc(BaseMongoRecord):
+    log_id: str
+    action_type: str  # DRAFT_SAVED, ANALYSIS_RUN, SUBMISSION_CREATED, FINDING_UPHELD, FINDING_OVERRULED, CHANGES_REQUESTED, REVIEW_APPROVED, COMPLIANCE_APPROVED, RELEASE_SEALED
+    actor_id: str
+    actor_name: str
+    actor_role: str
+    resource_type: str
+    resource_id: str
+    details: Dict[str, Any] = Field(default_factory=dict)
+    reason: Optional[str] = ""
+    previous_hash: Optional[str] = None
+    current_hash: str
+    timestamp: int = Field(default_factory=current_epoch_ms)
+

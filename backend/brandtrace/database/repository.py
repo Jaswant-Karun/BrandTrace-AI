@@ -47,7 +47,15 @@ class BrandTraceRepository:
             "change_simulations": [],
             "impact_reports": [],
             "audit_events": [],
-            "notifications": []
+            "notifications": [],
+            "drafts": [],
+            "draft_versions": [],
+            "submissions": [],
+            "review_decisions": [],
+            "compliance_decisions": [],
+            "final_approvals": [],
+            "release_records": [],
+            "audit_logs": []
         }
 
     # ==============================================================================

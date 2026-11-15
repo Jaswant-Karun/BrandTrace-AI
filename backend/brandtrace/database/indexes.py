@@ -125,6 +125,39 @@ async def build_phase5_indexes(db: AsyncIOMotorDatabase):
         # 27. notifications
         await db.notifications.create_index([("organisation_id", ASCENDING), ("recipient_user_id", ASCENDING), ("is_read", ASCENDING)])
 
-        logger.info("Successfully established indexes for all 27 Phase 5 MongoDB Atlas collections.")
+        # 28. drafts
+        await db.drafts.create_index([("organisation_id", ASCENDING), ("workspace_id", ASCENDING), ("draft_id", ASCENDING)], unique=True)
+        await db.drafts.create_index([("organisation_id", ASCENDING), ("user_id", ASCENDING)])
+
+        # 29. draft_versions
+        await db.draft_versions.create_index([("organisation_id", ASCENDING), ("draft_id", ASCENDING), ("version_number", ASCENDING)])
+
+        # 30. submissions
+        await db.submissions.create_index([("organisation_id", ASCENDING), ("workspace_id", ASCENDING), ("submission_id", ASCENDING)], unique=True)
+        await db.submissions.create_index([("organisation_id", ASCENDING), ("status", ASCENDING)])
+        await db.submissions.create_index([("organisation_id", ASCENDING), ("creator_id", ASCENDING)])
+
+        # 31. review_decisions
+        await db.review_decisions.create_index([("organisation_id", ASCENDING), ("decision_id", ASCENDING)], unique=True)
+        await db.review_decisions.create_index([("organisation_id", ASCENDING), ("submission_id", ASCENDING)])
+
+        # 32. compliance_decisions
+        await db.compliance_decisions.create_index([("organisation_id", ASCENDING), ("decision_id", ASCENDING)], unique=True)
+        await db.compliance_decisions.create_index([("organisation_id", ASCENDING), ("submission_id", ASCENDING)])
+
+        # 33. final_approvals
+        await db.final_approvals.create_index([("organisation_id", ASCENDING), ("approval_id", ASCENDING)], unique=True)
+        await db.final_approvals.create_index([("organisation_id", ASCENDING), ("submission_id", ASCENDING)])
+
+        # 34. release_records
+        await db.release_records.create_index([("organisation_id", ASCENDING), ("workspace_id", ASCENDING), ("release_id", ASCENDING)], unique=True)
+        await db.release_records.create_index([("seal_code", ASCENDING)], unique=True)
+
+        # 35. audit_logs
+        await db.audit_logs.create_index([("organisation_id", ASCENDING), ("log_id", ASCENDING)], unique=True)
+        await db.audit_logs.create_index([("organisation_id", ASCENDING), ("resource_id", ASCENDING)])
+        await db.audit_logs.create_index([("organisation_id", ASCENDING), ("timestamp", DESCENDING)])
+
+        logger.info("Successfully established indexes for all Phase 2 and Phase 5 MongoDB Atlas collections.")
     except Exception as e:
-        logger.warning(f"Error ensuring Phase 5 indexes: {e}")
+        logger.warning(f"Error ensuring indexes: {e}")
