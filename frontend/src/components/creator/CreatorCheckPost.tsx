@@ -4,7 +4,7 @@ import {
   CheckCircle2, 
   Send, RefreshCw, Check, ArrowRight, X, ChevronDown, ChevronRight,
   AlertCircle, AlertTriangle, ShieldCheck, Eye, HelpCircle,
-  UploadCloud, Image as ImageIcon, Trash2, Bookmark, FileText, Layers,
+  Trash2, Bookmark, FileText, Layers,
   MessageSquare, GitCompare, History, RotateCcw, CheckCheck
 } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
@@ -247,7 +247,7 @@ const EXAMPLE_POSTS: ExamplePost[] = [
   },
 ];
 
-const DEFAULT_SAMPLE_TEXT = `Subject: Your Diwali glow, sorted\n\nOur Diwali sale is here: 20% off sitewide on every Aurelle favourite. Over 120000 customers already trust our Online store. Visit WWW.Aurelle.example/Diwali to shop the Diwali gift set.`;
+const DEFAULT_SAMPLE_TEXT = `Got my PR package from Aurelle today ✨ The vit C serum smells like nothing (fragrance-free!) and my skin looks so fresh. Obsessed. #aurelleglowroutine`;
 
 export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
   onSaveAuditVersion,
@@ -287,12 +287,19 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
   // Active filter for findings
   const [activeFindingFilter, setActiveFindingFilter] = useState<'all' | 'blocking' | 'major' | 'minor' | 'needsHuman' | 'advisory' | 'claims' | 'rules' | 'compliance' | 'visual'>('blocking');
 
-  const [channel, setChannel] = useState<PostChannel>(revisionData?.channel || 'email');
+  const [channel, setChannel] = useState<PostChannel>(revisionData?.channel || 'Instagram');
   const [keyPhrases, setKeyPhrases] = useState<string>('Diwali, sale, 20% off');
   const [callToAction, setCallToAction] = useState<string>('shop the Diwali gift set');
   const [isAccordionOpen, setIsAccordionOpen] = useState<boolean>(false);
   const [isChecking, setIsChecking] = useState<boolean>(false);
   const [hasChecked, setHasChecked] = useState<boolean>(false);
+
+  const handleOpenSamplePost = () => {
+    setDraftContent(DEFAULT_SAMPLE_TEXT);
+    setChannel('Instagram');
+    setAnalysisId(null);
+    setHasChecked(false);
+  };
   
   // Image upload states
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -302,7 +309,6 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
   const [inspectionReport, setInspectionReport] = useState<any | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [imageUploadError, setImageUploadError] = useState<string | null>(null);
-  const [isDragging, setIsDragging] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [submissionStatus, setSubmissionStatus] = useState<string | null>(null);
@@ -503,24 +509,6 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       processImageFile(e.target.files[0]);
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      processImageFile(e.dataTransfer.files[0]);
     }
   };
 
@@ -760,7 +748,11 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
         setOriginalDraftContent(textToAnalyze);
       }
 
-      const activeFindings = await executeAnalysis(textToAnalyze, currentAsset);
+      // Run analysis and guarantee scanning laser animation sweeps for at least 1.4s
+      const [activeFindings] = await Promise.all([
+        executeAnalysis(textToAnalyze, currentAsset),
+        new Promise((resolve) => setTimeout(resolve, 1400)),
+      ]);
       const allFound = [...activeFindings];
 
       // Append image & cross-modal findings from report
@@ -1519,12 +1511,50 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
           </div>
 
           {/* Notebook Paper with Red Margin Rule & Ruled Lines */}
-          <div className="relative min-h-[190px] px-3 sm:px-6 pb-6 pt-2 w-full">
+          <div className="relative min-h-[190px] px-3 sm:px-6 pb-6 pt-2 w-full overflow-hidden">
             {/* Left Vertical Red Margin Line */}
             <div 
               className="absolute top-0 bottom-0 pointer-events-none" 
               style={{ left: 'clamp(14px, 4.5vw, 36px)', width: '1px', backgroundColor: '#e28d8d' }} 
             />
+
+            {/* Glowing Purple Scanning Laser Effect */}
+            <AnimatePresence>
+              {isChecking && (
+                <motion.div
+                  initial={{ top: '0%', opacity: 0 }}
+                  animate={{ 
+                    top: ['0%', '75%', '15%', '85%', '0%'],
+                    opacity: [0.85, 1, 0.9, 1, 0.85],
+                  }}
+                  exit={{ opacity: 0 }}
+                  transition={{ 
+                    duration: 2.2, 
+                    repeat: Infinity, 
+                    ease: 'easeInOut' 
+                  }}
+                  className="absolute left-0 right-0 pointer-events-none z-20 flex flex-col items-center"
+                  style={{ height: '64px' }}
+                >
+                  {/* Soft violet glowing gradient band */}
+                  <div 
+                    className="w-full h-full"
+                    style={{
+                      background: 'linear-gradient(to bottom, rgba(168, 85, 247, 0) 0%, rgba(129, 140, 248, 0.28) 40%, rgba(168, 85, 247, 0.42) 60%, rgba(99, 102, 241, 0) 100%)',
+                      filter: 'blur(2px)',
+                    }}
+                  />
+                  {/* Intense central laser beam line */}
+                  <div 
+                    className="w-full h-[2.5px] absolute top-1/2 -translate-y-1/2"
+                    style={{
+                      background: 'linear-gradient(to right, transparent 3%, #c084fc 25%, #818cf8 50%, #c084fc 75%, transparent 97%)',
+                      boxShadow: '0 0 14px #818cf8, 0 0 28px #a855f7, 0 0 40px #c084fc',
+                    }}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Textarea */}
             <textarea
@@ -1535,7 +1565,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
               }}
               placeholder="Paste your draft here"
               rows={6}
-              className="w-full bg-transparent resize-y text-sm sm:text-base text-neutral-900 placeholder:text-neutral-400 leading-relaxed font-sans focus:outline-none border-0 p-0 pl-4 sm:pl-7 pr-2.5 sm:pr-4"
+              className="w-full bg-transparent resize-y text-sm sm:text-base text-neutral-900 placeholder:text-neutral-400 leading-relaxed font-sans focus:outline-none border-0 p-0 pl-4 sm:pl-7 pr-2.5 sm:pr-4 relative z-10"
               style={{
                 backgroundImage: 'repeating-linear-gradient(transparent, transparent 27px, #e3ded5 28px)',
                 lineHeight: '28px',
@@ -1606,187 +1636,110 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
 
       </div>
 
-      {/* 2. IMAGE UPLOAD & MULTIMODAL INSPECTION SECTION */}
-      <div className="rounded-2xl border border-neutral-800 bg-[#121214] p-4 sm:p-5 space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-800 pb-3">
-          <div className="flex items-center gap-2">
-            <UploadCloud className="w-4 h-4 text-indigo-400" />
-            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-white">
-              IMAGE UPLOAD & VISUAL PACKAGING INSPECTION
-            </h3>
-          </div>
-          <span className="text-[10px] font-mono text-neutral-400">
-            PNG, JPG, JPEG, WebP · Max 25 MB · Mobile Camera Supported
-          </span>
-        </div>
-
-        {/* Upload Drop Zone / Input */}
-        {!selectedFile ? (
-          <div
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            onClick={() => fileInputRef.current?.click()}
-            className={`border-2 border-dashed rounded-xl p-6 sm:p-8 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2 ${
-              isDragging 
-                ? 'border-indigo-500 bg-indigo-950/20' 
-                : 'border-neutral-800 hover:border-neutral-700 bg-neutral-900/40 hover:bg-neutral-900/70'
-            }`}
+      {/* Action Row matching reference screenshot */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3">
+        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+          {/* Open the sample post button */}
+          <button
+            type="button"
+            onClick={handleOpenSamplePost}
+            className="px-4 py-2 rounded-lg bg-[#14161c] hover:bg-[#1a1d26] border border-zinc-700/80 text-zinc-200 text-xs font-medium font-sans transition-colors cursor-pointer select-none"
           >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/png,image/jpeg,image/jpg,image/webp"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-            <div className="w-12 h-12 rounded-full bg-neutral-800/80 flex items-center justify-center text-neutral-400">
-              <ImageIcon className="w-6 h-6 text-indigo-400" />
-            </div>
-            <div className="space-y-1">
-              <p className="text-xs sm:text-sm font-sans font-medium text-neutral-200">
-                Click to browse or drag and drop an image
-              </p>
-              <p className="text-[10px] sm:text-[11px] font-mono text-neutral-400">
-                OCR extracts visible packaging claims, disclaimers, and checks for caption contradictions
-              </p>
-            </div>
+            Open the sample post
+          </button>
+
+          {/* Inline Choose File Input */}
+          <div className="flex items-center gap-2">
+            <label className="px-3.5 py-1.5 rounded-lg bg-[#1c1f28] hover:bg-[#252936] border border-zinc-700 text-zinc-300 text-xs font-sans cursor-pointer transition-colors select-none">
+              <span>Choose File</span>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/jpg,image/webp"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </label>
+            <span className="text-xs text-zinc-500 font-sans truncate max-w-[200px]">
+              {selectedFile ? selectedFile.name : 'No file chosen'}
+            </span>
+            {uploadProgress !== null && uploadProgress < 100 && (
+              <span className="text-[10px] font-mono text-indigo-400">
+                ({uploadProgress}%)
+              </span>
+            )}
+            {selectedFile && (
+              <button
+                type="button"
+                onClick={handleRemoveFile}
+                className="text-zinc-500 hover:text-rose-400 p-0.5 cursor-pointer"
+                title="Remove file"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
             {imageUploadError && (
-              <span className="text-xs text-rose-400 font-mono mt-2 flex items-center gap-1">
-                <AlertCircle className="w-3.5 h-3.5" /> {imageUploadError}
+              <span className="text-xs text-rose-400 font-mono ml-2">
+                {imageUploadError}
               </span>
             )}
           </div>
-        ) : (
-          <div className="space-y-3">
-            {/* Image Preview & Details Card */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-3 sm:p-4 rounded-xl bg-neutral-900/90 border border-neutral-800">
-              <div className="flex items-center gap-3.5">
-                {imagePreviewUrl && (
-                  <img
-                    src={imagePreviewUrl}
-                    alt="Upload Preview"
-                    className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg border border-neutral-700 shrink-0"
-                  />
-                )}
-                <div className="space-y-1">
-                  <div className="text-xs sm:text-sm font-mono font-bold text-white truncate max-w-[240px] sm:max-w-md">
-                    {selectedFile.name}
-                  </div>
-                  <div className="text-[11px] font-mono text-neutral-400 flex flex-wrap items-center gap-2">
-                    <span>{(selectedFile.size / (1024 * 1024)).toFixed(2)} MB</span>
-                    {imageDimensions && (
-                      <>
-                        <span>·</span>
-                        <span>{imageDimensions.width} × {imageDimensions.height} px</span>
-                      </>
-                    )}
-                    <span>·</span>
-                    <span className="text-emerald-400">Ready for backend inspection</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="flex items-center gap-2 self-end sm:self-center">
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-mono font-semibold transition-colors cursor-pointer"
-                >
-                  Replace
-                </button>
-                <button
-                  type="button"
-                  onClick={handleRemoveFile}
-                  className="px-3 py-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 border border-rose-800/60 text-rose-300 text-xs font-mono font-semibold transition-colors cursor-pointer flex items-center gap-1"
-                >
-                  <Trash2 className="w-3 h-3" />
-                  <span>Remove</span>
-                </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/png,image/jpeg,image/jpg,image/webp"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-              </div>
-            </div>
-
-            {/* Upload Progress Bar */}
-            {uploadProgress !== null && uploadProgress < 100 && (
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-[10px] font-mono text-neutral-400">
-                  <span>Uploading actual bytes to backend storage...</span>
-                  <span className="font-bold text-white">{uploadProgress}%</span>
-                </div>
-                <div className="h-1.5 rounded-full bg-neutral-800 overflow-hidden">
-                  <div
-                    className="h-full bg-indigo-500 transition-all duration-300"
-                    style={{ width: `${uploadProgress}%` }}
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Inspection Results Box if already processed */}
-            {inspectionReport && (
-              <div className="p-3.5 rounded-xl bg-neutral-950 border border-indigo-500/30 text-xs font-mono space-y-2">
-                <div className="flex items-center justify-between text-indigo-300 font-bold uppercase text-[10.5px]">
-                  <span>VLM & OCR EXTRACTION REPORT</span>
-                  <span className="text-neutral-400 font-normal">Method: {inspectionReport.ocr_method || 'VISION_OCR'}</span>
-                </div>
-                {inspectionReport.extracted_text_preview && (
-                  <div className="p-2.5 rounded bg-neutral-900/80 text-neutral-300 whitespace-pre-line text-[11px] leading-relaxed">
-                    {inspectionReport.extracted_text_preview}
-                  </div>
-                )}
-                {inspectionReport.packaging_claims?.length > 0 && (
-                  <div className="text-[10px] text-neutral-400 space-y-1">
-                    <span className="font-bold text-neutral-300">Verified Packaging Claims:</span>
-                    <ul className="list-disc pl-4 space-y-0.5 text-emerald-400">
-                      {inspectionReport.packaging_claims.map((c: any, i: number) => (
-                        <li key={i}>"{c.claim_text}" ({c.fact_id || 'SUPPORTED'})</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Main Run Audit Action Button */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
-        <div className="text-xs font-mono text-neutral-400">
-          {!draftContent.trim() && selectedFile
-            ? '⚡ Image-Only mode: extracts packaging text and checks claims against brand facts.'
-            : selectedFile && draftContent.trim()
-            ? '⚡ Combined mode: audits text and checks cross-modal consistency with uploaded image.'
-            : '⚡ Text-Only mode: checks claims, rules, and formatting against the brand rulebook.'}
         </div>
 
+        {/* Checking... / Check post Button */}
         <button
           type="button"
           onClick={handleRunCheck}
           disabled={isChecking || (!draftContent.trim() && !selectedFile)}
-          className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-white text-black hover:bg-neutral-200 font-mono font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-lg disabled:opacity-40 flex items-center justify-center gap-2"
+          className={`w-full sm:w-auto px-6 py-2 rounded-lg font-sans font-semibold text-xs tracking-wide transition-all shadow-sm ${
+            isChecking
+              ? 'bg-[#717684] text-zinc-950 cursor-not-allowed'
+              : 'bg-zinc-200 hover:bg-white text-zinc-950 cursor-pointer active:scale-95 disabled:opacity-40'
+          }`}
         >
-          {isChecking ? (
-            <>
-              <RefreshCw className="w-4 h-4 animate-spin text-black" />
-              <span>Running Real AI Audit...</span>
-            </>
-          ) : (
-            <>
-              <Check className="w-4 h-4 text-black stroke-[3]" />
-              <span>Check a Post</span>
-            </>
-          )}
+          {isChecking ? 'Checking...' : 'Check post'}
         </button>
       </div>
+
+      {/* Selected Image Preview & Details Card if file chosen */}
+      {selectedFile && (
+        <div className="p-3.5 rounded-xl bg-neutral-900/90 border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            {imagePreviewUrl && (
+              <img
+                src={imagePreviewUrl}
+                alt="Upload Preview"
+                className="w-14 h-14 object-cover rounded-lg border border-neutral-700 shrink-0"
+              />
+            )}
+            <div className="space-y-1">
+              <div className="text-xs font-mono font-bold text-white truncate max-w-[240px] sm:max-w-md">
+                {selectedFile.name}
+              </div>
+              <div className="text-[11px] font-mono text-neutral-400 flex flex-wrap items-center gap-2">
+                <span>{(selectedFile.size / (1024 * 1024)).toFixed(2)} MB</span>
+                {imageDimensions && (
+                  <>
+                    <span>·</span>
+                    <span>{imageDimensions.width} × {imageDimensions.height} px</span>
+                  </>
+                )}
+                <span>·</span>
+                <span className="text-emerald-400">Ready for visual inspection</span>
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleRemoveFile}
+            className="px-3 py-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 border border-rose-800/60 text-rose-300 text-xs font-mono font-semibold transition-colors cursor-pointer self-start sm:self-center flex items-center gap-1"
+          >
+            <Trash2 className="w-3 h-3" />
+            <span>Remove</span>
+          </button>
+        </div>
+      )}
 
       {submissionStatus && (
         <div className="p-3.5 rounded-xl bg-neutral-900 border border-neutral-700 text-xs font-mono text-neutral-200 flex flex-wrap items-center justify-between gap-2">
