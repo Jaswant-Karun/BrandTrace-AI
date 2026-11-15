@@ -105,3 +105,4 @@ We hereby certify that BRANDTRACE AI represents complete, working, verified soft
 - **Jaiwant Karrun S A** (Team Member — Frontend Systems & Knowledge Graph Specialist)  
 **Team Storm Crackers — KPR Institute of Engineering and Technology**  
 *November 14, 2026*
+
