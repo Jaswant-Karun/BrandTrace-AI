@@ -344,8 +344,7 @@ class DemoWorkflowService:
             v_req = VerificationRequest(
                 brand_id=self.workspace_id,
                 channel="Instagram / Meta Feed Ads",
-                raw_content=ad_content,
-                reviewer="Sarah Chen (Admin)"
+                content=ad_content
             )
             v_res = governance_pipeline.analyze_asset(v_req, bkg)
             mutations = {
@@ -503,8 +502,7 @@ class DemoWorkflowService:
         v_req = VerificationRequest(
             brand_id=self.workspace_id,
             channel="Multi-Channel Digital",
-            raw_content=text_to_test,
-            reviewer="David Sterling (Compliance Reviewer)"
+            content=text_to_test
         )
         v_res = governance_pipeline.analyze_asset(v_req, bkg)
 
