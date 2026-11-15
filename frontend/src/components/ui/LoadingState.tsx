@@ -10,10 +10,10 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
   subtext = "Querying MongoDB Atlas with tenant isolation..."
 }) => {
   return (
-    <div className="bg-[#0B0F19] border border-slate-800/80 rounded-2xl p-12 text-center flex flex-col items-center justify-center min-h-[280px] space-y-3">
-      <div className="w-10 h-10 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
-      <div className="text-sm font-bold text-white tracking-wide">{message}</div>
-      <p className="text-xs text-slate-400 max-w-sm">{subtext}</p>
+    <div className="bg-white border border-slate-200 rounded-xl p-12 text-center flex flex-col items-center justify-center min-h-[280px] space-y-3 shadow-xs">
+      <div className="w-8 h-8 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
+      <div className="text-sm font-bold text-slate-900 tracking-wide">{message}</div>
+      <p className="text-xs text-slate-500 max-w-sm">{subtext}</p>
     </div>
   );
 };
