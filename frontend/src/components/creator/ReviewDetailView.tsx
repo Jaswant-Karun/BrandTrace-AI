@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { 
   ArrowLeft, CheckCircle2, AlertTriangle, ShieldCheck, 
-  Clock, Check, X, ExternalLink, HelpCircle, FileText
+  Clock, Check, X
 } from 'lucide-react';
 
 export interface FindingDetail {
@@ -68,7 +68,7 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Normalize findings list
-  const [normalizedFindings, setNormalizedFindings] = useState<FindingDetail[]>(() => {
+  const [normalizedFindings] = useState<FindingDetail[]>(() => {
     return (post.findings || []).map((f: any, idx: number) => {
       const num = f.number || idx + 1;
       const fid = f.id || `f-${num}`;
@@ -91,7 +91,7 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
 
   // Decisions state
   const [decisions, setDecisions] = useState<
-    Record<string, { decision: 'UPHELD' | 'OVERRULED'; overrule_reason?: string; comment?: string }>
+    Record<string, { decision: 'UPHELD' | 'OVERRULED' | 'UNDECIDED'; overrule_reason?: string; comment?: string }>
   >(() => {
     const init: Record<string, any> = {};
     normalizedFindings.forEach((f) => {
@@ -193,7 +193,13 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
 
     setIsSubmitting(true);
     try {
-      await onSubmitDecision(decisionType, overallFeedback, decisions);
+      const finalDecisions: Record<string, { decision: 'UPHELD' | 'OVERRULED'; overrule_reason?: string; comment?: string }> = {};
+      Object.entries(decisions).forEach(([k, v]) => {
+        if (v.decision === 'UPHELD' || v.decision === 'OVERRULED') {
+          finalDecisions[k] = { decision: v.decision, overrule_reason: v.overrule_reason, comment: v.comment };
+        }
+      });
+      await onSubmitDecision(decisionType, overallFeedback, finalDecisions);
     } catch (e: any) {
       setErrorMessage(e.message || 'Failed to submit review decision. Please try again.');
     } finally {

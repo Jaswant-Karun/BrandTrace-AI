@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { CreatorHeader, CreatorTab, TabItem } from './CreatorHeader';
 import { CreatorCheckPost } from './CreatorCheckPost';
 import { CreatorAuditLog } from './CreatorAuditLog';
@@ -9,10 +8,7 @@ import { CreatorGuidelineHealth } from './CreatorGuidelineHealth';
 import { CreatorClaimWatch } from './CreatorClaimWatch';
 import { CreatorSubmissionsView } from './CreatorSubmissionsView';
 import { ReviewDetailView } from './ReviewDetailView';
-import {
-  CheckCircle2, ExternalLink, X,
-  ShieldCheck, Check, Clock
-} from 'lucide-react';
+import { CheckCircle2, ExternalLink, X } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 
 export type DashboardRole = 'agency' | 'reviewer' | 'compliance' | 'brand-owner';
@@ -227,9 +223,6 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
   const [activeTab, setActiveTab] = useState<CreatorTab>(roleConfig.defaultTab);
   const [queuePosts, setQueuePosts] = useState<QueueItem[]>(DEFAULT_QUEUE_POSTS);
   const [selectedPost, setSelectedPost] = useState<QueueItem | null>(null);
-  const [findingDecisions, setFindingDecisions] = useState<Record<number, 'UPHELD' | 'OVERRULED'>>({});
-  const [decisionNotes, setDecisionNotes] = useState<string>('');
-  const [isSubmittingDecision, setIsSubmittingDecision] = useState<boolean>(false);
   const [feedbackToast, setFeedbackToast] = useState<string | null>(null);
   const [revisionData, setRevisionData] = useState<{
     submissionId: string;
@@ -292,12 +285,6 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
 
   const handleOpenReview = (item: QueueItem) => {
     setSelectedPost(item);
-    const initialDecisions: Record<number, 'UPHELD' | 'OVERRULED'> = {};
-    (item.findings || []).forEach((f: any) => {
-      initialDecisions[f.number] = f.status === 'OVERRULED' ? 'OVERRULED' : 'UPHELD';
-    });
-    setFindingDecisions(initialDecisions);
-    setDecisionNotes('');
   };
 
   const handleReviewDetailSubmit = async (
@@ -334,8 +321,8 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
         decision === 'APPROVE'
           ? `Post approved and advanced to Compliance Queue by ${roleConfig.userName}.`
           : decision === 'REQUEST_CHANGES'
-            ? `Changes requested. Post returned to ${selectedPost.creatorType === 'agency' ? 'Agency Sana' : 'Creator Asha'}.`
-            : `Post marked as rejected.`
+          ? `Changes requested. Post returned to ${selectedPost.creatorType === 'agency' ? 'Agency Sana' : 'Creator Asha'}.`
+          : `Post marked as rejected.`
       );
 
       // Update local state
@@ -343,11 +330,11 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
         prev.map((p) =>
           p.id === selectedPost.id
             ? {
-              ...p,
-              status: decision === 'APPROVE' ? 'REVIEW APPROVED' : decision === 'REQUEST_CHANGES' ? 'CHANGES REQ' : 'REJECTED',
-              statusColor: decision === 'APPROVE' ? 'emerald' : decision === 'REQUEST_CHANGES' ? 'amber' : 'rose',
-              reviewerFeedback: feedback,
-            }
+                ...p,
+                status: decision === 'APPROVE' ? 'REVIEW APPROVED' : decision === 'REQUEST_CHANGES' ? 'CHANGES REQ' : 'REJECTED',
+                statusColor: decision === 'APPROVE' ? 'emerald' : decision === 'REQUEST_CHANGES' ? 'amber' : 'rose',
+                reviewerFeedback: feedback,
+              }
             : p
         )
       );
@@ -365,7 +352,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
       <CreatorHeader
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        onSignOut={onBackToLanding || (() => { })}
+        onSignOut={onBackToLanding || (() => {})}
         userName={roleConfig.userName}
         roleName={roleConfig.roleName}
         customTabs={roleConfig.tabs as TabItem[]}
@@ -373,7 +360,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
 
       {/* Main Content Area */}
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
+        
         {/* CHECK A POST tab */}
         {activeTab === 'check' && (
           <div className="space-y-6">
@@ -385,7 +372,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
               revisionData={revisionData}
               onClearRevision={() => setRevisionData(null)}
               onNavigateToSubmissions={() => setActiveTab('submissions')}
-              onSaveAuditVersion={() => { }}
+              onSaveAuditVersion={() => {}}
             />
           </div>
         )}
@@ -416,6 +403,16 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
 
         {/* REVIEW QUEUE tab (for Reviewer & Compliance) */}
         {activeTab === 'queue' && (
+          selectedPost ? (
+            <ReviewDetailView
+              post={selectedPost}
+              userName={roleConfig.userName}
+              roleName={roleConfig.roleName}
+              brandName={brandName}
+              onBack={() => setSelectedPost(null)}
+              onSubmitDecision={handleReviewDetailSubmit}
+            />
+          ) : (
           <div className="space-y-8 max-w-5xl mx-auto py-6 px-4 sm:px-6">
             <div className="space-y-2">
               <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
@@ -491,14 +488,15 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
                     {/* Middle: Content & Metadata */}
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider ${item.statusColor === 'emerald'
-                          ? 'bg-emerald-950/80 border border-emerald-500/40 text-emerald-300'
-                          : item.statusColor === 'purple'
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider ${
+                          item.statusColor === 'emerald'
+                            ? 'bg-emerald-950/80 border border-emerald-500/40 text-emerald-300'
+                            : item.statusColor === 'purple'
                             ? 'bg-purple-950/80 border border-purple-500/40 text-purple-300'
                             : item.statusColor === 'rose'
-                              ? 'bg-rose-950/80 border border-rose-500/40 text-rose-300'
-                              : 'bg-amber-950/80 border border-amber-500/40 text-amber-300'
-                          }`}>
+                            ? 'bg-rose-950/80 border border-rose-500/40 text-rose-300'
+                            : 'bg-amber-950/80 border border-amber-500/40 text-amber-300'
+                        }`}>
                           {item.status}
                         </span>
                         {item.creatorType === 'agency' ? (
@@ -536,6 +534,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
               ))}
             </div>
           </div>
+          )
         )}
 
         {/* AUDIT LOG tab with Merkle Chain visualization for Reviewer */}
@@ -595,229 +594,6 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
 
       </main>
 
-      {/* TWO-COLUMN REVIEW DETAIL MODAL (Matching Reviewer Reference Image) */}
-      <AnimatePresence>
-        {selectedPost && (
-          <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.96 }}
-              className="w-full max-w-5xl bg-neutral-950 border border-neutral-800 rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden"
-            >
-              {/* Modal Top Bar */}
-              <div className="p-6 border-b border-neutral-800 flex items-center justify-between">
-                <div>
-                  <div className="text-[10px] font-mono tracking-widest text-neutral-400 uppercase">
-                    REVIEW WORKSPACE · {selectedPost.id}
-                  </div>
-                  <h2 className="text-xl font-black text-white font-sans uppercase tracking-tight">
-                    {selectedPost.title}
-                  </h2>
-                  <div className="text-xs font-mono text-neutral-400 mt-0.5">
-                    {selectedPost.meta}
-                  </div>
-                </div>
-                <button
-                  onClick={() => setSelectedPost(null)}
-                  className="p-2 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Modal Body: 2-Column Review Layout */}
-              <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-                {/* LEFT COLUMN: Submitted Content & Timeline (5 cols) */}
-                <div className="lg:col-span-5 space-y-4">
-                  <div className="text-xs font-mono font-bold uppercase text-neutral-400 tracking-wider">
-                    SUBMITTED CONTENT
-                  </div>
-                  <div className="bg-[#121214] border border-neutral-800 rounded-2xl p-5 text-sm font-sans text-neutral-200 leading-relaxed min-h-[140px] whitespace-pre-wrap">
-                    {selectedPost.content || selectedPost.title}
-                  </div>
-
-                  {/* Governance Approval Steps */}
-                  <div className="space-y-2 pt-2">
-                    <div className="text-xs font-mono font-bold uppercase text-neutral-400 tracking-wider">
-                      APPROVAL LIFECYCLE
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-3 p-3 rounded-xl bg-neutral-900/80 border border-neutral-800 text-xs font-mono">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                        <div>
-                          <div className="text-white font-bold">
-                            1. {selectedPost.creatorType === 'agency' ? 'AGENCY PARTNER SUBMISSION' : 'CREATOR SUBMISSION'}
-                          </div>
-                          <div className="text-neutral-400 text-[10px]">
-                            Submitted by {selectedPost.creatorName || 'Creator Asha'} ({selectedPost.orgId || (selectedPost.creatorType === 'agency' ? 'ORG-AGENCY-PULSE' : 'ORG-AURELLE')})
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3 p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/40 text-xs font-mono">
-                        <Clock className="w-4 h-4 text-indigo-400 shrink-0 animate-pulse" />
-                        <div>
-                          <div className="text-indigo-200 font-bold">2. REVIEWER CHECK</div>
-                          <div className="text-neutral-400 text-[10px]">Currently under review by {roleConfig.userName}</div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3 p-3 rounded-xl bg-neutral-900/40 border border-neutral-800 text-xs font-mono opacity-50">
-                        <ShieldCheck className="w-4 h-4 text-neutral-500 shrink-0" />
-                        <div>
-                          <div className="text-neutral-300 font-bold">3. COMPLIANCE SIGN-OFF</div>
-                          <div className="text-neutral-500 text-[10px]">Awaiting final regulatory release</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* RIGHT COLUMN: Finding-by-Finding Decisions (7 cols) */}
-                <div className="lg:col-span-7 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="text-xs font-mono font-bold uppercase text-neutral-400 tracking-wider">
-                      FINDINGS ({selectedPost.findings?.length || 0})
-                    </div>
-                    <span className="text-[10px] font-mono text-neutral-500">
-                      Uphold to enforce or Overrule with rationale
-                    </span>
-                  </div>
-
-                  {(!selectedPost.findings || selectedPost.findings.length === 0) ? (
-                    <div className="p-8 rounded-2xl bg-neutral-900/40 border border-neutral-800 text-center space-y-2">
-                      <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto" />
-                      <div className="text-sm font-mono font-bold text-white">No Blocking Findings</div>
-                      <p className="text-xs text-neutral-400">This submission cleared all statutory and brand claim checks.</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1">
-                      {selectedPost.findings.map((f: any) => {
-                        const isOverruled = findingDecisions[f.number] === 'OVERRULED';
-                        return (
-                          <div
-                            key={f.number}
-                            className={`p-4 rounded-2xl border transition-all ${isOverruled
-                              ? 'bg-neutral-900/30 border-neutral-800 opacity-60'
-                              : 'bg-[#18181b] border-rose-900/60 shadow-lg'
-                              }`}
-                          >
-                            <div className="flex items-center justify-between gap-2">
-                              <div className="flex items-center gap-2">
-                                <span className="w-5 h-5 rounded-full bg-neutral-900 border border-neutral-700 text-white font-mono font-bold text-[10px] flex items-center justify-center shrink-0">
-                                  #{f.number}
-                                </span>
-                                <span className="px-2 py-0.5 rounded text-[9.5px] font-mono font-bold bg-rose-600 text-white uppercase">
-                                  {f.severity || 'BLOCKING'}
-                                </span>
-                                <span className="text-xs font-mono font-bold text-white">
-                                  {f.title}
-                                </span>
-                              </div>
-                              <span className="text-[10px] font-mono text-neutral-400 bg-neutral-900 px-2 py-0.5 rounded border border-neutral-800">
-                                {f.ruleCitation}
-                              </span>
-                            </div>
-
-                            <div className="mt-2 text-xs font-mono p-2.5 rounded-lg bg-neutral-900 text-neutral-300">
-                              <span className="text-rose-400 line-through mr-2">"{f.rejectedText}"</span>
-                              <span className="text-emerald-400">→ "{f.approvedText}"</span>
-                            </div>
-
-                            <p className="text-xs text-neutral-400 font-sans mt-2">
-                              {f.recommendation}
-                            </p>
-
-                            <div className="mt-3 pt-2.5 border-t border-neutral-800 flex items-center justify-between gap-2">
-                              <span className="text-[10px] font-mono text-neutral-500">
-                                Decision: <strong className={isOverruled ? 'text-amber-400' : 'text-rose-400'}>{isOverruled ? 'OVERRULED' : 'UPHELD'}</strong>
-                              </span>
-                              <div className="flex items-center gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() => handleToggleFindingDecision(f.number, 'UPHELD')}
-                                  className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold uppercase cursor-pointer border ${!isOverruled
-                                    ? 'bg-rose-600 border-rose-500 text-white'
-                                    : 'bg-neutral-900 border-neutral-700 text-neutral-400 hover:text-white'
-                                    }`}
-                                >
-                                  Uphold
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleToggleFindingDecision(f.number, 'OVERRULED')}
-                                  className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold uppercase cursor-pointer border ${isOverruled
-                                    ? 'bg-amber-600 border-amber-500 text-white'
-                                    : 'bg-neutral-900 border-neutral-700 text-neutral-400 hover:text-white'
-                                    }`}
-                                >
-                                  Overrule
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  {/* Reviewer Note Input */}
-                  <div className="space-y-1.5 pt-2">
-                    <label className="text-[11px] font-mono text-neutral-400 uppercase">
-                      Reviewer Feedback / Compliance Rationale
-                    </label>
-                    <textarea
-                      value={decisionNotes}
-                      onChange={(e) => setDecisionNotes(e.target.value)}
-                      placeholder="Add compliance notes or instructions for the creator..."
-                      rows={2}
-                      className="w-full p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-xs font-sans text-white focus:outline-none focus:border-indigo-500"
-                    />
-                  </div>
-
-                </div>
-
-              </div>
-
-              {/* Modal Bottom Actions */}
-              <div className="p-6 border-t border-neutral-800 bg-neutral-950/80 flex flex-wrap items-center justify-between gap-3">
-                <button
-                  onClick={() => setSelectedPost(null)}
-                  className="px-4 py-2 rounded-xl border border-neutral-800 text-neutral-400 hover:text-white text-xs font-mono font-bold uppercase cursor-pointer"
-                >
-                  Close
-                </button>
-
-                <div className="flex items-center gap-2.5">
-                  <button
-                    disabled={isSubmittingDecision}
-                    onClick={() => handleRecordReviewDecision('REQUEST_CHANGES')}
-                    className="px-4 py-2 rounded-xl bg-neutral-900 border border-amber-600/60 hover:bg-neutral-800 text-amber-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer"
-                  >
-                    Request Changes
-                  </button>
-                  <button
-                    disabled={isSubmittingDecision}
-                    onClick={() => handleRecordReviewDecision('REJECT')}
-                    className="px-4 py-2 rounded-xl bg-rose-950/60 border border-rose-600/60 hover:bg-rose-900 text-rose-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer"
-                  >
-                    Reject
-                  </button>
-                  <button
-                    disabled={isSubmittingDecision}
-                    onClick={() => handleRecordReviewDecision('APPROVE')}
-                    className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold uppercase shadow-md transition-colors cursor-pointer flex items-center gap-1.5"
-                  >
-                    <Check className="w-3.5 h-3.5" />
-                    <span>Approve Submission</span>
-                  </button>
-                </div>
-              </div>
-
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
 
       {/* Footer */}
       <footer className="border-t border-neutral-900 py-6 px-4 text-center text-xs font-mono text-neutral-400 flex flex-col sm:flex-row items-center justify-between max-w-7xl mx-auto w-full gap-2">
