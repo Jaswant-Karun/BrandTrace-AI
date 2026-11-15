@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BookOpen, Search, Plus, ExternalLink, Edit2, Flame, Calendar, Tag, ShieldCheck } from 'lucide-react';
+import { BookOpen, Search, Plus, ExternalLink, Edit2, Flame, Calendar, Tag } from 'lucide-react';
 import { apiClient } from '../services/apiClient';
 import { PageHeader } from './ui/PageHeader';
 import { WorkflowBanner } from './ui/WorkflowBanner';
@@ -228,15 +228,6 @@ export const BrandKnowledgeBaseView: React.FC<BrandKnowledgeBaseViewProps> = ({ 
   const allNodes = graphData?.nodes || [];
 
   const filteredNodes = allNodes.filter((n: any) => {
-    const nodeType = n.data?.nodeType;
-    const matchesTab = activeTab === 'ALL' || nodeType === activeTab;
-    const matchesSearch =
-      search.trim() === '' ||
-      (n.data?.label || '').toLowerCase().includes(search.toLowerCase()) ||
-      (n.data?.id || '').toLowerCase().includes(search.toLowerCase()) ||
-      (n.data?.description || '').toLowerCase().includes(search.toLowerCase());
-    return matchesTab && matchesSearch;
-  });
     const nodeType = n.data?.nodeType;
     const matchesTab = activeTab === 'ALL' || nodeType === activeTab;
     const matchesSearch =
