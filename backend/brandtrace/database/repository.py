@@ -51,6 +51,20 @@ class BrandTraceRepository:
         }
 
     # ==============================================================================
+    # 0. IMMUTABLE ID UPSERT HELPER (DEF-02 REMEDIATION)
+    # ==============================================================================
+    @staticmethod
+    def _split_doc_for_upsert(doc: Dict[str, Any]) -> tuple[Dict[str, Any], Dict[str, Any]]:
+        """
+        Separates mutable payload from immutable _id to prevent MongoDB WriteError:
+        'Performing an update on the path _id would modify the immutable field _id'.
+        _id is only assigned on insert ($setOnInsert), preserving existing document identity.
+        """
+        update_set = {k: v for k, v in doc.items() if k != "_id"}
+        set_on_insert = {"_id": doc["_id"]} if "_id" in doc and doc["_id"] else {"_id": str(ObjectId())}
+        return update_set, set_on_insert
+
+    # ==============================================================================
     # 1. ORGANISATIONS & TENANT ISOLATION
     # ==============================================================================
     async def create_organisation(self, org: OrganisationDoc) -> Dict[str, Any]:
@@ -59,9 +73,10 @@ class BrandTraceRepository:
             doc["_id"] = str(ObjectId())
 
         if self.mm.is_connected and self.mm.db is not None:
+            update_set, set_on_insert = self._split_doc_for_upsert(doc)
             await self.mm.db.organisations.update_one(
                 {"organisation_id": org.organisation_id},
-                {"$set": doc},
+                {"$set": update_set, "$setOnInsert": set_on_insert},
                 upsert=True
             )
         # In-memory store
@@ -85,9 +100,10 @@ class BrandTraceRepository:
             doc["_id"] = str(ObjectId())
 
         if self.mm.is_connected and self.mm.db is not None:
+            update_set, set_on_insert = self._split_doc_for_upsert(doc)
             await self.mm.db.brand_workspaces.update_one(
                 {"organisation_id": ws.organisation_id, "workspace_id": ws.workspace_id},
-                {"$set": doc},
+                {"$set": update_set, "$setOnInsert": set_on_insert},
                 upsert=True
             )
         self._memory_collections["brand_workspaces"] = [
@@ -116,9 +132,10 @@ class BrandTraceRepository:
             doc["_id"] = str(ObjectId())
 
         if self.mm.is_connected and self.mm.db is not None:
+            update_set, set_on_insert = self._split_doc_for_upsert(doc)
             await self.mm.db.users.update_one(
                 {"organisation_id": user.organisation_id, "user_id": user.user_id},
-                {"$set": doc},
+                {"$set": update_set, "$setOnInsert": set_on_insert},
                 upsert=True
             )
         self._memory_collections["users"] = [
@@ -134,9 +151,10 @@ class BrandTraceRepository:
             doc["_id"] = str(ObjectId())
 
         if self.mm.is_connected and self.mm.db is not None:
+            update_set, set_on_insert = self._split_doc_for_upsert(doc)
             await self.mm.db.workspace_memberships.update_one(
                 {"organisation_id": mem.organisation_id, "workspace_id": mem.workspace_id, "user_id": mem.user_id},
-                {"$set": doc},
+                {"$set": update_set, "$setOnInsert": set_on_insert},
                 upsert=True
             )
         self._memory_collections["workspace_memberships"] = [
