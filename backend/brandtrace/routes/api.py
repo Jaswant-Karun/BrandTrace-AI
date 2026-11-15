@@ -56,6 +56,20 @@ class TaskResolutionRequest(BaseModel):
     final_content: Optional[str] = None
     resolution_notes: Optional[str] = None
 
+class MultimodalInspectionRequest(BaseModel):
+    brand_id: str
+    asset_title: str
+    channel: str
+    primary_color_hex: str = "#0F172A"
+    accent_color_hex: str = "#06B6D4"
+    background_color_hex: str = "#020617"
+    text_color_hex: str = "#F8FAFC"
+    logo_padding_px: int = 24
+    min_logo_clearance_px: int = 20
+    disclaimer_font_size_pt: float = 9.0
+    aspect_ratio: str = "16:9"
+    has_trademark_symbol_in_lockup: bool = True
+
 # 1. System & DB Status
 @router.get("/db/status")
 async def get_database_status():
