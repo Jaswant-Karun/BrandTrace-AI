@@ -1,6 +1,6 @@
 from typing import Dict
 from brandtrace.graph.schema import (
-    BrandGraphData, Node, Edge, NodeType, EdgeType
+    BrandGraphData, Node, Edge, NodeType, EdgeType, ApprovedFact
 )
 
 APEX_DYNAMICS_DATA = BrandGraphData(
@@ -39,6 +39,34 @@ APEX_DYNAMICS_DATA = BrandGraphData(
             description="Empirical cradle-to-grave lifecycle emissions disclosure without deceptive carbon offsets.",
             properties={"weight": 0.95, "category": "ESG"}
         ),
+        # Approved Facts (Product Prices, Specifications, Official Disclaimers)
+        Node(
+            id="FACT-PRC-01",
+            label="QuantumConnect Fleet Subscription Price",
+            type=NodeType.APPROVED_FACT,
+            description="Official entry price point for connected vehicle telematics and remote diagnostics subscription.",
+            properties={
+                "category": "PRICE",
+                "current_value": "₹499",
+                "unit": "per vehicle / month",
+                "department_owner": "Pricing & Commercial Operations",
+                "verification_source": "Apex Executive Pricing Committee Resolution #2026-Q1-PRC",
+                "status": "APPROVED_ACTIVE"
+            }
+        ),
+        Node(
+            id="FACT-SPEC-01",
+            label="Apex Supercharger Peak Output",
+            type=NodeType.APPROVED_FACT,
+            description="Maximum DC fast charging output across proprietary charging network.",
+            properties={
+                "category": "SPECIFICATION",
+                "current_value": "350kW",
+                "unit": "kW DC",
+                "department_owner": "Powertrain Engineering",
+                "verification_source": "Apex Charging Infrastructure Specification v4.2"
+            }
+        ),
         # Tone Attributes
         Node(
             id="TONE-01",
@@ -66,22 +94,15 @@ APEX_DYNAMICS_DATA = BrandGraphData(
             id="TM-01",
             label="QuantumCell™",
             type=NodeType.TRADEMARK,
-            description="Registered trademark for proprietary cell chemistry. Must retain exact capitalization and ™ mark on first mention.",
-            properties={"exact_mark": "QuantumCell™", "registered_territories": ["US", "EU", "JP", "UK"]}
+            description="Registered trademark for proprietary cell chemistry. Must retain exact capitalization and ™ mark.",
+            properties={"exact_mark": "QuantumCell™", "registered_territories": ["US", "EU", "JP", "UK", "IN"]}
         ),
         Node(
             id="TM-02",
             label="HyperDrive OS®",
             type=NodeType.TRADEMARK,
-            description="Registered mark for vehicle central compute platform. Must never be abbreviated as 'HDOS'.",
-            properties={"exact_mark": "HyperDrive OS®", "registered_territories": ["US", "EU"]}
-        ),
-        Node(
-            id="TM-03",
-            label="AeroGlide™",
-            type=NodeType.TRADEMARK,
-            description="Active aero suspension control algorithm mark.",
-            properties={"exact_mark": "AeroGlide™"}
+            description="Registered mark for vehicle central compute platform.",
+            properties={"exact_mark": "HyperDrive OS®"}
         ),
         # Approved Claims
         Node(
@@ -92,8 +113,7 @@ APEX_DYNAMICS_DATA = BrandGraphData(
             properties={
                 "citation": "EPA Test Cycle J1634_202409, Certificate #EV-APX-982",
                 "verified_date": "2025-10-14",
-                "verification_status": "VALID",
-                "qualifier_required": "EPA-estimated or WLTP combined cycle depending on jurisdiction"
+                "verification_status": "VALID"
             }
         ),
         Node(
@@ -107,202 +127,147 @@ APEX_DYNAMICS_DATA = BrandGraphData(
                 "verification_status": "VALID"
             }
         ),
-        Node(
-            id="AC-03",
-            label="0.208 Drag Coefficient (Cd)",
-            type=NodeType.APPROVED_CLAIM,
-            description="0.208 Drag Coefficient independently verified in wind tunnel aerodynamic validation.",
-            properties={
-                "citation": "Stuttgart Aero Lab Report #STG-2025-04",
-                "verified_date": "2025-08-19",
-                "verification_status": "VALID"
-            }
-        ),
-        Node(
-            id="AC-04",
-            label="85% post-consumer recycled aluminum chassis",
-            type=NodeType.APPROVED_CLAIM,
-            description="Structural chassis engineered using 85% certified recycled aluminum alloy.",
-            properties={
-                "citation": "TÜV Rheinland ISO 14021 Verification Report #TR-2025-AL85",
-                "verified_date": "2025-09-30",
-                "verification_status": "VALID"
-            }
-        ),
         # Prohibited Claims
         Node(
             id="PC-01",
             label="Zero-Carbon / 100% Eco-Friendly without qualification",
             type=NodeType.PROHIBITED_CLAIM,
-            description="Blanket claims of 'Zero-Carbon' or '100% Eco-Friendly' violate FTC Green Guides §260.4 and EU Green Claims Directive COM/2023/166 unless electricity grid lifecycle and production impact are disclosed.",
+            description="Blanket claims of 'Zero-Carbon' or '100% Eco-Friendly' violate FTC Green Guides §260.4 and EU Green Claims Directive COM/2023/166.",
             properties={
                 "severity": "CRITICAL",
                 "governing_policy": "FTC Green Guides §260.4 / EU Directive 2024/825",
-                "forbidden_phrases": ["100% eco-friendly", "zero carbon footprint", "completely green", "zero emissions vehicle (without tailpipe qualifier)"]
+                "forbidden_phrases": ["100% eco-friendly", "zero carbon footprint", "completely green"]
             }
         ),
         Node(
             id="PC-02",
             label="Full Autonomous / Self-Driving without driver attention",
             type=NodeType.PROHIBITED_CLAIM,
-            description="Claiming hands-free autonomous operation without requiring continuous driver vigilance triggers immediate NHTSA and California DMV regulatory sanctions.",
-            properties={
-                "severity": "CRITICAL",
-                "governing_policy": "NHTSA Standing General Order 2021-01 / SAE J3016",
-                "forbidden_phrases": ["fully autonomous", "self-driving without supervision", "relax while the car drives for you", "hands-off autopilot"]
-            }
-        ),
-        Node(
-            id="PC-03",
-            label="The World's Fastest EV (Unqualified Superlative)",
-            type=NodeType.PROHIBITED_CLAIM,
-            description="Unsubstantiated absolute speed or acceleration superlatives without certified Guinness or FIA timing results create acute Lanham Act false advertising liability.",
-            properties={
-                "severity": "HIGH",
-                "governing_policy": "Lanham Act §43(a) / ASA UK CAP Code Rule 3.1",
-                "forbidden_phrases": ["fastest car in existence", "world's undisputed speed king", "destroys all competitors"]
-            }
+            description="Claiming hands-free autonomous operation without requiring continuous driver vigilance triggers regulatory sanctions.",
+            properties={"severity": "CRITICAL", "governing_policy": "NHTSA Standing General Order 2021-01"}
         ),
         # Regulations
         Node(
             id="REG-01",
             label="FTC Green Guides 16 CFR §260",
             type=NodeType.REGULATION,
-            description="Federal Trade Commission standards governing environmental marketing claims, carbon offsets, and recyclability.",
-            properties={"jurisdiction": "United States (Federal)", "enforcement_agency": "FTC"}
-        ),
-        Node(
-            id="REG-02",
-            label="EU Green Claims Directive (COM/2023/166)",
-            type=NodeType.REGULATION,
-            description="European Union directive mandating independent third-party scientific substantiation for all corporate sustainability claims.",
-            properties={"jurisdiction": "European Union", "effective_date": "2026-03-01"}
-        ),
-        Node(
-            id="REG-03",
-            label="NHTSA SAE Level 2 Marketing Guardrail",
-            type=NodeType.REGULATION,
-            description="Automated driving system marketing guidance mandating clear consumer notification of human driver responsibility.",
-            properties={"jurisdiction": "United States (Federal)", "enforcement_agency": "NHTSA"}
+            description="Standards governing environmental marketing claims, carbon offsets, and recyclability.",
+            properties={"jurisdiction": "United States (Federal)"}
         ),
         # Campaigns
+        Node(
+            id="CMP-FLEET-01",
+            label="Connected Fleet 2026 Initiative",
+            type=NodeType.CAMPAIGN,
+            description="Enterprise B2B and consumer push for remote fleet intelligence subscriptions.",
+            properties={"quarter": "Q1 2026", "department": "Commercial Growth", "status": "LIVE"}
+        ),
         Node(
             id="CMP-01",
             label="Spring 2026 Fleet Launch: The Precision Era",
             type=NodeType.CAMPAIGN,
             description="Global multi-channel flagship launch of the Apex GT Aerosedan.",
-            properties={"quarter": "Q1 2026", "budget_usd": 12000000, "status": "LIVE"}
+            properties={"quarter": "Q1 2026", "department": "Brand Marketing", "status": "LIVE"}
+        ),
+        # Advertisements (Directly dependent on FACT-PRC-01)
+        Node(
+            id="AD-META-01",
+            label="Meta Carousel Ad: Fleet Connect at ₹499/mo",
+            type=NodeType.ADVERTISEMENT,
+            description="Digital sponsored carousel targeting commercial fleet operators with ₹499 entry subscription.",
+            properties={
+                "channel": "Instagram / Facebook Ads",
+                "department": "Performance Marketing",
+                "reviewer_role": "Performance Marketing Lead",
+                "status": "APPROVED",
+                "content": "Scale your EV logistics with real-time battery analytics. QuantumConnect starting at just ₹499/month per vehicle."
+            }
         ),
         Node(
-            id="CMP-02",
-            label="Global Out-of-Home (OOH) Range Awareness",
-            type=NodeType.CAMPAIGN,
-            description="High-visibility billboard and airport terminal installations highlighting 520-mile EPA range.",
-            properties={"quarter": "Q1 2026", "channels": ["Billboard", "Airport Displays"], "status": "LIVE"}
+            id="AD-GOOG-01",
+            label="Google PPC Ad: Smart Telematics from ₹499",
+            type=NodeType.ADVERTISEMENT,
+            description="Paid search ad highlighting affordable fleet telemetry starting at ₹499.",
+            properties={
+                "channel": "Google Search Ads",
+                "department": "Performance Marketing",
+                "reviewer_role": "Digital Growth Lead",
+                "status": "APPROVED",
+                "content": "Official Apex Telematics | Real-Time Fleet Diagnostics from ₹499/mo. 14-Day Free Enterprise Trial."
+            }
         ),
+        # Website (Directly dependent on FACT-PRC-01)
         Node(
-            id="CMP-03",
-            label="Apex Sustainability & Closed-Loop Circularity",
-            type=NodeType.CAMPAIGN,
-            description="PR and ESG disclosures highlighting 85% recycled aluminum chassis and battery circularity.",
-            properties={"quarter": "Q2 2026", "channels": ["Press Release", "Web", "Investor Deck"], "status": "STAGED"}
+            id="WEB-PRC-01",
+            label="Apex Pricing Matrix & Checkout Page",
+            type=NodeType.WEBSITE,
+            description="Main consumer and enterprise checkout page showing pricing tiers.",
+            properties={
+                "channel": "Official Website (apex.auto/pricing)",
+                "department": "E-Commerce & Digital Products",
+                "reviewer_role": "E-Commerce Product Director",
+                "status": "APPROVED",
+                "content": "Standard Fleet Tier: ₹499 per vehicle billed monthly. Includes full QuantumCell™ telemetry and OTA updates."
+            }
         ),
-        # Assets
+        # Document (Directly dependent on FACT-PRC-01)
+        Node(
+            id="DOC-PRO-01",
+            label="B2B Commercial Sales PDF Deck",
+            type=NodeType.DOCUMENT,
+            description="Official enterprise procurement brochure distributed to fleet buyers.",
+            properties={
+                "channel": "PDF Document / Sales Collateral",
+                "department": "Commercial B2B Sales",
+                "reviewer_role": "Sales Operations Director",
+                "status": "APPROVED",
+                "content": "Commercial Specification Document: Enterprise telematics package is fixed at ₹499/unit monthly with annual contract."
+            }
+        ),
+        # Other Assets
         Node(
             id="AST-01",
             label="Billboard: 520 Miles of Zero Compromise",
             type=NodeType.ASSET,
-            description="Headline: '520 Miles of Zero Compromise. QuantumCell™ Battery Architecture. The Apex GT.'",
+            description="Flagship OOH billboard featuring range and QuantumCell architecture.",
             properties={
-                "channel": "Print / OOH Billboard",
-                "campaign_id": "CMP-02",
+                "channel": "OOH Billboard",
+                "department": "Brand Marketing",
+                "reviewer_role": "Brand Creative Director",
                 "status": "APPROVED",
                 "content": "520 Miles of Zero Compromise. Powered by QuantumCell™ 800V Architecture. The Apex GT arrives."
-            }
-        ),
-        Node(
-            id="AST-02",
-            label="Instagram Carousel: 14-Minute Supercharge",
-            type=NodeType.ASSET,
-            description="Social copy: 'Stop for coffee. Leave with 80% charge. 10% to 80% in 14 minutes with Apex HyperDrive.'",
-            properties={
-                "channel": "Social Media (Instagram/LinkedIn)",
-                "campaign_id": "CMP-01",
-                "status": "APPROVED",
-                "content": "Stop for coffee. Leave with 80% charge. 10% to 80% in 14 minutes flat with QuantumCell™ on 350kW DC fast chargers."
-            }
-        ),
-        Node(
-            id="AST-03",
-            label="YouTube Video Ad: Hands-Free Highway Cruising",
-            type=NodeType.ASSET,
-            description="Script claiming: 'Kick back and let HyperDrive pilot your commute hands-free without looking.'",
-            properties={
-                "channel": "Digital Video (YouTube)",
-                "campaign_id": "CMP-01",
-                "status": "REJECTED_BY_GATE",
-                "content": "Kick back, relax, and let HyperDrive pilot your commute hands-free. Fully autonomous driving has finally arrived."
-            }
-        ),
-        Node(
-            id="AST-04",
-            label="PR Wire: The Completely Eco-Friendly Super-Saloon",
-            type=NodeType.ASSET,
-            description="Draft press release: 'Apex Dynamics launches 100% eco-friendly zero-emissions super-saloon.'",
-            properties={
-                "channel": "PR Newswire / Investor Wire",
-                "campaign_id": "CMP-03",
-                "status": "FLAGGED_FOR_REMEDITATION",
-                "content": "Apex Dynamics unveils the world's most completely eco-friendly vehicle with zero carbon footprint and 85% post-consumer recycled aluminum."
             }
         )
     ],
     edges=[
-        # Brand -> Pillars
-        Edge(source="BRD-APEX", target="PIL-01", type=EdgeType.DEFINES, label="core_pillar"),
-        Edge(source="BRD-APEX", target="PIL-02", type=EdgeType.DEFINES, label="core_pillar"),
-        Edge(source="BRD-APEX", target="PIL-03", type=EdgeType.DEFINES, label="core_pillar"),
+        # Brand -> Facts & Pillars
+        Edge(source="BRD-APEX", target="PIL-01", type=EdgeType.DEFINES),
+        Edge(source="BRD-APEX", target="PIL-02", type=EdgeType.DEFINES),
+        Edge(source="BRD-APEX", target="PIL-03", type=EdgeType.DEFINES),
+        Edge(source="BRD-APEX", target="FACT-PRC-01", type=EdgeType.DEFINES, label="approved_pricing"),
+        Edge(source="BRD-APEX", target="FACT-SPEC-01", type=EdgeType.DEFINES, label="approved_spec"),
+        Edge(source="BRD-APEX", target="TM-01", type=EdgeType.PROTECTS),
 
-        # Brand -> Trademarks
-        Edge(source="BRD-APEX", target="TM-01", type=EdgeType.PROTECTS, label="owns_trademark"),
-        Edge(source="BRD-APEX", target="TM-02", type=EdgeType.PROTECTS, label="owns_trademark"),
-        Edge(source="BRD-APEX", target="TM-03", type=EdgeType.PROTECTS, label="owns_trademark"),
+        # Campaigns
+        Edge(source="BRD-APEX", target="CMP-FLEET-01", type=EdgeType.GOVERNS),
+        Edge(source="BRD-APEX", target="CMP-01", type=EdgeType.GOVERNS),
 
-        # Pillars -> Tone
-        Edge(source="PIL-01", target="TONE-01", type=EdgeType.MANDATES_TONE, label="mandates_precision"),
-        Edge(source="PIL-02", target="TONE-02", type=EdgeType.MANDATES_TONE, label="mandates_sophistication"),
-        Edge(source="PIL-03", target="TONE-03", type=EdgeType.MANDATES_TONE, label="mandates_safety_truth"),
+        # Campaign -> Assets/Ads/Websites/Docs
+        Edge(source="CMP-FLEET-01", target="AD-META-01", type=EdgeType.GOVERNS),
+        Edge(source="CMP-FLEET-01", target="AD-GOOG-01", type=EdgeType.GOVERNS),
+        Edge(source="CMP-FLEET-01", target="WEB-PRC-01", type=EdgeType.GOVERNS),
+        Edge(source="CMP-FLEET-01", target="DOC-PRO-01", type=EdgeType.GOVERNS),
+        Edge(source="CMP-01", target="AST-01", type=EdgeType.GOVERNS),
 
-        # Pillars -> Claims
-        Edge(source="PIL-01", target="AC-01", type=EdgeType.SUBSTANTIATES, label="enables_range"),
-        Edge(source="PIL-01", target="AC-02", type=EdgeType.SUBSTANTIATES, label="enables_charging"),
-        Edge(source="PIL-02", target="AC-03", type=EdgeType.SUBSTANTIATES, label="enables_aero"),
-        Edge(source="PIL-03", target="AC-04", type=EdgeType.SUBSTANTIATES, label="enables_circularity"),
+        # Assets -> DEPENDS_ON_FACT (The Core BDIG Links!)
+        Edge(source="AD-META-01", target="FACT-PRC-01", type=EdgeType.DEPENDS_ON_FACT, label="cites_price_₹499"),
+        Edge(source="AD-GOOG-01", target="FACT-PRC-01", type=EdgeType.DEPENDS_ON_FACT, label="cites_price_₹499"),
+        Edge(source="WEB-PRC-01", target="FACT-PRC-01", type=EdgeType.DEPENDS_ON_FACT, label="publishes_price_₹499"),
+        Edge(source="DOC-PRO-01", target="FACT-PRC-01", type=EdgeType.DEPENDS_ON_FACT, label="commits_price_₹499"),
 
-        # Regulations -> Constraints
-        Edge(source="REG-01", target="PC-01", type=EdgeType.CONSTRAINS, label="prohibits_greenwashing"),
-        Edge(source="REG-02", target="PC-01", type=EdgeType.CONSTRAINS, label="mandates_lifecycle_proof"),
-        Edge(source="REG-03", target="PC-02", type=EdgeType.CONSTRAINS, label="prohibits_l2_deception"),
-
-        # Brand -> Campaigns
-        Edge(source="BRD-APEX", target="CMP-01", type=EdgeType.GOVERNS, label="owns_campaign"),
-        Edge(source="BRD-APEX", target="CMP-02", type=EdgeType.GOVERNS, label="owns_campaign"),
-        Edge(source="BRD-APEX", target="CMP-03", type=EdgeType.GOVERNS, label="owns_campaign"),
-
-        # Campaigns -> Assets
-        Edge(source="CMP-02", target="AST-01", type=EdgeType.GOVERNS, label="deploys_asset"),
-        Edge(source="CMP-01", target="AST-02", type=EdgeType.GOVERNS, label="deploys_asset"),
-        Edge(source="CMP-01", target="AST-03", type=EdgeType.GOVERNS, label="deploys_asset"),
-        Edge(source="CMP-03", target="AST-04", type=EdgeType.GOVERNS, label="deploys_asset"),
-
-        # Assets -> Dependencies / Claims
-        Edge(source="AST-01", target="AC-01", type=EdgeType.CONTAINS_CLAIM, label="cites_range"),
-        Edge(source="AST-01", target="TM-01", type=EdgeType.DEPENDS_ON, label="references_tm"),
-        Edge(source="AST-02", target="AC-02", type=EdgeType.CONTAINS_CLAIM, label="cites_charging"),
-        Edge(source="AST-02", target="TM-01", type=EdgeType.DEPENDS_ON, label="references_tm"),
-        Edge(source="AST-03", target="PC-02", type=EdgeType.DEPENDS_ON, label="violates_prohibited"),
-        Edge(source="AST-04", target="PC-01", type=EdgeType.DEPENDS_ON, label="violates_greenwashing"),
-        Edge(source="AST-04", target="AC-04", type=EdgeType.CONTAINS_CLAIM, label="cites_recycled_metal"),
+        # Other claim dependencies
+        Edge(source="AST-01", target="AC-01", type=EdgeType.CONTAINS_CLAIM),
+        Edge(source="AST-01", target="TM-01", type=EdgeType.DEPENDS_ON),
     ]
 )
 
@@ -320,18 +285,24 @@ NOVUS_HEALTH_DATA = BrandGraphData(
             properties={"headquarters": "Boston / Basel", "governance_tier": "Biopharma FDA Class III"}
         ),
         Node(
+            id="FACT-NH-PRC-01",
+            label="NovusCare Patient Monitoring Subscription",
+            type=NodeType.APPROVED_FACT,
+            description="Patient support program monthly co-pay assistance and digital tracking membership.",
+            properties={
+                "category": "PRICE",
+                "current_value": "₹499",
+                "unit": "per patient / month",
+                "department_owner": "Market Access & Patient Commercial",
+                "verification_source": "Novus Commercial Access Policy 2026-B"
+            }
+        ),
+        Node(
             id="PIL-NH-01",
             label="Clinical Evidence-First Rigor",
             type=NodeType.PILLAR,
-            description="Every health claim must be anchored to published, peer-reviewed, double-blind randomized clinical trial (RCT) evidence.",
+            description="Every health claim must be anchored to published, peer-reviewed clinical trial evidence.",
             properties={"weight": 1.0}
-        ),
-        Node(
-            id="TONE-NH-01",
-            label="Empathetic & Medically Precise",
-            type=NodeType.TONE_ATTRIBUTE,
-            description="Scientific, objective, reassuring, strictly non-alarmist. Zero sensationalism or unsubstantiated wellness hype.",
-            properties={"formality": "Clinical/Professional"}
         ),
         Node(
             id="TM-NH-01",
@@ -341,68 +312,92 @@ NOVUS_HEALTH_DATA = BrandGraphData(
             properties={"exact_mark": "CardioShield™"}
         ),
         Node(
-            id="AC-NH-01",
-            label="Reduces ApoB by 38% in Phase III RCT",
-            type=NodeType.APPROVED_CLAIM,
-            description="Demonstrated a 38% mean reduction in circulating ApoB lipoproteins in 4,200 patient double-blind trial.",
-            properties={
-                "citation": "NEJM 2025; 392:1402-1411 (NCT05128912)",
-                "verification_status": "VALID",
-                "indication": "Adults with primary heterozygous hypercholesterolemia"
-            }
-        ),
-        Node(
-            id="PC-NH-01",
-            label="Guaranteed Cure for Cardiovascular Disease",
-            type=NodeType.PROHIBITED_CLAIM,
-            description="Directly violates FDA 21 CFR §202.1 Fair Balance regulations. No prescription drug may claim to 'cure' chronic atherogenic disease.",
-            properties={
-                "severity": "CRITICAL",
-                "governing_policy": "FDA 21 CFR §202.1 / FTC Health Guides",
-                "forbidden_phrases": ["guaranteed cure", "reverses all heart disease", "100% side effect free", "miracle heart pill"]
-            }
-        ),
-        Node(
-            id="REG-NH-01",
-            label="FDA 21 CFR §202.1 Fair Balance",
-            type=NodeType.REGULATION,
-            description="Mandates equal prominence of safety risks and contraindications whenever therapeutic benefits are communicated.",
-            properties={"jurisdiction": "United States (FDA CDER)"}
-        ),
-        Node(
             id="CMP-NH-01",
-            label="ApoB Awareness & Patient Horizon Campaign",
+            label="Patient Access & Lipid Horizon Campaign",
             type=NodeType.CAMPAIGN,
-            description="Educational patient campaign highlighting lipid management and risk reduction.",
+            description="Direct patient education and enrollment campaign.",
             properties={"quarter": "Q1 2026", "status": "LIVE"}
         ),
         Node(
-            id="AST-NH-01",
-            label="Patient Guide: Understanding Your Lipid Horizon",
-            type=NodeType.ASSET,
-            description="Brochure detailing ApoB management and CardioShield™ clinical results.",
+            id="AD-NH-01",
+            label="Digital Patient Ad: NovusCare Enrollment at ₹499",
+            type=NodeType.ADVERTISEMENT,
+            description="Digital banner for patient monitoring enrollment at ₹499 monthly.",
             properties={
-                "channel": "Print & Web Patient Guide",
-                "campaign_id": "CMP-NH-01",
+                "channel": "Health Web Banner",
+                "department": "Patient Advocacy & Marketing",
+                "reviewer_role": "Patient Marketing Director",
                 "status": "APPROVED",
-                "content": "Ask your cardiologist about CardioShield™. In a Phase III clinical trial, CardioShield™ lowered ApoB by up to 38% alongside standard statin therapy."
+                "content": "Support your cardiovascular therapy with NovusCare™ Digital Monitoring for only ₹499/month."
+            }
+        ),
+        Node(
+            id="WEB-NH-01",
+            label="NovusCare Patient Portal Enrollment Page",
+            type=NodeType.WEBSITE,
+            description="Official enrollment page detailing ₹499 monthly subscription.",
+            properties={
+                "channel": "Patient Web Portal",
+                "department": "Digital Patient Operations",
+                "reviewer_role": "Clinical Operations Lead",
+                "status": "APPROVED",
+                "content": "NovusCare Membership: Comprehensive digital biomarker tracking for ₹499 per month."
             }
         )
     ],
     edges=[
+        Edge(source="BRD-NOVUS", target="FACT-NH-PRC-01", type=EdgeType.DEFINES),
         Edge(source="BRD-NOVUS", target="PIL-NH-01", type=EdgeType.DEFINES),
         Edge(source="BRD-NOVUS", target="TM-NH-01", type=EdgeType.PROTECTS),
-        Edge(source="PIL-NH-01", target="TONE-NH-01", type=EdgeType.MANDATES_TONE),
-        Edge(source="PIL-NH-01", target="AC-NH-01", type=EdgeType.SUBSTANTIATES),
-        Edge(source="REG-NH-01", target="PC-NH-01", type=EdgeType.CONSTRAINS),
         Edge(source="BRD-NOVUS", target="CMP-NH-01", type=EdgeType.GOVERNS),
-        Edge(source="CMP-NH-01", target="AST-NH-01", type=EdgeType.GOVERNS),
-        Edge(source="AST-NH-01", target="AC-NH-01", type=EdgeType.CONTAINS_CLAIM),
-        Edge(source="AST-NH-01", target="TM-NH-01", type=EdgeType.DEPENDS_ON),
+        Edge(source="CMP-NH-01", target="AD-NH-01", type=EdgeType.GOVERNS),
+        Edge(source="CMP-NH-01", target="WEB-NH-01", type=EdgeType.GOVERNS),
+        Edge(source="AD-NH-01", target="FACT-NH-PRC-01", type=EdgeType.DEPENDS_ON_FACT, label="cites_price_₹499"),
+        Edge(source="WEB-NH-01", target="FACT-NH-PRC-01", type=EdgeType.DEPENDS_ON_FACT, label="publishes_price_₹499"),
     ]
 )
 
 BRAND_SEEDS: Dict[str, BrandGraphData] = {
     "apex-dynamics": APEX_DYNAMICS_DATA,
     "novus-health": NOVUS_HEALTH_DATA,
+}
+
+# Approved Facts Catalog for easy query
+APPROVED_FACTS_CATALOG: Dict[str, ApprovedFact] = {
+    "FACT-PRC-01": ApprovedFact(
+        id="FACT-PRC-01",
+        brand_id="apex-dynamics",
+        name="QuantumConnect Fleet Subscription Price",
+        category="PRICE",
+        current_value="₹499",
+        unit="per vehicle / month",
+        description="Official entry price point for connected vehicle telematics subscription.",
+        source_citation="Executive Pricing Committee Resolution #2026-Q1-PRC",
+        department_owner="Pricing & Commercial Operations",
+        last_verified="2026-01-15"
+    ),
+    "FACT-SPEC-01": ApprovedFact(
+        id="FACT-SPEC-01",
+        brand_id="apex-dynamics",
+        name="Apex Supercharger Peak Output",
+        category="SPECIFICATION",
+        current_value="350kW",
+        unit="kW DC",
+        description="Maximum DC fast charging output across proprietary charging network.",
+        source_citation="Apex Charging Infrastructure Specification v4.2",
+        department_owner="Powertrain Engineering",
+        last_verified="2026-02-01"
+    ),
+    "FACT-NH-PRC-01": ApprovedFact(
+        id="FACT-NH-PRC-01",
+        brand_id="novus-health",
+        name="NovusCare Patient Monitoring Subscription",
+        category="PRICE",
+        current_value="₹499",
+        unit="per patient / month",
+        description="Patient support program monthly co-pay assistance and digital tracking membership.",
+        source_citation="Novus Commercial Access Policy 2026-B",
+        department_owner="Market Access & Patient Commercial",
+        last_verified="2026-01-20"
+    )
 }
