@@ -6,7 +6,7 @@ import {
   Network, LineChart,
   FileText, Globe, Cpu,
   Check, AlertCircle, X, Menu,
-  Hash, ArrowUpRight, Scale, Clock, Sliders
+  Hash, Scale, Clock, Sliders
 } from 'lucide-react';
 import { ThemeToggle } from './ui/ThemeToggle';
 import { PlumbBob } from './ui/PlumbBob';
@@ -1281,35 +1281,28 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           </div>
 
-          {/* Hanging Plumb Bob & Grand Statement directly matching Reference Image 5 */}
-          <div className="pt-16 pb-8 text-center space-y-6 flex flex-col items-center">
+          {/* Hanging Plumb Bob & Grand Statement directly matching Reference Image 1 */}
+          <div className="pt-20 pb-12 text-center space-y-6 flex flex-col items-center">
             
-            {/* Hanging Plumb Bob wire with purple diamond */}
+            {/* Hanging Plumb Bob wire with horizontal T-bar and purple diamond */}
             <div className="flex flex-col items-center pointer-events-none select-none">
-              <div className="w-[1.5px] h-16 bg-gradient-to-b from-purple-400/20 via-purple-400 to-purple-500" />
-              <div className="w-4 h-4 rotate-45 bg-purple-500 border border-purple-300 shadow-lg shadow-purple-500/50 mt-[-2px]" />
+              <div className="w-8 h-[2px] bg-slate-400 dark:bg-slate-500 rounded-full" />
+              <div className="w-[1.5px] h-10 bg-indigo-500" />
+              <div className="w-4 h-4 rotate-45 bg-[#6366f1] border border-indigo-300 shadow-md shadow-indigo-500/50 mt-[-2px]" />
             </div>
 
             {/* Headline */}
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight uppercase">
+            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight uppercase">
               SILENCE IS NEVER CLEARANCE.
             </h2>
 
-            {/* Check Your First Post Underlined Link / Button */}
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-6">
+            {/* Check Your First Post Underlined Link */}
+            <div className="pt-2 flex items-center justify-center">
               <button
                 onClick={() => onEnterApp('content-studio')}
                 className="text-lg sm:text-xl font-bold uppercase tracking-wider text-white underline decoration-white decoration-2 underline-offset-8 hover:text-indigo-300 hover:decoration-indigo-300 transition-colors cursor-pointer"
               >
                 CHECK YOUR FIRST POST
-              </button>
-              
-              <button
-                onClick={() => onEnterApp('command-center')}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md"
-              >
-                <span>Continue to Dashboard</span>
-                <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
 
@@ -1319,108 +1312,37 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* ------------------------------------------------------------------- */}
-      {/* SECTION 10 — FOOTER                                                 */}
+      {/* SECTION 10 — FOOTER (Minimalist Single Line Matching Reference)     */}
       {/* ------------------------------------------------------------------- */}
-      <footer id="about" className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 py-12 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <footer id="about" className="border-t border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-950 py-5 transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-x-6 gap-y-3 text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 w-full">
             
-            {/* Col 1: Identity */}
-            <div className="space-y-3 md:col-span-1">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-slate-900 dark:bg-indigo-600 flex items-center justify-center text-white">
-                  <ShieldCheck className="w-4 h-4 stroke-[2.2]" />
-                </div>
-                <span className="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white">
-                  BRANDTRACE AI
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                The Autonomous Brand Intelligence &amp; Governance Control Plane. Detect. Predict. Verify. Prevent.
-              </p>
-              <div className="pt-1 text-[11px] font-mono text-slate-400 dark:text-slate-500">
-                Team Storm Crackers • KPR Institute
-              </div>
+            <div className="flex items-center gap-4 sm:gap-6 shrink-0 whitespace-nowrap">
+              <span className="font-bold text-slate-800 dark:text-slate-200 tracking-wider">
+                EVIDENCE OR SILENCE.
+              </span>
+              <button
+                onClick={onVerify || (() => onEnterApp('public-verification'))}
+                className="hover:text-indigo-600 dark:hover:text-indigo-400 font-bold transition-colors cursor-pointer"
+              >
+                STATUS
+              </button>
+              <button
+                onClick={() => scrollToSection('how-it-works')}
+                className="hover:text-indigo-600 dark:hover:text-indigo-400 font-bold transition-colors cursor-pointer"
+              >
+                HOW I KNOW IT WORKS
+              </button>
             </div>
 
-            {/* Col 2: Platform Links */}
-            <div className="space-y-2 text-xs">
-              <span className="font-mono font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">
-                Platform
-              </span>
-              <ul className="space-y-1.5 text-slate-600 dark:text-slate-300">
-                <li><button onClick={() => onEnterApp('command-center')} className="hover:text-slate-900 dark:hover:text-white cursor-pointer">Command Center</button></li>
-                <li><button onClick={() => onEnterApp('knowledge-base')} className="hover:text-slate-900 dark:hover:text-white cursor-pointer">Brand Knowledge Base</button></li>
-                <li><button onClick={() => onEnterApp('bdig')} className="hover:text-slate-900 dark:hover:text-white cursor-pointer">Knowledge Graph (BDIG)</button></li>
-                <li><button onClick={() => onEnterApp('content-studio')} className="hover:text-slate-900 dark:hover:text-white cursor-pointer">Content Intelligence Studio</button></li>
-                <li><button onClick={() => onEnterApp('impact-simulator')} className="hover:text-slate-900 dark:hover:text-white cursor-pointer">Digital Twin Simulator</button></li>
-                <li><button onClick={() => onEnterApp('approvals')} className="hover:text-slate-900 dark:hover:text-white cursor-pointer">Approval Center</button></li>
-              </ul>
-            </div>
-
-            {/* Col 3: Governance & Verification */}
-            <div className="space-y-2 text-xs">
-              <span className="font-mono font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">
-                Verification
-              </span>
-              <ul className="space-y-1.5 text-slate-600 dark:text-slate-300">
-                <li><button onClick={onVerify || (() => onEnterApp('public-verification'))} className="hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold cursor-pointer">Public Verification Portal</button></li>
-                <li><button onClick={() => onEnterApp('audit-trust')} className="hover:text-slate-900 dark:hover:text-white cursor-pointer">Trust &amp; Audit Ledger</button></li>
-                <li><button onClick={() => onEnterApp('risks')} className="hover:text-slate-900 dark:hover:text-white cursor-pointer">Risk Intelligence</button></li>
-                <li><button onClick={() => onEnterApp('campaigns')} className="hover:text-slate-900 dark:hover:text-white cursor-pointer">Campaign Intelligence</button></li>
-              </ul>
-            </div>
-
-            {/* Col 4: Repository & Source */}
-            <div className="space-y-2 text-xs">
-              <span className="font-mono font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">
-                Open Source &amp; Submission
-              </span>
-              <ul className="space-y-1.5 text-slate-600 dark:text-slate-300">
-                <li>
-                  <a 
-                    href="https://github.com/Jaswant-Karun/BrandTrace-AI" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="hover:text-slate-900 dark:hover:text-white flex items-center gap-1 text-indigo-600 dark:text-indigo-400 font-semibold"
-                  >
-                    <span>GitHub Repository</span>
-                    <ArrowUpRight className="w-3 h-3" />
-                  </a>
-                </li>
-                <li>
-                  <a 
-                    href="https://brandtrace-backend.onrender.com/health" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="hover:text-slate-900 dark:hover:text-white flex items-center gap-1"
-                  >
-                    <span>Live Health Endpoint</span>
-                    <ArrowUpRight className="w-3 h-3" />
-                  </a>
-                </li>
-                <li>
-                  <a 
-                    href="https://brandtrace-backend.onrender.com/docs" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="hover:text-slate-900 dark:hover:text-white flex items-center gap-1"
-                  >
-                    <span>API Swagger Docs</span>
-                    <ArrowUpRight className="w-3 h-3" />
-                  </a>
-                </li>
-              </ul>
+            <div className="flex items-center gap-3 sm:gap-4 shrink-0 text-center md:text-right text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-500 whitespace-nowrap">
+              <span>AURELLE SKIN IS A FICTIONAL BRAND; NO REAL DATA IS USED.</span>
+              <span className="opacity-40">•</span>
+              <span>DEMO RUNS ON FREE MODEL TIERS WITH FICTIONAL DATA ONLY.</span>
             </div>
 
           </div>
-
-          <div className="pt-8 border-t border-slate-100 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 dark:text-slate-500 gap-4">
-            <p>&copy; {new Date().getFullYear()} BrandTrace AI. All rights reserved.</p>
-            <p className="font-mono text-[11px]">Strict Multi-Tenant Architecture • SHA-256 Ledger Provenance</p>
-          </div>
-
         </div>
       </footer>
 
