@@ -129,6 +129,13 @@ class AuthService:
         clean_email = email.lower().strip()
         user_record = PRESET_USERS.get(clean_email)
         if not user_record:
+            from brandtrace.database.mongo import mongo_manager
+            if mongo_manager.repo and "users" in mongo_manager.repo._memory_collections:
+                found_user = next((u for u in mongo_manager.repo._memory_collections["users"] if u.get("email") == clean_email), None)
+                if found_user and found_user.get("password_hash"):
+                    user_record = found_user
+
+        if not user_record:
             # Mock persona strictly forbidden in production mode; only allowed if explicitly opted in during development/testing
             if allow_mock_fallback and settings.environment != "production":
                 return UserProfile(
@@ -228,7 +235,8 @@ class AuthService:
                     workspace_id=workspace_id,
                     email=clean_email,
                     name=req.name.strip(),
-                    role=role.value
+                    role=role.value,
+                    password_hash=pwd_hash
                 )
                 await mongo_manager.repo.create_user(u_doc)
                 m_doc = WorkspaceMembershipDoc(

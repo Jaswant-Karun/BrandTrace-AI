@@ -2,9 +2,17 @@ import os
 from pydantic import BaseModel
 from typing import Optional
 
+def _detect_environment() -> str:
+    env = os.getenv("ENVIRONMENT", "").strip().lower()
+    if env:
+        return env
+    if os.getenv("RENDER") or os.getenv("VERCEL") or os.getenv("NODE_ENV", "").lower() == "production":
+        return "production"
+    return "development"
+
 class Settings(BaseModel):
     app_name: str = "BRANDTRACE AI"
-    environment: str = os.getenv("ENVIRONMENT", "development")
+    environment: str = _detect_environment()
     port: int = int(os.getenv("PORT", "8000"))
     host: str = os.getenv("HOST", "0.0.0.0")
     debug: bool = os.getenv("DEBUG", "true").lower() == "true"

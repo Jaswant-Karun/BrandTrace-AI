@@ -485,7 +485,18 @@ class DemoWorkflowService:
         bkg.update_node_property("FACT-AUR-PRC-01", "current_value", "₹499")
         BRAND_SEEDS["aurelle-tech"] = bkg.to_graph_data()
         dependency_engine.revision_tasks = {k: v for k, v in dependency_engine.revision_tasks.items() if v.brand_id != self.workspace_id}
-        audit_ledger_engine.records = {}
+        audit_ledger_engine.records = {
+            k: v for k, v in audit_ledger_engine.records.items()
+            if getattr(v, "brand_id", None) != self.workspace_id and getattr(v, "workspace_id", None) != self.workspace_id
+        }
+        from brandtrace.database.mongo import mongo_manager
+        if mongo_manager.is_connected and mongo_manager.db is not None:
+            try:
+                await mongo_manager.db.revision_tasks.delete_many({"brand_id": self.workspace_id})
+                await mongo_manager.db.release_ledger.delete_many({"brand_id": self.workspace_id})
+                await mongo_manager.db.change_simulations.delete_many({"brand_id": self.workspace_id})
+            except Exception:
+                pass
         return await self.get_scenario_status()
 
     def get_cases(self) -> List[DemoCase]:

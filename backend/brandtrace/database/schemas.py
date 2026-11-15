@@ -29,6 +29,7 @@ class UserDoc(BaseMongoRecord):
     role: str = "REVIEWER"
     department: str = "Governance"
     is_active: bool = True
+    password_hash: Optional[str] = None
 
 # 2. organisations
 class OrganisationDoc(BaseMongoRecord):
