@@ -10,6 +10,7 @@ import { PageHeader } from './ui/PageHeader';
 import { WorkflowBanner } from './ui/WorkflowBanner';
 import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
+import { JudgeJourneyPanel } from './JudgeJourneyPanel';
 
 interface CommandCenterProps {
   brandId: string;
@@ -138,6 +139,13 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           </Button>
         )}
       </PageHeader>
+
+      {/* Dedicated Guided Judge Evaluation Journey (8 Steps & Safe Reset) */}
+      <JudgeJourneyPanel
+        brandId={brandId}
+        onNavigate={onNavigate}
+        onRefreshData={loadDashboardData}
+      />
 
       {/* 1. Governance Posture & Quantitative Telemetry Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
