@@ -70,13 +70,19 @@ def test_commitment1_propose_price_mutation_aurelle_blast_radius():
     assert any("ad" in n or "pricing" in n or "rate card" in n or "checkout" in n for n in touchpoint_names)
     assert any("ad" in t or "doc" in t or "web" in t for t in touchpoint_types)
 
-    # 3. Financial Liability Exposure: $320,000 in unbudgeted reprint/ad expenditure
-    assert report["total_estimated_exposure_usd"] == 320000.0 or report["total_estimated_exposure_usd"] >= 250000.0
+    # 3. Before-and-After Risk & Compliance Impact
+    assert "before_after_summary" in report
+    b_after = report["before_after_summary"]
+    assert b_after["baseline_compliance_score"] >= 90.0
+    assert b_after["simulated_score_if_unaddressed"] < 50.0, "Unaddressed score must plunge due to price mismatch"
+    assert b_after["simulated_score_if_remediated"] >= 95.0
+    assert report["overall_risk_score"] >= 50.0
 
-    # 4. Workload Estimate
+    # 4. Workload Estimate & Human Decisions Required
     workload = report["workload_estimate"]
     assert workload["estimated_review_hours"] > 0.0
     assert workload["required_human_decisions_count"] >= 4
+    assert "Performance Marketing" in workload["affected_departments"]
 
     # 5. Simulated findings are demarcated as preview only
     for tp in report["affected_touchpoints"]:
