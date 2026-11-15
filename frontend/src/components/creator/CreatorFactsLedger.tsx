@@ -287,12 +287,12 @@ export const CreatorFactsLedger: React.FC<CreatorFactsLedgerProps> = ({
                       <div className="absolute right-0 top-0 bottom-0 w-2.5 bg-white/25 rounded-r pointer-events-none blur-[0.5px]" />
 
                       <motion.span
-                        initial={{ opacity: 0, x: -4 }}
+                        initial={shouldReduceMotion ? false : { opacity: 0, x: -4 }}
                         whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: false, amount: 0.15 }}
+                        viewport={{ once: true, amount: 0.15 }}
                         transition={{
                           duration: 0.35,
-                          delay: idx * 0.075 + 0.32
+                          delay: shouldReduceMotion ? 0 : idx * 0.075 + 0.32
                         }}
                         className="text-[9px] truncate select-none font-mono tracking-tight"
                       >
@@ -370,10 +370,11 @@ export const CreatorFactsLedger: React.FC<CreatorFactsLedgerProps> = ({
                 <AnimatePresence>
                   {isExpanded && (
                     <motion.div
-                      initial={{ opacity: 0, height: 0 }}
+                      initial={shouldReduceMotion ? false : { opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="pt-2 border-t border-neutral-800/80 space-y-2 text-xs font-mono"
+                      exit={shouldReduceMotion ? undefined : { opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="pt-2 border-t border-neutral-800/80 space-y-2 text-xs font-mono overflow-hidden"
                     >
                       <div className="p-2.5 rounded-xl bg-neutral-900/90 border border-neutral-800 text-[11px] space-y-1">
                         <div className="text-neutral-400 text-[10px] uppercase font-semibold flex items-center gap-1 text-emerald-400">

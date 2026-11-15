@@ -845,7 +845,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.2 }}
-                className="px-4 sm:px-6 pb-5 pt-1 border-t border-neutral-800/60"
+                className="px-4 sm:px-6 pb-5 pt-1 border-t border-neutral-800/60 overflow-hidden"
               >
                 {/* Vertical Layout for Optional Fields on Mobile */}
                 <div className="flex flex-col gap-3.5">
@@ -1248,10 +1248,10 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
                     <div
                       key={f.id}
                       id={`finding-card-${f.id}`}
-                      className={`rounded-2xl border p-4.5 transition-all ${
+                      className={`rounded-2xl border p-4.5 transition-all duration-200 ${
                         f.accepted
                           ? 'bg-neutral-950/40 border-neutral-800 opacity-50'
-                          : `bg-[#18181b] ${sevBorder} shadow-xl text-neutral-100 ${isSelected ? 'ring-2 ring-white/80' : ''}`
+                          : `bg-[#18181b] ${sevBorder} shadow-xl text-neutral-100 hover:border-blue-500/50 ${isSelected ? 'ring-2 ring-blue-500 border-blue-500 bg-[#1c1c22]' : ''}`
                       }`}
                     >
                       <div className="space-y-3">

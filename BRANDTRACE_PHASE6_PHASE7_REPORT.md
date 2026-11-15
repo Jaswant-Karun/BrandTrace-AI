@@ -11,7 +11,7 @@ All implementations strictly satisfy the **Master Implementation Rules**:
 - **Design System Fidelity**: Preserved the professional dark enterprise aesthetic, typography (`Inter`, `JetBrains Mono`), and color palette (`#0e0e11`, `#121215`, `#2563EB`, `#ff6358`, `#10b981`).
 - **No Mock or Fake Data**: All 5 roles interact with real backend schemas, FastAPI endpoints, and MongoDB collections.
 - **Rule 12 Adherence**: No automatic git commits, pushes, or deployments were performed without user instruction.
-- **Zero Regressions**: 100% of the 222 pytest backend test suite passes in 18.87s, and the frontend builds cleanly with 0 TypeScript/Vite errors in 32.27s.
+- **Zero Regressions**: 100% of the 222 pytest backend test suite passes in 17.22s, and the frontend builds cleanly with 0 TypeScript/Vite errors in 15.69s.
 
 ---
 
@@ -50,7 +50,7 @@ flowchart TD
 ### Role 1: Creator Workspace
 - **Post Check Form**: Lined-paper document editor with responsive margin rules.
 - **Mobile Actions**: Prominent 46px high "CHECK POST" action button with spinner state.
-- **Optional Accordion**: Collapsible with clear chevron indicator; preserves vertical screen real estate.
+- **Optional Accordion**: Collapsible with clear chevron indicator and `overflow-hidden` transition; preserves vertical screen real estate.
 - **Submissions View**: Mobile card layout displaying status badge, version pill, and feedback drawer.
 
 ### Role 2: Agency Partner Workspace
@@ -59,7 +59,7 @@ flowchart TD
 - **Review Queue Routing**: Agency can check drafts and forward approved content directly to client reviewer queue.
 
 ### Role 3: Reviewer Workspace
-- **Queue Overview**: 4 responsive KPI cards (`Waiting`, `Blocking`, `Need Compliance`, `Approved`).
+- **Queue Overview**: 4 responsive KPI cards (`Waiting`, `Blocking`, `Need Compliance`, `Approved`) with subtle hover elevation.
 - **Interactive Review Interface**:
   - Highlights in-text violations with color-coded severity tags (`[#1]`, `[#2]`).
   - Mobile touch selection: Tapping an in-text highlight automatically scrolls to and focuses the matching finding card.
@@ -83,15 +83,17 @@ flowchart TD
 BrandTrace AI strictly adheres to enterprise-grade motion principles: **subtle, explainable, and performance-first**.
 
 1. **Accessibility & Reduced Motion**:
-   - Integrated Framer Motion's `useReducedMotion()` hook.
-   - When a user has `prefers-reduced-motion: reduce` configured in their OS or browser, all positional transforms (`y: 20` $\rightarrow$ `0`) are disabled, ensuring instant opacity visibility without delay or disorientation.
+   - Integrated Framer Motion's `useReducedMotion()` hook across all animated modules (`LandingPage`, `RoleDashboardStage`, `ReviewDetailView`, `CreatorFactsLedger`, `CreatorRulebook`, `CreatorSubmissionsView`).
+   - When a user has `prefers-reduced-motion: reduce` configured in their OS or browser, all positional transforms (`y: 20` $\rightarrow$ `0`, `scale`) are disabled, ensuring instant opacity visibility without delay or disorientation.
 
 2. **Scroll-Triggered Reveals**:
    - **Hero Editorial Cards**: Staggered upward fade-in with progressive delays (`0.1s`, `0.2s`, `0.3s`) and `viewport={{ once: true, amount: 0.15 }}`.
    - **Bento Grid (How It Works)**: 6 sequential steps animate progressively (`delay: i * 0.08s`), guiding the user's eye naturally through the 6-stage governance pipeline.
    - **Security Cards**: Staggered reveal across all 6 enterprise architecture cards (`delay: index * 0.08s`).
+   - **Role Persona Cards (Section 9)**: Staggered reveal across all 5 role cards (`delay: 0.05s` to `0.33s`), `viewport={{ once: true, amount: 0.15 }}`.
 
 3. **Micro-Interactions**:
+   - **Workspace Switching**: Smooth tab-switching transitions in `RoleDashboardStage` wrapped in `<AnimatePresence mode="wait"><motion.div key={activeTab}>`.
    - **Active State Highlights**: Hovering or focusing security cards triggers an electric blue highlight border (`#2563EB`) with subtle elevation (`-translate-y-1`) and active status badge.
    - **Tactile Feedback**: Interactive buttons feature `active:scale-[0.98]` feedback for immediate touch confirmation on mobile devices.
    - **Laser AI Scanning Line**: Continuous smooth multimodal scan sweep across editorial visual cards with glowing gradient tails (`duration: 4.0s`, `ease: easeInOut`).
@@ -105,11 +107,11 @@ BrandTrace AI strictly adheres to enterprise-grade motion principles: **subtle, 
 ```
 ✓ 2546 modules transformed.
 dist/index.html                                   2.56 kB │ gzip:  1.09 kB
-dist/assets/index-B5kFhdQr.css                  107.53 kB │ gzip: 16.61 kB
-dist/assets/RoleDashboardStage-BSNjznWL.js       47.63 kB │ gzip: 11.33 kB
-dist/assets/LandingPage-CJ_HKn89.js              66.36 kB │ gzip: 14.16 kB
-dist/assets/CreatorSubmissionsView-CDECp1q9.js  114.22 kB │ gzip: 26.55 kB
-✓ built in 32.27s (0 TypeScript errors)
+dist/assets/index-TdopVz1d.css                  108.48 kB │ gzip: 16.75 kB
+dist/assets/RoleDashboardStage-C4JghHTm.js       48.37 kB │ gzip: 11.56 kB
+dist/assets/LandingPage-BUmNORrE.js              66.63 kB │ gzip: 14.15 kB
+dist/assets/CreatorSubmissionsView-CRTlEOiL.js  114.75 kB │ gzip: 26.78 kB
+✓ built in 15.69s (0 TypeScript errors)
 ```
 
 ### Backend Automated Test Suite
@@ -119,7 +121,7 @@ pytest backend/tests -q
 ........................................................................ [ 64%]
 ........................................................................ [ 97%]
 ......                                                                   [100%]
-222 passed in 18.87s
+222 passed in 17.22s
 ```
 
 ---
