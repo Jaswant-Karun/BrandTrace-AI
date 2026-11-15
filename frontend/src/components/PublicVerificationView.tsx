@@ -185,7 +185,7 @@ export const PublicVerificationView: React.FC<PublicVerificationViewProps> = ({
             </div>
 
             {/* Right circular status badges (Realistic 3D Stitched Seal Medallions) */}
-            <div className="flex items-center gap-3 sm:gap-5 self-center lg:self-auto shrink-0 py-1">
+            <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-5 self-center lg:self-auto shrink-0 py-1">
               
               {/* APPROVED 3D Medal */}
               <div

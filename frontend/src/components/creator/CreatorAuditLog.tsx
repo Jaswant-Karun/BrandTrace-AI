@@ -139,8 +139,63 @@ export const CreatorAuditLog: React.FC<CreatorAuditLogProps> = ({
           </button>
         </div>
 
-        <div className="bg-neutral-950 border border-neutral-800/90 rounded-2xl overflow-hidden shadow-2xl">
-          <div className="overflow-x-auto">
+        {/* Responsive Mobile Card List (< 640px) */}
+        <div className="block sm:hidden space-y-3">
+          {allEvents.map((evt) => (
+            <div
+              key={evt.id}
+              className="p-4 rounded-2xl bg-neutral-950 border border-neutral-800 space-y-2.5 shadow-lg"
+            >
+              <div className="flex items-center justify-between gap-2 border-b border-neutral-800/80 pb-2">
+                <span className="font-mono font-bold text-xs text-white">
+                  {evt.who}
+                </span>
+                <span className="text-[10px] font-mono text-neutral-400">
+                  {evt.when}
+                </span>
+              </div>
+
+              <div className="space-y-1">
+                <div className="text-xs font-mono font-semibold text-neutral-200 break-words">
+                  {evt.what}
+                </div>
+                {evt.reason && (
+                  <p className="text-[11px] font-sans text-neutral-400 break-words leading-relaxed">
+                    Reason: {evt.reason}
+                  </p>
+                )}
+              </div>
+
+              <div className="pt-2 border-t border-neutral-800/80 flex flex-wrap items-center justify-between gap-2">
+                <button
+                  onClick={() => handleCopy(evt.hash)}
+                  className="inline-flex items-center gap-1.5 text-indigo-400 hover:text-indigo-300 text-[11px] font-mono cursor-pointer py-1.5 px-2 rounded-lg bg-neutral-900 border border-neutral-800"
+                  title="Click to copy full SHA-256 cryptographic proof"
+                >
+                  <span className="truncate max-w-[140px]">{evt.hash.slice(0, 16)}...</span>
+                  {copiedHash === evt.hash ? (
+                    <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  ) : (
+                    <Copy className="w-3.5 h-3.5 opacity-60 shrink-0" />
+                  )}
+                </button>
+
+                {onRestoreDraft && (
+                  <button
+                    onClick={() => onRestoreDraft(`Make every brand decision count this Diwali. Aurelle Skin helps teams review marketing content against approved brand guidelines (Restored from Audit ${evt.id}).`)}
+                    className="px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-700 hover:border-neutral-500 text-neutral-200 text-xs font-mono font-bold uppercase transition-colors cursor-pointer min-h-[36px]"
+                  >
+                    Load Draft
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop Data Grid Table (>= 640px) */}
+        <div className="hidden sm:block bg-neutral-950 border border-neutral-800/90 rounded-2xl overflow-hidden shadow-2xl">
+          <div className="overflow-x-auto no-scrollbar">
             <table className="w-full text-left text-xs font-mono">
               <thead>
                 <tr className="border-b border-neutral-800/80 bg-neutral-900/60 text-neutral-400 text-[11px] uppercase tracking-wider">

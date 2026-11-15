@@ -1387,7 +1387,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
               <button
                 onClick={() => onNavigateRole ? onNavigateRole('creator') : onOpenCreatorDashboard ? onOpenCreatorDashboard() : null}
-                className="w-full py-2.5 px-3 rounded-xl bg-[#544df2] hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider cursor-pointer shadow-md transition-colors"
+                className="w-full py-2.5 px-3 rounded-xl bg-[#544df2] hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider cursor-pointer shadow-md transition-colors min-h-[44px] flex items-center justify-center active:scale-[0.98]"
               >
                 TRY AS CREATOR
               </button>
@@ -1418,7 +1418,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
               <button
                 onClick={() => onNavigateRole ? onNavigateRole('agency') : null}
-                className="w-full py-2.5 px-3 rounded-xl bg-[#f0ede6] hover:bg-white text-neutral-900 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
+                className="w-full py-2.5 px-3 rounded-xl bg-[#f0ede6] hover:bg-white text-neutral-900 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors min-h-[44px] flex items-center justify-center active:scale-[0.98]"
               >
                 TRY AS AGENCY
               </button>
@@ -1449,7 +1449,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
               <button
                 onClick={() => onNavigateRole ? onNavigateRole('reviewer') : null}
-                className="w-full py-2.5 px-3 rounded-xl bg-[#f0ede6] hover:bg-white text-neutral-900 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
+                className="w-full py-2.5 px-3 rounded-xl bg-[#f0ede6] hover:bg-white text-neutral-900 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors min-h-[44px] flex items-center justify-center active:scale-[0.98]"
               >
                 TRY AS REVIEWER
               </button>
@@ -1480,7 +1480,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
               <button
                 onClick={() => onNavigateRole ? onNavigateRole('compliance') : null}
-                className="w-full py-2.5 px-3 rounded-xl bg-[#f0ede6] hover:bg-white text-neutral-900 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
+                className="w-full py-2.5 px-3 rounded-xl bg-[#f0ede6] hover:bg-white text-neutral-900 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors min-h-[44px] flex items-center justify-center active:scale-[0.98]"
               >
                 TRY AS COMPLIANCE
               </button>
@@ -1511,7 +1511,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
               <button
                 onClick={() => onNavigateRole ? onNavigateRole('brand-owner') : null}
-                className="w-full py-2.5 px-3 rounded-xl bg-[#f0ede6] hover:bg-white text-neutral-900 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors"
+                className="w-full py-2.5 px-3 rounded-xl bg-[#f0ede6] hover:bg-white text-neutral-900 font-bold text-xs uppercase tracking-wider cursor-pointer shadow-xs transition-colors min-h-[44px] flex items-center justify-center active:scale-[0.98]"
               >
                 TRY AS BRAND OWNER
               </button>

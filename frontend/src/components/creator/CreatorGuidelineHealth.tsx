@@ -169,9 +169,52 @@ export const CreatorGuidelineHealth: React.FC<CreatorGuidelineHealthProps> = ({
         </div>
       </div>
 
-      {/* Health Data Table */}
-      <div className="bg-neutral-950 border border-neutral-800 rounded-2xl overflow-hidden shadow-2xl">
-        <div className="overflow-x-auto">
+      {/* Mobile Health Stats Card List (< 640px) */}
+      <div className="block sm:hidden space-y-3">
+        {HEALTH_STATS.map((row) => (
+          <div
+            key={row.code}
+            className="p-4 rounded-2xl bg-neutral-950 border border-neutral-800 space-y-3 shadow-lg"
+          >
+            <div className="flex items-center justify-between gap-2 border-b border-neutral-800/80 pb-2">
+              <span className="font-mono font-bold text-xs text-white px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800">
+                {row.code}
+              </span>
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-neutral-900 border border-neutral-800 text-neutral-300">
+                {row.status}
+              </span>
+            </div>
+
+            <p className="text-xs font-sans text-neutral-300 leading-snug">
+              {row.name}
+            </p>
+
+            <div className="grid grid-cols-3 gap-2 text-center text-xs font-mono pt-1">
+              <div className="p-2 rounded-xl bg-neutral-900/80 border border-neutral-800">
+                <div className="text-[10px] text-neutral-400">AGREEMENT</div>
+                <div className="text-sm font-bold text-white">{row.agreement}%</div>
+              </div>
+              <div className="p-2 rounded-xl bg-neutral-900/80 border border-neutral-800">
+                <div className="text-[10px] text-emerald-400">UPHELD</div>
+                <div className="text-sm font-bold text-emerald-400">{row.upheld}</div>
+              </div>
+              <div className="p-2 rounded-xl bg-neutral-900/80 border border-neutral-800">
+                <div className="text-[10px] text-rose-400">OVERRULED</div>
+                <div className="text-sm font-bold text-rose-400">{row.overruled}</div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between text-[11px] font-mono text-neutral-400 pt-1 border-t border-neutral-900">
+              <span>95% Lower Bound: {row.lowerBound}%</span>
+              <span>Total Flags: {row.flags}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Health Data Table (>= 640px) */}
+      <div className="hidden sm:block bg-neutral-950 border border-neutral-800 rounded-2xl overflow-hidden shadow-2xl">
+        <div className="overflow-x-auto no-scrollbar">
           <table className="w-full text-left text-xs font-mono">
             <thead>
               <tr className="border-b border-neutral-800/80 bg-neutral-900/60 text-neutral-400 text-[11px] uppercase tracking-wider">

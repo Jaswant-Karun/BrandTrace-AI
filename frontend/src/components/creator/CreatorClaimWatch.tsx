@@ -128,13 +128,13 @@ export const CreatorClaimWatch: React.FC<CreatorClaimWatchProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
             
             <div className="md:col-span-5 space-y-1.5">
-              <label className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider">
+              <label className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider font-semibold">
                 APPROVED POST
               </label>
               <select
                 value={selectedPost}
                 onChange={(e) => setSelectedPost(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-neutral-900 border border-neutral-800 text-xs font-sans text-white focus:outline-none focus:border-indigo-500 cursor-pointer"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-sm font-sans text-white focus:outline-none focus:border-indigo-500 cursor-pointer min-h-[44px]"
               >
                 <option value="">Choose...</option>
                 <option value="Aurelle Vitamin C Launch Post (Approved 12 Nov)">
@@ -147,7 +147,7 @@ export const CreatorClaimWatch: React.FC<CreatorClaimWatchProps> = ({
             </div>
 
             <div className="md:col-span-5 space-y-1.5">
-              <label className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider">
+              <label className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider font-semibold">
                 LIVE ADDRESS
               </label>
               <input
@@ -155,7 +155,7 @@ export const CreatorClaimWatch: React.FC<CreatorClaimWatchProps> = ({
                 value={liveUrl}
                 onChange={(e) => setLiveUrl(e.target.value)}
                 placeholder="https://shop.example.com/serum"
-                className="w-full px-3 py-2 rounded-xl bg-neutral-900 border border-neutral-800 text-xs font-sans text-white focus:outline-none focus:border-indigo-500"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-sm font-sans text-white focus:outline-none focus:border-indigo-500 min-h-[44px]"
               />
             </div>
 
@@ -163,7 +163,7 @@ export const CreatorClaimWatch: React.FC<CreatorClaimWatchProps> = ({
               <button
                 type="submit"
                 disabled={isRegistering || !liveUrl.trim()}
-                className="w-full py-2 px-3 rounded-xl bg-neutral-200 hover:bg-white text-neutral-950 font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-md"
+                className="w-full py-2.5 sm:py-2 px-3 rounded-xl bg-neutral-200 hover:bg-white text-neutral-950 font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-md min-h-[44px] active:scale-[0.98]"
               >
                 {isRegistering ? (
                   <>
