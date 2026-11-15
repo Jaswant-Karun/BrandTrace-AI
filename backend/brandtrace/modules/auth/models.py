@@ -13,6 +13,14 @@ class LoginRequest(BaseModel):
     email: str
     password: str
 
+class RegisterRequest(BaseModel):
+    name: str
+    email: str
+    password: str
+    organisation_name: Optional[str] = "Aurelle Technologies Inc."
+    role: Optional[UserRole] = UserRole.BRAND_MANAGER
+    workspace_id: Optional[str] = "aurelle-tech"
+
 class UserProfile(BaseModel):
     user_id: str
     email: str
