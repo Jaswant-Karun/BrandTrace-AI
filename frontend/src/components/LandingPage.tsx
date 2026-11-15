@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ShieldCheck, GitFork, ArrowRight, Lock, 
@@ -26,6 +26,71 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 }) => {
   const { user, isAuthenticated, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // -------------------------------------------------------------------------
+  // HERO MOTION TYPOGRAPHY SEQUENCE (Directly matching user reference images)
+  // -------------------------------------------------------------------------
+  const CLAIMS_ROTATION = [
+    {
+      id: 'aurelle-spots',
+      rejected: ['CLINICALLY', 'PROVEN'],
+      approved: ['SHOWN TO VISIBLY', 'REDUCE*'],
+      footnote: '*FACT-014 · 32% fewer visible dark spots in 8 weeks · in-house study, 48 participants',
+      badge: 'AURELLE SKIN'
+    },
+    {
+      id: 'apex-autonomous',
+      rejected: ['100% UNCONDITIONAL', 'AUTONOMOUS'],
+      approved: ['SUPERVISED HIGHWAY', 'PILOT ASSIST*'],
+      footnote: '*FACT-022 · NHTSA 49 CFR §571 compliant · Level 2 hands-on driver telemetry verified',
+      badge: 'APEX EV MOBILITY'
+    },
+    {
+      id: 'aurelle-audio',
+      rejected: ['ZERO LOSS', 'WIRELESS AUDIO'],
+      approved: ['QUANTUMACOUSTICS™', 'LOSSLESS 24-BIT*'],
+      footnote: '*FACT-033 · Lanham Act §43(a) · verified 96kHz acoustic benchmark standard',
+      badge: 'AURELLE TECH'
+    }
+  ];
+
+  // Optional stage override via URL for automated verification
+  const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const stageOverride = urlParams?.get('stage'); // 'strikethrough' | 'approved'
+
+  const [claimIndex, setClaimIndex] = useState(0);
+  const [isStrikethrough, setIsStrikethrough] = useState(stageOverride === 'strikethrough' || stageOverride === 'approved');
+  const [isApprovedVisible, setIsApprovedVisible] = useState(stageOverride === 'approved');
+
+  // Cinematic Motion Loop (when not frozen by stage override)
+  useEffect(() => {
+    if (stageOverride) return;
+
+    // Phase 1: Reset claim to clean state
+    setIsStrikethrough(false);
+    setIsApprovedVisible(false);
+
+    // Phase 2: Coral red strikethrough line sweeps across (auditing the claim)
+    const t1 = setTimeout(() => {
+      setIsStrikethrough(true);
+    }, 600);
+
+    // Phase 3: Green verified replacement expands in, gracefully pushing CHECKED down
+    const t2 = setTimeout(() => {
+      setIsApprovedVisible(true);
+    }, 1800);
+
+    // Phase 4: Hold verified clearance for 4.2 seconds, then transition to next claim
+    const t3 = setTimeout(() => {
+      setClaimIndex((prev) => (prev + 1) % CLAIMS_ROTATION.length);
+    }, 6400);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
+  }, [claimIndex, stageOverride]);
 
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false);
@@ -228,7 +293,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </nav>
 
       {/* ------------------------------------------------------------------- */}
-      {/* SECTION 2 — HERO SECTION (Matching Reference Visual Design)         */}
+      {/* SECTION 2 — HERO SECTION (Matching Reference Visual Design & Motion) */}
       {/* ------------------------------------------------------------------- */}
       <section id="overview" className="relative pt-8 sm:pt-14 pb-16 sm:pb-24 overflow-hidden">
         {/* Subtle background ambient gradients */}
@@ -236,7 +301,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-gradient-to-b from-indigo-100/50 via-purple-50/20 to-transparent dark:from-indigo-950/30 dark:via-purple-950/10 dark:to-transparent rounded-full blur-3xl" />
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Subtle topographic contour wave lines matching reference images */}
+        <svg
+          className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.05] dark:opacity-[0.14] stroke-slate-500 dark:stroke-slate-400"
+          viewBox="0 0 1440 800"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M-50 140 C 250 260, 650 60, 1500 200" strokeWidth="1.5" />
+          <path d="M-50 240 C 300 360, 750 140, 1500 300" strokeWidth="1.5" />
+          <path d="M-50 340 C 350 460, 850 220, 1500 400" strokeWidth="1.5" />
+          <path d="M-50 440 C 400 560, 950 300, 1500 500" strokeWidth="1.5" />
+          <path d="M-50 540 C 450 660, 1050 380, 1500 600" strokeWidth="1.5" />
+        </svg>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
           {/* Top Hanging Plumb Bob Motif inspired by reference */}
           <div className="flex justify-end pr-12 lg:pr-24 -mt-4 mb-2 pointer-events-none select-none">
@@ -254,28 +333,117 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Left Column: Bold Editorial Typography & CTA */}
             <div className="lg:col-span-7 space-y-6 text-left">
               
-              <div className="space-y-1">
-                <span className="text-xs font-mono font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 block">
-                  BEFORE IT'S PUBLISHED
-                </span>
+              <div className="space-y-2 select-none">
                 
-                {/* Massive Bold Headline directly styled like Reference Image 1 */}
+                {/* Meta Tag & Claim Switcher Dots */}
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-mono font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 block">
+                    BEFORE IT'S PUBLISHED
+                  </span>
+                  <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-full px-2 py-0.5">
+                    {CLAIMS_ROTATION.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          setClaimIndex(idx);
+                        }}
+                        className={`w-2 h-2 rounded-full transition-all cursor-pointer ${
+                          claimIndex === idx 
+                            ? 'bg-indigo-600 dark:bg-indigo-400 w-4' 
+                            : 'bg-slate-300 dark:bg-slate-600 hover:bg-slate-400'
+                        }`}
+                        title={`Switch to claim ${idx + 1}`}
+                      />
+                    ))}
+                    <span className="text-[9px] font-mono font-bold text-slate-500 dark:text-slate-400 ml-1">
+                      {CLAIMS_ROTATION[claimIndex].badge}
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Motion Typography Headline directly matching user reference images */}
                 <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 dark:text-white leading-[1.02] uppercase font-sans">
-                  EVERY CLAIM <br />
-                  <span className="line-through decoration-rose-500 decoration-4 text-rose-600 dark:text-rose-400">
-                    CLINICALLY PROVEN
-                  </span> <br />
-                  <span className="text-emerald-600 dark:text-emerald-400">
-                    SHOWN TO VISIBLY REDUCE*
-                  </span> <br />
-                  CHECKED.
+                  <div className="block">EVERY CLAIM</div>
+
+                  {/* Rejected Unverified Claim with animated Laser Strikethrough Bar */}
+                  <div className="py-0.5">
+                    {CLAIMS_ROTATION[claimIndex].rejected.map((line, idx) => (
+                      <div key={idx} className="relative inline-block mr-3 my-0.5 leading-none">
+                        <span className="text-[#ff6358] dark:text-[#ff6b6b] font-black">
+                          {line}
+                        </span>
+                        {/* Animated solid horizontal strike bar passing through the exact vertical center */}
+                        <motion.div
+                          initial={{ scaleX: 0 }}
+                          animate={{ scaleX: isStrikethrough ? 1 : 0 }}
+                          transition={{ 
+                            duration: 0.45, 
+                            delay: idx * 0.12, 
+                            ease: [0.16, 1, 0.3, 1] 
+                          }}
+                          className="absolute top-1/2 left-0 right-0 h-[4px] sm:h-[5px] lg:h-[7px] bg-[#ff6358] dark:bg-[#ff6b6b] -translate-y-1/2 origin-left rounded-full pointer-events-none"
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Approved verified claim animating in and smoothly pushing CHECKED down */}
+                  <AnimatePresence mode="wait">
+                    {isApprovedVisible ? (
+                      <motion.div
+                        key={`approved-${claimIndex}`}
+                        initial={{ opacity: 0, height: 0, y: -16 }}
+                        animate={{ opacity: 1, height: 'auto', y: 0 }}
+                        exit={{ opacity: 0, height: 0, y: -10 }}
+                        transition={{ 
+                          duration: 0.55, 
+                          ease: [0.16, 1, 0.3, 1] 
+                        }}
+                        className="overflow-hidden text-[#10b981] dark:text-[#34d399] py-0.5"
+                      >
+                        {CLAIMS_ROTATION[claimIndex].approved.map((line, idx) => (
+                          <div key={idx} className="block font-black leading-none my-0.5">
+                            {line}
+                          </div>
+                        ))}
+                      </motion.div>
+                    ) : (
+                      // Empty space placeholder matching the frame shown in reference Image 1 & 2!
+                      <motion.div 
+                        key={`spacer-${claimIndex}`}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="h-2 sm:h-3"
+                      />
+                    )}
+                  </AnimatePresence>
+
+                  {/* CHECKED. Grounded Anchor Word */}
+                  <motion.div 
+                    layout 
+                    transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                    className="block text-slate-900 dark:text-white pt-0.5"
+                  >
+                    CHECKED.
+                  </motion.div>
                 </h1>
               </div>
 
               {/* Substantiation Footnote directly matching reference */}
-              <p className="text-[11px] sm:text-xs font-mono text-slate-500 dark:text-slate-400">
-                *FACT-014 · 32% fewer visible dark spots in 8 weeks · in-house study, 48 participants
-              </p>
+              <div className="min-h-[20px]">
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={`foot-${claimIndex}-${isApprovedVisible}`}
+                    initial={{ opacity: 0, y: 3 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -3 }}
+                    transition={{ duration: 0.25 }}
+                    className="text-[11px] sm:text-xs font-mono text-slate-500 dark:text-slate-400"
+                  >
+                    {CLAIMS_ROTATION[claimIndex].footnote}
+                  </motion.p>
+                </AnimatePresence>
+              </div>
 
               {/* Subtitle Statement */}
               <p className="text-base sm:text-lg font-bold text-slate-800 dark:text-slate-200 uppercase tracking-tight max-w-xl leading-snug">
