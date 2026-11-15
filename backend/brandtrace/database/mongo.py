@@ -63,8 +63,10 @@ class MongoManager:
             
             self.client = AsyncIOMotorClient(
                 settings.mongodb_uri,
-                maxPoolSize=50,
-                minPoolSize=5,
+                maxPoolSize=100,
+                minPoolSize=10,
+                maxIdleTimeMS=45000,
+                waitQueueTimeoutMS=5000,
                 serverSelectionTimeoutMS=2500,
                 connectTimeoutMS=2500,
                 retryWrites=True

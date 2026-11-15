@@ -89,27 +89,35 @@ async def list_submissions(
     status: Optional[str] = Query(None),
     brand_id: Optional[str] = Query(None),
     creator_id: Optional[str] = Query(None),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=500),
     user: UserProfile = Depends(get_current_user)
 ):
-    """Lists submissions filtered by user role, brand, or review state."""
+    """Lists submissions filtered by user role, brand, or review state with pagination."""
     active_creator_id = creator_id
     return await submissions_service.list_submissions(
         creator_id=active_creator_id,
         role=role,
         status=status,
-        brand_id=brand_id
+        brand_id=brand_id,
+        skip=skip,
+        limit=limit
     )
 
 @router.get("/submissions/queue", response_model=List[SubmissionResponse])
 async def get_reviewer_queue(
     brand_id: Optional[str] = Query(None),
     role: Optional[str] = Query(None),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=500),
     user: UserProfile = Depends(get_current_user)
 ):
-    """Retrieves submissions queue filtered by role (reviewer vs compliance vs brand-owner)."""
+    """Retrieves submissions queue filtered by role (reviewer vs compliance vs brand-owner) with pagination."""
     return await submissions_service.list_submissions(
         brand_id=brand_id,
-        role=role
+        role=role,
+        skip=skip,
+        limit=limit
     )
 
 @router.get("/submissions/{submission_id}", response_model=SubmissionResponse)

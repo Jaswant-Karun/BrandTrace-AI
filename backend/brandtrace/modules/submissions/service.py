@@ -665,7 +665,9 @@ class SubmissionsService:
         creator_id: Optional[str] = None,
         role: Optional[str] = None,
         status: Optional[str] = None,
-        brand_id: Optional[str] = None
+        brand_id: Optional[str] = None,
+        skip: int = 0,
+        limit: int = 100
     ) -> List[Dict[str, Any]]:
         query: Dict[str, Any] = {}
         if creator_id and role == "creator":
@@ -690,9 +692,12 @@ class SubmissionsService:
         if brand_id:
             query["brand_id"] = brand_id
 
+        safe_limit = max(1, min(limit, 500))
+        safe_skip = max(0, skip)
+
         if mongo_manager.is_connected and mongo_manager.db is not None:
-            cursor = mongo_manager.db.submissions.find(query, {"_id": 0}).sort("updated_at", -1)
-            docs = await cursor.to_list(length=100)
+            cursor = mongo_manager.db.submissions.find(query, {"_id": 0}).sort("updated_at", -1).skip(safe_skip)
+            docs = await cursor.to_list(length=safe_limit)
             if docs:
                 return docs
 
@@ -714,7 +719,7 @@ class SubmissionsService:
             subs = [s for s in subs if s.get("status") in ["COMPLIANCE_APPROVED", "RELEASED", "APPROVED"]]
         if brand_id:
             subs = [s for s in subs if s.get("brand_id") == brand_id]
-        return subs
+        return subs[safe_skip:safe_skip + safe_limit]
 
     # ==========================================================================
     # 2.5 AGENCY WORKFLOW (Agency Sana)

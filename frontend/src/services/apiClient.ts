@@ -13,6 +13,10 @@ export interface ApiError {
 }
 
 class ApiClient {
+  private inFlightRequests: Map<string, Promise<any>> = new Map();
+  private queryCache: Map<string, { data: any; expiry: number }> = new Map();
+  private readonly DEFAULT_CACHE_TTL_MS = 5000;
+
   private getAuthHeader(): Record<string, string> {
     const token = localStorage.getItem('brandtrace_jwt_token');
     if (token) {
@@ -21,9 +25,20 @@ class ApiClient {
     return {};
   }
 
-  async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  public clearCache(): void {
+    this.queryCache.clear();
+    this.inFlightRequests.clear();
+  }
+
+  async request<T>(endpoint: string, options: RequestInit & { ttlMs?: number; skipCache?: boolean } = {}): Promise<T> {
+    const method = (options.method || 'GET').toUpperCase();
     const url = endpoint.startsWith('http') ? endpoint : `${BASE_URL}${endpoint}`;
     
+    // Invalidate query cache upon any write mutation to ensure immediate data consistency
+    if (method !== 'GET') {
+      this.queryCache.clear();
+    }
+
     const headers: Record<string, string> = {
       ...this.getAuthHeader(),
       ...(options.headers as Record<string, string> || {}),
@@ -33,45 +48,78 @@ class ApiClient {
       headers['Content-Type'] = 'application/json';
     }
 
-    try {
-      const response = await fetch(url, { ...options, headers });
+    const cacheKey = `${method}:${url}:${headers['Authorization'] || 'anon'}`;
 
-      if (!response.ok) {
-        let errorData: any = {};
-        try {
-          errorData = await response.json();
-        } catch {
-          errorData = { message: response.statusText };
-        }
-        
-        // Handle 401 Session Expiry
-        if (response.status === 401) {
-          localStorage.removeItem('brandtrace_jwt_token');
-          if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('brandtrace_session_expired', {
-              detail: { message: errorData.detail || 'Session expired or invalid credentials. Please log in again.' }
-            }));
-          }
-        }
-
-        const error: ApiError = {
-          message: errorData.detail || errorData.message || `Request failed with status ${response.status}`,
-          status: response.status,
-          detail: errorData
-        };
-        throw error;
+    // Return cached response if valid and not explicitly skipped
+    if (method === 'GET' && !options.skipCache) {
+      const cached = this.queryCache.get(cacheKey);
+      if (cached && cached.expiry > Date.now()) {
+        return cached.data as T;
       }
 
-      return await response.json() as T;
-    } catch (err: any) {
-      if (err.status) {
-        throw err;
+      // In-flight request deduplication: avoid firing duplicate parallel network calls
+      if (this.inFlightRequests.has(cacheKey)) {
+        return this.inFlightRequests.get(cacheKey) as Promise<T>;
       }
-      throw {
-        message: err.message || 'Service unreachable. Please ensure the backend control plane is online.',
-        status: 0
-      } as ApiError;
     }
+
+    const fetchPromise = (async () => {
+      try {
+        const response = await fetch(url, { ...options, headers });
+
+        if (!response.ok) {
+          let errorData: any = {};
+          try {
+            errorData = await response.json();
+          } catch {
+            errorData = { message: response.statusText };
+          }
+          
+          // Handle 401 Session Expiry
+          if (response.status === 401) {
+            localStorage.removeItem('brandtrace_jwt_token');
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('brandtrace_session_expired', {
+                detail: { message: errorData.detail || 'Session expired or invalid credentials. Please log in again.' }
+              }));
+            }
+          }
+
+          const error: ApiError = {
+            message: errorData.detail || errorData.message || `Request failed with status ${response.status}`,
+            status: response.status,
+            detail: errorData
+          };
+          throw error;
+        }
+
+        const data = await response.json() as T;
+
+        // Populate short-lived cache for idempotent GET queries
+        if (method === 'GET' && !options.skipCache) {
+          const ttl = options.ttlMs ?? this.DEFAULT_CACHE_TTL_MS;
+          this.queryCache.set(cacheKey, { data, expiry: Date.now() + ttl });
+        }
+
+        return data;
+      } catch (err: any) {
+        if (err.status) {
+          throw err;
+        }
+        throw {
+          message: err.message || 'Service unreachable. Please ensure the backend control plane is online.',
+          status: 0
+        } as ApiError;
+      } finally {
+        this.inFlightRequests.delete(cacheKey);
+      }
+    })();
+
+    if (method === 'GET' && !options.skipCache) {
+      this.inFlightRequests.set(cacheKey, fetchPromise);
+    }
+
+    return fetchPromise;
   }
 
   // Domain API Endpoints

@@ -14,6 +14,11 @@ export default defineConfig({
     },
   },
   build: {
+    target: 'es2020',
+    cssCodeSplit: true,
+    minify: 'esbuild',
+    assetsInlineLimit: 4096,
+    sourcemap: false,
     rollupOptions: {
       output: {
         manualChunks: {

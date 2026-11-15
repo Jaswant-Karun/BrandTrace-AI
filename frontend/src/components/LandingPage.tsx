@@ -764,6 +764,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <img
                     src="/images/aurelle_luxury_serum_radiance.jpg"
                     alt="Aurelle Skin C-Radiance Complex Serum"
+                    width={400}
+                    height={350}
+                    fetchPriority="high"
+                    decoding="sync"
                     className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   />
 
@@ -844,6 +848,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <img
                     src="/images/serum_scan_glow.jpg"
                     alt="Aurelle Glow In 2 Weeks Banner"
+                    width={360}
+                    height={300}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
                   />
 
@@ -909,6 +917,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <img
                     src="/images/email_swatches_leaves.jpg"
                     alt="Diwali Campaign Swatches"
+                    width={360}
+                    height={195}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   />
 
@@ -1143,6 +1155,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <img
                   src="/images/digital_twin_network.jpg"
                   alt="Digital Twin Neural Dependency Mesh"
+                  width={600}
+                  height={128}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />

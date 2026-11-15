@@ -346,9 +346,19 @@ async def seed_database():
 # BRAND DEPENDENCY INTELLIGENCE GRAPH (BDIG) ENDPOINTS
 # ==============================================================================
 
+# Caching layer for high-throughput fact queries with automatic invalidation on writes
+_FACTS_SERIALIZED_CACHE: Dict[str, Any] = {}
+
+def invalidate_facts_cache():
+    _FACTS_SERIALIZED_CACHE.clear()
+
 @router.get("/facts")
 async def list_approved_facts(brand_id: Optional[str] = Query(None), role: Optional[str] = Query(None)):
     """List approved facts (prices, claims, specifications, policies). Filters confidential facts for agency role."""
+    cache_key = f"{brand_id or 'all'}:{role or 'all'}"
+    if cache_key in _FACTS_SERIALIZED_CACHE:
+        return _FACTS_SERIALIZED_CACHE[cache_key]
+
     facts = list(APPROVED_FACTS_CATALOG.values())
     if brand_id:
         facts = [f for f in facts if f.brand_id == brand_id]
@@ -359,10 +369,13 @@ async def list_approved_facts(brand_id: Optional[str] = Query(None), role: Optio
             if getattr(f, "category", "") not in ("CONFIDENTIAL", "EMBARGOED") 
             and not getattr(f, "is_confidential", False)
         ]
-    return [f.model_dump() for f in facts]
+    dumped = [f.model_dump() for f in facts]
+    _FACTS_SERIALIZED_CACHE[cache_key] = dumped
+    return dumped
 
 @router.post("/facts")
 async def create_approved_fact(req: FactCreatePayload):
+    invalidate_facts_cache()
     """Registers a new approved fact in memory and MongoDB Atlas."""
     from brandtrace.graph.schema import ApprovedFact, NodeType, Node as GraphNode
     from brandtrace.database.schemas import ApprovedFactDoc
@@ -476,6 +489,7 @@ async def get_approved_fact(fact_id: str):
 @router.put("/facts/{fact_id}")
 async def update_approved_fact(fact_id: str, req: FactUpdatePayload, brand_id: Optional[str] = Query(None)):
     """Edits an approved fact with server-side validation and persistence."""
+    invalidate_facts_cache()
     from brandtrace.graph.schema import ApprovedFact, NodeType, Node as GraphNode
     from brandtrace.database.schemas import ApprovedFactDoc
     import datetime
@@ -707,6 +721,7 @@ async def mutate_approved_fact(
     7. Preserves old versions and historical approval records.
     8. Never silently modifies or republishes approved content.
     """
+    invalidate_facts_cache()
     if current_user.role in [UserRole.CREATOR, UserRole.REVIEWER]:
         raise HTTPException(
             status_code=403,
