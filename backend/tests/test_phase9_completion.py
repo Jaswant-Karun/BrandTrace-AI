@@ -69,19 +69,22 @@ def test_phase9_module_endpoints_audit():
         "asset_title": "Test Promo"
     }, headers=headers)
     assert verify_res.status_code == 200
-    assert "composite_score" in verify_res.json()
+    assert "composite_risk_score" in verify_res.json()
+    assert "governance_decision" in verify_res.json()
 
     # 4. Change Impact Simulator
     sim_res = client.post("/api/simulator/propose", json={
-        "workspace_id": "aurelle-tech",
-        "org_id": "ORG-AURELLE",
-        "scenario_type": "PRODUCT_FACT_CHANGE",
-        "target_node_id": "FACT-AUR-PRC-01",
-        "new_value": "₹599",
-        "justification": "Annual supply chain inflation adjustment"
+        "brand_id": "aurelle-tech",
+        "target_record_id": "FACT-AUR-PRC-01",
+        "target_record_type": "PRICE",
+        "record_label": "Aurelle Studio Subscription",
+        "old_value": "₹499",
+        "proposed_value": "₹599",
+        "change_rationale": "Commercial indexing",
+        "proposed_by": "Julian Vance"
     }, headers=headers)
     assert sim_res.status_code == 200
-    assert "affected_assets" in sim_res.json()
+    assert "affected_touchpoints" in sim_res.json()
 
     # 5. Multimodal Creative Inspection
     mm_res = client.post("/api/multimodal/inspect", json={

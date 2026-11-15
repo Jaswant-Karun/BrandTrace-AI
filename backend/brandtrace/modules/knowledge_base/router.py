@@ -172,6 +172,7 @@ async def create_approved_fact(req: CreateFactRequest):
         description=req.description,
         source_citation=req.source_citation,
         department_owner=req.department_owner,
+        last_verified=now_iso,
         effective_from=now_iso
     )
     APPROVED_FACTS_CATALOG[fact_id] = fact_obj
@@ -269,7 +270,7 @@ async def list_approved_facts(workspace_id: Optional[str] = None, org_id: Option
                 source_citation=fact.source_citation,
                 department_owner=fact.department_owner,
                 status=getattr(fact, "status", "ACTIVE"),
-                created_at=fact.effective_from or datetime.datetime.now(datetime.timezone.utc).isoformat()
+                created_at=getattr(fact, "last_verified", getattr(fact, "effective_from", datetime.datetime.now(datetime.timezone.utc).isoformat()))
             ))
     return results
 
