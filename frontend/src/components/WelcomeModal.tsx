@@ -34,8 +34,9 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
       <div className="bg-white border border-slate-200 rounded-2xl max-w-3xl w-full p-4 sm:p-6 md:p-8 shadow-2xl relative max-h-[92vh] overflow-y-auto">
         <button
           onClick={onClose}
-          className="absolute right-3 sm:right-5 top-3 sm:top-5 p-2 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+          className="absolute right-3 sm:right-5 top-3 sm:top-5 p-2 min-w-[40px] min-h-[40px] sm:min-w-0 sm:min-h-0 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
           title="Close onboarding"
+          aria-label="Close welcome modal"
         >
           <X className="w-5 h-5" />
         </button>

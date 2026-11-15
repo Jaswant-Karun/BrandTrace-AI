@@ -138,7 +138,7 @@ export const DemoWalkthroughModal: React.FC<DemoWalkthroughModalProps> = ({
                   AURELLE Interactive Governance Walkthrough
                 </h2>
                 <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-slate-100 border border-slate-200 text-slate-700">
-                  Phase 6 Master Scenario
+                  Enterprise Governance Lifecycle Scenario
                 </span>
               </div>
               <p className="text-xs text-slate-500">
@@ -159,7 +159,8 @@ export const DemoWalkthroughModal: React.FC<DemoWalkthroughModalProps> = ({
             </button>
             <button
               onClick={onClose}
-              className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition cursor-pointer"
+              className="p-2 sm:p-1.5 min-w-[40px] min-h-[40px] sm:min-w-0 sm:min-h-0 flex items-center justify-center text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition cursor-pointer"
+              aria-label="Close walkthrough"
             >
               <X className="w-5 h-5" />
             </button>

@@ -99,7 +99,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ brand, dbStatus, onR
               className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-slate-400 font-medium cursor-pointer shadow-xs"
             >
               <option value="mock">
-                Deterministic Neural Engine (Offline Resilient &bull; Recommended for Hackathon Judging)
+                Deterministic Neural Engine (Offline Resilient)
               </option>
               <option value="gemini">Google Gemini 2.0 Flash / Pro (Live API Key Required)</option>
               <option value="openai">OpenAI GPT-4o Enterprise</option>
