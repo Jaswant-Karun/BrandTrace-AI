@@ -15,10 +15,11 @@ import { GovernanceAnalyticsView } from './components/GovernanceAnalyticsView';
 import { AuditTrustCenterView } from './components/AuditTrustCenterView';
 import { SettingsView } from './components/SettingsView';
 import { DatabaseStatusModal } from './components/DatabaseStatusModal';
+import { DemoWalkthroughModal } from './components/DemoWalkthroughModal';
 import { AuthHeader } from './components/AuthHeader';
 import { useAuth } from './context/AuthContext';
 import { BrandProfile, DatabaseStatus, VerificationResult } from './types';
-import { ExternalLink, Database, RefreshCw } from 'lucide-react';
+import { ExternalLink, Database, RefreshCw, Sparkles } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [viewMode, setViewMode] = useState<'landing' | 'app'>('app');
@@ -29,6 +30,7 @@ export const App: React.FC = () => {
   const [selectedBrandId, setSelectedBrandId] = useState<string>(currentWorkspace || 'apex-dynamics');
   const [dbStatus, setDbStatus] = useState<DatabaseStatus | null>(null);
   const [isDbModalOpen, setIsDbModalOpen] = useState<boolean>(false);
+  const [isDemoModalOpen, setIsDemoModalOpen] = useState<boolean>(false);
   const [isReseeding, setIsReseeding] = useState<boolean>(false);
 
   useEffect(() => {
@@ -151,7 +153,10 @@ export const App: React.FC = () => {
       {/* Main App Workspace */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Enterprise Tenant & Auth Header */}
-        <AuthHeader onOpenDbStatus={() => setIsDbModalOpen(true)} />
+        <AuthHeader
+          onOpenDbStatus={() => setIsDbModalOpen(true)}
+          onOpenDemoWalkthrough={() => setIsDemoModalOpen(true)}
+        />
 
         {/* Top Control Bar */}
         <header className="border-b border-slate-800/80 bg-[#0B0F19]/80 backdrop-blur-xl px-6 py-3 flex items-center justify-between sticky top-0 z-30">
@@ -166,6 +171,16 @@ export const App: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Phase 6 Guided Demo Button */}
+            <button
+              onClick={() => setIsDemoModalOpen(true)}
+              className="text-xs font-bold text-cyan-300 bg-cyan-950/60 hover:bg-cyan-900/60 px-3 py-1 rounded-lg border border-cyan-500/40 transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm shadow-cyan-500/20"
+              title="Launch AURELLE 12-Step Lifecycle & 9 Test Cases"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+              <span>AURELLE Demo Walkthrough</span>
+            </button>
+
             {/* View Public Landing Page Button */}
             <button
               onClick={() => setViewMode('landing')}
@@ -272,6 +287,21 @@ export const App: React.FC = () => {
         isOpen={isDbModalOpen}
         onClose={() => setIsDbModalOpen(false)}
         status={dbStatus}
+      />
+
+      {/* Phase 6 AURELLE Demo Walkthrough Modal */}
+      <DemoWalkthroughModal
+        isOpen={isDemoModalOpen}
+        onClose={() => setIsDemoModalOpen(false)}
+        onNavigateToView={(viewName) => {
+          if (viewName.includes('Graph')) setCurrentTab('bdig');
+          else if (viewName.includes('Simulator')) setCurrentTab('impact-simulator');
+          else if (viewName.includes('Approval')) setCurrentTab('approvals');
+          else if (viewName.includes('Audit')) setCurrentTab('audit-trust');
+          else if (viewName.includes('Knowledge')) setCurrentTab('knowledge-base');
+          else if (viewName.includes('Studio') || viewName.includes('Content')) setCurrentTab('content-studio');
+          else setCurrentTab('command-center');
+        }}
       />
     </div>
   );

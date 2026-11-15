@@ -7,9 +7,10 @@ import {
 
 interface AuthHeaderProps {
   onOpenDbStatus: () => void;
+  onOpenDemoWalkthrough?: () => void;
 }
 
-export const AuthHeader: React.FC<AuthHeaderProps> = ({ onOpenDbStatus }) => {
+export const AuthHeader: React.FC<AuthHeaderProps> = ({ onOpenDbStatus, onOpenDemoWalkthrough }) => {
   const { user, currentOrg, currentWorkspace, switchPersona, personas, setWorkspace } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -41,6 +42,7 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({ onOpenDbStatus }) => {
             onChange={(e) => setWorkspace(e.target.value)}
             className="bg-transparent text-xs font-bold text-white focus:outline-none cursor-pointer"
           >
+            <option value="aurelle-tech" className="bg-slate-950 text-white">Aurelle Technologies (Consumer Tech)</option>
             <option value="apex-dynamics" className="bg-slate-950 text-white">Apex Dynamics (EV Mobility)</option>
             <option value="novus-health" className="bg-slate-950 text-white">Novus Health (BioPharma)</option>
             <option value="aurelle-maison" className="bg-slate-950 text-white">Aurelle Maison (Eco-Luxury)</option>
@@ -56,6 +58,19 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({ onOpenDbStatus }) => {
           <Database className="w-3 h-3" />
           <span>MongoDB Atlas Vector Search Active</span>
         </button>
+
+        {/* Phase 6 Guided Demo Pill */}
+        {onOpenDemoWalkthrough && (
+          <button
+            onClick={onOpenDemoWalkthrough}
+            className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-indigo-500/20 border border-cyan-500/40 text-cyan-300 text-xs font-bold hover:bg-cyan-500/30 transition-all cursor-pointer shadow-sm shadow-cyan-500/20"
+            title="Open Interactive AURELLE Walkthrough & 9 Test Cases"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+            <span>Guided Demo: AURELLE</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+          </button>
+        )}
       </div>
 
       {/* Right: Authenticated User & Persona Switcher */}
