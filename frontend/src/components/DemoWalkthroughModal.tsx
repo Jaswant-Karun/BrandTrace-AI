@@ -142,7 +142,7 @@ export const DemoWalkthroughModal: React.FC<DemoWalkthroughModalProps> = ({
                 </span>
               </div>
               <p className="text-xs text-slate-500">
-                Fictional consumer technology enterprise · 12-Step lifecycle &amp; 9 statutory test cases · MongoDB Atlas live sync
+                Fictional consumer technology enterprise · 12-Step lifecycle &amp; 9 statutory test cases · Enterprise cloud sync
               </p>
             </div>
           </div>

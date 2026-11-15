@@ -541,7 +541,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                         BT-SEAL-8F3A2B1C
                       </span>
                       <span className="text-[10px] text-slate-500 dark:text-slate-400">
-                        SHA-256 Tamper-Evident Chained Seal
+                        Tamper-Evident Cryptographic Seal
                       </span>
                     </div>
                   </div>
@@ -1182,7 +1182,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   </span>
                 </div>
                 <span className="text-[10px] font-mono text-cyan-300 bg-cyan-950 px-2 py-0.5 rounded border border-cyan-800">
-                  NetworkX Directed Engine
+                  Enterprise Graph Engine
                 </span>
               </div>
 
