@@ -9,7 +9,7 @@ from brandtrace.modules.knowledge_base.models import (
     CreateGuidelineRequest, GuidelineResponse
 )
 from brandtrace.database.mongo import mongo_manager
-from brandtrace.database.schemas import ApprovedFactDoc
+from brandtrace.database.schemas import ApprovedFactDoc, BrandGuidelineDoc
 from brandtrace.graph.schema import ApprovedFact, Node as GraphNode, NodeType
 from brandtrace.engine.ai_provider import ai_provider
 from brandtrace.data.seed_data import APPROVED_FACTS_CATALOG
@@ -433,7 +433,7 @@ async def create_brand_guideline(req: CreateGuidelineRequest):
         node = GraphNode(
             id=guideline_id,
             label=f"{req.title}",
-            type=NodeType.BRAND_GUIDELINE,
+            type=NodeType.GUIDELINE,
             description=req.rule_statement,
             properties={
                 "category": req.category,
@@ -493,7 +493,7 @@ async def list_brand_guidelines(workspace_id: Optional[str] = None, org_id: Opti
     from brandtrace.data.seed_data import BRAND_SEEDS
     if workspace_id and workspace_id in BRAND_SEEDS:
         for node in BRAND_SEEDS[workspace_id].nodes:
-            if node.type in [NodeType.BRAND_GUIDELINE, NodeType.REGULATION, NodeType.PROHIBITED_CLAIM] and node.id not in seen_ids:
+            if node.type in [NodeType.GUIDELINE, NodeType.REGULATION, NodeType.PROHIBITED_CLAIM] and node.id not in seen_ids:
                 seen_ids.add(node.id)
                 results.append(GuidelineResponse(
                     guideline_id=node.id,

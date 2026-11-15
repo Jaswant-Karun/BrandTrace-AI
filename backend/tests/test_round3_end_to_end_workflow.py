@@ -2,7 +2,7 @@ import pytest
 import time
 from fastapi.testclient import TestClient
 from brandtrace.main import app
-from brandtrace.modules.auth.router import create_access_token
+from brandtrace.core.security import create_access_token
 from brandtrace.modules.auth.models import UserRole
 from brandtrace.database.mongo import mongo_manager
 
@@ -167,12 +167,12 @@ async def test_round3_end_to_end_aurelle_workflow():
         "proposed_value": "₹599",
         "change_rationale": "High-fidelity spatial audio infrastructure scaling.",
         "proposed_by": "Julian Vance, VP Brand Governance"
-    })
+    }, headers=admin_headers)
     assert res_sim_propose.status_code == 200
     sim_report = res_sim_propose.json()
     simulation_id = sim_report["simulation_id"]
-    assert sim_report["affected_touchpoints_count"] >= 3
-    assert sim_report["commercial_risk_tier"] in ["CRITICAL", "HIGH", "MODERATE"]
+    assert len(sim_report["affected_touchpoints"]) >= 3
+    assert sim_report["risk_tier"] in ["CRITICAL", "HIGH", "MODERATE", "MEDIUM"]
 
     # 7.2 NON-DESTRUCTIVE GUARANTEE: Verify approved fact was NOT modified yet!
     res_check_fact = client.get(f"/api/facts?brand_id={brand_id}")
@@ -187,8 +187,10 @@ async def test_round3_end_to_end_aurelle_workflow():
     res_mutate = client.post("/api/facts/mutate", json={
         "brand_id": brand_id,
         "fact_id": "FACT-AUR-PRC-01",
+        "old_value": "₹499",
         "new_value": "₹599",
-        "change_rationale": "Commercial master price update"
+        "mutation_reason": "Commercial master price update",
+        "initiated_by": "Commercial Operations Director"
     })
     assert res_mutate.status_code == 200
     mutation_result = res_mutate.json()
@@ -197,13 +199,13 @@ async def test_round3_end_to_end_aurelle_workflow():
     task = mutation_result["revision_tasks"][0]
     task_id = task["task_id"]
 
-    # 8.1 RBAC Gate: Unauthorized user cannot resolve task
-    viewer_headers = get_auth_header(UserRole.VIEWER, "Guest Viewer")
+    # 8.1 RBAC Gate: Unauthorized user (e.g. CREATOR) cannot resolve task
+    creator_headers = get_auth_header(UserRole.CREATOR, "Content Creator")
     res_unauth = client.post(f"/api/tasks/{task_id}/resolve", json={
-        "reviewer_name": "Guest Viewer",
+        "reviewer_name": "Content Creator",
         "decision": "APPROVED",
         "final_content": task["proposed_content"]
-    }, headers=viewer_headers)
+    }, headers=creator_headers)
     assert res_unauth.status_code == 403
 
     # 8.2 Authorized Approval & Sealing
