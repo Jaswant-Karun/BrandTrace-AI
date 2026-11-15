@@ -747,6 +747,33 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
                   <span>Grant Final Approval & Release</span>
                 </button>
               </div>
+            ) : roleName === 'AGENCY' ? (
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2.5 w-full sm:w-auto">
+                <button
+                  disabled={isSubmitting}
+                  onClick={() => handleTriggerDecision('REQUEST_CHANGES')}
+                  className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl bg-neutral-900 border border-amber-600/70 hover:bg-neutral-800 text-amber-300 text-xs font-mono font-bold uppercase transition-all cursor-pointer text-center min-h-[46px] flex items-center justify-center active:scale-[0.98]"
+                >
+                  Return to Creator
+                </button>
+
+                <button
+                  disabled={isSubmitting}
+                  onClick={() => handleTriggerDecision('REJECT')}
+                  className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl bg-rose-950/60 border border-rose-600/70 hover:bg-rose-900 text-rose-300 text-xs font-mono font-bold uppercase transition-all cursor-pointer text-center min-h-[46px] flex items-center justify-center active:scale-[0.98]"
+                >
+                  Reject
+                </button>
+
+                <button
+                  disabled={isSubmitting}
+                  onClick={() => handleTriggerDecision('APPROVE')}
+                  className="w-full sm:w-auto px-6 py-3.5 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold uppercase shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2 min-h-[46px] active:scale-[0.98]"
+                >
+                  <Check className="w-4 h-4" />
+                  <span>Forward to Reviewer</span>
+                </button>
+              </div>
             ) : roleName === 'COMPLIANCE' ? (
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2.5 w-full sm:w-auto">
                 <button

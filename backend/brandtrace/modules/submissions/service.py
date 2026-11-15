@@ -487,27 +487,37 @@ class SubmissionsService:
     # 2. SUBMISSION MANAGEMENT
     # ==========================================================================
     async def create_submission(self, req: SubmissionCreateRequest) -> Dict[str, Any]:
-        sub_id = f"SUB-{uuid.uuid4().hex[:6].upper()}"
+        sub_id = req.submission_id.strip() if req.submission_id and req.submission_id.strip() else f"SUB-{uuid.uuid4().hex[:6].upper()}"
         task_id = f"REV-TSK-{uuid.uuid4().hex[:6].upper()}"
         now_time = _now_str()
 
         # Build initial approval history
+        is_agency_submitter = req.creator_type == "agency" or "agency" in req.creator_name.lower()
         approval_history = [
             {
                 "stage": "CREATOR_SUBMISSION",
-                "label": "Creator Submission",
+                "label": "Agency Submission" if is_agency_submitter else "Creator Submission",
                 "user": req.creator_name,
-                "role": "Creator",
+                "role": "Agency Partner" if is_agency_submitter else "Creator",
                 "status": "COMPLETED",
                 "timestamp": now_time,
                 "comments": "Draft submitted for copy review."
+            },
+            {
+                "stage": "AGENCY_APPROVAL",
+                "label": "Agency Quality Check",
+                "user": "Agency Sana" if not is_agency_submitter else req.creator_name,
+                "role": "Agency",
+                "status": "COMPLETED" if is_agency_submitter else "ACTIVE",
+                "timestamp": now_time if is_agency_submitter else None,
+                "comments": "Pre-verified by agency partner." if is_agency_submitter else None
             },
             {
                 "stage": "REVIEWER_APPROVAL",
                 "label": "Reviewer Approval",
                 "user": "Reviewer Meera",
                 "role": "Reviewer",
-                "status": "ACTIVE",
+                "status": "ACTIVE" if is_agency_submitter else "PENDING",
                 "timestamp": None,
                 "comments": None
             },
@@ -591,7 +601,7 @@ class SubmissionsService:
                 created_at_iso=now_time
             )
             dependency_engine.revision_tasks[task_id] = rev_task
-            await mongo_manager.save_revision_task(rev_task.model_dump())
+            await mongo_manager.save_task(rev_task.model_dump())
         except Exception as e:
             print(f"[SubmissionsService] Task sync note: {e}")
 
@@ -669,6 +679,12 @@ class SubmissionsService:
             query["status"] = {"$in": ["REVIEW_APPROVED", "COMPLIANCE_APPROVED", "EVIDENCE_REQUESTED"]}
         elif role == "reviewer":
             query["status"] = {"$in": ["PENDING_REVIEW", "SUBMITTED", "REVIEW_APPROVED", "CHANGES_REQUESTED", "RETURNED_TO_CREATOR", "RETURNED_TO_AGENCY"]}
+        elif role == "agency":
+            query["$or"] = [
+                {"creator_type": "agency"},
+                {"org_id": "ORG-AGENCY-PULSE"},
+                {"creator_name": {"$regex": "agency", "$options": "i"}}
+            ]
         elif role in ["brand-owner", "brand_owner"]:
             query["status"] = {"$in": ["COMPLIANCE_APPROVED", "RELEASED", "APPROVED"]}
         if brand_id:
@@ -692,11 +708,100 @@ class SubmissionsService:
             subs = [s for s in subs if s.get("status") in ["REVIEW_APPROVED", "COMPLIANCE_APPROVED", "EVIDENCE_REQUESTED"]]
         elif role == "reviewer":
             subs = [s for s in subs if s.get("status") in ["PENDING_REVIEW", "SUBMITTED", "REVIEW_APPROVED", "CHANGES_REQUESTED", "RETURNED_TO_CREATOR", "RETURNED_TO_AGENCY"]]
+        elif role == "agency":
+            subs = [s for s in subs if s.get("creator_type") == "agency" or s.get("org_id") == "ORG-AGENCY-PULSE" or "agency" in str(s.get("creator_name", "")).lower()]
         elif role in ["brand-owner", "brand_owner"]:
             subs = [s for s in subs if s.get("status") in ["COMPLIANCE_APPROVED", "RELEASED", "APPROVED"]]
         if brand_id:
             subs = [s for s in subs if s.get("brand_id") == brand_id]
         return subs
+
+    # ==========================================================================
+    # 2.5 AGENCY WORKFLOW (Agency Sana)
+    # ==========================================================================
+    async def record_agency_decision(
+        self,
+        submission_id: str,
+        decision: str,
+        agency_name: str,
+        feedback: Optional[str] = None
+    ) -> Optional[Dict[str, Any]]:
+        sub = await self.get_submission(submission_id)
+        if not sub:
+            return None
+
+        now_time = _now_str()
+        history = sub.get("approval_history", [])
+
+        if decision in ["APPROVE", "FORWARD", "AGENCY_APPROVE"]:
+            sub["status"] = "PENDING_REVIEW"
+            for step in history:
+                if step.get("stage") == "AGENCY_APPROVAL":
+                    step["status"] = "COMPLETED"
+                    step["timestamp"] = now_time
+                    step["comments"] = feedback or f"Quality verified and forwarded to Brand Reviewer by {agency_name}."
+                elif step.get("stage") == "REVIEWER_APPROVAL":
+                    step["status"] = "ACTIVE"
+
+            self.add_notification(
+                recipient_role="REVIEWER",
+                title=f"Agency forwarded submission: {sub.get('title', '')[:35]}",
+                message=f"Agency {agency_name} verified guidelines and forwarded draft for review.",
+                submission_id=submission_id
+            )
+
+        elif decision in ["REQUEST_CHANGES", "SEND_BACK"]:
+            sub["status"] = "RETURNED_TO_CREATOR"
+            sub["reviewer_feedback"] = feedback or "Agency requested adjustments before client submission."
+            for step in history:
+                if step.get("stage") == "AGENCY_APPROVAL":
+                    step["status"] = "REJECTED"
+                    step["timestamp"] = now_time
+                    step["comments"] = feedback or "Agency requested revisions from creator."
+
+            self.add_notification(
+                recipient_role="CREATOR",
+                title=f"Agency requested revisions: {sub.get('title', '')[:35]}",
+                message=feedback or f"Agency {agency_name} requested updates before client review.",
+                submission_id=submission_id
+            )
+
+        elif decision == "REJECT":
+            sub["status"] = "REJECTED"
+            sub["rejection_reason"] = feedback or "Rejected by agency partner."
+            for step in history:
+                if step.get("stage") == "AGENCY_APPROVAL":
+                    step["status"] = "REJECTED"
+                    step["timestamp"] = now_time
+                    step["comments"] = feedback or "Rejected by agency."
+
+            self.add_notification(
+                recipient_role="CREATOR",
+                title=f"Submission rejected by agency {agency_name}",
+                message=feedback or "Content does not meet brand standards.",
+                submission_id=submission_id
+            )
+
+        sub["updated_at"] = now_time
+        sub["approval_history"] = history
+
+        # Update in database & memory
+        if mongo_manager.is_connected and mongo_manager.db is not None:
+            await mongo_manager.db.submissions.update_one(
+                {"submission_id": submission_id},
+                {"$set": sub}
+            )
+        _SUBMISSIONS_STORE[submission_id] = sub
+
+        evt_hash = _hash_str(f"agency:{submission_id}:{decision}:{now_time}")
+        await self.record_audit_event(
+            what=f"agency decision ({decision.lower()}): {sub.get('title', '')[:30]}",
+            reason=feedback or f"Agency decision: {decision}",
+            actor_name=agency_name,
+            event_hash=evt_hash
+        )
+
+        return sub
 
     # ==========================================================================
     # 3. REVIEW WORKFLOW (Reviewer Meera)
@@ -897,12 +1002,15 @@ class SubmissionsService:
             # Save in release ledger
             try:
                 audit_ledger_engine.record_release(
-                    asset_id=submission_id,
-                    asset_title=sub.get("title", ""),
-                    channel=sub.get("channel", "digital"),
+                    user_identity=compliance_name,
+                    user_role="COMPLIANCE_REVIEWER",
+                    resource_id=submission_id,
+                    resource_type="MARKETING_COPY",
                     content=sub["current_content"],
-                    reviewer=compliance_name,
-                    brand_id=sub.get("brand_id", "aurelle-tech")
+                    decision="COMPLIANCE_APPROVED",
+                    review_notes=notes or "Statutory compliance verified.",
+                    approved_version=f"v{sub.get('version', 1)}.0",
+                    relevant_sources=[f.get("rule_id", "FACT-014") for f in sub.get("findings", []) if f.get("rule_id")]
                 )
             except Exception as e:
                 print(f"[SubmissionsService] Audit ledger seal note: {e}")

@@ -213,6 +213,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
       tabs: [
         { id: 'check' as CreatorTab, label: 'CHECK A POST' },
         { id: 'submissions' as CreatorTab, label: 'MY SUBMISSIONS' },
+        { id: 'queue' as CreatorTab, label: 'CLIENT REVIEW' },
         { id: 'audit' as CreatorTab, label: 'AUDIT LOG' },
         { id: 'rulebook' as CreatorTab, label: 'RULEBOOK' },
         { id: 'facts' as CreatorTab, label: 'FACTS' },
@@ -294,6 +295,8 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
           ? '/api/submissions/queue?role=brand-owner'
           : role === 'compliance'
           ? '/api/submissions/queue?role=compliance'
+          : role === 'agency'
+          ? '/api/submissions/queue?role=agency'
           : '/api/submissions/queue?role=reviewer';
       apiClient
         .request<any[]>(qUrl)
@@ -402,6 +405,24 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
             ? `Changes requested by Compliance. Returned to submitter.`
             : `Compliance rejection recorded.`;
         setFeedbackToast(toastMsg);
+      } else if (role === 'agency') {
+        await apiClient.request(`/api/submissions/${targetSubId}/agency-review`, {
+          method: 'POST',
+          body: JSON.stringify({
+            agency_name: roleConfig.userName,
+            agency_role: 'AGENCY',
+            decision: decision === 'APPROVE' ? 'FORWARD' : decision,
+            feedback: feedback || `Agency quality review by ${roleConfig.userName}`,
+          }),
+        });
+
+        const toastMsg =
+          decision === 'APPROVE'
+            ? `Draft quality verified and forwarded to Brand Reviewer by ${roleConfig.userName}.`
+            : decision === 'REQUEST_CHANGES'
+            ? `Agency requested revisions. Returned to creator.`
+            : `Submission rejected by Agency.`;
+        setFeedbackToast(toastMsg);
       } else {
         await apiClient.request(`/api/submissions/${targetSubId}/review`, {
           method: 'POST',
@@ -434,6 +455,8 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
                       ? 'RELEASED'
                       : role === 'compliance'
                       ? 'COMPLIANCE APPROVED'
+                      : role === 'agency'
+                      ? 'AGENCY APPROVED'
                       : 'REVIEW APPROVED'
                     : decision === 'REQUEST_EVIDENCE'
                     ? 'EVIDENCE REQUESTED'

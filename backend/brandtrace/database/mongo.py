@@ -532,6 +532,9 @@ class MongoManager:
             )
         self._memory_tasks[task_id] = task_doc
 
+    # Backward-compatible alias
+    save_revision_task = save_task
+
     async def list_tasks(self, brand_id: Optional[str] = None) -> List[Dict[str, Any]]:
         if self.is_connected and self.db is not None:
             query = {"brand_id": brand_id} if brand_id else {}

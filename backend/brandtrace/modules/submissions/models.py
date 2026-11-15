@@ -135,6 +135,12 @@ class SubmissionResponse(BaseModel):
     release_digest: Optional[str] = None
     released_at: Optional[str] = None
 
+class AgencyDecisionRequest(BaseModel):
+    decision: str = "APPROVE"  # APPROVE, FORWARD, REQUEST_CHANGES, REJECT
+    agency_name: str = "Agency Sana"
+    agency_role: str = "AGENCY"
+    feedback: Optional[str] = None
+
 class ReviewDecisionRequest(BaseModel):
     decision: str  # APPROVE, REQUEST_CHANGES, REJECT
     reviewer_name: str = "Reviewer Meera"

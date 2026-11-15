@@ -6,7 +6,7 @@ from brandtrace.modules.submissions.models import (
     DraftCreateRequest, DraftUpdateRequest, DraftResponse,
     DraftVersionRequest, DraftVersionResponse,
     SubmissionCreateRequest, SubmissionResponse,
-    ReviewDecisionRequest, ComplianceDecisionRequest, FinalApprovalRequest,
+    AgencyDecisionRequest, ReviewDecisionRequest, ComplianceDecisionRequest, FinalApprovalRequest,
     PublishRequest, PublishResponse,
     AuditRecordRequest, AuditEventResponse
 )
@@ -120,6 +120,28 @@ async def get_submission(submission_id: str, user: UserProfile = Depends(get_cur
         raise HTTPException(status_code=404, detail="Submission not found")
     return sub
 
+@router.post("/submissions/{submission_id}/agency-review", response_model=SubmissionResponse)
+async def agency_review_submission(
+    submission_id: str,
+    req: AgencyDecisionRequest,
+    user: UserProfile = Depends(get_current_user)
+):
+    """Agency quality check: forwards approved content to reviewer or requests revisions from creator."""
+    if user and getattr(user, "role", None):
+        user_role_str = (user.role.value if hasattr(user.role, "value") else str(user.role)).upper()
+        if user_role_str in ["CREATOR"] and "agency" not in getattr(user, "name", "").lower():
+            raise HTTPException(status_code=403, detail="Standard creators cannot record agency quality review decisions.")
+
+    sub = await submissions_service.record_agency_decision(
+        submission_id=submission_id,
+        decision=req.decision,
+        agency_name=req.agency_name or user.name,
+        feedback=req.feedback
+    )
+    if not sub:
+        raise HTTPException(status_code=404, detail="Submission not found")
+    return sub
+
 @router.post("/submissions/{submission_id}/review", response_model=SubmissionResponse)
 async def review_submission(
     submission_id: str,
@@ -182,6 +204,8 @@ async def final_approval_submission(
             raise HTTPException(status_code=403, detail="Creators are not authorized to grant final brand release.")
         if user_role_str in ["REVIEWER"]:
             raise HTTPException(status_code=403, detail="Reviewers are not authorized to grant final brand release.")
+        if user_role_str in ["COMPLIANCE"]:
+            raise HTTPException(status_code=403, detail="Compliance officers are not authorized to grant final brand release.")
 
     try:
         sub = await submissions_service.record_final_approval(
