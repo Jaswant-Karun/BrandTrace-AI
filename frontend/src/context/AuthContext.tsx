@@ -15,28 +15,49 @@ interface AuthContextType {
   isAuthenticated: boolean;
   currentOrg: string;
   currentWorkspace: string;
-  login: (email: string) => Promise<void>;
+  login: (email: string, password?: string) => Promise<void>;
   logout: () => void;
   switchPersona: (persona: UserPersona) => Promise<void>;
   setWorkspace: (workspaceId: string) => void;
   personas: UserPersona[];
 }
 
-const DEFAULT_PERSONA: UserPersona = {
-  email: "governance@apex.com",
-  name: "David Sterling, Chief Governance Officer",
-  role: "COMPLIANCE_REVIEWER",
-  org_id: "ORG-APEX",
-  workspace_id: "apex-dynamics"
+export const DEMO_AURELLE_PERSONA: UserPersona = {
+  email: "demo@brandtrace.ai",
+  name: "Alex Mercer, VP Global Brand Governance",
+  role: "BRAND_MANAGER",
+  org_id: "ORG-AURELLE",
+  workspace_id: "aurelle-tech"
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<UserPersona | null>(DEFAULT_PERSONA);
-  const [token, setToken] = useState<string | null>(localStorage.getItem('brandtrace_jwt_token'));
-  const [currentOrg, setCurrentOrg] = useState<string>("ORG-APEX");
-  const [currentWorkspace, setCurrentWorkspace] = useState<string>("apex-dynamics");
+  const [token, setToken] = useState<string | null>(() => {
+    return localStorage.getItem('brandtrace_jwt_token');
+  });
+
+  const [user, setUser] = useState<UserPersona | null>(() => {
+    const savedUser = localStorage.getItem('brandtrace_user_profile');
+    if (savedUser) {
+      try {
+        return JSON.parse(savedUser);
+      } catch {
+        return null;
+      }
+    }
+    // If a valid token exists but no profile, initialize with DEMO persona
+    return localStorage.getItem('brandtrace_jwt_token') ? DEMO_AURELLE_PERSONA : null;
+  });
+
+  const [currentOrg, setCurrentOrg] = useState<string>(() => {
+    return user?.org_id || "ORG-AURELLE";
+  });
+
+  const [currentWorkspace, setCurrentWorkspace] = useState<string>(() => {
+    return user?.workspace_id || "aurelle-tech";
+  });
+
   const [personas, setPersonas] = useState<UserPersona[]>([]);
 
   useEffect(() => {
@@ -44,25 +65,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     apiClient.auth.personas()
       .then((data) => setPersonas(data))
       .catch((e) => console.log('Persona fetch note:', e));
-
-    // Auto-login default persona if token is absent
-    if (!token) {
-      apiClient.auth.login({ email: DEFAULT_PERSONA.email })
-        .then((res) => {
-          localStorage.setItem('brandtrace_jwt_token', res.access_token);
-          setToken(res.access_token);
-          setUser(res.user);
-          setCurrentOrg(res.user.org_id);
-          setCurrentWorkspace(res.user.workspace_id);
-        })
-        .catch((e) => console.log('Auto-login note:', e));
-    }
   }, []);
 
-  const login = async (email: string) => {
+  const login = async (email: string, password?: string) => {
     try {
-      const res = await apiClient.auth.login({ email });
+      const cleanEmail = email.toLowerCase().trim();
+      const defaultPassword = cleanEmail === 'demo@brandtrace.ai'
+        ? 'DemoAurelle2026!'
+        : 'brandtrace2026';
+
+      const res = await apiClient.auth.login({
+        email: cleanEmail,
+        password: password || defaultPassword
+      });
+
       localStorage.setItem('brandtrace_jwt_token', res.access_token);
+      localStorage.setItem('brandtrace_user_profile', JSON.stringify(res.user));
       setToken(res.access_token);
       setUser(res.user);
       setCurrentOrg(res.user.org_id);
@@ -75,6 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     localStorage.removeItem('brandtrace_jwt_token');
+    localStorage.removeItem('brandtrace_user_profile');
     setToken(null);
     setUser(null);
   };
@@ -92,6 +111,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       setCurrentOrg('ORG-APEX');
     }
+
+    if (user) {
+      const updatedUser = { ...user, workspace_id: workspaceId };
+      setUser(updatedUser);
+      localStorage.setItem('brandtrace_user_profile', JSON.stringify(updatedUser));
+    }
   };
 
   return (
@@ -99,7 +124,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         user,
         token,
-        isAuthenticated: !!user,
+        isAuthenticated: !!user && !!token,
         currentOrg,
         currentWorkspace,
         login,
