@@ -119,9 +119,10 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
     }
   };
 
-  // Normalize findings list with full detail matching screenshots
+  // Normalize findings list with full detail matching real backend data
   const [normalizedFindings] = useState<FindingDetail[]>(() => {
-    if (post.findings && post.findings.length > 0) {
+    if (Array.isArray(post.findings)) {
+      if (post.findings.length === 0) return [];
       return post.findings.map((f: any, idx: number) => {
         const num = f.number || idx + 1;
         const fid = f.id || `f-${num}`;
@@ -129,28 +130,26 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
           id: fid,
           number: num,
           severity: (f.severity || 'BLOCKING').toUpperCase() as any,
-          title: f.title || f.rule_title || 'Environmental claims must be specific and substantiated',
+          title: f.title || f.rule_title || f.explanation || 'Governance Finding',
           ruleCitation: f.ruleCitation || f.rule_id || (num === 1 ? 'CL-03 · FACT-009' : num === 2 ? 'CL-03' : num === 5 ? 'CL-05' : num === 6 ? 'FACT-031' : 'FACT-014'),
-          evidenceRef: f.evidenceRef || f.evidence_ref || f.source || 'Vitamin C Brightening Serum is made with 94% naturally derived ingredients (ISO 16128)',
+          evidenceRef: f.evidenceRef || f.evidence_ref || f.source || 'Verified Brand & Statutory Evidence',
           rejectedText: f.rejectedText || f.flagged_text || '',
           approvedText: f.approvedText || f.suggested_fix || '',
-          recommendation: f.recommendation || f.explanation || "Claim says '100% natural': 100% is more than the 94% in the evidence. FACT-009 says Vitamin C Brightening Serum is made with 94% naturally derived ingredients (ISO 16128).",
+          recommendation: f.recommendation || f.explanation || f.title || 'Align copy with approved brand evidence.',
           decision: f.decision || (f.status === 'OVERRULED' ? 'OVERRULED' : f.status === 'UPHELD' ? 'UPHELD' : 'UPHELD'),
           overruleReason: f.overrule_reason || '',
           reviewerComment: f.reviewer_comment || '',
-          claimStatus: f.claimStatus || (num === 1 ? 'Claim contradicted' : 'Claim unsupported'),
-          source: f.source || f.evidenceRef || 'Vitamin C Brightening Serum is made with 94% naturally derived ingredients (ISO 16128)',
+          claimStatus: f.claimStatus || f.claim_classification || (num === 1 ? 'Claim contradicted' : 'Claim unsupported'),
+          source: f.source || f.evidenceRef || f.evidence_ref || 'Brand Knowledge Graph',
           suggestedFixCode: f.suggestedFixCode || (num === 1 ? 'AW-009A' : num === 4 ? 'AW-014B' : undefined),
-          notes: f.notes || [
-            'Creator Asha asked a reviewer: "No approved wording I can use here."',
-            'Compliance Arjun upheld: "Agreed: publish only with the approved wording."',
-          ],
+          notes: f.notes || [],
         };
       });
     }
 
-    // Default seeded 6 findings matching screenshot exactly
-    return [
+    if (post.id === 'SUB-SEED-001' || post.id === 'post-1' || !post.submission_id) {
+      // Default seeded 6 findings for demo sample post only
+      return [
       {
         id: 'f-1',
         number: 1,
@@ -248,7 +247,9 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
         decision: 'UPHELD',
       },
     ];
-  });
+  }
+  return [];
+});
 
   // Decisions state
   const [decisions, setDecisions] = useState<
@@ -266,8 +267,12 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
   });
 
   const rawContent =
+    post.currentContent ||
+    (post as any).current_content ||
+    post.originalContent ||
+    (post as any).original_content ||
     post.content ||
-    `Meet the NEW Aurelle Vitamin-C serum!!! 100% natural, eco-friendly and clinically proven to fade dark spots by 60% in just 2 weeks . Dermatologist recommended. Launching with our Mumbai flagship on 15 Nov. Click here to shop!`;
+    '';
 
   // Calculate metrics
   const blockingCount = normalizedFindings.filter((f) => f.severity === 'BLOCKING').length;
@@ -753,8 +758,19 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
           </div>
 
           {/* Finding Cards List matching Screenshots 1, 2, and 3 */}
-          <div className="space-y-4">
-            {normalizedFindings.map((finding) => {
+          {normalizedFindings.length === 0 ? (
+            <div className="p-8 rounded-2xl border border-emerald-500/30 bg-[#131316] text-center space-y-3">
+              <Check className="w-8 h-8 text-emerald-400 mx-auto" />
+              <div className="text-sm font-mono font-bold text-white uppercase tracking-wider">
+                NO DEFECTS OR UNSUBSTANTIATED CLAIMS DETECTED
+              </div>
+              <p className="text-xs text-neutral-400 font-sans max-w-md mx-auto">
+                All submitted text aligns with verified facts and statutory standards. The content is cleared and ready for review and compliance sign-off.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {normalizedFindings.map((finding) => {
               const currentDecision = decisions[finding.id]?.decision || 'UPHELD';
               const overruleReason = decisions[finding.id]?.overrule_reason || '';
               const comment = decisions[finding.id]?.comment || '';
@@ -921,6 +937,7 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
               );
             })}
           </div>
+        )}
 
           {/* Overall Review Feedback Input */}
           <div className="p-5 rounded-2xl bg-[#131316] border border-neutral-800 space-y-2 shadow-lg">

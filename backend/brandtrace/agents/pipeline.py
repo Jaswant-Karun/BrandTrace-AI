@@ -8,6 +8,7 @@ from brandtrace.core.security import generate_release_proof
 from brandtrace.agents.schema import (
     RiskSpan, AgentFinding, VerificationRequest, VerificationResult
 )
+from brandtrace.engine.content_intelligence import content_intelligence_engine
 
 class VoicePersonaAgent:
     def analyze(self, text: str, bkg: BrandKnowledgeGraph) -> AgentFinding:
@@ -587,147 +588,273 @@ class AutonomousGovernancePipeline:
         t0_iso = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(t0))
         verification_id = f"VRF-{uuid.uuid4().hex[:10].upper()}"
 
-        # 1. Run Agents
-        voice_report = self.voice_agent.analyze(request.content, bkg)
-        claim_report = self.claim_agent.analyze(request.content, bkg)
-        legal_report = self.legal_agent.analyze(request.content, bkg)
+        # 0. Content Intelligence & Semantic Intent Analysis
+        ci_report = content_intelligence_engine.analyze(request.content)
+        is_casual = ci_report.classification.is_greeting_or_casual or ci_report.classification.is_personal
+        is_announcement = ci_report.classification.is_announcement
+        is_informational = ci_report.classification.is_informational
 
         all_spans: List[RiskSpan] = []
-        all_spans.extend(voice_report.risk_spans)
-        all_spans.extend(claim_report.risk_spans)
-        all_spans.extend(legal_report.risk_spans)
 
-        # 1b. Brand & Aurelle Rulebook Grounding (Facts & Specific Rules)
-        brand_id_lower = (request.brand_id or "").lower()
-        if not brand_id_lower or "aurelle" in brand_id_lower:
-            aurelle_spans = self._analyze_aurelle_specifics(
-                request.content,
-                key_phrases=getattr(request, "key_phrases", None),
-                cta=getattr(request, "call_to_action", None)
+        if is_casual:
+            # Casual greetings and personal messages: do NOT inject brand rules or campaign requirements
+            # Voice, Claim, and Legal reports remain clean
+            voice_report = AgentFinding(
+                agent_name="Voice & Persona Alignment Agent",
+                score=100.0,
+                status="PASSED",
+                confidence=0.99,
+                summary="Casual/personal communication classified. No brand voice conflicts.",
+                risk_spans=[],
+                citations=[]
             )
-            # Avoid duplicate spans covering identical text
-            for aspan in aurelle_spans:
-                if not any(abs(s.start_char - aspan.start_char) < 3 and s.matched_text == aspan.matched_text for s in all_spans):
-                    all_spans.append(aspan)
+            claim_report = AgentFinding(
+                agent_name="Claim & Fact Substantiation Agent",
+                score=100.0,
+                status="PASSED",
+                confidence=0.99,
+                summary="No factual or commercial claims present in conversational content.",
+                risk_spans=[],
+                citations=[]
+            )
+            legal_report = AgentFinding(
+                agent_name="Regulatory & Legal Compliance Agent",
+                score=100.0,
+                status="PASSED",
+                confidence=0.99,
+                summary="Conversational message meets all statutory criteria.",
+                risk_spans=[],
+                citations=[]
+            )
 
-        # 1c. Configured AI Provider Grounding (Gemini / Semantic Intelligence)
-        try:
-            from brandtrace.engine.ai_provider import ai_provider
-            truth_nodes = [{"id": f.id, "label": f.name} for f in getattr(bkg, "approved_facts", {}).values()] if hasattr(bkg, "approved_facts") else []
-            ai_findings = ai_provider.generate_grounded_review_sync(request.content, truth_nodes, [])
-            for af in ai_findings:
-                if af.exact_text and af.exact_text.lower() in request.content.lower():
-                    s_idx = request.content.lower().find(af.exact_text.lower())
-                    e_idx = s_idx + len(af.exact_text)
-                    # Add if not overlapping with an existing span
-                    if not any(max(s.start_char, s_idx) < min(s.end_char, e_idx) for s in all_spans):
-                        sev_map = {
-                            "CRITICAL": SeverityLevel.CRITICAL,
-                            "BLOCKING": SeverityLevel.CRITICAL,
-                            "HIGH": SeverityLevel.HIGH,
-                            "MAJOR": SeverityLevel.HIGH,
-                            "MODERATE": SeverityLevel.MODERATE,
-                            "LOW": SeverityLevel.LOW
-                        }
+            # Map grammar findings if any into advisory spans
+            for gf in ci_report.grammar_findings:
+                all_spans.append(
+                    RiskSpan(
+                        start_char=gf.start_char,
+                        end_char=gf.end_char,
+                        matched_text=gf.original_text,
+                        category="VOICE",
+                        severity=SeverityLevel.LOW,
+                        explanation=gf.explanation,
+                        rule_citation="Editorial Style & Writing Standard (§Grammar & Capitalization)",
+                        suggested_fix=gf.suggested_text
+                    )
+                )
+
+            remediated_text = ci_report.corrected_content
+            remediation_rationale = (
+                "No policy defects detected. Original content meets all governance thresholds."
+                if not all_spans else
+                "Enhanced capitalization and punctuation while preserving friendly conversational tone."
+            )
+            composite_risk = 0.0 if not all_spans else 4.0
+            critical_count = 0
+            decision = "APPROVED_FOR_RELEASE"
+            verdict_badge = "READY FOR REVIEW"
+        else:
+            # Standard marketing / product / campaign inspection
+            voice_report = self.voice_agent.analyze(request.content, bkg)
+            claim_report = self.claim_agent.analyze(request.content, bkg)
+            legal_report = self.legal_agent.analyze(request.content, bkg)
+
+            all_spans.extend(voice_report.risk_spans)
+            all_spans.extend(claim_report.risk_spans)
+            all_spans.extend(legal_report.risk_spans)
+
+            # If announcement or schedule without product mentions, suppress spurious hype checks
+            if (is_announcement or is_informational) and not any(w in request.content.lower() for w in ["serum", "cream", "skin", "aurelle", "battery", "price", "trial", "sale", "discount"]):
+                all_spans = [s for s in all_spans if s.category != "VOICE" or "insane" in s.matched_text.lower() or "unbeatable" in s.matched_text.lower()]
+
+            # 1b. Brand & Aurelle Rulebook Grounding (Facts & Specific Rules)
+            brand_id_lower = (request.brand_id or "").lower()
+            if not brand_id_lower or "aurelle" in brand_id_lower:
+                aurelle_spans = self._analyze_aurelle_specifics(
+                    request.content,
+                    key_phrases=getattr(request, "key_phrases", None),
+                    cta=getattr(request, "call_to_action", None)
+                )
+                for aspan in aurelle_spans:
+                    if not any(abs(s.start_char - aspan.start_char) < 3 and s.matched_text == aspan.matched_text for s in all_spans):
+                        all_spans.append(aspan)
+
+            # 1b-2. Ground detected claims from Content Intelligence
+            for dc in ci_report.detected_claims:
+                if dc.claim_type == "MEDICAL_CURE":
+                    if not any("drug" in s.explanation.lower() or "cure" in s.explanation.lower() or "medical" in s.explanation.lower() for s in all_spans):
+                        all_spans.append(
+                            RiskSpan(
+                                start_char=dc.start_char,
+                                end_char=dc.end_char,
+                                matched_text=dc.claim_text,
+                                category="REGULATORY",
+                                severity=SeverityLevel.CRITICAL,
+                                explanation=dc.explanation,
+                                rule_citation=dc.applicable_standard,
+                                suggested_fix="supports general health and wellness (consult healthcare professional)"
+                            )
+                        )
+                elif dc.claim_type == "QUANTITATIVE":
+                    if not any(dc.claim_text.lower() in s.matched_text.lower() for s in all_spans):
+                        all_spans.append(
+                            RiskSpan(
+                                start_char=dc.start_char,
+                                end_char=dc.end_char,
+                                matched_text=dc.claim_text,
+                                category="CLAIM",
+                                severity=SeverityLevel.HIGH,
+                                explanation=dc.explanation,
+                                rule_citation=dc.applicable_standard,
+                                suggested_fix=f"{dc.claim_text}* (*verified under standardized test protocol)"
+                            )
+                        )
+                elif dc.claim_type == "SUBJECTIVE_PUFFERY":
+                    if not any(dc.claim_text.lower() in s.matched_text.lower() for s in all_spans):
+                        all_spans.append(
+                            RiskSpan(
+                                start_char=dc.start_char,
+                                end_char=dc.end_char,
+                                matched_text=dc.claim_text,
+                                category="VOICE",
+                                severity=SeverityLevel.LOW,
+                                explanation=dc.explanation,
+                                rule_citation=dc.applicable_standard,
+                                suggested_fix="committed to providing high-quality service"
+                            )
+                        )
+
+            # 1b-3. Ground grammar findings from Content Intelligence
+            for gf in ci_report.grammar_findings:
+                if not any(max(s.start_char, gf.start_char) < min(s.end_char, gf.end_char) for s in all_spans):
+                    all_spans.append(
+                        RiskSpan(
+                            start_char=gf.start_char,
+                            end_char=gf.end_char,
+                            matched_text=gf.original_text,
+                            category="VOICE",
+                            severity=SeverityLevel.LOW,
+                            explanation=gf.explanation,
+                            rule_citation="Editorial Style & Writing Standard (§Grammar & Phrasing)",
+                            suggested_fix=gf.suggested_text
+                        )
+                    )
+
+            # 1c. Configured AI Provider Grounding (Gemini / Semantic Intelligence)
+            try:
+                from brandtrace.engine.ai_provider import ai_provider
+                truth_nodes = [{"id": f.id, "label": f.name} for f in getattr(bkg, "approved_facts", {}).values()] if hasattr(bkg, "approved_facts") else []
+                ai_findings = ai_provider.generate_grounded_review_sync(request.content, truth_nodes, [])
+                for af in ai_findings:
+                    if af.exact_text and af.exact_text.lower() in request.content.lower():
+                        s_idx = request.content.lower().find(af.exact_text.lower())
+                        e_idx = s_idx + len(af.exact_text)
+                        if not any(max(s.start_char, s_idx) < min(s.end_char, e_idx) for s in all_spans):
+                            sev_map = {
+                                "CRITICAL": SeverityLevel.CRITICAL,
+                                "BLOCKING": SeverityLevel.CRITICAL,
+                                "HIGH": SeverityLevel.HIGH,
+                                "MAJOR": SeverityLevel.HIGH,
+                                "MODERATE": SeverityLevel.MODERATE,
+                                "LOW": SeverityLevel.LOW
+                            }
+                            all_spans.append(
+                                RiskSpan(
+                                    start_char=s_idx,
+                                    end_char=e_idx,
+                                    matched_text=request.content[s_idx:e_idx],
+                                    category=af.category,
+                                    severity=sev_map.get(af.severity, SeverityLevel.MODERATE),
+                                    explanation=af.explanation,
+                                    rule_citation=f"{af.citation.rule_or_fact_id} ({af.citation.source_title})",
+                                    suggested_fix=af.suggested_correction
+                                )
+                            )
+            except Exception:
+                pass
+
+            # 1d. Multimodal & Cross-Modal Image Grounding
+            if request.image_analysis and isinstance(request.image_analysis, dict):
+                raw_findings = (request.image_analysis.get("findings") or []) + (request.image_analysis.get("cross_modal_findings") or [])
+                for imf in raw_findings:
+                    if isinstance(imf, dict):
+                        loc = imf.get("location", "Visual Asset")
+                        expl = imf.get("explanation", "Visual rule finding")
+                        cite = imf.get("rule_citation", "Visual Guidelines")
+                        fix = imf.get("suggested_fix", "")
+                        sev_val = str(imf.get("severity", "MODERATE")).upper()
+                        cat = imf.get("category", "VISUAL")
+                    else:
+                        loc = getattr(imf, "location", "Visual Asset")
+                        expl = getattr(imf, "explanation", "Visual rule finding")
+                        cite = getattr(imf, "rule_citation", "Visual Guidelines")
+                        fix = getattr(imf, "suggested_fix", "")
+                        sev_val = str(getattr(imf, "severity", "MODERATE")).upper()
+                        cat = getattr(imf, "category", "VISUAL")
+
+                    sev_map = {
+                        "CRITICAL": SeverityLevel.CRITICAL,
+                        "BLOCKING": SeverityLevel.CRITICAL,
+                        "HIGH": SeverityLevel.HIGH,
+                        "MAJOR": SeverityLevel.HIGH,
+                        "MODERATE": SeverityLevel.MODERATE,
+                        "LOW": SeverityLevel.LOW,
+                        "INFO": SeverityLevel.LOW,
+                    }
+                    actual_sev = sev_map.get(sev_val, SeverityLevel.MODERATE)
+
+                    s_idx = 0
+                    e_idx = min(len(request.content), 25)
+                    matched_str = loc
+                    for kw in ["100% natural", "zero toxins", "60%", "2 weeks", "₹499", "completely healed", "cures eczema", "treatment"]:
+                        if kw in expl.lower() and kw in request.content.lower():
+                            f_idx = request.content.lower().find(kw)
+                            s_idx = f_idx
+                            e_idx = f_idx + len(kw)
+                            matched_str = request.content[s_idx:e_idx]
+                            break
+
+                    if not any(s.explanation == expl for s in all_spans):
                         all_spans.append(
                             RiskSpan(
                                 start_char=s_idx,
                                 end_char=e_idx,
-                                matched_text=request.content[s_idx:e_idx],
-                                category=af.category,
-                                severity=sev_map.get(af.severity, SeverityLevel.MODERATE),
-                                explanation=af.explanation,
-                                rule_citation=f"{af.citation.rule_or_fact_id} ({af.citation.source_title})",
-                                suggested_fix=af.suggested_correction
+                                matched_text=matched_str,
+                                category="CLAIM" if "contradict" in expl.lower() else ("VISUAL" if "color" in expl.lower() or "contrast" in expl.lower() else "REGULATORY"),
+                                severity=actual_sev,
+                                explanation=expl,
+                                rule_citation=cite,
+                                suggested_fix=fix
                             )
                         )
-        except Exception:
-            # Resilient fallback: network or provider timeouts do not break inspection
-            pass
 
-        # 1d. Multimodal & Cross-Modal Image Grounding
-        if request.image_analysis and isinstance(request.image_analysis, dict):
-            raw_findings = (request.image_analysis.get("findings") or []) + (request.image_analysis.get("cross_modal_findings") or [])
-            for imf in raw_findings:
-                if isinstance(imf, dict):
-                    loc = imf.get("location", "Visual Asset")
-                    expl = imf.get("explanation", "Visual rule finding")
-                    cite = imf.get("rule_citation", "Visual Guidelines")
-                    fix = imf.get("suggested_fix", "")
-                    sev_val = str(imf.get("severity", "MODERATE")).upper()
-                    cat = imf.get("category", "VISUAL")
-                else:
-                    loc = getattr(imf, "location", "Visual Asset")
-                    expl = getattr(imf, "explanation", "Visual rule finding")
-                    cite = getattr(imf, "rule_citation", "Visual Guidelines")
-                    fix = getattr(imf, "suggested_fix", "")
-                    sev_val = str(getattr(imf, "severity", "MODERATE")).upper()
-                    cat = getattr(imf, "category", "VISUAL")
+            # 2. Risk Scoring & Governance Gate
+            risk_points = 0.0
+            critical_count = 0
+            for span in all_spans:
+                if span.severity == SeverityLevel.CRITICAL:
+                    risk_points += 35.0
+                    critical_count += 1
+                elif span.severity == SeverityLevel.HIGH:
+                    risk_points += 20.0
+                elif span.severity == SeverityLevel.MODERATE:
+                    risk_points += 10.0
+                elif span.severity == SeverityLevel.LOW:
+                    risk_points += 4.0
 
-                sev_map = {
-                    "CRITICAL": SeverityLevel.CRITICAL,
-                    "BLOCKING": SeverityLevel.CRITICAL,
-                    "HIGH": SeverityLevel.HIGH,
-                    "MAJOR": SeverityLevel.HIGH,
-                    "MODERATE": SeverityLevel.MODERATE,
-                    "LOW": SeverityLevel.LOW,
-                    "INFO": SeverityLevel.LOW,
-                }
-                actual_sev = sev_map.get(sev_val, SeverityLevel.MODERATE)
+            composite_risk = min(100.0, round(risk_points, 1))
 
-                # Locate relevant text in content if applicable
-                s_idx = 0
-                e_idx = min(len(request.content), 25)
-                matched_str = loc
-                for kw in ["100% natural", "zero toxins", "60%", "2 weeks", "₹499", "completely healed", "cures eczema", "treatment"]:
-                    if kw in expl.lower() and kw in request.content.lower():
-                        f_idx = request.content.lower().find(kw)
-                        s_idx = f_idx
-                        e_idx = f_idx + len(kw)
-                        matched_str = request.content[s_idx:e_idx]
-                        break
+            if critical_count > 0 or composite_risk >= 50:
+                decision = "REJECTED_GATED"
+            elif composite_risk >= 20:
+                decision = "STAGED_FOR_HUMAN_REVIEW"
+            else:
+                decision = "APPROVED_FOR_RELEASE"
 
-                if not any(s.explanation == expl for s in all_spans):
-                    all_spans.append(
-                        RiskSpan(
-                            start_char=s_idx,
-                            end_char=e_idx,
-                            matched_text=matched_str,
-                            category="CLAIM" if "contradict" in expl.lower() else ("VISUAL" if "color" in expl.lower() or "contrast" in expl.lower() else "REGULATORY"),
-                            severity=actual_sev,
-                            explanation=expl,
-                            rule_citation=cite,
-                            suggested_fix=fix
-                        )
-                    )
-
-        # 2. Risk Scoring & Governance Gate
-        # Critical severity adds 35 risk points, High adds 20, Moderate adds 10, Low adds 4.
-        risk_points = 0.0
-        critical_count = 0
-        for span in all_spans:
-            if span.severity == SeverityLevel.CRITICAL:
-                risk_points += 35.0
-                critical_count += 1
-            elif span.severity == SeverityLevel.HIGH:
-                risk_points += 20.0
-            elif span.severity == SeverityLevel.MODERATE:
-                risk_points += 10.0
-            elif span.severity == SeverityLevel.LOW:
-                risk_points += 4.0
-
-        composite_risk = min(100.0, round(risk_points, 1))
-
-        # Governance Decision Matrix
-        if critical_count > 0 or composite_risk >= 50:
-            decision = "REJECTED_GATED"
-        elif composite_risk >= 20:
-            decision = "STAGED_FOR_HUMAN_REVIEW"
-        else:
-            decision = "APPROVED_FOR_RELEASE"
-
-        # 3. Generate Remediation
-        remediated_text, remediation_rationale = self.generate_remediation(request.content, all_spans)
+            # 3. Generate Remediation
+            remediated_text, remediation_rationale = self.generate_remediation(request.content, all_spans)
+            if remediated_text == request.content and ci_report.corrected_content != request.content:
+                remediated_text = ci_report.corrected_content
+            remediated_text = re.sub(r"\s+([,\.!?;:])", r"\1", remediated_text)
 
         # 4. Generate Sentence-Level Findings & Verdict
         sentence_findings = self._build_sentence_findings(request.content, all_spans)
@@ -786,60 +913,79 @@ class AutonomousGovernancePipeline:
             sentence_findings=sentence_findings,
             summary_counts=summary_counts,
             verdict_badge=verdict_badge,
-            image_analysis=request.image_analysis
+            image_analysis=request.image_analysis,
+            content_type=ci_report.classification.content_type,
+            intent=ci_report.classification.intent,
+            summary=ci_report.classification.summary,
+            original_content=ci_report.original_content,
+            corrected_content=ci_report.corrected_content,
+            grammar_findings=[f.model_dump() for f in ci_report.grammar_findings],
+            claim_findings=[c.model_dump() for c in ci_report.detected_claims],
+            policy_findings=[f for f in sentence_findings if f.get("category") in ["POLICY", "VOICE", "BRAND"] or f.get("severity") in ["BLOCKING", "CRITICAL"]],
+            regulatory_findings=[f for f in sentence_findings if f.get("category") in ["REGULATORY", "STATUTORY"]],
+            brand_findings=[f for f in sentence_findings if "FACT" in f.get("rule_citation", "") or "Brand" in f.get("rule_citation", "")],
+            suggestions=[{"original": f.original_text, "suggested": f.suggested_text, "explanation": f.explanation} for f in ci_report.grammar_findings],
+            overall_status=ci_report.overall_status,
+            analysis_status="SUCCESS",
+            limitations=ci_report.limitations or []
         )
 
     def _analyze_aurelle_specifics(self, text: str, key_phrases: Optional[str] = None, cta: Optional[str] = None) -> List[RiskSpan]:
         spans: List[RiskSpan] = []
         lower_text = text.lower()
+        has_cosmetic_context = any(w in lower_text for w in [
+            "skin", "spots", "barrier", "serum", "vitamin c", "aurelle", "cream",
+            "lotion", "dermatol", "cosmetic", "glow", "blemish", "face", "complexion"
+        ])
 
-        # 1. FACT-014: Dark spots study benchmark & timeline exaggeration
-        dark_spots_pattern = re.compile(r"\b(?:fade\s+dark\s+spots\s+)?(?:by\s+)?60%(?:\s+in\s+just\s+2\s+weeks|\s+in\s+2\s+weeks)?\b", re.IGNORECASE)
-        for m in dark_spots_pattern.finditer(text):
-            spans.append(
-                RiskSpan(
-                    start_char=m.start(),
-                    end_char=m.end(),
-                    matched_text=m.group(0),
-                    category="CLAIM",
-                    severity=SeverityLevel.CRITICAL,
-                    explanation="Clinical evidence confirms 32% reduction in 8 weeks under protocol AUR-LAB-014, not 60% in 2 weeks.",
-                    rule_citation="FACT-014 (Clinical Hydration & Barrier Benchmark)",
-                    suggested_fix="fade dark spots by 32% in 8 weeks (FACT-014)"
+        # 1. FACT-014: Dark spots study benchmark & timeline exaggeration (Cosmetics context only)
+        if has_cosmetic_context:
+            dark_spots_pattern = re.compile(r"\b(?:fade\s+dark\s+spots\s+)?(?:by\s+)?60%(?:\s+in\s+just\s+2\s+weeks|\s+in\s+2\s+weeks)?\b", re.IGNORECASE)
+            for m in dark_spots_pattern.finditer(text):
+                spans.append(
+                    RiskSpan(
+                        start_char=m.start(),
+                        end_char=m.end(),
+                        matched_text=m.group(0),
+                        category="CLAIM",
+                        severity=SeverityLevel.CRITICAL,
+                        explanation="Clinical evidence confirms 32% reduction in 8 weeks under protocol AUR-LAB-014, not 60% in 2 weeks.",
+                        rule_citation="FACT-014 (Clinical Hydration & Barrier Benchmark)",
+                        suggested_fix="fade dark spots by 32% in 8 weeks (FACT-014)"
+                    )
                 )
-            )
 
-        # 1b. FACT-014: Concentration percentage check against approved formula (15% Ethyl Ascorbic Acid)
-        vit_c_pattern = re.compile(r"\b([2-9]\d|\d{3})%\s*(?:vitamin\s+c|ethyl\s+ascorbic)\b", re.IGNORECASE)
-        for m in vit_c_pattern.finditer(text):
-            spans.append(
-                RiskSpan(
-                    start_char=m.start(),
-                    end_char=m.end(),
-                    matched_text=m.group(0),
-                    category="CLAIM",
-                    severity=SeverityLevel.CRITICAL,
-                    explanation=f"Claimed concentration '{m.group(0)}' contradicts approved formulation of 15% Ethyl Ascorbic Acid (FACT-014).",
-                    rule_citation="FACT-014 (Clinical Formulation & Barrier Benchmark)",
-                    suggested_fix="15% Vitamin C"
+            # 1b. FACT-014: Concentration percentage check against approved formula (15% Ethyl Ascorbic Acid)
+            vit_c_pattern = re.compile(r"\b([2-9]\d|\d{3})%\s*(?:vitamin\s+c|ethyl\s+ascorbic)\b", re.IGNORECASE)
+            for m in vit_c_pattern.finditer(text):
+                spans.append(
+                    RiskSpan(
+                        start_char=m.start(),
+                        end_char=m.end(),
+                        matched_text=m.group(0),
+                        category="CLAIM",
+                        severity=SeverityLevel.CRITICAL,
+                        explanation=f"Claimed concentration '{m.group(0)}' contradicts approved formulation of 15% Ethyl Ascorbic Acid (FACT-014).",
+                        rule_citation="FACT-014 (Clinical Formulation & Barrier Benchmark)",
+                        suggested_fix="15% Vitamin C"
+                    )
                 )
-            )
 
-        # 2. Healed skin barrier / cure claim
-        barrier_pattern = re.compile(r"\b(?:my\s+)?skin\s+barrier\s+is\s+completely\s+healed\b", re.IGNORECASE)
-        for m in barrier_pattern.finditer(text):
-            spans.append(
-                RiskSpan(
-                    start_char=m.start(),
-                    end_char=m.end(),
-                    matched_text=m.group(0),
-                    category="CLAIM",
-                    severity=SeverityLevel.HIGH,
-                    explanation="Cosmetics cannot claim permanent physiological healing of dermal barriers under CDSCO & FDA guidelines.",
-                    rule_citation="Approved Claim AC-AUR-03 / CDSCO Drugs & Cosmetics Act",
-                    suggested_fix="skin barrier function is visibly supported"
+            # 2. Healed skin barrier / cure claim
+            barrier_pattern = re.compile(r"\b(?:my\s+)?skin\s+barrier\s+is\s+completely\s+healed\b", re.IGNORECASE)
+            for m in barrier_pattern.finditer(text):
+                spans.append(
+                    RiskSpan(
+                        start_char=m.start(),
+                        end_char=m.end(),
+                        matched_text=m.group(0),
+                        category="CLAIM",
+                        severity=SeverityLevel.HIGH,
+                        explanation="Cosmetics cannot claim permanent physiological healing of dermal barriers under CDSCO & FDA guidelines.",
+                        rule_citation="Approved Claim AC-AUR-03 / CDSCO Drugs & Cosmetics Act",
+                        suggested_fix="skin barrier function is visibly supported"
+                    )
                 )
-            )
 
         # 3. Medical / Disease Treatment (e.g. Eczema, Dermatitis, Acne Cures)
         cure_pattern = re.compile(r"\b(?:cures?\s+(?:dermatitis|acne|eczema|psoriasis)|treats?\s+(?:cystic\s+acne|dermatitis)|treatment\s+for\s+(?:eczema|acne|dermatitis)(?:(?:\s+and\s+dry)?,\s+itchy\s+skin)?)\b", re.IGNORECASE)
@@ -1129,7 +1275,7 @@ class AutonomousGovernancePipeline:
                 )
 
         # 10. Missing mandatory key phrases (if specified by Creator)
-        if key_phrases:
+        if key_phrases and key_phrases.strip():
             req_phrases = [p.strip() for p in key_phrases.split(",") if p.strip()]
             for p in req_phrases:
                 if p.lower() not in lower_text:
@@ -1221,6 +1367,8 @@ class AutonomousGovernancePipeline:
                 m_rule = re.search(r"TM-[A-Za-z0-9-]+", span.rule_citation)
                 if m_rule:
                     rule_id = m_rule.group(0)
+            elif "Writing Standard" in span.rule_citation or "Editorial Style" in span.rule_citation or "WQ-" in span.rule_citation:
+                rule_id = "WQ-01"
 
             suggested_sentence = enclosing_sentence
             if span.suggested_fix and span.matched_text and span.matched_text in enclosing_sentence:
@@ -1268,6 +1416,9 @@ class AutonomousGovernancePipeline:
             elif rule_id == "FACT-006":
                 rule_title = "Authorized Commercial Pricing Schedule"
                 evidence_ref = "SOURCE Aurelle Commercial Pricing Schedule (FACT-006)"
+            elif rule_id == "WQ-01":
+                rule_title = "Editorial Grammar & Style Standard"
+                evidence_ref = "SOURCE Editorial Style & Writing Standard"
             elif not evidence_ref.startswith("SOURCE"):
                 evidence_ref = f"SOURCE {evidence_ref}"
 

@@ -55,4 +55,19 @@ class VerificationResult(BaseModel):
     summary_counts: Optional[Dict[str, int]] = None
     verdict_badge: Optional[str] = None
     image_analysis: Optional[Dict[str, Any]] = None
+        # Creator Content Intelligence
+    content_type: Optional[str] = None
+    intent: Optional[str] = None
+    summary: Optional[str] = None
+    original_content: Optional[str] = None
+    corrected_content: Optional[str] = None
+    grammar_findings: List[Dict[str, Any]] = Field(default_factory=list)
+    claim_findings: List[Dict[str, Any]] = Field(default_factory=list)
+    policy_findings: List[Dict[str, Any]] = Field(default_factory=list)
+    regulatory_findings: List[Dict[str, Any]] = Field(default_factory=list)
+    brand_findings: List[Dict[str, Any]] = Field(default_factory=list)
+    suggestions: List[Dict[str, Any]] = Field(default_factory=list)
+    overall_status: Optional[str] = None
+    analysis_status: Optional[str] = None
+    limitations: List[str] = Field(default_factory=list)
 

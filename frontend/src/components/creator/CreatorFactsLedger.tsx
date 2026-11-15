@@ -35,12 +35,19 @@ interface CreatorFactsLedgerProps {
 function formatTimelineDate(dateStr?: string): string {
   if (!dateStr) return '';
   try {
+    const raw = dateStr.split('T')[0];
+    const parts = raw.split('-');
+    if (parts.length === 3) {
+      const day = parseInt(parts[2], 10);
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+      const monthIdx = parseInt(parts[1], 10) - 1;
+      const year = parseInt(parts[0], 10);
+      return `${day} ${months[monthIdx] || parts[1]} ${year}`;
+    }
     const d = new Date(dateStr);
     const day = d.getDate();
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
-    const month = months[d.getMonth()];
-    const year = d.getFullYear();
-    return `${day} ${month} ${year}`;
+    return `${day} ${months[d.getMonth()]} ${d.getFullYear()}`;
   } catch {
     return dateStr;
   }
@@ -359,6 +366,8 @@ export const CreatorFactsLedger: React.FC<CreatorFactsLedgerProps> = ({
                 const leftPct = Math.max(0, Math.min(100, ((sourceMs - domainStartMs) / totalDomainMs) * 100));
                 const endPct = Math.max(0, Math.min(100, ((expiryMs - domainStartMs) / totalDomainMs) * 100));
                 const widthPct = Math.max(3.5, endPct - leftPct);
+                const barWidthPct = isExpired ? Math.max(3.5, todayLeftPct - leftPct) : widthPct;
+                const labelLeftPct = isExpired ? todayLeftPct : (leftPct + widthPct);
 
                 const formattedDate = formatTimelineDate(fact.expiry_date);
 
@@ -391,7 +400,7 @@ export const CreatorFactsLedger: React.FC<CreatorFactsLedgerProps> = ({
                           backgroundColor: isExpired ? '#c85a54' : '#2d7d59',
                         }}
                         initial={{ width: 0, opacity: 0.2 }}
-                        whileInView={{ width: `${widthPct}%`, opacity: 1 }}
+                        whileInView={{ width: `${barWidthPct}%`, opacity: 1 }}
                         viewport={{ once: true, margin: '-20px' }}
                         transition={{
                           duration: 0.75,
@@ -405,7 +414,7 @@ export const CreatorFactsLedger: React.FC<CreatorFactsLedgerProps> = ({
                       <motion.div
                         style={{
                           position: 'absolute',
-                          left: `${leftPct + widthPct}%`,
+                          left: `${labelLeftPct}%`,
                         }}
                         className="pl-2 sm:pl-2.5 flex items-center select-none z-10 pointer-events-none"
                         initial={{ opacity: 0, x: -4 }}

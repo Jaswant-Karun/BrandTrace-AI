@@ -301,16 +301,24 @@ export const CreatorClaimWatch: React.FC<CreatorClaimWatchProps> = ({
       </AnimatePresence>
 
       {/* Header Eyebrow & Title */}
-      <div className="space-y-1.5 pt-2">
-        <div className="text-[11px] font-mono tracking-widest text-zinc-500 uppercase">
-          PLUMBLINE · {brandName.toUpperCase()}
+      <div className="relative pt-2">
+        {/* Suspended Plumb Bob Diamond Icon from top right */}
+        <div className="absolute right-4 -top-8 hidden md:flex flex-col items-center pointer-events-none select-none">
+          <div className="w-[1px] h-14 bg-neutral-700/80" />
+          <div className="w-3.5 h-3.5 rotate-45 bg-[#7064e9] shadow-[0_0_14px_rgba(112,100,233,0.7)] -mt-0.5" />
         </div>
-        <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-white uppercase font-sans">
-          CLAIM WATCH
-        </h1>
-        <p className="text-zinc-400 text-xs sm:text-sm max-w-2xl leading-relaxed pt-1">
-          Facts change after a post goes live. This shows the live posts whose facts moved, and the live pages that no longer match what was approved.
-        </p>
+
+        <div className="space-y-1.5">
+          <div className="text-[11px] font-mono tracking-widest text-zinc-500 uppercase">
+            PLUMBLINE · {brandName.toUpperCase()}
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-white uppercase font-sans">
+            CLAIM WATCH
+          </h1>
+          <p className="text-zinc-400 text-xs sm:text-sm max-w-2xl leading-relaxed pt-1">
+            Facts change after a post goes live. This shows the live posts whose facts moved, and the live pages that no longer match what was approved.
+          </p>
+        </div>
       </div>
 
       {/* SECTION 1: UPDATE OR WITHDRAW */}

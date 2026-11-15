@@ -547,6 +547,20 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
                   {(sub.current_content || sub.original_content || '').length > 240 ? '...' : ''}
                 </div>
 
+                {/* Cryptographic Release Seal Banner for Released Submissions */}
+                {(sub.release_seal || sub.release_id) && (
+                  <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl bg-cyan-950/40 border border-cyan-500/40 text-xs font-mono">
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-cyan-400 shrink-0" />
+                      <span className="text-cyan-300 font-bold uppercase tracking-wider">CRYPTOGRAPHIC RELEASE SEAL:</span>
+                      <span className="text-white font-bold">{sub.release_seal || sub.release_id}</span>
+                    </div>
+                    <span className="text-[10px] text-cyan-400 font-sans">
+                      Verified against Brand Knowledge Graph & SHA-256 Digest
+                    </span>
+                  </div>
+                )}
+
                 {/* Reviewer Feedback Banner (Active when Changes Requested) */}
                 {isChangesReq && (
                   <div className="p-4 rounded-xl bg-amber-950/40 border border-amber-600/70 space-y-3">

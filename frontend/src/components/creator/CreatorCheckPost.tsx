@@ -278,7 +278,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
 
   const [postTitle, setPostTitle] = useState<string>(() => {
     if (revisionData?.submissionId) return `Revision: ${revisionData.submissionId}`;
-    return 'Diwali Festive Glow Campaign';
+    return '';
   });
   const [contentType, setContentType] = useState<ContentType>('email');
   const [isSavingDraft, setIsSavingDraft] = useState<boolean>(false);
@@ -288,15 +288,19 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
   const [activeFindingFilter, setActiveFindingFilter] = useState<'all' | 'blocking' | 'major' | 'minor' | 'needsHuman' | 'advisory' | 'claims' | 'rules' | 'compliance' | 'visual'>('blocking');
 
   const [channel, setChannel] = useState<PostChannel>(revisionData?.channel || 'Instagram');
-  const [keyPhrases, setKeyPhrases] = useState<string>('Diwali, sale, 20% off');
-  const [callToAction, setCallToAction] = useState<string>('shop the Diwali gift set');
+  const [keyPhrases, setKeyPhrases] = useState<string>('');
+  const [callToAction, setCallToAction] = useState<string>('');
   const [isAccordionOpen, setIsAccordionOpen] = useState<boolean>(false);
   const [isChecking, setIsChecking] = useState<boolean>(false);
   const [hasChecked, setHasChecked] = useState<boolean>(false);
+  const [contentIntelligence, setContentIntelligence] = useState<any | null>(null);
 
   const handleOpenSamplePost = () => {
     setDraftContent(DEFAULT_SAMPLE_TEXT);
+    setPostTitle('Aurelle Vitamin-C Radiance Launch');
     setChannel('Instagram');
+    setKeyPhrases('Vitamin C, glow, brightening');
+    setCallToAction('Shop now at aurelle.com');
     setAnalysisId(null);
     setHasChecked(false);
   };
@@ -600,6 +604,19 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
       }),
     });
     setAnalysisId(res?.verification_id || null);
+
+    if (res) {
+      setContentIntelligence({
+        contentType: res.content_type || 'General Text',
+        intent: res.intent || 'Informational',
+        summary: res.summary || '',
+        originalContent: res.original_content || activeText,
+        correctedContent: res.corrected_content || res.remediated_content || activeText,
+        grammarFindings: res.grammar_findings || [],
+        claimFindings: res.claim_findings || [],
+        overallStatus: res.overall_status || 'NO_ISSUES',
+      });
+    }
 
     const parsedFindings: FindingItem[] = [];
     let count = 1;
@@ -1766,7 +1783,77 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
           transition={{ duration: 0.3 }}
           className="space-y-6 pt-6 border-t border-neutral-800"
         >
-          
+          {/* Content Intelligence & Intent Classification Banner */}
+          {contentIntelligence && (
+            <div className="p-4 sm:p-5 rounded-2xl bg-neutral-900 border border-indigo-500/30 space-y-3.5 shadow-xl">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-800 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-indigo-400 animate-pulse" />
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-300">
+                    CONTENT INTELLIGENCE & SEMANTIC INTENT
+                  </span>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 text-[10px] font-mono">
+                  <span className="px-2.5 py-0.5 rounded-full bg-indigo-950/80 border border-indigo-500/40 text-indigo-200 font-bold uppercase">
+                    TYPE: {contentIntelligence.contentType}
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-neutral-800 border border-neutral-700 text-neutral-300 font-bold uppercase">
+                    INTENT: {contentIntelligence.intent}
+                  </span>
+                  <span className={`px-2.5 py-0.5 rounded-full border font-bold uppercase ${
+                    contentIntelligence.overallStatus === 'NO_ISSUES' ? 'bg-emerald-950/80 border-emerald-500/40 text-emerald-300' :
+                    contentIntelligence.overallStatus === 'CONFIRMED_POLICY_VIOLATION' ? 'bg-rose-950/80 border-rose-500/40 text-rose-300' :
+                    'bg-amber-950/80 border-amber-500/40 text-amber-300'
+                  }`}>
+                    {contentIntelligence.overallStatus.replace(/_/g, ' ')}
+                  </span>
+                </div>
+              </div>
+
+              {contentIntelligence.summary && (
+                <p className="text-xs text-neutral-300 font-sans leading-relaxed">
+                  {contentIntelligence.summary}
+                </p>
+              )}
+
+              {/* Writing Quality & Grammar Suggestions if present */}
+              {contentIntelligence.grammarFindings && contentIntelligence.grammarFindings.length > 0 && (
+                <div className="p-3.5 rounded-xl bg-neutral-950 border border-indigo-500/20 space-y-2.5">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <span className="text-xs font-mono font-bold text-indigo-300 uppercase tracking-wide">
+                      Writing Quality & Editorial Improvements ({contentIntelligence.grammarFindings.length})
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (contentIntelligence.correctedContent) {
+                          setDraftContent(contentIntelligence.correctedContent);
+                          setDraftToast("Applied editorial grammar and punctuation improvements");
+                          setTimeout(() => setDraftToast(null), 3000);
+                        }
+                      }}
+                      className="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-white font-mono text-xs font-bold transition-colors cursor-pointer"
+                    >
+                      Apply All Editorial Corrections
+                    </button>
+                  </div>
+                  <div className="space-y-1.5">
+                    {contentIntelligence.grammarFindings.map((gf: any, i: number) => (
+                      <div key={i} className="text-xs font-sans text-neutral-300 flex items-start gap-2">
+                        <span className="text-neutral-500 font-mono text-[11px] shrink-0">•</span>
+                        <div>
+                          <span className="text-rose-300 line-through mr-1 font-mono">{gf.original_text}</span>
+                          <span className="text-emerald-300 font-mono font-semibold mr-2">→ {gf.suggested_text}</span>
+                          <span className="text-neutral-400 text-[11px]">({gf.explanation})</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* A. THE VERDICT CARD (EXACT PLUMBLINE MATCH) */}
           {verdict && (
             <div className="rounded-2xl border border-neutral-800 bg-[#16161a] shadow-2xl overflow-hidden p-6 sm:p-7">

@@ -1602,6 +1602,14 @@ class SubmissionsService:
             "created_at": int(time.time() * 1000)
         }
         _NOTIFICATIONS_STORE.insert(0, notif)
+        if mongo_manager.is_connected and mongo_manager.db is not None:
+            try:
+                import asyncio
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    asyncio.create_task(mongo_manager.db.notifications.insert_one(dict(notif)))
+            except Exception:
+                pass
 
     def list_notifications(self, role: Optional[str] = None) -> List[Dict[str, Any]]:
         if not role:
