@@ -1,7 +1,41 @@
 import hashlib
 import json
 import time
-from typing import Dict, Any
+import os
+from typing import Dict, Any, Optional
+from datetime import datetime, timedelta, timezone
+import jwt
+
+SECRET_KEY = os.getenv("JWT_SECRET_KEY", "brandtrace-enterprise-governance-secret-key-2026-audit")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 # 24 hours
+
+def hash_password(password: str, salt: str = "brandtrace_salt_v1") -> str:
+    """Computes SHA-256 salted password hash."""
+    return hashlib.sha256(f"{password}:{salt}".encode('utf-8')).hexdigest()
+
+def verify_password(plain_password: str, hashed_password: str, salt: str = "brandtrace_salt_v1") -> bool:
+    """Verifies plain password against stored salted hash."""
+    return hash_password(plain_password, salt) == hashed_password
+
+def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
+    """Creates signed JWT token with expiry and tenant claims."""
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire, "iat": datetime.now(timezone.utc)})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+def decode_access_token(token: str) -> Optional[Dict[str, Any]]:
+    """Decodes and validates JWT token."""
+    try:
+        decoded = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return decoded
+    except jwt.PyJWTError:
+        return None
 
 def compute_hash(content: str) -> str:
     """Computes SHA-256 hash of a string."""
