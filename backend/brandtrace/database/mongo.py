@@ -41,6 +41,7 @@ class MongoManager:
     _memory_embeddings: List[Dict[str, Any]] = []
     _memory_documents: Dict[str, Dict[str, Any]] = {}
     _memory_doc_versions: Dict[str, List[Dict[str, Any]]] = {}
+    _memory_claims: Dict[str, Dict[str, Any]] = {}
 
     def __init__(self):
         from brandtrace.database.repository import BrandTraceRepository
@@ -148,6 +149,11 @@ class MongoManager:
             await self.db.release_ledger.create_index([("org_id", ASCENDING), ("release_id", ASCENDING)], unique=True)
             await self.db.release_ledger.create_index([("timestamp", DESCENDING)])
             await self.db.release_ledger.create_index([("audit_stamp", ASCENDING)])
+            await self.db.claims.create_index(
+                [("org_id", ASCENDING), ("workspace_id", ASCENDING), ("claim_id", ASCENDING)],
+                unique=True,
+            )
+            await self.db.claims.create_index([("org_id", ASCENDING), ("status", ASCENDING), ("created_at", DESCENDING)])
 
             logger.info("MongoDB Atlas indexes ensured across all collections.")
         except Exception as e:
@@ -496,6 +502,67 @@ class MongoManager:
         if self.is_connected and self.db is not None:
             await self.db.verifications.insert_one(dict(verification_doc))
         self._memory_verifications.append(verification_doc)
+
+    async def save_claim(self, claim: Dict[str, Any]) -> Dict[str, Any]:
+        """Persist a claim extracted from a real verification result."""
+        self._memory_claims[claim["claim_id"]] = claim
+        if self.is_connected and self.db is not None:
+            await self.db.claims.update_one(
+                {"org_id": claim["org_id"], "claim_id": claim["claim_id"]},
+                {"$set": claim},
+                upsert=True,
+            )
+        return claim
+
+    async def list_claims(
+        self,
+        org_id: str,
+        workspace_id: Optional[str] = None,
+        status: Optional[str] = None,
+        search: Optional[str] = None,
+        skip: int = 0,
+        limit: int = 50,
+    ) -> List[Dict[str, Any]]:
+        query: Dict[str, Any] = {"org_id": org_id}
+        if workspace_id:
+            query["workspace_id"] = workspace_id
+        if status:
+            query["status"] = status
+        if search:
+            query["claim_text"] = {"$regex": search, "$options": "i"}
+        if self.is_connected and self.db is not None:
+            return await self.db.claims.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(length=limit)
+        claims = [
+            claim for claim in self._memory_claims.values()
+            if claim.get("org_id") == org_id
+            and (not workspace_id or claim.get("workspace_id") == workspace_id)
+            and (not status or claim.get("status") == status)
+            and (not search or search.lower() in claim.get("claim_text", "").lower())
+        ]
+        return sorted(claims, key=lambda claim: claim.get("created_at", 0), reverse=True)[skip:skip + limit]
+
+    async def get_claim(self, claim_id: str, org_id: str, workspace_id: Optional[str] = None) -> Optional[Dict[str, Any]]:
+        query: Dict[str, Any] = {"claim_id": claim_id, "org_id": org_id}
+        if workspace_id:
+            query["workspace_id"] = workspace_id
+        if self.is_connected and self.db is not None:
+            return await self.db.claims.find_one(query, {"_id": 0})
+        claim = self._memory_claims.get(claim_id)
+        if claim and claim.get("org_id") == org_id and (not workspace_id or claim.get("workspace_id") == workspace_id):
+            return claim
+        return None
+
+    async def link_claims_to_submission(self, verification_id: Optional[str], submission_id: str, org_id: str) -> None:
+        if not verification_id:
+            return
+        for claim in self._memory_claims.values():
+            if claim.get("verification_id") == verification_id and claim.get("org_id") == org_id:
+                claim["submission_id"] = submission_id
+        if self.is_connected and self.db is not None:
+            await self.db.claims.update_many(
+                {"verification_id": verification_id, "org_id": org_id},
+                {"$set": {"submission_id": submission_id}},
+            )
 
     async def list_verifications(self, brand_id: Optional[str] = None, limit: int = 20) -> List[Dict[str, Any]]:
         if self.is_connected and self.db is not None:

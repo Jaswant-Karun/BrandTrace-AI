@@ -14,7 +14,7 @@ Repository state at validation: `main...origin/main`, with uncommitted Phase 2 c
 | My Submissions | PASS | Preserved | PASS | Existing Phase 1 creator workflow tests |
 | Audit Log | PARTIAL | Added authenticated Creator filtering by `actor_id` and `org_id`; added action/resource/timestamp fields for new events; removed historical UI seed records | PARTIAL | Route and service inspection; targeted workflow tests pass. Legacy audit records without tenant metadata are intentionally not exposed to Creators |
 | Rulebook | PARTIAL | Removed static rule merge and hardcoded metrics; loads persisted `/api/guidelines` records through the authenticated API client | PARTIAL | Frontend build passes; endpoint and response model inspected |
-| FAQs | NOT TESTED | No implementation added | BLOCKED | Repository-wide search found no FAQ model, endpoint, service, or authoritative content source |
+| Facts | NOT TESTED | No implementation added in Phase 2 | PARTIAL | Existing approved-facts source was identified but still required Phase 3 API/UI completion |
 | Guideline Health | FAIL | Replaced hardcoded reviewer-health scores with persisted guideline counts and an explicit unavailable state for unsupported decision metrics | PARTIAL | Frontend build passes; `/api/guidelines` is the available source |
 | Claim Watch | PARTIAL | Preserved honest unavailable state; no simulated scanner or fake findings added | BLOCKED | No Claim Watch collection, endpoint, evidence service, or persisted monitoring capability exists |
 | Creator authentication | PASS | Preserved | PASS | Existing Phase 1 authentication and role tests |
@@ -34,12 +34,12 @@ Repository state at validation: `main...origin/main`, with uncommitted Phase 2 c
 - `GET /api/audit/events` now requires the existing authenticated-user dependency. Creator requests are filtered by the authenticated `user_id` and `org_id`; non-Creator reviewer/admin workflows retain the existing organization-wide behavior.
 - New submission audit events use the existing `audit_logs` store and include `actor_id`, `org_id`, `resource_id` (submission ID), `action_type`, and a millisecond timestamp.
 - `GET /api/guidelines?brand_id=aurelle-tech` is the existing Rulebook and Guideline Health source.
-- No FAQ source was found in backend routes, models, services, frontend components, or repository search results.
+- No separate FAQ source was found; the authoritative Creator knowledge source is the approved-facts catalog.
 - No Claim Watch persistence or evidence-monitoring API was found. `/api/verify` provides content-analysis findings, but it is not a Claim Watch service and was not misrepresented as one.
 
-## FAQ and Claim Watch approval blockers
+## Fact and Claim Watch approval blockers
 
-Implementing actual FAQs would require an authoritative content source and likely a new API or data model. Implementing Claim Watch would require persisted claim records/evidence relationships and a monitoring or analysis contract. The request explicitly requires approval before introducing those architectural changes. They remain blocked pending approval and product/data-source requirements.
+Completing the Fact interface required reusing the existing approved-facts source. Completing Claim Watch required persisted claim records/evidence relationships and a verification integration. Those changes were deferred to and authorized for Phase 3.
 
 ## Six backend test failure investigation
 
@@ -77,10 +77,9 @@ The reproduced subset after Phase 2 changes produced 12 passing and 2 failing te
 
 - Add isolated fixtures or resettable test state for the six existing full-suite failures; do not alter production data.
 - Add backend-level tests for Creator audit tenant isolation and legacy audit records.
-- Decide and approve an authoritative FAQ source/API before implementation.
-- Decide and approve the Claim Watch persistence/evidence architecture before implementation.
+- Validate the authorized Fact and Claim Watch implementation in Phase 3.
 - Reviewer decision-level data is not exposed by the current API, so Guideline Health cannot honestly calculate agreement, conflict, or Wilson-bound metrics.
 
 ## Final status
 
-The core Creator submission and review workflow remains **PASS**. Phase 2 supported modules are improved without fabricated data, but the complete Creator intelligence surface is **PARTIAL** because FAQs and Claim Watch require approved backend capabilities, and the full backend suite retains six pre-existing state/rate-limit/data-collision failures.
+The core Creator submission and review workflow remains **PASS**. Phase 2 documented the Fact and Claim Watch gaps that Phase 3 was authorized to address; the full backend suite retained six pre-existing state/rate-limit/data-collision failures.

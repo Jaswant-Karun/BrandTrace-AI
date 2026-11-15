@@ -11,6 +11,7 @@ from brandtrace.modules.submissions.models import (
     AuditRecordRequest, AuditEventResponse
 )
 from brandtrace.modules.submissions.service import submissions_service
+from brandtrace.database.mongo import mongo_manager
 
 router = APIRouter(tags=["Submissions & Workflow Lifecycle"])
 
@@ -89,7 +90,13 @@ async def create_submission(req: SubmissionCreateRequest, user: UserProfile = De
             "org_id": user.org_id,
             "brand_id": user.workspace_id,
         })
-    return await submissions_service.create_submission(req)
+    submission = await submissions_service.create_submission(req)
+    await mongo_manager.link_claims_to_submission(
+        verification_id=req.analysis_id,
+        submission_id=submission.get("submission_id", ""),
+        org_id=user.org_id,
+    )
+    return submission
 
 @router.get("/submissions", response_model=List[SubmissionResponse])
 async def list_submissions(

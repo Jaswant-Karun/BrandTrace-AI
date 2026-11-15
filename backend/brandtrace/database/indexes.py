@@ -57,6 +57,11 @@ async def build_phase5_indexes(db: AsyncIOMotorDatabase):
         # 9. fact_sources
         await db.fact_sources.create_index([("organisation_id", ASCENDING), ("source_id", ASCENDING)], unique=True)
         await db.fact_sources.create_index([("organisation_id", ASCENDING), ("fact_id", ASCENDING)])
+        await db.claims.create_index(
+            [("org_id", ASCENDING), ("workspace_id", ASCENDING), ("claim_id", ASCENDING)],
+            unique=True
+        )
+        await db.claims.create_index([("org_id", ASCENDING), ("status", ASCENDING), ("created_at", DESCENDING)])
 
         # 10. terminology
         await db.terminology.create_index([("organisation_id", ASCENDING), ("workspace_id", ASCENDING), ("term_text", ASCENDING)])

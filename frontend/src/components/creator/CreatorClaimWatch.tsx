@@ -1,209 +1,138 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Globe, Eye, CheckCircle2, ChevronRight, ChevronDown, RefreshCw, ExternalLink } from 'lucide-react';
+import React from 'react';
+import { Search, X, ShieldAlert } from 'lucide-react';
+import { apiClient } from '../../services/apiClient';
 
-interface LivePageItem {
-  id: string;
-  approvedPostTitle: string;
-  url: string;
-  registeredDate: string;
-  status: '100% MATCH' | 'DRIFT DETECTED';
-  lastChecked: string;
+interface ClaimRecord {
+  claim_id: string;
+  claim_text: string;
+  status: string;
+  severity: string;
+  verification_id: string;
+  submission_id?: string | null;
+  related_fact_ids: string[];
+  evidence_references: string[];
+  explanation: string;
+  created_at: number;
 }
 
 interface CreatorClaimWatchProps {
   brandName?: string;
 }
 
-export const CreatorClaimWatch: React.FC<CreatorClaimWatchProps> = ({
-  brandName = 'Aurelle Skin',
-}) => {
-  const [selectedPost, setSelectedPost] = useState<string>('');
-  const [liveUrl, setLiveUrl] = useState<string>('https://shop.example.com/serum');
-  const [isClosedTasksOpen, setIsClosedTasksOpen] = useState<boolean>(false);
-  const [isRegistering, setIsRegistering] = useState<boolean>(false);
-  const [feedbackMsg, setFeedbackMsg] = useState<string | null>(null);
+export const CreatorClaimWatch: React.FC<CreatorClaimWatchProps> = ({ brandName = 'Aurelle Skin' }) => {
+  const [claims, setClaims] = React.useState<ClaimRecord[]>([]);
+  const [search, setSearch] = React.useState('');
+  const [status, setStatus] = React.useState('');
+  const [selectedClaim, setSelectedClaim] = React.useState<ClaimRecord | null>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
 
-  const [livePages] = useState<LivePageItem[]>([]);
+  const loadClaims = React.useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams({ limit: '200' });
+      if (search.trim()) params.set('search', search.trim());
+      if (status) params.set('status', status);
+      setClaims(await apiClient.request<ClaimRecord[]>(`/api/claims?${params.toString()}`, { skipCache: true }));
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : 'Unable to load persisted claims.');
+    } finally {
+      setLoading(false);
+    }
+  }, [search, status]);
 
-  const handleRegisterAndRead = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!liveUrl.trim()) return;
+  React.useEffect(() => {
+    const timer = window.setTimeout(loadClaims, 250);
+    return () => window.clearTimeout(timer);
+  }, [loadClaims]);
 
-    setIsRegistering(false);
-    setFeedbackMsg('Claim Watch registration is unavailable because no backend claim-monitoring endpoint is configured.');
-  };
+  const countByStatus = (value: string) => claims.filter((claim) => claim.status === value).length;
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto py-6 px-4 sm:px-6">
-      
-      {/* Breadcrumb & Section Header */}
       <div className="space-y-2">
-        <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
-          BRANDTRACE · {brandName.toUpperCase()}
-        </div>
-        <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white font-sans uppercase">
-          CLAIM WATCH
-        </h1>
-        <p className="text-xs sm:text-base text-neutral-400 font-sans max-w-2xl leading-relaxed">
-          Facts change after a post goes live. This shows the live posts whose facts moved, and the live pages that no longer match what was approved.
+        <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">BRANDTRACE · {brandName.toUpperCase()}</div>
+        <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white uppercase">CLAIM WATCH</h1>
+        <p className="text-xs sm:text-base text-neutral-400 max-w-2xl leading-relaxed">
+          Claims extracted from persisted content analyses, with source verification and evidence traceability.
         </p>
       </div>
 
-      {/* Section 1: UPDATE OR WITHDRAW */}
-      <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-6 sm:p-7 space-y-4 shadow-xl">
-        <div className="flex items-center gap-2 text-xs font-mono font-bold text-white uppercase tracking-wider">
-          <Eye className="w-4 h-4 text-indigo-400" />
-          <span>UPDATE OR WITHDRAW</span>
-        </div>
-
-        <p className="text-xs sm:text-sm text-neutral-400 font-sans leading-relaxed">
-          Nothing needs updating. Every live post's facts are as they were when it was approved. Posts checked before the watch existed have no fact record: check them again to include them.
-        </p>
-
-        {/* Closed Tasks Accordion */}
-        <div className="pt-2">
-          <button
-            onClick={() => setIsClosedTasksOpen(!isClosedTasksOpen)}
-            className="flex items-center gap-1.5 text-xs font-mono text-neutral-500 hover:text-neutral-300 cursor-pointer select-none"
-          >
-            {isClosedTasksOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-            <span>CLOSED TASKS</span>
-          </button>
-
-          <AnimatePresence>
-            {isClosedTasksOpen && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mt-3 p-4 rounded-xl bg-neutral-900/50 border border-neutral-800 text-xs font-mono text-neutral-400 space-y-1.5"
-              >
-                <div>Task #102: Verified FACT-014 study revision across shop.example.com (Resolved 10 Nov)</div>
-                <div>Task #098: Updated Diwali early bird embargo date (Resolved 5 Nov)</div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          ['CLAIMS', claims.length, 'text-white'],
+          ['UNSUPPORTED', countByStatus('UNSUPPORTED'), 'text-rose-400'],
+          ['CONTRADICTED', countByStatus('CONTRADICTED'), 'text-amber-400'],
+          ['HUMAN REVIEW', countByStatus('NEEDS_HUMAN_REVIEW'), 'text-indigo-300'],
+        ].map(([label, value, color]) => (
+          <div key={label} className="bg-neutral-950 border border-neutral-800 rounded-2xl p-4">
+            <div className={`text-2xl sm:text-4xl font-extrabold font-mono ${color}`}>{value}</div>
+            <div className="text-[10px] font-mono font-bold text-neutral-400 uppercase tracking-wider">{label}</div>
+          </div>
+        ))}
       </div>
 
-      {/* Section 2: LIVE PAGES */}
-      <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-6 sm:p-7 space-y-5 shadow-xl">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2 text-xs font-mono font-bold text-white uppercase tracking-wider">
-            <Globe className="w-4 h-4 text-cyan-400" />
-            <span>LIVE PAGES</span>
-          </div>
-          <p className="text-xs sm:text-sm text-neutral-400 font-sans leading-relaxed">
-            Tell BrandTrace where an approved post is live. It reads the page and compares it with the approved text, sentence by sentence; extra text on the page is ignored, but a missing or reworded sentence (or a changed number) raises a task.
-          </p>
+      <div className="p-4 rounded-xl border border-indigo-900/70 bg-indigo-950/20 text-xs text-indigo-200">
+        AI analysis does not create verified claims. Claims remain human-reviewable unless a supported evidence path establishes a stronger status.
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" />
+          <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search extracted claims..." className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-sm text-white focus:outline-none focus:border-indigo-500" />
         </div>
+        <select value={status} onChange={(event) => setStatus(event.target.value)} className="px-3 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-sm text-white">
+          <option value="">All statuses</option>
+          <option value="UNSUPPORTED">Unsupported</option>
+          <option value="CONTRADICTED">Contradicted</option>
+          <option value="NEEDS_HUMAN_REVIEW">Needs human review</option>
+        </select>
+      </div>
 
-        {/* Register Form */}
-        <form onSubmit={handleRegisterAndRead} className="space-y-4 pt-2">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-            
-            <div className="md:col-span-5 space-y-1.5">
-              <label className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider font-semibold">
-                APPROVED POST
-              </label>
-              <select
-                value={selectedPost}
-                onChange={(e) => setSelectedPost(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-sm font-sans text-white focus:outline-none focus:border-indigo-500 cursor-pointer min-h-[44px]"
-              >
-                <option value="">Choose...</option>
-                <option value="Aurelle Vitamin C Launch Post (Approved 12 Nov)">
-                  Aurelle Vitamin C Launch Post (Approved 12 Nov)
-                </option>
-                <option value="Diwali Festive Teaser (Approved 8 Nov)">
-                  Diwali Festive Teaser (Approved 8 Nov)
-                </option>
-              </select>
-            </div>
-
-            <div className="md:col-span-5 space-y-1.5">
-              <label className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider font-semibold">
-                LIVE ADDRESS
-              </label>
-              <input
-                type="url"
-                value={liveUrl}
-                onChange={(e) => setLiveUrl(e.target.value)}
-                placeholder="https://shop.example.com/serum"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-sm font-sans text-white focus:outline-none focus:border-indigo-500 min-h-[44px]"
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <button
-                type="submit"
-                disabled={isRegistering || !liveUrl.trim()}
-                className="w-full py-2.5 sm:py-2 px-3 rounded-xl bg-neutral-200 hover:bg-white text-neutral-950 font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-md min-h-[44px] active:scale-[0.98]"
-              >
-                {isRegistering ? (
-                  <>
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                    <span>Reading...</span>
-                  </>
-                ) : (
-                  <span>Register and read</span>
-                )}
-              </button>
-            </div>
-
-          </div>
-        </form>
-
-        {feedbackMsg && (
-          <motion.div
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="p-3 rounded-xl bg-cyan-950/60 border border-cyan-800/80 text-cyan-300 text-xs font-mono flex items-center gap-2"
-          >
-            <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-            <span>{feedbackMsg}</span>
-          </motion.div>
-        )}
-
-        {/* Monitored Live Pages Table */}
-        <div className="pt-3 border-t border-neutral-900">
-          <div className="text-[11px] font-mono font-bold uppercase text-neutral-400 mb-2">
-            MONITORED LIVE POSTS ({livePages.length})
-          </div>
-
-          <div className="divide-y divide-neutral-900 bg-neutral-900/40 rounded-xl border border-neutral-800/80 overflow-hidden text-xs font-mono">
-            {livePages.map((page) => (
-              <div key={page.id} className="p-3.5 flex flex-wrap items-center justify-between gap-3">
-                <div className="space-y-0.5 max-w-lg">
-                  <div className="font-bold text-white text-xs">{page.approvedPostTitle}</div>
-                  <a
-                    href={page.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-[11px] text-cyan-400 hover:underline flex items-center gap-1 font-mono truncate"
-                  >
-                    <span>{page.url}</span>
-                    <ExternalLink className="w-3 h-3 shrink-0" />
-                  </a>
+      {error && <div className="p-4 rounded-xl border border-rose-800 bg-rose-950/30 text-sm text-rose-200">{error}</div>}
+      {loading ? (
+        <div className="p-8 text-center text-sm text-neutral-400">Loading persisted claims...</div>
+      ) : claims.length === 0 ? (
+        <div className="p-8 text-center bg-neutral-950 border border-neutral-800 rounded-2xl text-sm text-neutral-400">No claims have been extracted from analyses available to this workspace.</div>
+      ) : (
+        <div className="grid gap-3">
+          {claims.map((claim) => (
+            <button key={claim.claim_id} onClick={() => setSelectedClaim(claim)} className="text-left p-5 rounded-2xl bg-neutral-950 border border-neutral-800 hover:border-indigo-500 transition-colors">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <ShieldAlert className="w-4 h-4 text-amber-400" />
+                  <span className="font-mono text-xs font-bold text-indigo-300">{claim.claim_id}</span>
                 </div>
-
-                <div className="flex items-center gap-3">
-                  <span className="text-[11px] text-neutral-400">
-                    Checked {page.lastChecked}
-                  </span>
-                  <span className="px-2.5 py-1 rounded-md text-[10px] font-mono font-bold bg-emerald-950/80 border border-emerald-800 text-emerald-300 flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                    <span>{page.status}</span>
-                  </span>
-                </div>
+                <span className="text-[10px] font-mono uppercase text-amber-300">{claim.status.replace(/_/g, ' ')}</span>
               </div>
-            ))}
+              <p className="mt-3 text-sm text-white">{claim.claim_text}</p>
+              <p className="mt-2 text-xs text-neutral-400">{claim.explanation}</p>
+              <div className="mt-3 text-[10px] font-mono text-neutral-500">Verification: {claim.verification_id}{claim.submission_id ? ` · Submission: ${claim.submission_id}` : ''}</div>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {selectedClaim && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setSelectedClaim(null)}>
+          <div className="w-full max-w-xl rounded-2xl bg-neutral-950 border border-neutral-700 p-6 space-y-4" onClick={(event) => event.stopPropagation()}>
+            <div className="flex items-start justify-between gap-4">
+              <div><div className="text-xs font-mono text-indigo-300">{selectedClaim.claim_id}</div><h2 className="text-xl font-bold text-white mt-1">{selectedClaim.claim_text}</h2></div>
+              <button onClick={() => setSelectedClaim(null)} aria-label="Close claim details"><X className="w-5 h-5 text-neutral-400" /></button>
+            </div>
+            <div className="text-sm text-neutral-300">{selectedClaim.explanation}</div>
+            <div className="grid grid-cols-2 gap-3 text-xs text-neutral-400">
+              <div>Status: <span className="text-white">{selectedClaim.status}</span></div>
+              <div>Severity: <span className="text-white">{selectedClaim.severity}</span></div>
+              <div>Verification: <span className="text-white">{selectedClaim.verification_id}</span></div>
+              <div>Submission: <span className="text-white">{selectedClaim.submission_id || 'Not linked'}</span></div>
+            </div>
+            <div className="text-xs text-neutral-400">Related facts: {selectedClaim.related_fact_ids.length ? selectedClaim.related_fact_ids.join(', ') : 'None recorded'}</div>
+            <div className="text-xs text-neutral-400">Evidence references: {selectedClaim.evidence_references.length ? selectedClaim.evidence_references.join(', ') : 'None recorded'}</div>
           </div>
         </div>
-
-      </div>
-
+      )}
     </div>
   );
 };

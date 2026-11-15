@@ -1,7 +1,8 @@
 import time
 import uuid
+import re
 from typing import Dict, Any, List, Optional
-from fastapi import APIRouter, HTTPException, Query, UploadFile, File, Form, Depends
+from fastapi import APIRouter, HTTPException, Query, UploadFile, File, Form, Depends, Header
 from pydantic import BaseModel
 
 from brandtrace.modules.auth.router import get_current_user
@@ -107,6 +108,39 @@ class FactUpdatePayload(BaseModel):
     restricted_terms: Optional[List[str]] = None
     required_phrases: Optional[List[str]] = None
 
+class FactRecord(BaseModel):
+    fact_id: str
+    id: str
+    brand_id: str
+    name: str
+    category: str
+    current_value: str
+    unit: Optional[str] = ""
+    description: str = ""
+    source_citation: str = ""
+    department_owner: str = ""
+    last_verified: Optional[str] = None
+    source_date: Optional[str] = None
+    expiry_date: Optional[str] = None
+    evidence_reference: Optional[str] = None
+    restricted_terms: Optional[List[str]] = None
+    required_phrases: Optional[List[str]] = None
+    status: str = "ACTIVE"
+
+class ClaimRecord(BaseModel):
+    claim_id: str
+    org_id: str
+    workspace_id: str
+    claim_text: str
+    status: str
+    severity: str
+    verification_id: str
+    submission_id: Optional[str] = None
+    related_fact_ids: List[str] = []
+    evidence_references: List[str] = []
+    explanation: str
+    created_at: int
+
 class MultimodalInspectionRequest(BaseModel):
     brand_id: str
     asset_title: str
@@ -176,7 +210,7 @@ async def get_brand_knowledge_graph(brand_id: str):
 
 # 4. Multi-Agent Governance Verification
 @router.post("/verify", response_model=VerificationResult)
-async def verify_asset(request: VerificationRequest):
+async def verify_asset(request: VerificationRequest, current_user: UserProfile = Depends(get_current_user)):
     """
     Executes the Autonomous Multi-Agent Governance Pipeline on marketing content.
     Returns token-level risk spans, citations, scores, remediation, and release proof.
@@ -192,12 +226,64 @@ async def verify_asset(request: VerificationRequest):
     
     # Persist verification to MongoDB
     await mongo_manager.save_verification(result.model_dump())
+    for index, span in enumerate(result.all_risk_spans):
+        if span.category.upper() != "CLAIM":
+            continue
+        citation = span.rule_citation or ""
+        related_fact_ids = sorted(set(re.findall(r"FACT-[A-Z0-9-]+", citation)))
+        explanation = span.explanation or "Claim requires evidence review."
+        explanation_lower = explanation.lower()
+        if "contradict" in explanation_lower:
+            status = "CONTRADICTED"
+        elif "unsupported" in explanation_lower or "unsubstantiat" in explanation_lower:
+            status = "UNSUPPORTED"
+        else:
+            status = "NEEDS_HUMAN_REVIEW"
+        await mongo_manager.save_claim({
+            "claim_id": f"CLM-{result.verification_id}-{index}",
+            "org_id": current_user.org_id,
+            "workspace_id": current_user.workspace_id,
+            "claim_text": span.matched_text,
+            "status": status,
+            "severity": span.severity.value if hasattr(span.severity, "value") else str(span.severity),
+            "verification_id": result.verification_id,
+            "submission_id": None,
+            "related_fact_ids": related_fact_ids,
+            "evidence_references": [citation] if citation else [],
+            "explanation": explanation,
+            "created_at": result.timestamp,
+        })
     return result
 
 @router.get("/verifications")
-async def list_verification_history(brand_id: Optional[str] = Query(None), limit: int = Query(20)):
+async def list_verification_history(brand_id: Optional[str] = Query(None), limit: int = Query(20), user: UserProfile = Depends(get_current_user)):
     """Returns chronological content inspection & verification history."""
     return await mongo_manager.list_verifications(brand_id=brand_id, limit=limit)
+
+@router.get("/claims", response_model=List[ClaimRecord])
+async def list_claim_records(
+    status: Optional[str] = Query(None),
+    search: Optional[str] = Query(None, min_length=1),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
+    user: UserProfile = Depends(get_current_user),
+):
+    claims = await mongo_manager.list_claims(
+        org_id=user.org_id,
+        workspace_id=user.workspace_id,
+        status=status,
+        search=search,
+        skip=skip,
+        limit=limit,
+    )
+    return [ClaimRecord(**claim) for claim in claims]
+
+@router.get("/claims/{claim_id}", response_model=ClaimRecord)
+async def get_claim_record(claim_id: str, user: UserProfile = Depends(get_current_user)):
+    claim = await mongo_manager.get_claim(claim_id, org_id=user.org_id, workspace_id=user.workspace_id)
+    if not claim:
+        raise HTTPException(status_code=404, detail="Claim not found")
+    return ClaimRecord(**claim)
 
 # 5. Cascading Blast Radius Analysis
 @router.post("/blast-radius", response_model=BlastRadiusResponse)
@@ -352,16 +438,57 @@ _FACTS_SERIALIZED_CACHE: Dict[str, Any] = {}
 def invalidate_facts_cache():
     _FACTS_SERIALIZED_CACHE.clear()
 
-@router.get("/facts")
-async def list_approved_facts(brand_id: Optional[str] = Query(None), role: Optional[str] = Query(None)):
+def _fact_status(expiry_date: Optional[str]) -> str:
+    if not expiry_date:
+        return "ACTIVE"
+    try:
+        from datetime import date
+        return "OUTDATED" if date.fromisoformat(expiry_date[:10]) < date.today() else "ACTIVE"
+    except ValueError:
+        return "UNVERIFIED"
+
+def _fact_record(fact: Any) -> Dict[str, Any]:
+    data = fact.model_dump() if hasattr(fact, "model_dump") else dict(fact)
+    return {
+        "fact_id": data.get("id") or data.get("fact_id"),
+        "id": data.get("id") or data.get("fact_id"),
+        "brand_id": data.get("brand_id") or data.get("workspace_id"),
+        "name": data.get("name", ""),
+        "category": data.get("category", ""),
+        "current_value": data.get("current_value", ""),
+        "unit": data.get("unit") or "",
+        "description": data.get("description", ""),
+        "source_citation": data.get("source_citation", ""),
+        "department_owner": data.get("department_owner", ""),
+        "last_verified": data.get("last_verified"),
+        "source_date": data.get("source_date"),
+        "expiry_date": data.get("expiry_date"),
+        "evidence_reference": data.get("evidence_reference"),
+        "restricted_terms": data.get("restricted_terms"),
+        "required_phrases": data.get("required_phrases"),
+        "status": _fact_status(data.get("expiry_date")),
+    }
+
+@router.get("/facts", response_model=List[FactRecord])
+async def list_approved_facts(
+    brand_id: Optional[str] = Query(None),
+    category: Optional[str] = Query(None),
+    status: Optional[str] = Query(None),
+    search: Optional[str] = Query(None, min_length=1),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
+    role: Optional[str] = Query(None),
+    user: UserProfile = Depends(get_current_user),
+):
     """List approved facts (prices, claims, specifications, policies). Filters confidential facts for agency role."""
+    if user.role == UserRole.CREATOR:
+        brand_id = user.workspace_id
+    requested_brand = brand_id or user.workspace_id
     cache_key = f"{brand_id or 'all'}:{role or 'all'}"
-    if cache_key in _FACTS_SERIALIZED_CACHE:
-        return _FACTS_SERIALIZED_CACHE[cache_key]
+    cache_key = f"{cache_key}:{category}:{status}:{search}:{skip}:{limit}:{user.org_id}"
 
     facts = list(APPROVED_FACTS_CATALOG.values())
-    if brand_id:
-        facts = [f for f in facts if f.brand_id == brand_id]
+    facts = [f for f in facts if f.brand_id == requested_brand]
     if role == "agency":
         # Agency users must never access confidential/embargoed internal facts without explicit clearance
         facts = [
@@ -369,18 +496,32 @@ async def list_approved_facts(brand_id: Optional[str] = Query(None), role: Optio
             if getattr(f, "category", "") not in ("CONFIDENTIAL", "EMBARGOED") 
             and not getattr(f, "is_confidential", False)
         ]
-    dumped = [f.model_dump() for f in facts]
-    _FACTS_SERIALIZED_CACHE[cache_key] = dumped
-    return dumped
+    records = [_fact_record(f) for f in facts]
+    if category:
+        records = [f for f in records if f["category"] == category]
+    if status:
+        records = [f for f in records if f["status"] == status]
+    if search:
+        term = search.lower()
+        records = [f for f in records if term in f["name"].lower() or term in f["description"].lower() or term in f["current_value"].lower()]
+    return records[skip:skip + limit]
 
 @router.post("/facts")
-async def create_approved_fact(req: FactCreatePayload):
+async def create_approved_fact(
+    req: FactCreatePayload,
+    user: UserProfile = Depends(get_current_user),
+    authorization: Optional[str] = Header(None),
+):
     invalidate_facts_cache()
     """Registers a new approved fact in memory and MongoDB Atlas."""
     from brandtrace.graph.schema import ApprovedFact, NodeType, Node as GraphNode
     from brandtrace.database.schemas import ApprovedFactDoc
     import datetime
 
+    if user.role in (UserRole.CREATOR, UserRole.REVIEWER):
+        raise HTTPException(status_code=403, detail="This role cannot create authoritative facts.")
+    if authorization and user.role != UserRole.ADMIN and req.brand_id != user.workspace_id:
+        raise HTTPException(status_code=403, detail="Fact workspace is outside your authorized scope.")
     if not req.name or not req.name.strip():
         raise HTTPException(status_code=400, detail="Fact name cannot be empty or whitespace.")
     if not req.current_value or not req.current_value.strip():
@@ -479,22 +620,32 @@ async def create_approved_fact(req: FactCreatePayload):
     return fact_obj.model_dump()
 
 @router.get("/facts/{fact_id}")
-async def get_approved_fact(fact_id: str):
+async def get_approved_fact(fact_id: str, user: UserProfile = Depends(get_current_user)):
     """Retrieves an approved fact by ID."""
     existing = APPROVED_FACTS_CATALOG.get(fact_id)
-    if not existing:
+    if not existing or existing.brand_id != user.workspace_id:
         raise HTTPException(status_code=404, detail=f"Fact '{fact_id}' not found.")
-    return existing.model_dump()
+    return _fact_record(existing)
 
 @router.put("/facts/{fact_id}")
-async def update_approved_fact(fact_id: str, req: FactUpdatePayload, brand_id: Optional[str] = Query(None)):
+async def update_approved_fact(
+    fact_id: str,
+    req: FactUpdatePayload,
+    brand_id: Optional[str] = Query(None),
+    user: UserProfile = Depends(get_current_user),
+    authorization: Optional[str] = Header(None),
+):
     """Edits an approved fact with server-side validation and persistence."""
     invalidate_facts_cache()
     from brandtrace.graph.schema import ApprovedFact, NodeType, Node as GraphNode
     from brandtrace.database.schemas import ApprovedFactDoc
     import datetime
     
-    b_id = brand_id or "aurelle-tech"
+    if user.role in (UserRole.CREATOR, UserRole.REVIEWER):
+        raise HTTPException(status_code=403, detail="This role cannot modify authoritative facts.")
+    b_id = brand_id or user.workspace_id
+    if authorization and user.role != UserRole.ADMIN and b_id != user.workspace_id:
+        raise HTTPException(status_code=403, detail="Fact workspace is outside your authorized scope.")
     org_id = "ORG-AURELLE" if "aurelle" in b_id else "ORG-APEX"
     now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
     now_int = int(time.time())
@@ -1557,8 +1708,3 @@ async def supersede_ledger_record(
 # Mount Public Verification Router
 from brandtrace.modules.public_verification.router import router as public_verification_router
 router.include_router(public_verification_router)
-
-
-
-
-

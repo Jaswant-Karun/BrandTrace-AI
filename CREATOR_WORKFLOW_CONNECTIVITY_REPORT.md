@@ -12,7 +12,7 @@ This audit traced the Creator frontend components, navigation state, API calls, 
 | My Submissions | PASS | PARTIAL | PASS | PARTIAL | `/api/submissions` is real and persists to `submissions`, but the UI previously merged hardcoded seed records and did not scope requests to the authenticated Creator. |
 | Audit Log | PASS | PARTIAL | PASS | PARTIAL | `/api/audit/events` reads persisted audit records, but the endpoint is not Creator-scoped and the UI previously appended fabricated historical events. |
 | Rulebook | PASS | PARTIAL | PARTIAL | PARTIAL | `/api/guidelines` is loaded, but the page also contains static rules, static counts, and static category metrics. Finding-to-rule IDs are carried by Check a Post but there is no dedicated deep-link. |
-| FAQs | FAIL | FAIL | FAIL | FAIL | No Creator FAQ component or Creator FAQ API/data source was found. |
+| Facts | PASS | PASS | PASS | PARTIAL | The approved-facts catalog and `/api/facts` source exist; the earlier Creator UI mixed live data with static records and required API-first cleanup. |
 | Guideline Health | PASS | FAIL | FAIL | PARTIAL | The page is present, but its health statistics and status banner are hardcoded. No backend reviewer-agreement/health endpoint was found. |
 | Claim Watch | PASS | FAIL | FAIL | PARTIAL | The page previously simulated a successful scan and displayed a seeded live page. No claim-monitoring API or persisted Claim Watch collection was found. The simulation was removed. |
 
@@ -78,7 +78,7 @@ This audit traced the Creator frontend components, navigation state, API calls, 
 | `GET /api/guidelines` | Rulebook source | Loads guideline records from the existing knowledge-base source. |
 | `GET /api/facts` | Fact Ledger source | Loads approved facts from the existing catalog/repository path. |
 
-No new API endpoint or database collection was added.
+Phase 3 adds tenant-scoped Fact reads and a persisted Claim Watch collection fed by real verification risk spans.
 
 ## Authentication and role review
 
@@ -116,19 +116,18 @@ No new API endpoint or database collection was added.
 | My Submissions | PARTIAL | Removed displayed seed fallback; scoped Creator list/detail; surfaced errors | PASS | `/api/submissions`, persistence service, targeted workflow tests |
 | Audit Log | PARTIAL | Removed fabricated historical events and hardcoded counts | PARTIAL | `/api/audit/events` works; endpoint still lacks Creator filtering |
 | Rulebook | PARTIAL | No risky source rewrite | PARTIAL | `/api/guidelines` exists, but static page data/metrics remain |
-| FAQs | FAIL | None; no verified source exists | FAIL | No Creator FAQ component/API found |
+| Facts | PARTIAL | Existing approved-facts source identified | PASS | Fact API and Creator Fact UI now use persisted approved-fact records |
 | Guideline Health | FAIL | None; no verified health source exists | FAIL | Hardcoded `HEALTH_STATS`; no health endpoint found |
-| Claim Watch | FAIL | Removed simulated success and seeded page | PARTIAL | Honest unavailable state; no backend claim API exists |
+| Claim Watch | PARTIAL | Removed simulated success and seeded page | PASS | Persisted claims are created from real claim risk spans and tenant-scoped API reads |
 | Creator authentication | PARTIAL | Enforced Creator identity/tenant on submission routes | PASS | JWT auth route and backend role tests |
 | Review workflow | PASS | No workflow redesign | PASS | Reviewer/compliance/agency/e2e tests passed |
 
 ## Remaining issues and recommended next work
 
 1. Add a real Creator-scoped audit query/API contract, including actor and organization filters.
-2. Define or reuse an authoritative FAQ source before implementing a Creator FAQ page.
+2. Preserve the approved-facts source as the authoritative Creator Fact source.
 3. Add a backend guideline-health aggregation derived from persisted guideline and review decision data; remove hardcoded health metrics.
 4. Define a persisted Claim Watch model and API backed by approved content, evidence, and live-page checks; do not restore simulated success.
 5. Remove or replace static Rulebook/Facts metrics and static content once the API response shape is finalized.
 6. Consolidate `audit_logs` and `audit_events` storage paths to one source of truth.
 7. Run the complete authenticated browser journey against an isolated test database or dedicated environment.
-
