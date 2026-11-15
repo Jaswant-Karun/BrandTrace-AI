@@ -9,6 +9,9 @@ export interface AuditEvent {
   what: string;
   reason: string;
   hash: string;
+  action_type?: string;
+  resource_id?: string;
+  timestamp?: number;
 }
 
 interface CreatorAuditLogProps {
@@ -17,77 +20,23 @@ interface CreatorAuditLogProps {
   onRestoreDraft?: (content: string) => void;
 }
 
-const DEFAULT_AUDIT_EVENTS: AuditEvent[] = [
-  {
-    id: 'evt-1',
-    when: '12 Nov 2026, 9:01 am',
-    who: 'Creator Asha',
-    what: 'saved version 1 (private)',
-    reason: '',
-    hash: '91d85d9334ef98b1a2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5',
-  },
-  {
-    id: 'evt-2',
-    when: '9 Nov 2026, 11:40 am',
-    who: 'Creator Asha',
-    what: 'saved version 1 (private)',
-    reason: '',
-    hash: '097b5053390d7c8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e',
-  },
-  {
-    id: 'evt-3',
-    when: '8 Nov 2026, 1:56 pm',
-    who: 'Creator Asha',
-    what: 'saved version 1 (private)',
-    reason: '',
-    hash: 'fe0f0faa9ef61234567890abcdef1234567890abcdef1234567890abcdef1234',
-  },
-  {
-    id: 'evt-4',
-    when: '8 Nov 2026, 5:58 am',
-    who: 'Creator Asha',
-    what: 'saved version 1 (private)',
-    reason: '',
-    hash: '591cf1c187af543210fedcba9876543210fedcba9876543210fedcba98765432',
-  },
-  {
-    id: 'evt-5',
-    when: '8 Nov 2026, 3:04 am',
-    who: 'Creator Asha',
-    what: 'saved version 1 (private)',
-    reason: '',
-    hash: '9c279feb1124abcdef1234567890abcdef1234567890abcdef1234567890abcd',
-  },
-  {
-    id: 'evt-6',
-    when: '7 Nov 2026, 11:59 pm',
-    who: 'Creator Asha',
-    what: 'saved version 1 (private)',
-    reason: '',
-    hash: 'b8a211342901123456789abcdef123456789abcdef123456789abcdef1234567',
-  },
-];
-
-void DEFAULT_AUDIT_EVENTS;
-
 export const CreatorAuditLog: React.FC<CreatorAuditLogProps> = ({
-  customEvents = [],
   brandName = 'Aurelle Skin',
   onRestoreDraft,
 }) => {
   const [copiedHash, setCopiedHash] = useState<string | null>(null);
   const [backendEvents, setBackendEvents] = useState<AuditEvent[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const loadAuditEvents = async () => {
     setIsLoading(true);
+    setLoadError(null);
     try {
       const data = await apiClient.request<AuditEvent[]>('/api/audit/events?limit=50');
-      if (Array.isArray(data) && data.length > 0) {
-        setBackendEvents(data);
-      }
-    } catch {
-      // Fallback to local events
+      setBackendEvents(Array.isArray(data) ? data : []);
+    } catch (error) {
+      setLoadError(error instanceof Error ? error.message : 'Unable to load audit events.');
     } finally {
       setIsLoading(false);
     }
@@ -97,7 +46,7 @@ export const CreatorAuditLog: React.FC<CreatorAuditLogProps> = ({
     loadAuditEvents();
   }, []);
 
-  const allEvents = [...customEvents, ...backendEvents];
+  const allEvents = backendEvents;
 
   const handleCopy = (fullHash: string) => {
     navigator.clipboard.writeText(fullHash);
@@ -129,6 +78,7 @@ export const CreatorAuditLog: React.FC<CreatorAuditLogProps> = ({
           <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
             BRANDTRACE · {brandName.toUpperCase()}
           </div>
+          {loadError && <div className="p-4 rounded-xl border border-rose-800 bg-rose-950/30 text-sm text-rose-200">{loadError}</div>}
           <div className="flex items-center gap-3">
             <button
               onClick={loadAuditEvents}
@@ -206,6 +156,11 @@ export const CreatorAuditLog: React.FC<CreatorAuditLogProps> = ({
                     Reason: {evt.reason}
                   </p>
                 )}
+                {evt.resource_id && (
+                  <p className="text-[11px] font-mono text-indigo-300 break-words">
+                    Submission: {evt.resource_id}
+                  </p>
+                )}
               </div>
 
               <div className="pt-2 border-t border-neutral-800/80 flex flex-wrap items-center justify-between gap-2">
@@ -259,6 +214,7 @@ export const CreatorAuditLog: React.FC<CreatorAuditLogProps> = ({
                     </td>
                     <td className="py-3.5 px-4 text-neutral-300 whitespace-nowrap">
                       {evt.what}
+                      {evt.resource_id && <div className="text-[10px] text-indigo-300">Submission: {evt.resource_id}</div>}
                     </td>
                     <td className="py-3.5 px-4 text-neutral-500 max-w-xs truncate">
                       {evt.reason || '—'}

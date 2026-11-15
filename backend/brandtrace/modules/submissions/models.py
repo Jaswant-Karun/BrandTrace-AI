@@ -188,3 +188,8 @@ class AuditEventResponse(BaseModel):
     what: str
     reason: str
     hash: str
+    action_type: Optional[str] = None
+    resource_id: Optional[str] = None
+    actor_id: Optional[str] = None
+    org_id: Optional[str] = None
+    timestamp: Optional[int] = None

@@ -268,8 +268,17 @@ async def publish_submission_route(
 # ==============================================================================
 
 @router.get("/audit/events", response_model=List[AuditEventResponse])
-async def list_audit_events(limit: int = Query(50)):
+async def list_audit_events(
+    limit: int = Query(50, ge=1, le=500),
+    user: UserProfile = Depends(get_current_user),
+):
     """Lists chronological audit log events with tamper-evident cryptographic hashes."""
+    if user.role.value == "CREATOR":
+        return await submissions_service.list_audit_events(
+            limit=limit,
+            actor_id=user.user_id,
+            org_id=user.org_id,
+        )
     return await submissions_service.list_audit_events(limit=limit)
 
 @router.post("/audit/record", response_model=AuditEventResponse)
@@ -282,7 +291,10 @@ async def record_audit_event(
         what=req.what,
         reason=req.reason,
         actor_name=req.who or user.name,
-        event_hash=req.hash
+        event_hash=req.hash,
+        actor_id=user.user_id,
+        org_id=user.org_id,
+        action_type="CREATOR_ACTION" if user.role.value == "CREATOR" else "AUDIT_EVENT",
     )
 
 # ==============================================================================

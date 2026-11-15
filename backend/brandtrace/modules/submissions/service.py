@@ -611,7 +611,11 @@ class SubmissionsService:
             what=f"submitted draft for review: {req.title[:40]}...",
             reason="Submitted to Reviewer Queue",
             actor_name=req.creator_name,
-            event_hash=event_hash
+            event_hash=event_hash,
+            actor_id=req.creator_id,
+            org_id=req.org_id,
+            resource_id=sub_id,
+            action_type="SUBMISSION_CREATED",
         )
 
         # 4. Notify Reviewer Meera
@@ -1337,9 +1341,20 @@ class SubmissionsService:
     # ==========================================================================
     # 7. AUDIT LOGGING
     # ==========================================================================
-    async def record_audit_event(self, what: str, reason: Optional[str], actor_name: str, event_hash: str) -> Dict[str, Any]:
+    async def record_audit_event(
+        self,
+        what: str,
+        reason: Optional[str],
+        actor_name: str,
+        event_hash: str,
+        actor_id: Optional[str] = None,
+        org_id: Optional[str] = None,
+        resource_id: Optional[str] = None,
+        action_type: Optional[str] = None,
+    ) -> Dict[str, Any]:
         evt_id = f"evt-{uuid.uuid4().hex[:8]}"
         when_str = _now_str()
+        timestamp = int(time.time() * 1000)
 
         event_record = {
             "id": evt_id,
@@ -1349,6 +1364,15 @@ class SubmissionsService:
             "reason": reason or "",
             "hash": event_hash
         }
+        if actor_id:
+            event_record["actor_id"] = actor_id
+        if org_id:
+            event_record["org_id"] = org_id
+        if resource_id:
+            event_record["resource_id"] = resource_id
+        if action_type:
+            event_record["action_type"] = action_type
+        event_record["timestamp"] = timestamp
 
         if mongo_manager.is_connected and mongo_manager.db is not None:
             await mongo_manager.db.audit_logs.insert_one(event_record)
@@ -1356,13 +1380,28 @@ class SubmissionsService:
         _AUDIT_EVENTS_STORE.insert(0, event_record)
         return event_record
 
-    async def list_audit_events(self, limit: int = 50) -> List[Dict[str, Any]]:
+    async def list_audit_events(
+        self,
+        limit: int = 50,
+        actor_id: Optional[str] = None,
+        org_id: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        query: Dict[str, Any] = {}
+        if actor_id:
+            query["actor_id"] = actor_id
+        if org_id:
+            query["org_id"] = org_id
         if mongo_manager.is_connected and mongo_manager.db is not None:
-            cursor = mongo_manager.db.audit_logs.find({}, {"_id": 0}).sort("when", -1)
+            cursor = mongo_manager.db.audit_logs.find(query, {"_id": 0}).sort("timestamp", -1)
             docs = await cursor.to_list(length=limit)
             if docs:
                 return docs
-        return _AUDIT_EVENTS_STORE[:limit]
+        events = _AUDIT_EVENTS_STORE
+        if actor_id:
+            events = [event for event in events if event.get("actor_id") == actor_id]
+        if org_id:
+            events = [event for event in events if event.get("org_id") == org_id]
+        return events[:limit]
 
     # ==========================================================================
     # 6. NOTIFICATIONS

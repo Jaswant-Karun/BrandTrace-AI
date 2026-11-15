@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { AlertTriangle, Search } from 'lucide-react';
+import { apiClient } from '../../services/apiClient';
 
 interface RuleItem {
   code: string;
@@ -14,111 +15,6 @@ interface RuleItem {
   linterWarning?: string;
 }
 
-const RULES_DATA: RuleItem[] = [
-  {
-    code: 'CIA-02',
-    title: 'Calls to action name the product, not "click here"',
-    citation: 'Aurelle Brand Book v1.3 §5.1 Calls to action',
-    type: 'BRAND',
-    engine: 'A - code',
-    pattern: 'pattern',
-    severity: 'ADVISORY',
-    owner: 'brand',
-  },
-  {
-    code: 'DL-01',
-    title: "Offers and discounts need \"T&Cs apply\"",
-    citation: 'Aurelle Brand Book v1.3 §7.3 Promotions',
-    type: 'MANDATORY',
-    engine: 'A - code',
-    pattern: 'required',
-    severity: 'ADVISORY',
-    owner: 'compliance',
-  },
-  {
-    code: 'DL-REQ',
-    title: 'A study or percentage claim needs its study footnote',
-    citation: 'Aurelle Brand Book v1.3 §7.2 Disclaimers (DL-02)',
-    type: 'MANDATORY',
-    engine: 'A - code',
-    pattern: 'required',
-    severity: 'ADVISORY',
-    owner: 'compliance',
-  },
-  {
-    code: 'GM06',
-    title: 'Email addresses and URIs in lowercase',
-    citation: 'Aurelle Brand Book v1.3 §8 Style (GM06)',
-    type: 'BRAND',
-    engine: 'A - code',
-    pattern: 'pattern',
-    severity: 'ADVISORY',
-    owner: 'brand',
-  },
-  {
-    code: 'GM07',
-    title: "Don't capitalise website, internet, online or email mid-sentence",
-    citation: 'Aurelle Brand Book v1.3 §8 Style (GM07)',
-    type: 'BRAND',
-    engine: 'A - code',
-    pattern: 'pattern',
-    severity: 'ADVISORY',
-    owner: 'brand',
-  },
-  {
-    code: 'GM08',
-    title: 'Use emoji sparingly: infrequently and deliberately',
-    citation: 'Aurelle Brand Book v1.3 §8 Style (GM08)',
-    type: 'BRAND',
-    engine: 'C - not run',
-    pattern: 'pattern',
-    severity: 'ADVISORY',
-    owner: 'brand',
-    linterWarning: "Linter: Vague quantifier 'sparingly' with no params; classified C, will not run",
-  },
-  {
-    code: 'GM10',
-    title: 'Numbers over three digits get commas',
-    citation: 'Aurelle Brand Book v1.3 §8 Style (GM10)',
-    type: 'BRAND',
-    engine: 'A - code',
-    pattern: 'pattern',
-    severity: 'ADVISORY',
-    owner: 'brand',
-  },
-  {
-    code: 'GM14',
-    title: 'Use the % symbol, not the word percent',
-    citation: 'Aurelle Brand Book v1.3 §8 Style (GM14)',
-    type: 'BRAND',
-    engine: 'A - code',
-    pattern: 'word list',
-    severity: 'BLOCKING',
-    owner: 'brand',
-  },
-  {
-    code: 'GM28',
-    title: 'Em dashes without spaces',
-    citation: 'Aurelle Brand Book v1.3 §8 Style (GM28)',
-    type: 'BRAND',
-    engine: 'A - code',
-    pattern: 'pattern',
-    severity: 'ADVISORY',
-    owner: 'brand',
-  },
-  {
-    code: 'GM29',
-    title: 'Use ellipses sparingly; not for drama',
-    citation: 'Aurelle Brand Book v1.3 §8 Style (GM29)',
-    type: 'BRAND',
-    engine: 'C - not run',
-    pattern: 'pattern',
-    severity: 'ADVISORY',
-    owner: 'brand',
-    linterWarning: "Linter: Vague quantifier 'sparingly' with no params; classified C, will not run",
-  },
-];
-
 interface CreatorRulebookProps {
   brandName?: string;
 }
@@ -128,30 +24,26 @@ export const CreatorRulebook: React.FC<CreatorRulebookProps> = ({
 }) => {
   const shouldReduceMotion = useReducedMotion();
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [dynamicRules, setDynamicRules] = useState<RuleItem[]>([]);
+  const [allRules, setAllRules] = useState<RuleItem[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   React.useEffect(() => {
-    fetch('/api/guidelines?brand_id=aurelle-tech')
-      .then((res) => (res.ok ? res.json() : []))
-      .then((data: any[]) => {
-        if (Array.isArray(data) && data.length > 0) {
-          const liveRules: RuleItem[] = data.map((g) => ({
+    apiClient.request<any[]>('/api/guidelines?brand_id=aurelle-tech', { skipCache: true })
+      .then((data) => {
+        setAllRules(data.map((g) => ({
             code: g.guideline_id || 'GL-LIVE',
             title: g.title || g.rule_statement || 'Brand Guideline',
-            citation: g.source_citation || `Aurelle Master Guidelines §${g.category || 'POLICY'}`,
+            citation: g.source_citation || `Brand Guidelines - ${g.category || 'POLICY'}`,
             type: g.severity === 'CRITICAL' || g.severity === 'HIGH' ? 'MANDATORY' : 'BRAND',
-            engine: 'A - code',
-            pattern: 'policy',
+            engine: 'C - not run',
+            pattern: g.rule_statement || 'policy',
             severity: g.severity === 'CRITICAL' || g.severity === 'HIGH' ? 'BLOCKING' : 'ADVISORY',
             owner: g.category === 'REGULATORY' ? 'compliance' : 'brand',
-          }));
-          setDynamicRules(liveRules);
-        }
+            linterWarning: g.status ? `Status: ${g.status}` : undefined,
+          })));
       })
-      .catch(() => {});
+      .catch((error) => setLoadError(error instanceof Error ? error.message : 'Unable to load guidelines.'));
   }, []);
-
-  const allRules = [...RULES_DATA, ...dynamicRules.filter((dr) => !RULES_DATA.some((r) => r.code === dr.code))];
 
   const filteredRules = allRules.filter((r) => {
     const matchesSearch =
@@ -160,6 +52,9 @@ export const CreatorRulebook: React.FC<CreatorRulebookProps> = ({
       r.citation.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
+  const mandatoryCount = allRules.filter((rule) => rule.type === 'MANDATORY').length;
+  const brandCount = allRules.filter((rule) => rule.type === 'BRAND').length;
+  const warningCount = allRules.filter((rule) => rule.engine === 'C - not run').length;
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto py-6 px-4 sm:px-6">
@@ -173,114 +68,39 @@ export const CreatorRulebook: React.FC<CreatorRulebookProps> = ({
           RULEBOOK
         </h1>
         <p className="text-xs sm:text-base text-neutral-400 font-sans max-w-2xl leading-relaxed">
-          Everything the checker looks for, where each rule comes from, and which rules are too vague to check.
+            Authoritative brand guidelines currently available to the checker.
         </p>
       </div>
+
+        {loadError && (
+          <div className="p-4 rounded-xl border border-rose-800 bg-rose-950/30 text-sm text-rose-200">
+            {loadError}
+          </div>
+        )}
 
       {/* 4 Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-3.5 sm:p-5 space-y-1">
-          <div className="text-2xl sm:text-4xl font-extrabold text-white font-mono">32</div>
+          <div className="text-2xl sm:text-4xl font-extrabold text-white font-mono">{allRules.length}</div>
           <div className="text-[10px] sm:text-xs font-mono font-bold text-neutral-400 uppercase tracking-wider">RULES</div>
         </div>
         <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-3.5 sm:p-5 space-y-1">
-          <div className="text-2xl sm:text-4xl font-extrabold text-white font-mono">12</div>
+          <div className="text-2xl sm:text-4xl font-extrabold text-white font-mono">{mandatoryCount}</div>
           <div className="text-[10px] sm:text-xs font-mono font-bold text-neutral-400 uppercase tracking-wider">MANDATORY</div>
         </div>
         <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-3.5 sm:p-5 space-y-1">
-          <div className="text-2xl sm:text-4xl font-extrabold text-white font-mono">20</div>
+          <div className="text-2xl sm:text-4xl font-extrabold text-white font-mono">{brandCount}</div>
           <div className="text-[10px] sm:text-xs font-mono font-bold text-neutral-400 uppercase tracking-wider">BRAND</div>
         </div>
         <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-3.5 sm:p-5 space-y-1">
-          <div className="text-2xl sm:text-4xl font-extrabold text-amber-400 font-mono">4</div>
+          <div className="text-2xl sm:text-4xl font-extrabold text-amber-400 font-mono">{warningCount}</div>
           <div className="text-[10px] sm:text-xs font-mono font-bold text-neutral-400 uppercase tracking-wider">LINTER WARNINGS</div>
         </div>
       </div>
 
       <p className="text-xs font-mono text-neutral-400 leading-relaxed">
-        Version <code className="text-indigo-400">rb-222d152cf5</code>. Mandatory rules block publishing; brand rules start as advisory and block only once they graduate.
+        Live guideline records. Mandatory rules are determined by their persisted severity; unavailable guideline data is not replaced with seed content.
       </p>
-
-      {/* Category Breakdown Section */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between text-xs font-mono">
-          <span className="font-bold uppercase tracking-wider text-neutral-300">BY CATEGORY</span>
-          <div className="flex items-center gap-3 text-[11px] text-neutral-400">
-            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-indigo-500" /> A - code</span>
-            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-cyan-400" /> B - AI judgement</span>
-            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-400" /> C - not run</span>
-          </div>
-        </div>
-
-        {/* Category Cards Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          
-          <div className="bg-neutral-950 border border-neutral-800 rounded-xl p-4 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-neutral-300 uppercase">STYLE</span>
-              <span className="text-base font-bold font-mono text-white">12</span>
-            </div>
-            <div className="w-full h-1.5 rounded-full bg-neutral-800 flex overflow-hidden">
-              <div className="w-[66%] bg-indigo-500" />
-              <div className="w-[17%] bg-cyan-400" />
-              <div className="w-[17%] bg-amber-400" />
-            </div>
-            <div className="text-[10px] font-mono text-neutral-500">A 8 · B 2 · C 2 · 0 mandatory</div>
-          </div>
-
-          <div className="bg-neutral-950 border border-neutral-800 rounded-xl p-4 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-neutral-300 uppercase">CLAIM</span>
-              <span className="text-base font-bold font-mono text-white">6</span>
-            </div>
-            <div className="w-full h-1.5 rounded-full bg-neutral-800 flex overflow-hidden">
-              <div className="w-[83%] bg-indigo-500" />
-              <div className="w-[17%] bg-cyan-400" />
-            </div>
-            <div className="text-[10px] font-mono text-neutral-500">A 5 · 6 mandatory</div>
-          </div>
-
-          <div className="bg-neutral-950 border border-neutral-800 rounded-xl p-4 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-neutral-300 uppercase">TONE</span>
-              <span className="text-base font-bold font-mono text-white">6</span>
-            </div>
-            <div className="w-full h-1.5 rounded-full bg-neutral-800 flex overflow-hidden">
-              <div className="w-[33%] bg-indigo-500" />
-              <div className="w-[33%] bg-cyan-400" />
-              <div className="w-[34%] bg-amber-400" />
-            </div>
-            <div className="text-[10px] font-mono text-neutral-500">A 2 · B 2 · C 2 · 0 mandatory</div>
-          </div>
-
-          <div className="bg-neutral-950 border border-neutral-800 rounded-xl p-4 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-neutral-300 uppercase">ACCESSIBILITY</span>
-              <span className="text-base font-bold font-mono text-white">3</span>
-            </div>
-            <div className="w-full h-1.5 rounded-full bg-neutral-800 flex overflow-hidden">
-              <div className="w-full bg-indigo-500" />
-            </div>
-            <div className="text-[10px] font-mono text-neutral-500">A 3 · 2 mandatory</div>
-          </div>
-
-          <div className="bg-neutral-950 border border-neutral-800 rounded-xl p-3 text-xs font-mono flex items-center justify-between">
-            <span className="text-neutral-400 uppercase">REQUIRED</span>
-            <span className="font-bold text-white">3</span>
-          </div>
-
-          <div className="bg-neutral-950 border border-neutral-800 rounded-xl p-3 text-xs font-mono flex items-center justify-between">
-            <span className="text-neutral-400 uppercase">CONFIDENTIAL</span>
-            <span className="font-bold text-white">1</span>
-          </div>
-
-          <div className="bg-neutral-950 border border-neutral-800 rounded-xl p-3 text-xs font-mono flex items-center justify-between">
-            <span className="text-neutral-400 uppercase">TERMINOLOGY</span>
-            <span className="font-bold text-white">1</span>
-          </div>
-
-        </div>
-      </div>
 
       {/* Rules Table */}
       <div className="space-y-3">
@@ -302,6 +122,9 @@ export const CreatorRulebook: React.FC<CreatorRulebookProps> = ({
 
         <div className="bg-neutral-950 border border-neutral-800/90 rounded-2xl overflow-hidden shadow-2xl">
           <div className="divide-y divide-neutral-800/80">
+            {filteredRules.length === 0 && !loadError && (
+              <div className="p-6 text-sm text-neutral-400">No persisted guidelines are available for this brand.</div>
+            )}
             {filteredRules.map((rule, idx) => (
               <motion.div
                 key={rule.code}
@@ -374,4 +197,3 @@ export const CreatorRulebook: React.FC<CreatorRulebookProps> = ({
     </div>
   );
 };
-
