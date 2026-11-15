@@ -360,4 +360,8 @@ class BrandTraceRepository:
             )
 
         self._memory_collections["approval_decisions"].append(doc)
+        for a in self._memory_collections["content_assets"]:
+            if a.get("organisation_id") == decision.organisation_id and a.get("asset_id") == decision.asset_id:
+                a["status"] = decision.decision
+                a["updated_at"] = int(time.time() * 1000)
         return doc

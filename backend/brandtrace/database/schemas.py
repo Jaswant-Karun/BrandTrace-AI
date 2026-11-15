@@ -171,7 +171,7 @@ class InspectionJobDoc(BaseMongoRecord):
     job_id: str
     asset_id: str
     file_id: Optional[str] = None
-    trigger_type: str # "ON_DEMAND", "PRE_RELEASE_GATE", "MUTATION_CASCADING"
+    trigger_type: str = "PRE_RELEASE_GATE" # "ON_DEMAND", "PRE_RELEASE_GATE", "MUTATION_CASCADING"
     findings_count: int = 0
     composite_risk_score: float = 0.0
 
