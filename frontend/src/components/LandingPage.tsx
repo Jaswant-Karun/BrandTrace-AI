@@ -337,7 +337,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 xl:gap-12 items-start pt-1 sm:pt-2">
             
             {/* Left Column: Bold Editorial Typography & CTA */}
-            <div className="lg:col-span-6 xl:col-span-6 space-y-6 text-left pl-0">
+            <div className="lg:col-span-7 xl:col-span-7 space-y-6 text-left pl-0">
               
               <div className="space-y-3 select-none">
                 
@@ -365,7 +365,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 
                 {/* Typography Headline: Animated Motion Sequence */}
-                <h1 className="text-5xl sm:text-7xl lg:text-8xl xl:text-[90px] 2xl:text-[98px] font-black tracking-tight text-white leading-[0.93] uppercase font-sans">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-[70px] 2xl:text-[76px] font-black tracking-tight text-white leading-[0.98] uppercase font-sans">
                   {/* Step 1: EVERY CLAIM (always displayed first) */}
                   <span className="block whitespace-nowrap">EVERY CLAIM</span>
 
@@ -390,7 +390,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                               initial={{ scaleX: 0 }}
                               animate={{ scaleX: motionStep >= 2 ? 1 : 0 }}
                               transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                              className="absolute top-1/2 left-0 right-0 h-[6px] sm:h-[8px] lg:h-[10px] xl:h-[11px] bg-[#ff6358] -translate-y-1/2 origin-left rounded-full pointer-events-none" 
+                              className="absolute top-1/2 left-0 right-0 h-[5px] sm:h-[6px] lg:h-[7px] xl:h-[8px] bg-[#ff6358] -translate-y-1/2 origin-left rounded-full pointer-events-none" 
                             />
                           </span>
                         </div>
@@ -405,7 +405,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                               initial={{ scaleX: 0 }}
                               animate={{ scaleX: motionStep >= 2 ? 1 : 0 }}
                               transition={{ duration: 0.45, delay: motionStep >= 2 ? 0.12 : 0, ease: [0.16, 1, 0.3, 1] }}
-                              className="absolute top-1/2 left-0 right-0 h-[6px] sm:h-[8px] lg:h-[10px] xl:h-[11px] bg-[#ff6358] -translate-y-1/2 origin-left rounded-full pointer-events-none" 
+                              className="absolute top-1/2 left-0 right-0 h-[5px] sm:h-[6px] lg:h-[7px] xl:h-[8px] bg-[#ff6358] -translate-y-1/2 origin-left rounded-full pointer-events-none" 
                             />
                           </span>
                         </div>
@@ -413,7 +413,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     )}
                   </AnimatePresence>
 
-                  {/* Step 3: Green color font - lightly smaller than parent headline */}
+                  {/* Step 3: Green color font - lightly smaller & compact, 100% visible with zero clipping */}
                   <AnimatePresence>
                     {motionStep >= 3 && (
                       <motion.div
@@ -422,7 +422,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                         animate={{ opacity: 1, height: 'auto', y: 0 }}
                         exit={{ opacity: 0, height: 0, y: 8 }}
                         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                        className="overflow-hidden text-[#10b981] py-1 text-4xl sm:text-6xl lg:text-7xl xl:text-[76px] 2xl:text-[82px] font-black leading-[0.95] tracking-tight"
+                        className="overflow-hidden text-[#10b981] py-1 text-2xl sm:text-4xl lg:text-[42px] xl:text-[48px] 2xl:text-[52px] font-black leading-[1.02] tracking-tight pr-4"
                       >
                         <span className="block whitespace-nowrap">
                           SHOWN TO VISIBLY
@@ -484,7 +484,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Right Column: Visual Book Document & Floating Issues with Animated Seal (Compact Editorial Book Design) */}
-            <div className="lg:col-span-6 xl:col-span-6 relative pb-16 sm:pb-20 flex justify-end">
+            <div className="lg:col-span-5 xl:col-span-5 relative pb-16 sm:pb-20 flex justify-end">
               {/* Plumb Bob Motif hanging along the left edge */}
               <div className="hidden lg:block absolute -top-8 -left-5 pointer-events-none select-none z-20">
                 <PlumbBob stringLength={140} />
