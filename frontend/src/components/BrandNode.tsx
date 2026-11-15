@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { Handle, Position, NodeProps } from '@xyflow/react';
 import { Shield, FileText, CheckCircle2, AlertTriangle, Stamp, Flag, Sparkles, Layers } from 'lucide-react';
 
