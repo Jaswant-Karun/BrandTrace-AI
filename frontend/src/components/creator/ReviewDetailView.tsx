@@ -625,37 +625,37 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
                     </div>
                   </div>
 
-                  {/* Reviewer Decision Controls */}
+                  {/* Reviewer & Compliance Decision Controls: Finger-friendly tap targets */}
                   <div className="pt-2 border-t border-neutral-800 space-y-3">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-[11px] font-mono text-neutral-400">
-                        Finding Action:
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                      <span className="text-[11px] font-mono text-neutral-400 font-semibold">
+                        Decision on Finding #{finding.number}:
                       </span>
-                      <div className="flex items-center gap-2">
+                      <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
                         <button
                           type="button"
                           onClick={() => handleSetDecision(finding.id, 'UPHELD')}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold uppercase transition-colors cursor-pointer border flex items-center gap-1.5 ${
+                          className={`w-full sm:w-auto px-4 py-2.5 sm:py-1.5 rounded-xl text-xs font-mono font-bold uppercase transition-all cursor-pointer border flex items-center justify-center gap-1.5 min-h-[44px] active:scale-95 ${
                             currentDecision === 'UPHELD'
                               ? 'bg-emerald-600 border-emerald-500 text-white shadow-md'
                               : 'bg-neutral-900 border-neutral-800 text-neutral-300 hover:text-white'
                           }`}
                         >
                           <Check className="w-3.5 h-3.5" />
-                          <span>Uphold Finding</span>
+                          <span>Uphold</span>
                         </button>
 
                         <button
                           type="button"
                           onClick={() => handleSetDecision(finding.id, 'OVERRULED')}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold uppercase transition-colors cursor-pointer border flex items-center gap-1.5 ${
+                          className={`w-full sm:w-auto px-4 py-2.5 sm:py-1.5 rounded-xl text-xs font-mono font-bold uppercase transition-all cursor-pointer border flex items-center justify-center gap-1.5 min-h-[44px] active:scale-95 ${
                             currentDecision === 'OVERRULED'
                               ? 'bg-amber-600 border-amber-500 text-white shadow-md'
                               : 'bg-neutral-900 border-neutral-800 text-neutral-300 hover:text-white'
                           }`}
                         >
                           <X className="w-3.5 h-3.5" />
-                          <span>Overturn Finding</span>
+                          <span>Overturn</span>
                         </button>
                       </div>
                     </div>
@@ -710,12 +710,12 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
             />
           </div>
 
-          {/* Final Actions Bar */}
+          {/* Final Actions Bar: Elevated Touch Targets for Mobile */}
           <div className="p-4 sm:p-5 rounded-2xl bg-[#0f0f12] border border-neutral-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-2xl">
             <button
               onClick={onBack}
               disabled={isSubmitting}
-              className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl border border-neutral-800 text-neutral-400 hover:text-white text-xs font-mono font-bold uppercase cursor-pointer text-center"
+              className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl border border-neutral-800 text-neutral-400 hover:text-white text-xs font-mono font-bold uppercase cursor-pointer text-center min-h-[46px] flex items-center justify-center active:scale-[0.98]"
             >
               Cancel / Back to Queue
             </button>
@@ -725,7 +725,7 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
                 <button
                   disabled={isSubmitting}
                   onClick={() => handleTriggerDecision('REJECT')}
-                  className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl bg-rose-950/60 border border-rose-600/70 hover:bg-rose-900 text-rose-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer text-center"
+                  className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl bg-rose-950/60 border border-rose-600/70 hover:bg-rose-900 text-rose-300 text-xs font-mono font-bold uppercase transition-all cursor-pointer text-center min-h-[46px] flex items-center justify-center active:scale-[0.98]"
                 >
                   Reject Release
                 </button>
@@ -733,7 +733,7 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
                 <button
                   disabled={isSubmitting}
                   onClick={() => handleTriggerDecision('REQUEST_CHANGES')}
-                  className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl bg-neutral-900 border border-amber-600/70 hover:bg-neutral-800 text-amber-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer text-center"
+                  className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl bg-neutral-900 border border-amber-600/70 hover:bg-neutral-800 text-amber-300 text-xs font-mono font-bold uppercase transition-all cursor-pointer text-center min-h-[46px] flex items-center justify-center active:scale-[0.98]"
                 >
                   Request Changes
                 </button>
@@ -741,7 +741,7 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
                 <button
                   disabled={isSubmitting}
                   onClick={() => handleTriggerDecision('APPROVE')}
-                  className="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold uppercase shadow-lg transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                  className="w-full sm:w-auto px-6 py-3.5 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold uppercase shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2 min-h-[46px] active:scale-[0.98]"
                 >
                   <ShieldCheck className="w-4 h-4" />
                   <span>Grant Final Approval & Release</span>
@@ -752,7 +752,7 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
                 <button
                   disabled={isSubmitting}
                   onClick={() => handleTriggerDecision('REJECT')}
-                  className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl bg-rose-950/60 border border-rose-600/70 hover:bg-rose-900 text-rose-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer text-center"
+                  className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl bg-rose-950/60 border border-rose-600/70 hover:bg-rose-900 text-rose-300 text-xs font-mono font-bold uppercase transition-all cursor-pointer text-center min-h-[46px] flex items-center justify-center active:scale-[0.98]"
                 >
                   Reject Compliance
                 </button>
@@ -760,7 +760,7 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
                 <button
                   disabled={isSubmitting}
                   onClick={() => handleTriggerDecision('REQUEST_CHANGES')}
-                  className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl bg-neutral-900 border border-amber-600/70 hover:bg-neutral-800 text-amber-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer text-center"
+                  className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl bg-neutral-900 border border-amber-600/70 hover:bg-neutral-800 text-amber-300 text-xs font-mono font-bold uppercase transition-all cursor-pointer text-center min-h-[46px] flex items-center justify-center active:scale-[0.98]"
                 >
                   Return for Revision
                 </button>
@@ -768,16 +768,16 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
                 <button
                   disabled={isSubmitting}
                   onClick={() => handleTriggerDecision('REQUEST_EVIDENCE')}
-                  className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl bg-sky-950/60 border border-sky-500/70 hover:bg-sky-900 text-sky-200 text-xs font-mono font-bold uppercase transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                  className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl bg-sky-950/60 border border-sky-500/70 hover:bg-sky-900 text-sky-200 text-xs font-mono font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-2 min-h-[46px] active:scale-[0.98]"
                 >
-                  <Clock className="w-3.5 h-3.5" />
+                  <Clock className="w-4 h-4" />
                   <span>Request Evidence</span>
                 </button>
 
                 <button
                   disabled={isSubmitting}
                   onClick={() => handleTriggerDecision('APPROVE')}
-                  className="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold uppercase shadow-lg transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                  className="w-full sm:w-auto px-6 py-3.5 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold uppercase shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2 min-h-[46px] active:scale-[0.98]"
                 >
                   <Check className="w-4 h-4" />
                   <span>Approve Compliance</span>
@@ -788,7 +788,7 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
                 <button
                   disabled={isSubmitting}
                   onClick={() => handleTriggerDecision('REQUEST_CHANGES')}
-                  className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl bg-neutral-900 border border-amber-600/70 hover:bg-neutral-800 text-amber-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer text-center"
+                  className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl bg-neutral-900 border border-amber-600/70 hover:bg-neutral-800 text-amber-300 text-xs font-mono font-bold uppercase transition-all cursor-pointer text-center min-h-[46px] flex items-center justify-center active:scale-[0.98]"
                 >
                   Send Back for Revision
                 </button>
@@ -796,7 +796,7 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
                 <button
                   disabled={isSubmitting}
                   onClick={() => handleTriggerDecision('REJECT')}
-                  className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl bg-rose-950/60 border border-rose-600/70 hover:bg-rose-900 text-rose-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer text-center"
+                  className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl bg-rose-950/60 border border-rose-600/70 hover:bg-rose-900 text-rose-300 text-xs font-mono font-bold uppercase transition-all cursor-pointer text-center min-h-[46px] flex items-center justify-center active:scale-[0.98]"
                 >
                   Reject
                 </button>
@@ -804,7 +804,7 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
                 <button
                   disabled={isSubmitting}
                   onClick={() => handleTriggerDecision('APPROVE')}
-                  className="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold uppercase shadow-lg transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                  className="w-full sm:w-auto px-6 py-3.5 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold uppercase shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2 min-h-[46px] active:scale-[0.98]"
                 >
                   <Check className="w-4 h-4" />
                   <span>Approve Review</span>

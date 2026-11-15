@@ -224,11 +224,11 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
         </p>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="flex flex-wrap items-center gap-2 pt-2 border-b border-neutral-800 pb-4">
+      {/* Filter Tabs: Horizontal Swipe on Mobile */}
+      <div className="flex items-center gap-2 pt-2 border-b border-neutral-800 pb-4 overflow-x-auto no-scrollbar flex-nowrap sm:flex-wrap">
         <button
           onClick={() => setFilter('ALL')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer border ${
+          className={`px-3.5 py-2 rounded-xl text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer border whitespace-nowrap min-h-[40px] shrink-0 ${
             filter === 'ALL'
               ? 'bg-neutral-800 border-neutral-600 text-white font-bold'
               : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
@@ -239,7 +239,7 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
 
         <button
           onClick={() => setFilter('CHANGES_REQUESTED')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer border flex items-center gap-1.5 ${
+          className={`px-3.5 py-2 rounded-xl text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer border flex items-center gap-1.5 whitespace-nowrap min-h-[40px] shrink-0 ${
             filter === 'CHANGES_REQUESTED'
               ? 'bg-amber-950/80 border-amber-600 text-amber-300 font-bold'
               : 'bg-neutral-950 border-neutral-800 text-amber-400 hover:border-amber-700'
@@ -251,7 +251,7 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
 
         <button
           onClick={() => setFilter('PENDING')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer border ${
+          className={`px-3.5 py-2 rounded-xl text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer border whitespace-nowrap min-h-[40px] shrink-0 ${
             filter === 'PENDING'
               ? 'bg-purple-950/80 border-purple-600 text-purple-300 font-bold'
               : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
@@ -262,7 +262,7 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
 
         <button
           onClick={() => setFilter('APPROVED')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer border ${
+          className={`px-3.5 py-2 rounded-xl text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer border whitespace-nowrap min-h-[40px] shrink-0 ${
             filter === 'APPROVED'
               ? 'bg-emerald-950/80 border-emerald-600 text-emerald-300 font-bold'
               : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
@@ -362,34 +362,34 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
                   <div className="p-4 rounded-xl bg-amber-950/40 border border-amber-600/70 space-y-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-amber-300 font-mono text-xs font-bold uppercase tracking-wider">
-                        <AlertTriangle className="w-4 h-4 text-amber-400" />
+                        <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
                         <span>REVIEWER FEEDBACK (Action Required)</span>
                       </div>
-                      <span className="text-[10px] font-mono text-amber-400/80">
-                        Assigned Reviewer: Meera
+                      <span className="text-[10px] font-mono text-amber-400/80 shrink-0">
+                        Reviewer Meera
                       </span>
                     </div>
 
-                    <p className="text-xs sm:text-sm text-amber-100 font-sans leading-relaxed pl-6">
+                    <p className="text-xs sm:text-sm text-amber-100 font-sans leading-relaxed pl-0 sm:pl-6">
                       {sub.reviewer_feedback ||
                         "Changes requested on draft claims. Please revise and align with certified brand facts before re-submission."}
                     </p>
 
                     {/* Action: Edit & Resubmit Button */}
-                    <div className="pt-1 pl-6 flex flex-wrap items-center gap-3">
+                    <div className="pt-1 pl-0 sm:pl-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
                       <button
                         onClick={() => {
                           if (onEditAndResubmit) {
                             onEditAndResubmit(sub);
                           }
                         }}
-                        className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-mono font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md flex items-center gap-2"
+                        className="w-full sm:w-auto px-5 py-3 sm:py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-mono font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md flex items-center justify-center gap-2 min-h-[46px] active:scale-[0.98]"
                       >
-                        <Edit3 className="w-3.5 h-3.5" />
+                        <Edit3 className="w-4 h-4" />
                         <span>Edit & Resubmit (v{sub.version + 1})</span>
                       </button>
                       <span className="text-[11px] font-mono text-amber-300/80">
-                        Opens copy in Content Checker to re-verify and increment version.
+                        Loads draft in Content Checker to revise and re-verify.
                       </span>
                     </div>
                   </div>

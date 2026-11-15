@@ -484,7 +484,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
               <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
                 BRANDTRACE · {brandName.toUpperCase()}
               </div>
-              <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-white font-sans uppercase">
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white font-sans uppercase leading-tight">
                 {role === 'brand-owner' ? 'FINAL APPROVAL & RELEASE QUEUE' : role === 'compliance' ? 'COMPLIANCE AUDIT QUEUE' : 'REVIEW QUEUE'}
               </h1>
               <p className="text-xs sm:text-sm text-neutral-400 font-sans max-w-2xl leading-relaxed">

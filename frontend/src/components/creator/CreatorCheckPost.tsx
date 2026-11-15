@@ -717,42 +717,77 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
         </div>
       )}
 
-      {/* Client Brand Selector for Agency */}
+      {/* Client Brand & Campaign Selector for Agency */}
       {role === 'agency' && (
-        <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-neutral-950 border border-neutral-800">
-          <div className="flex items-center gap-2.5">
-            <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400 font-bold">
-              ASSIGNED CLIENT BRAND:
-            </span>
-            <select
-              value={activeWorkspaceId}
-              onChange={(e) => handleClientBrandChange(e.target.value)}
-              className="px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-700 text-xs font-mono font-bold text-white focus:outline-none focus:border-indigo-500 cursor-pointer"
-            >
-              {CLIENT_BRANDS.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name} ({b.industry})
-                </option>
-              ))}
-            </select>
+        <div className="p-4 sm:p-5 rounded-2xl bg-neutral-950 border border-cyan-500/30 space-y-3.5 shadow-xl">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-800/80 pb-3">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse" />
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-cyan-300">
+                AGENCY CLIENT & CAMPAIGN WORKSPACE
+              </span>
+            </div>
+            <div className="flex items-center gap-2 text-[10px] font-mono">
+              <span className="text-neutral-500">Partner Org:</span>
+              <span className="px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-500/40 text-cyan-200 font-bold">
+                {orgId || 'ORG-AGENCY-PULSE'}
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-[10px] font-mono text-neutral-400">
-            <span>Agency Partner:</span>
-            <span className="px-2 py-0.5 rounded bg-neutral-900 border border-neutral-700 text-neutral-200 font-bold">
-              {orgId || 'ORG-AGENCY-PULSE'}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Client Brand Selector */}
+            <div className="space-y-1">
+              <label className="block text-[11px] font-mono text-neutral-400 font-semibold uppercase">
+                Assigned Client Brand
+              </label>
+              <select
+                value={activeWorkspaceId}
+                onChange={(e) => handleClientBrandChange(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-xs font-mono font-bold text-white focus:outline-none focus:border-cyan-400 cursor-pointer"
+              >
+                {CLIENT_BRANDS.map((b) => (
+                  <option key={b.id} value={b.id} className="bg-neutral-900 text-white">
+                    {b.name} — {b.industry}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Campaign Name Field */}
+            <div className="space-y-1">
+              <label className="block text-[11px] font-mono text-neutral-400 font-semibold uppercase">
+                Active Campaign Tag
+              </label>
+              <input
+                type="text"
+                defaultValue={`${activeBrandName} Q4 Festive Campaign`}
+                placeholder="e.g. Summer Launch / Festive 2026"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-900 border border-neutral-700 text-xs font-mono text-neutral-200 placeholder-neutral-500 focus:outline-none focus:border-cyan-400"
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-[10px] font-mono text-neutral-400">
+            <span className="flex items-center gap-1.5 text-cyan-400/90">
+              <ShieldCheck className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+              <span>Agency Governance Protocol: NDA Active · Client facts isolated</span>
+            </span>
+            <span className="text-neutral-400">
+              Submissions route directly to Reviewer Queue
             </span>
           </div>
         </div>
       )}
 
       {/* Main Lined Paper Document Card */}
-      <div className="rounded-2xl border border-neutral-800 shadow-2xl overflow-hidden bg-neutral-950 transition-all">
+      <div className="rounded-2xl border border-neutral-800 shadow-2xl overflow-hidden bg-neutral-950 transition-all w-full">
         
         {/* Lined Paper Container */}
-        <div className="bg-[#f5f2eb] text-neutral-900 relative">
+        <div className="bg-[#f5f2eb] text-neutral-900 relative w-full">
           
           {/* Card Top Label Bar inside the paper */}
-          <div className="px-4 sm:px-6 pt-3.5 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[10px] sm:text-[11px] font-mono font-bold text-neutral-600 select-none">
+          <div className="px-3.5 sm:px-6 pt-3.5 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[10px] sm:text-[11px] font-mono font-bold text-neutral-600 select-none">
             <span className="uppercase tracking-wider">PASTE A POST, OR UPLOAD A FILE</span>
             <span className="uppercase tracking-wider text-neutral-500">
               {draftContent.length} CHARACTERS · {channel.toUpperCase()}
@@ -760,11 +795,11 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
           </div>
 
           {/* Notebook Paper with Red Margin Rule & Ruled Lines */}
-          <div className="relative min-h-[180px] px-4 sm:px-6 pb-6 pt-2">
+          <div className="relative min-h-[190px] px-3 sm:px-6 pb-6 pt-2 w-full">
             {/* Left Vertical Red Margin Line */}
             <div 
               className="absolute top-0 bottom-0 pointer-events-none" 
-              style={{ left: 'clamp(24px, 5vw, 42px)', width: '1px', backgroundColor: '#e28d8d' }} 
+              style={{ left: 'clamp(14px, 4.5vw, 36px)', width: '1px', backgroundColor: '#e28d8d' }} 
             />
 
             {/* Textarea */}
@@ -773,7 +808,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
               onChange={(e) => setDraftContent(e.target.value)}
               placeholder="Paste your draft here"
               rows={6}
-              className="w-full bg-transparent resize-y text-xs sm:text-base text-neutral-900 placeholder:text-neutral-400 leading-relaxed font-sans focus:outline-none border-0 p-0 pl-5 sm:pl-7"
+              className="w-full bg-transparent resize-y text-sm sm:text-base text-neutral-900 placeholder:text-neutral-400 leading-relaxed font-sans focus:outline-none border-0 p-0 pl-4 sm:pl-7 pr-2.5 sm:pr-4"
               style={{
                 backgroundImage: 'repeating-linear-gradient(transparent, transparent 27px, #e3ded5 28px)',
                 lineHeight: '28px',
@@ -782,19 +817,24 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
           </div>
         </div>
 
-        {/* Dark Accordion Section matching reference */}
+        {/* Dark Accordion Section: Vertical layout for optional fields */}
         <div className="bg-[#121214] border-t border-neutral-800">
           <button
             type="button"
             onClick={() => setIsAccordionOpen(!isAccordionOpen)}
-            className="w-full px-6 py-3 flex items-center gap-2 text-[11px] font-mono font-bold text-neutral-400 hover:text-white uppercase tracking-wider cursor-pointer select-none transition-colors"
+            className="w-full px-4 sm:px-6 py-3 flex items-center justify-between text-[11px] font-mono font-bold text-neutral-400 hover:text-white uppercase tracking-wider cursor-pointer select-none transition-colors"
           >
-            {isAccordionOpen ? (
-              <ChevronDown className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
-            ) : (
-              <ChevronRight className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
-            )}
-            <span>OPTIONAL: WORDS AND THE CALL TO ACTION THIS POST MUST KEEP</span>
+            <div className="flex items-center gap-2 truncate">
+              {isAccordionOpen ? (
+                <ChevronDown className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+              ) : (
+                <ChevronRight className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+              )}
+              <span className="truncate">OPTIONAL: WORDS AND THE CALL TO ACTION THIS POST MUST KEEP</span>
+            </div>
+            <span className="text-[10px] text-neutral-500 shrink-0">
+              {isAccordionOpen ? 'COLLAPSE' : 'EXPAND'}
+            </span>
           </button>
 
           <AnimatePresence>
@@ -804,13 +844,14 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.2 }}
-                className="px-6 pb-4 pt-1"
+                className="px-4 sm:px-6 pb-5 pt-1 border-t border-neutral-800/60"
               >
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {/* Vertical Layout for Optional Fields on Mobile */}
+                <div className="flex flex-col gap-3.5">
                   
                   {/* Field 1: Key phrases */}
-                  <div>
-                    <label className="block text-[11px] font-mono text-neutral-400 mb-1.5">
+                  <div className="space-y-1">
+                    <label className="block text-xs font-mono text-neutral-300 font-semibold">
                       Key phrases, comma separated
                     </label>
                     <input
@@ -818,46 +859,52 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
                       value={keyPhrases}
                       onChange={(e) => setKeyPhrases(e.target.value)}
                       placeholder="e.g. dark spots, Vitamin C, brightening serum"
-                      className="w-full px-3 py-2 rounded-lg bg-[#0d0d0f] border border-neutral-700/80 text-xs font-mono text-neutral-200 placeholder-neutral-500 focus:outline-none focus:border-indigo-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#0d0d0f] border border-neutral-700 text-sm font-mono text-neutral-200 placeholder-neutral-500 focus:outline-none focus:border-indigo-500"
                     />
+                    <p className="text-[10px] font-mono text-neutral-500">
+                      Content checking will flag if these mandatory phrases are absent.
+                    </p>
                   </div>
 
                   {/* Field 2: Call to action */}
-                  <div>
-                    <label className="block text-[11px] font-mono text-neutral-400 mb-1.5">
-                      Call to action
+                  <div className="space-y-1">
+                    <label className="block text-xs font-mono text-neutral-300 font-semibold">
+                      Mandated Call to Action (CTA)
                     </label>
                     <input
                       type="text"
                       value={callToAction}
                       onChange={(e) => setCallToAction(e.target.value)}
-                      placeholder="e.g. Shop"
-                      className="w-full px-3 py-2 rounded-lg bg-[#0d0d0f] border border-neutral-700/80 text-xs font-mono text-neutral-200 placeholder-neutral-500 focus:outline-none focus:border-indigo-500"
+                      placeholder="e.g. Shop / Claim offer / Learn More"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#0d0d0f] border border-neutral-700 text-sm font-mono text-neutral-200 placeholder-neutral-500 focus:outline-none focus:border-indigo-500"
                     />
+                    <p className="text-[10px] font-mono text-neutral-500">
+                      Brand guidelines mandate a clear conversion call-to-action.
+                    </p>
                   </div>
 
                   {/* Field 3: Channel Dropdown */}
-                  <div>
-                    <label className="block text-[11px] font-mono text-neutral-400 mb-1.5">
-                      Channel Selection
+                  <div className="space-y-1">
+                    <label className="block text-xs font-mono text-neutral-300 font-semibold">
+                      Target Distribution Channel
                     </label>
                     <div className="relative">
                       <select
                         value={channel}
                         onChange={(e) => setChannel(e.target.value as PostChannel)}
-                        className="w-full appearance-none px-3 py-2 rounded-lg bg-[#0d0d0f] border border-neutral-700/80 text-xs font-mono text-neutral-200 focus:outline-none focus:border-indigo-500 cursor-pointer pr-8"
+                        className="w-full appearance-none px-3.5 py-2.5 rounded-xl bg-[#0d0d0f] border border-neutral-700 text-sm font-mono text-neutral-200 focus:outline-none focus:border-indigo-500 cursor-pointer pr-10"
                       >
                         <option value="instagram" className="bg-neutral-900 text-white">instagram</option>
                         <option value="email" className="bg-neutral-900 text-white">email</option>
                         <option value="web" className="bg-neutral-900 text-white">web</option>
                         <option value="print" className="bg-neutral-900 text-white">print</option>
-                        <option value="other" className="bg-neutral-900 text-white">other</option>
                         <option value="facebook" className="bg-neutral-900 text-white">facebook</option>
                         <option value="linkedin" className="bg-neutral-900 text-white">linkedin</option>
                         <option value="x" className="bg-neutral-900 text-white">x</option>
                         <option value="youtube" className="bg-neutral-900 text-white">youtube</option>
+                        <option value="other" className="bg-neutral-900 text-white">other</option>
                       </select>
-                      <ChevronDown className="w-3.5 h-3.5 text-neutral-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <ChevronDown className="w-4 h-4 text-neutral-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                     </div>
                   </div>
 
@@ -869,18 +916,18 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
 
       </div>
 
-      {/* Buttons Row matching reference */}
+      {/* Buttons Row: Check Button Prominent & Accessible */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           <button
             onClick={handleOpenSample}
-            className="flex-1 sm:flex-none px-4 py-2.5 sm:py-2 rounded-lg border border-neutral-700 bg-neutral-950 hover:bg-neutral-900 text-xs font-mono font-medium text-white transition-colors cursor-pointer text-center"
+            className="w-full sm:w-auto px-4 py-3 sm:py-2 rounded-xl border border-neutral-700 bg-neutral-950 hover:bg-neutral-900 text-xs font-mono font-medium text-white transition-colors cursor-pointer text-center"
           >
             Open the sample post
           </button>
 
-          <label className="flex-1 sm:flex-none flex items-center justify-center gap-2 text-xs font-mono text-neutral-400 cursor-pointer">
-            <span className="px-3.5 py-2.5 sm:py-2 rounded-lg border border-neutral-700 bg-neutral-950 hover:bg-neutral-900 text-white font-medium transition-colors">
+          <label className="w-full sm:w-auto flex items-center justify-center gap-2 text-xs font-mono text-neutral-400 cursor-pointer">
+            <span className="w-full sm:w-auto px-4 py-3 sm:py-2 rounded-xl border border-neutral-700 bg-neutral-950 hover:bg-neutral-900 text-white font-medium transition-colors text-center">
               Choose File
             </span>
             <span className="text-neutral-500 text-[11px] truncate max-w-[120px] sm:max-w-[150px]">
@@ -895,19 +942,22 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
           </label>
         </div>
 
-        {/* Check Button matching reference gray filled style */}
+        {/* Check Button: High prominence on mobile */}
         <button
           onClick={handleRunCheck}
           disabled={isChecking || (!draftContent.trim() && !selectedFile)}
-          className="w-full sm:w-auto px-7 py-3 sm:py-2 rounded-lg bg-[#8c8983] hover:bg-[#a09c95] disabled:opacity-40 text-neutral-950 font-mono font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md flex items-center justify-center gap-2"
+          className="w-full sm:w-auto px-8 py-3.5 sm:py-2.5 rounded-xl bg-white hover:bg-neutral-200 disabled:opacity-40 text-neutral-950 font-mono font-black text-xs uppercase tracking-wider transition-all cursor-pointer shadow-xl flex items-center justify-center gap-2 active:scale-[0.98]"
         >
           {isChecking ? (
             <>
-              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-              <span>Checking Draft...</span>
+              <RefreshCw className="w-4 h-4 animate-spin text-neutral-950" />
+              <span>Analyzing Draft...</span>
             </>
           ) : (
-            <span>Check</span>
+            <>
+              <Sparkles className="w-4 h-4 text-indigo-600" />
+              <span>CHECK POST</span>
+            </>
           )}
         </button>
       </div>
@@ -1229,36 +1279,36 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
                         </div>
 
                         {/* Problematic Text & Approved Fix Box */}
-                        <div className="space-y-1.5 p-3 rounded-xl bg-neutral-900 border border-neutral-800 text-xs font-mono">
+                        <div className="space-y-1.5 p-3 sm:p-3.5 rounded-xl bg-neutral-900 border border-neutral-800 text-xs font-mono break-words break-anywhere">
                           <div className="text-rose-400 line-through decoration-rose-500 font-medium">
                             "{f.rejectedText}"
                           </div>
-                          <div className="text-emerald-400 font-bold flex items-center gap-1.5 pt-0.5">
-                            <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                            <span>{f.approvedText}</span>
+                          <div className="text-emerald-400 font-bold flex items-start gap-1.5 pt-0.5">
+                            <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                            <span className="break-words break-anywhere">{f.approvedText}</span>
                           </div>
                         </div>
 
                         {/* Explanation */}
-                        <p className="text-xs text-neutral-300 font-sans leading-relaxed">
+                        <p className="text-xs text-neutral-300 font-sans leading-relaxed break-words">
                           {f.recommendation}
                         </p>
                       </div>
 
-                      {/* Card Action */}
-                      <div className="mt-4 pt-3 border-t border-neutral-800 flex items-center justify-end gap-2">
+                      {/* Card Action: Mobile-friendly touch target */}
+                      <div className="mt-4 pt-3 border-t border-neutral-800 flex items-center justify-end">
                         {f.accepted ? (
-                          <span className="text-[11px] font-mono font-bold text-emerald-400 flex items-center gap-1">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            Fix Applied
+                          <span className="text-[11px] font-mono font-bold text-emerald-400 flex items-center gap-1.5 py-1">
+                            <CheckCircle2 className="w-4 h-4" />
+                            Fix Applied to Draft
                           </span>
                         ) : (
                           <button
                             onClick={() => handleAcceptFix(f.id)}
-                            className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-mono font-bold text-xs uppercase tracking-wider shadow-sm transition-colors cursor-pointer flex items-center gap-1.5"
+                            className="w-full sm:w-auto px-4 py-2.5 sm:py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono font-bold text-xs uppercase tracking-wider shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-95 min-h-[44px]"
                           >
                             <span>Accept Fix</span>
-                            <ArrowRight className="w-3 h-3" />
+                            <ArrowRight className="w-3.5 h-3.5" />
                           </button>
                         )}
                       </div>
@@ -1303,7 +1353,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
                 </div>
               </div>
 
-              {/* Side-by-side comparison */}
+              {/* Side-by-side comparison: Stacks cleanly on mobile without horizontal scroll */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 
                 {/* Original Version */}
@@ -1311,7 +1361,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
                   <div className="text-[10px] font-mono text-neutral-400 uppercase font-semibold">
                     ORIGINAL SUBMISSION
                   </div>
-                  <div className="p-4 rounded-xl bg-neutral-900 border border-neutral-800 text-xs sm:text-sm text-neutral-300 font-sans leading-relaxed min-h-[100px]">
+                  <div className="p-4 rounded-xl bg-neutral-900 border border-neutral-800 text-xs sm:text-sm text-neutral-300 font-sans leading-relaxed min-h-[100px] break-words break-anywhere">
                     {draftContent}
                   </div>
                 </div>
@@ -1330,7 +1380,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
                       className="w-full p-4 rounded-xl bg-neutral-900 border border-indigo-500/50 text-xs sm:text-sm text-white font-sans leading-relaxed focus:outline-none"
                     />
                   ) : (
-                    <div className="p-4 rounded-xl bg-indigo-950/20 border border-indigo-500/40 text-xs sm:text-sm text-indigo-100 font-sans leading-relaxed min-h-[100px]">
+                    <div className="p-4 rounded-xl bg-indigo-950/20 border border-indigo-500/40 text-xs sm:text-sm text-indigo-100 font-sans leading-relaxed min-h-[100px] break-words break-anywhere">
                       {suggestedContent}
                     </div>
                   )}
@@ -1339,25 +1389,25 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
               </div>
 
               {/* Actions for Suggested Version */}
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
                 <div className="text-xs font-mono text-neutral-500">
                   Accepting replaces your editor draft with verified compliant text.
                 </div>
-                <div className="flex items-center gap-2.5">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                   <button
                     type="button"
                     onClick={() => {
                       setSuggestedRejected(true);
                       setSubmissionStatus('Suggested changes discarded.');
                     }}
-                    className="px-3.5 py-1.5 rounded-lg border border-neutral-800 bg-neutral-950 hover:bg-neutral-900 text-neutral-400 hover:text-white text-xs font-mono transition-colors cursor-pointer"
+                    className="w-full sm:w-auto px-3.5 py-2.5 sm:py-1.5 rounded-xl border border-neutral-800 bg-neutral-950 hover:bg-neutral-900 text-neutral-400 hover:text-white text-xs font-mono transition-colors cursor-pointer text-center min-h-[44px] flex items-center justify-center"
                   >
                     Reject Changes
                   </button>
                   <button
                     type="button"
                     onClick={() => setIsManualEditSuggested(!isManualEditSuggested)}
-                    className="px-3.5 py-1.5 rounded-lg border border-neutral-700 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 text-xs font-mono transition-colors cursor-pointer flex items-center gap-1.5"
+                    className="w-full sm:w-auto px-3.5 py-2.5 sm:py-1.5 rounded-xl border border-neutral-700 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 text-xs font-mono transition-colors cursor-pointer flex items-center justify-center gap-1.5 min-h-[44px]"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
                     <span>{isManualEditSuggested ? 'Lock Edits' : 'Edit Manually'}</span>
@@ -1365,7 +1415,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
                   <button
                     type="button"
                     onClick={handleAcceptSuggested}
-                    className="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-mono font-bold uppercase transition-colors cursor-pointer shadow-md flex items-center gap-1.5"
+                    className="w-full sm:w-auto px-4 py-2.5 sm:py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-mono font-bold uppercase transition-colors cursor-pointer shadow-md flex items-center justify-center gap-1.5 min-h-[44px]"
                   >
                     <Check className="w-3.5 h-3.5" />
                     <span>Accept Suggested Changes</span>
@@ -1384,10 +1434,10 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
               Satisfied with the draft? Save privately or request reviewer sign-off.
             </div>
 
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full md:w-auto">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 w-full md:w-auto">
               <button
                 onClick={handleSavePrivateVersion}
-                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-neutral-900 border border-neutral-700 hover:bg-neutral-800 text-neutral-200 font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer text-center"
+                className="w-full sm:w-auto px-5 py-3 sm:py-2.5 rounded-xl bg-neutral-900 border border-neutral-700 hover:bg-neutral-800 text-neutral-200 font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer text-center min-h-[46px] flex items-center justify-center active:scale-[0.98]"
               >
                 Save Version (Private)
               </button>
@@ -1395,7 +1445,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
               <button
                 onClick={handleApplyFixesAndCheckAgain}
                 disabled={isChecking}
-                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-neutral-800 border border-indigo-500/50 hover:bg-neutral-700 text-indigo-300 font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                className="w-full sm:w-auto px-5 py-3 sm:py-2.5 rounded-xl bg-neutral-800 border border-indigo-500/50 hover:bg-neutral-700 text-indigo-300 font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2 min-h-[46px] active:scale-[0.98]"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isChecking ? 'animate-spin' : ''}`} />
                 <span>Apply My Fixes and Check Again</span>
@@ -1403,9 +1453,9 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
 
               <button
                 onClick={() => setIsReviewModalOpen(true)}
-                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-mono font-bold text-xs uppercase tracking-wider shadow-md transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                className="w-full sm:w-auto px-6 py-3.5 sm:py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-mono font-bold text-xs uppercase tracking-wider shadow-lg transition-colors cursor-pointer flex items-center justify-center gap-2 min-h-[46px] active:scale-[0.98]"
               >
-                <Send className="w-3.5 h-3.5" />
+                <Send className="w-4 h-4" />
                 <span>Submit for Human Review</span>
               </button>
             </div>

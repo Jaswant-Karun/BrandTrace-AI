@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown, ChevronUp, Copy, Check, ShieldCheck } from 'lucide-react';
 
 interface FactCardItem {
   id: string;
@@ -138,6 +139,15 @@ export const CreatorFactsLedger: React.FC<CreatorFactsLedgerProps> = ({
       })
       .catch(() => {});
   }, []);
+
+  const [expandedFactId, setExpandedFactId] = useState<string | null>(null);
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+
+  const handleCopyWording = (code: string, text: string) => {
+    navigator.clipboard?.writeText(text);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
 
   const allFacts = [...FACTS_DATA, ...dynamicFacts.filter((df) => !FACTS_DATA.some((f) => f.code === df.code))];
 
