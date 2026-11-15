@@ -173,12 +173,22 @@ class BrandTraceRepository:
             doc["_id"] = str(ObjectId())
 
         if self.mm.is_connected and self.mm.db is not None:
+            update_set, set_on_insert = self._split_doc_for_upsert(doc)
             await self.mm.db.brand_guidelines.update_one(
                 {"organisation_id": guideline.organisation_id, "guideline_id": guideline.guideline_id},
-                {"$set": doc},
+                {"$set": update_set, "$setOnInsert": set_on_insert},
                 upsert=True
             )
-        self._memory_collections["brand_guidelines"].append(doc)
+        existing_idx = next(
+            (i for i, g in enumerate(self._memory_collections["brand_guidelines"])
+             if g.get("organisation_id") == guideline.organisation_id and g.get("guideline_id") == guideline.guideline_id),
+            None
+        )
+        if existing_idx is not None:
+            doc["_id"] = self._memory_collections["brand_guidelines"][existing_idx].get("_id", doc["_id"])
+            self._memory_collections["brand_guidelines"][existing_idx] = doc
+        else:
+            self._memory_collections["brand_guidelines"].append(doc)
         return doc
 
     async def get_brand_guidelines(
@@ -208,12 +218,22 @@ class BrandTraceRepository:
             doc["_id"] = str(ObjectId())
 
         if self.mm.is_connected and self.mm.db is not None:
+            update_set, set_on_insert = self._split_doc_for_upsert(doc)
             await self.mm.db.approved_facts.update_one(
                 {"organisation_id": fact.organisation_id, "fact_id": fact.fact_id},
-                {"$set": doc},
+                {"$set": update_set, "$setOnInsert": set_on_insert},
                 upsert=True
             )
-        self._memory_collections["approved_facts"].append(doc)
+        existing_idx = next(
+            (i for i, f in enumerate(self._memory_collections["approved_facts"])
+             if f.get("organisation_id") == fact.organisation_id and f.get("fact_id") == fact.fact_id),
+            None
+        )
+        if existing_idx is not None:
+            doc["_id"] = self._memory_collections["approved_facts"][existing_idx].get("_id", doc["_id"])
+            self._memory_collections["approved_facts"][existing_idx] = doc
+        else:
+            self._memory_collections["approved_facts"].append(doc)
         return doc
 
     async def get_approved_facts(
@@ -243,12 +263,22 @@ class BrandTraceRepository:
             doc["_id"] = str(ObjectId())
 
         if self.mm.is_connected and self.mm.db is not None:
+            update_set, set_on_insert = self._split_doc_for_upsert(doc)
             await self.mm.db.content_assets.update_one(
                 {"organisation_id": asset.organisation_id, "asset_id": asset.asset_id},
-                {"$set": doc},
+                {"$set": update_set, "$setOnInsert": set_on_insert},
                 upsert=True
             )
-        self._memory_collections["content_assets"].append(doc)
+        existing_idx = next(
+            (i for i, a in enumerate(self._memory_collections["content_assets"])
+             if a.get("organisation_id") == asset.organisation_id and a.get("asset_id") == asset.asset_id),
+            None
+        )
+        if existing_idx is not None:
+            doc["_id"] = self._memory_collections["content_assets"][existing_idx].get("_id", doc["_id"])
+            self._memory_collections["content_assets"][existing_idx] = doc
+        else:
+            self._memory_collections["content_assets"].append(doc)
         return doc
 
     async def get_content_asset(self, organisation_id: str, asset_id: str) -> Optional[Dict[str, Any]]:
