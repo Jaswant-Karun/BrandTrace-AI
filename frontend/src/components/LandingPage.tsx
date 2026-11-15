@@ -42,7 +42,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onVerify = () => { },
   onSignIn = () => { },
   brandName: _brandName = 'Apex Dynamics',
-  animateEntrance,
+  animateEntrance: _animateEntrance,
   brands: _brands = [],
   selectedBrandId: _selectedBrandId = 'aurelle-tech',
   setSelectedBrandId: _setSelectedBrandId = () => { },
@@ -61,39 +61,50 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const [activeSecurityIndex, setActiveSecurityIndex] = useState<number | null>(null);
   const [activeStepIndex, setActiveStepIndex] = useState<number>(3);
 
-  // Check if entrance animation was requested (either via prop or URL param ?fromLogin=true)
-  const shouldAnimate = typeof animateEntrance === 'boolean'
-    ? animateEntrance
-    : (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('fromLogin') === 'true');
+  // Motion choreography state for hero headline & approved seal:
+  // Starts at 0 (EVERY CLAIM), animates through 1 (CLINICALLY PROVEN), 2 (strikethroughs), and 3 (SHOWN TO VISIBLY REDUCE* + APPROVED VLM-SEALED slam)
+  const [motionStep, setMotionStep] = useState<number>(shouldReduceMotion ? 3 : 0);
 
-  // Motion choreography state for hero headline:
-  // Default is 3 (text fully shown as permanent).
-  // If arriving from sign in page and motion not reduced, starts at 0 and runs once to 3, then stays permanent.
-  const [motionStep, setMotionStep] = useState<number>(shouldAnimate && !shouldReduceMotion ? 0 : 3);
-
-  useEffect(() => {
-    // If not arriving fresh from sign-in or if user prefers reduced motion, keep text fully shown as permanent
-    if (!shouldAnimate || shouldReduceMotion) {
+  // Trigger function for 3-step hero choreography
+  const runHeroMotion = () => {
+    if (shouldReduceMotion) {
       setMotionStep(3);
-      return;
+      return () => {};
     }
 
-    let t1: any;
-    let t2: any;
-    let t3: any;
-
     setMotionStep(0);
-    t1 = setTimeout(() => setMotionStep(1), 900);
-    t2 = setTimeout(() => setMotionStep(2), 1900);
-    t3 = setTimeout(() => setMotionStep(3), 2900);
+    const t1 = setTimeout(() => setMotionStep(1), 750);
+    const t2 = setTimeout(() => setMotionStep(2), 1600);
+    const t3 = setTimeout(() => setMotionStep(3), 2500);
 
-    // IMPORTANT: No auto-reset or loop! Once step 3 is reached, it remains permanently fully shown.
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
     };
-  }, [shouldAnimate, shouldReduceMotion]);
+  };
+
+  // Run automatically whenever user lands on or returns to the landing page
+  useEffect(() => {
+    const cleanup = runHeroMotion();
+    return cleanup;
+  }, [shouldReduceMotion]);
+
+  // Re-trigger if user scrolls far down into the content and returns to the top of the hero
+  useEffect(() => {
+    if (shouldReduceMotion) return;
+    let hasScrolledDown = false;
+    const handleScroll = () => {
+      if (window.scrollY > 450) {
+        hasScrolledDown = true;
+      } else if (hasScrolledDown && window.scrollY < 60) {
+        hasScrolledDown = false;
+        runHeroMotion();
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [shouldReduceMotion]);
 
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false);
@@ -632,41 +643,46 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
                 {/* Motion Approved Circular Stamp Seal ("APPROVED VLM-SEALED") */}
                 {/* Centered directly on the container's bottom border line: the line passes right through the middle of the logo */}
-                <div className="mt-3 -mb-[80px] sm:-mb-[82px] flex justify-center items-center relative z-20 select-none">
-                  <motion.div
-                    key={`stamp-seal-${motionStep}`}
-                    initial={{ scale: 2.3, opacity: 0, rotate: -32 }}
-                    animate={{ scale: 1, opacity: 1, rotate: -12 }}
-                    transition={{
-                      delay: 0.35,
-                      duration: 0.45,
-                      type: 'spring',
-                      damping: 13,
-                      stiffness: 250
-                    }}
-                    className="relative flex items-center justify-center select-none"
-                  >
-                    {/* Concentric Double Rings */}
-                    <div className="w-36 h-36 sm:w-42 sm:h-42 lg:w-[162px] lg:h-[162px] rounded-full border-2 border-emerald-500/90 bg-[#06281e]/95 backdrop-blur-md shadow-[0_0_35px_rgba(16,185,129,0.35)] flex items-center justify-center p-2.5 hover:scale-105 transition-transform duration-200 cursor-default">
-                      <div className="w-full h-full rounded-full border border-dashed border-emerald-400/85 flex flex-col items-center justify-center text-center p-2.5">
-                        <span className="text-sm sm:text-[15px] lg:text-[16.5px] font-black tracking-widest text-emerald-300 uppercase font-sans">
-                          APPROVED
-                        </span>
-                        <div className="w-14 sm:w-16 h-[1.5px] bg-emerald-500/70 my-1" />
-                        <span className="text-[10.5px] sm:text-[11.5px] lg:text-xs font-mono font-extrabold tracking-widest text-emerald-400">
-                          VLM-SEALED
-                        </span>
-                      </div>
-                    </div>
+                <div className="mt-3 -mb-[80px] sm:-mb-[82px] min-h-[162px] flex justify-center items-center relative z-20 select-none">
+                  <AnimatePresence>
+                    {motionStep >= 3 && (
+                      <motion.div
+                        key={`stamp-seal-${motionStep}`}
+                        initial={{ scale: 2.3, opacity: 0, rotate: -32 }}
+                        animate={{ scale: 1, opacity: 1, rotate: -12 }}
+                        exit={{ scale: 0.8, opacity: 0 }}
+                        transition={{
+                          delay: 0.18,
+                          duration: 0.45,
+                          type: 'spring',
+                          damping: 13,
+                          stiffness: 250
+                        }}
+                        className="relative flex items-center justify-center select-none"
+                      >
+                        {/* Concentric Double Rings */}
+                        <div className="w-36 h-36 sm:w-42 sm:h-42 lg:w-[162px] lg:h-[162px] rounded-full border-2 border-emerald-500/90 bg-[#06281e]/95 backdrop-blur-md shadow-[0_0_35px_rgba(16,185,129,0.35)] flex items-center justify-center p-2.5 hover:scale-105 transition-transform duration-200 cursor-default">
+                          <div className="w-full h-full rounded-full border border-dashed border-emerald-400/85 flex flex-col items-center justify-center text-center p-2.5">
+                            <span className="text-sm sm:text-[15px] lg:text-[16.5px] font-black tracking-widest text-emerald-300 uppercase font-sans">
+                              APPROVED
+                            </span>
+                            <div className="w-14 sm:w-16 h-[1.5px] bg-emerald-500/70 my-1" />
+                            <span className="text-[10.5px] sm:text-[11.5px] lg:text-xs font-mono font-extrabold tracking-widest text-emerald-400">
+                              VLM-SEALED
+                            </span>
+                          </div>
+                        </div>
 
-                    {/* Shockwave Impact Ring upon sealing */}
-                    <motion.span
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: [0.85, 1.45], opacity: [0.9, 0] }}
-                      transition={{ delay: 0.42, duration: 0.6, ease: 'easeOut' }}
-                      className="absolute inset-0 rounded-full border-2 border-emerald-400 pointer-events-none"
-                    />
-                  </motion.div>
+                        {/* Shockwave Impact Ring upon sealing */}
+                        <motion.span
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: [0.85, 1.45], opacity: [0.9, 0] }}
+                          transition={{ delay: 0.25, duration: 0.6, ease: 'easeOut' }}
+                          className="absolute inset-0 rounded-full border-2 border-emerald-400 pointer-events-none"
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
               </div>
@@ -770,10 +786,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Card 1: INSTAGRAM POST (BIG & TALL on Left) */}
             <motion.div
-              initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.5, delay: shouldReduceMotion ? 0 : 0.1 }}
+              viewport={{ once: false, amount: 0.15 }}
+              transition={{ duration: 0.45, delay: shouldReduceMotion ? 0 : 0.1 }}
               className="w-full max-w-full sm:max-w-[420px] lg:max-w-[440px] shrink-0 bg-[#fbf9f5] text-slate-900 rounded-2xl border border-neutral-800 shadow-2xl overflow-hidden flex flex-col justify-between"
             >
               <div>
@@ -871,10 +887,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Card 2: WEB BANNER (COMPACT / STAGGERED / MEDIUM - Floating Higher) */}
             <motion.div
-              initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.5, delay: shouldReduceMotion ? 0 : 0.2 }}
+              viewport={{ once: false, amount: 0.15 }}
+              transition={{ duration: 0.45, delay: shouldReduceMotion ? 0 : 0.25 }}
               className="w-full max-w-full sm:max-w-[340px] lg:max-w-[360px] shrink-0 bg-[#fbf9f5] text-slate-900 rounded-2xl border border-neutral-800 shadow-2xl overflow-hidden flex flex-col justify-between self-start lg:-translate-y-4"
             >
               <div>
@@ -940,10 +956,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Card 3: EMAIL (WIDE / STAGGERED on Right - Floating Slightly Lower) */}
             <motion.div
-              initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.5, delay: shouldReduceMotion ? 0 : 0.3 }}
+              viewport={{ once: false, amount: 0.15 }}
+              transition={{ duration: 0.45, delay: shouldReduceMotion ? 0 : 0.4 }}
               className="w-full max-w-full sm:max-w-[400px] lg:max-w-[420px] shrink-0 bg-[#fbf9f5] text-slate-900 rounded-2xl border border-neutral-800 shadow-2xl overflow-hidden flex flex-col justify-between self-start lg:translate-y-6"
             >
               <div>
@@ -1099,10 +1115,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 tabIndex={0}
                 role="article"
                 aria-label={`${item.step}: ${item.title}`}
-                initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.15 }}
-                transition={{ duration: 0.4, delay: shouldReduceMotion ? 0 : i * 0.08 }}
+                viewport={{ once: false, amount: 0.15 }}
+                transition={{ duration: 0.45, delay: shouldReduceMotion ? 0 : i * 0.1, ease: 'easeOut' }}
                 onMouseEnter={() => setActiveStepIndex(i)}
                 onFocus={() => setActiveStepIndex(i)}
                 className={`p-7 sm:p-9 lg:p-10 flex flex-col justify-start space-y-3.5 transition-all duration-200 ease-out cursor-pointer outline-none active:scale-[0.99] ${item.borderClasses} ${isStepActive
@@ -1138,7 +1154,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
 
             {/* Left text */}
-            <div className="lg:col-span-6 space-y-6 text-left">
+            <motion.div
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 0.5, delay: shouldReduceMotion ? 0 : 0.1 }}
+              className="lg:col-span-6 space-y-6 text-left"
+            >
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-indigo-950 border border-indigo-700 text-indigo-300">
                 <Network className="w-3.5 h-3.5 text-indigo-400" />
                 <span>SIGNATURE INNOVATION</span>
@@ -1200,10 +1222,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </button>
               </div>
 
-            </div>
+            </motion.div>
 
             {/* Right: Graph Canvas Simulation Preview Card */}
-            <div className="lg:col-span-6 bg-neutral-950 border border-neutral-800 rounded-2xl p-6 space-y-4 shadow-2xl">
+            <motion.div
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 0.5, delay: shouldReduceMotion ? 0 : 0.25 }}
+              className="lg:col-span-6 bg-neutral-950 border border-neutral-800 rounded-2xl p-6 space-y-4 shadow-2xl"
+            >
               {/* Realistic Neural Dependency Mesh Header */}
               <div className="h-32 w-full rounded-xl overflow-hidden relative border border-neutral-800">
                 <img
@@ -1244,7 +1272,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   { id: 'AST-AUR-WEB-01', name: 'Aurelle Cloud Studio Pricing & Checkout', status: 'REQUIRES REVISION', risk: 'CRITICAL' },
                   { id: 'AST-AUR-DOC-01', name: 'B2B Enterprise Rate Card PDF', status: 'REQUIRES REVISION', risk: 'MEDIUM' },
                 ].map((item, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-2.5 bg-neutral-900 border border-neutral-800 rounded-lg text-xs font-mono">
+                  <motion.div
+                    key={idx}
+                    initial={shouldReduceMotion ? false : { opacity: 0, x: -16 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: false, amount: 0.2 }}
+                    transition={{ duration: 0.35, delay: shouldReduceMotion ? 0 : 0.35 + idx * 0.08 }}
+                    className="flex items-center justify-between p-2.5 bg-neutral-900 border border-neutral-800 rounded-lg text-xs font-mono"
+                  >
                     <div>
                       <span className="text-neutral-400 text-[10px] block">{item.id}</span>
                       <span className="text-neutral-200 font-sans font-medium text-[11px]">{item.name}</span>
@@ -1252,7 +1287,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-rose-950 text-rose-300 border border-rose-800">
                       {item.status}
                     </span>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
 
@@ -1260,7 +1295,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <Lock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                 <span>Non-destructive guarantee: Production database facts remain unchanged until authorized.</span>
               </div>
-            </div>
+            </motion.div>
 
           </div>
 
@@ -1347,7 +1382,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               },
               {
                 id: 'automated-tests',
-                title: '222 Automated Tests Passing',
+                title: '242 Automated Tests Passing',
                 icon: CheckCircle2,
                 defaultIconColor: 'bg-emerald-950 text-emerald-400',
                 desc: (
@@ -1365,10 +1400,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   tabIndex={0}
                   role="article"
                   aria-label={feature.title}
-                  initial={shouldReduceMotion ? false : { opacity: 0, y: 18 }}
+                  initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.15 }}
-                  transition={{ duration: 0.4, delay: shouldReduceMotion ? 0 : index * 0.08 }}
+                  viewport={{ once: false, amount: 0.12 }}
+                  transition={{ duration: 0.45, delay: shouldReduceMotion ? 0 : index * 0.09, ease: 'easeOut' }}
                   onMouseEnter={() => setActiveSecurityIndex(index)}
                   onMouseLeave={() => {
                     if (activeSecurityIndex === index) {
@@ -1440,8 +1475,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <motion.div
               initial={shouldReduceMotion ? false : { opacity: 0, y: 20, scale: 0.98 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.4, delay: shouldReduceMotion ? 0 : 0.05, ease: 'easeOut' }}
+              viewport={{ once: false, amount: 0.15 }}
+              transition={{ duration: 0.45, delay: shouldReduceMotion ? 0 : 0.05, ease: 'easeOut' }}
               className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-200 space-y-4 shadow-lg"
             >
               <div className="space-y-3">
@@ -1471,8 +1506,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <motion.div
               initial={shouldReduceMotion ? false : { opacity: 0, y: 20, scale: 0.98 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.4, delay: shouldReduceMotion ? 0 : 0.12, ease: 'easeOut' }}
+              viewport={{ once: false, amount: 0.15 }}
+              transition={{ duration: 0.45, delay: shouldReduceMotion ? 0 : 0.15, ease: 'easeOut' }}
               className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-200 space-y-4 shadow-lg"
             >
               <div className="space-y-3">
@@ -1502,8 +1537,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <motion.div
               initial={shouldReduceMotion ? false : { opacity: 0, y: 20, scale: 0.98 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.4, delay: shouldReduceMotion ? 0 : 0.19, ease: 'easeOut' }}
+              viewport={{ once: false, amount: 0.15 }}
+              transition={{ duration: 0.45, delay: shouldReduceMotion ? 0 : 0.25, ease: 'easeOut' }}
               className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-200 space-y-4 shadow-lg"
             >
               <div className="space-y-3">
@@ -1533,8 +1568,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <motion.div
               initial={shouldReduceMotion ? false : { opacity: 0, y: 20, scale: 0.98 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.4, delay: shouldReduceMotion ? 0 : 0.26, ease: 'easeOut' }}
+              viewport={{ once: false, amount: 0.15 }}
+              transition={{ duration: 0.45, delay: shouldReduceMotion ? 0 : 0.35, ease: 'easeOut' }}
               className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-200 space-y-4 shadow-lg"
             >
               <div className="space-y-3">
@@ -1564,8 +1599,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <motion.div
               initial={shouldReduceMotion ? false : { opacity: 0, y: 20, scale: 0.98 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.4, delay: shouldReduceMotion ? 0 : 0.33, ease: 'easeOut' }}
+              viewport={{ once: false, amount: 0.15 }}
+              transition={{ duration: 0.45, delay: shouldReduceMotion ? 0 : 0.45, ease: 'easeOut' }}
               className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-200 space-y-4 shadow-lg"
             >
               <div className="space-y-3">
