@@ -105,10 +105,10 @@ export const CreatorAuditLog: React.FC<CreatorAuditLogProps> = ({
         <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
           BRANDTRACE · {brandName.toUpperCase()}
         </div>
-        <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-white font-sans uppercase">
+        <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white font-sans uppercase">
           AUDIT LOG
         </h1>
-        <p className="text-sm sm:text-base text-neutral-400 font-sans max-w-2xl leading-relaxed">
+        <p className="text-xs sm:text-base text-neutral-400 font-sans max-w-2xl leading-relaxed">
           Every decision and approval, recorded so that nobody can quietly change it later.
         </p>
       </div>
@@ -166,27 +166,29 @@ export const CreatorAuditLog: React.FC<CreatorAuditLogProps> = ({
                     <td className="py-3.5 px-4 text-neutral-500 max-w-xs truncate">
                       {evt.reason || '—'}
                     </td>
-                    <td className="py-3.5 px-4 text-right whitespace-nowrap flex items-center justify-end gap-3">
-                      {onRestoreDraft && (
-                        <button
-                          onClick={() => onRestoreDraft(`Make every brand decision count this Diwali. Aurelle Skin helps teams review marketing content against approved brand guidelines (Restored from Audit ${evt.id}).`)}
-                          className="px-2 py-0.5 rounded bg-neutral-900 border border-neutral-700 hover:border-neutral-500 text-neutral-300 text-[10px] uppercase font-mono transition-colors cursor-pointer"
-                        >
-                          Load Draft
-                        </button>
-                      )}
-                      <button
-                        onClick={() => handleCopy(evt.hash)}
-                        className="inline-flex items-center gap-1.5 text-indigo-400 hover:text-indigo-300 text-[11px] cursor-pointer"
-                        title="Click to copy full SHA-256 cryptographic proof"
-                      >
-                        <span>{evt.hash.slice(0, 12)}...</span>
-                        {copiedHash === evt.hash ? (
-                          <Check className="w-3 h-3 text-emerald-400" />
-                        ) : (
-                          <Copy className="w-3 h-3 opacity-60 hover:opacity-100" />
+                    <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                      <div className="flex items-center justify-end gap-2 sm:gap-3">
+                        {onRestoreDraft && (
+                          <button
+                            onClick={() => onRestoreDraft(`Make every brand decision count this Diwali. Aurelle Skin helps teams review marketing content against approved brand guidelines (Restored from Audit ${evt.id}).`)}
+                            className="px-2 py-0.5 rounded bg-neutral-900 border border-neutral-700 hover:border-neutral-500 text-neutral-300 text-[10px] uppercase font-mono transition-colors cursor-pointer"
+                          >
+                            Load Draft
+                          </button>
                         )}
-                      </button>
+                        <button
+                          onClick={() => handleCopy(evt.hash)}
+                          className="inline-flex items-center gap-1.5 text-indigo-400 hover:text-indigo-300 text-[11px] cursor-pointer"
+                          title="Click to copy full SHA-256 cryptographic proof"
+                        >
+                          <span>{evt.hash.slice(0, 12)}...</span>
+                          {copiedHash === evt.hash ? (
+                            <Check className="w-3 h-3 text-emerald-400" />
+                          ) : (
+                            <Copy className="w-3 h-3 opacity-60 hover:opacity-100" />
+                          )}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

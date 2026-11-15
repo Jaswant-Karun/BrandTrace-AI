@@ -154,10 +154,10 @@ export const CreatorFactsLedger: React.FC<CreatorFactsLedgerProps> = ({
         <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
           BRANDTRACE · {brandName.toUpperCase()}
         </div>
-        <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-white font-sans uppercase">
+        <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white font-sans uppercase">
           FACT LEDGER
         </h1>
-        <p className="text-sm sm:text-base text-neutral-400 font-sans max-w-2xl leading-relaxed">
+        <p className="text-xs sm:text-base text-neutral-400 font-sans max-w-2xl leading-relaxed">
           The claims Aurelle can back up with evidence, and the approved way to say each one.
         </p>
       </div>
@@ -219,72 +219,79 @@ export const CreatorFactsLedger: React.FC<CreatorFactsLedgerProps> = ({
           )}
         </div>
 
-        {/* Timeline Chart Container */}
-        <div className="relative pt-6 pb-2">
-          {/* Vertical TODAY line */}
-          <div 
-            className="absolute top-0 bottom-0 w-[1px] bg-neutral-500/70 z-20 pointer-events-none flex flex-col items-center"
-            style={{ left: '43.5%' }}
-          >
-            <span className="text-[9px] font-mono font-bold text-white bg-[#151518] border border-neutral-700 px-2 py-0.5 rounded -mt-2.5 shadow-sm uppercase tracking-wider">
-              TODAY
-            </span>
-          </div>
+        {/* Mobile Swipe Hint */}
+        <div className="text-[10px] font-mono text-neutral-500 sm:hidden">
+          ← Swipe timeline horizontally →
+        </div>
 
-          {/* Timeline Rows with Sequential Scroll Motion Increase */}
-          <div className="space-y-2">
-            {TIMELINE_FACTS.map((tf, idx) => (
-              <motion.div
-                key={tf.code}
-                initial={{ opacity: 0, x: -12 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: false, amount: 0.15 }}
-                transition={{
-                  duration: 0.45,
-                  delay: idx * 0.04,
-                  ease: "easeOut"
-                }}
-                className="flex items-center text-[10px] font-mono h-6 relative group"
-              >
-                <span className="w-20 text-neutral-400 shrink-0 font-mono text-[11px] font-medium group-hover:text-white transition-colors">
-                  {tf.code}
-                </span>
-                <div className="flex-1 relative h-6 bg-[#121214] border border-neutral-800/40 rounded overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0, opacity: 0 }}
-                    whileInView={{ width: `${tf.width}%`, opacity: 1 }}
-                    viewport={{ once: false, amount: 0.15 }}
-                    transition={{
-                      duration: 0.85,
-                      delay: idx * 0.075,
-                      ease: [0.16, 1, 0.3, 1] // Fluid cubic-bezier expansion one by one
-                    }}
-                    style={{ left: `${tf.start}%` }}
-                    className={`absolute top-0 bottom-0 rounded px-2.5 flex items-center justify-end text-[9.5px] font-mono font-bold text-white whitespace-nowrap transition-all group-hover:brightness-110 ${
-                      tf.status === 'expired'
-                        ? 'bg-gradient-to-r from-[#dc2643] to-[#e62044] shadow-[0_0_16px_rgba(220,38,67,0.55)]'
-                        : 'bg-gradient-to-r from-[#00875a] to-[#009b66] shadow-[0_0_12px_rgba(0,155,102,0.35)]'
-                    }`}
-                  >
-                    {/* Active Leading Expansion Edge Shimmer */}
-                    <div className="absolute right-0 top-0 bottom-0 w-2.5 bg-white/25 rounded-r pointer-events-none blur-[0.5px]" />
+        {/* Timeline Chart Container with Horizontal Pan on Mobile */}
+        <div className="overflow-x-auto no-scrollbar pb-2">
+          <div className="relative pt-6 pb-2 min-w-[540px]">
+            {/* Vertical TODAY line */}
+            <div 
+              className="absolute top-0 bottom-0 w-[1px] bg-neutral-500/70 z-20 pointer-events-none flex flex-col items-center"
+              style={{ left: '43.5%' }}
+            >
+              <span className="text-[9px] font-mono font-bold text-white bg-[#151518] border border-neutral-700 px-2 py-0.5 rounded -mt-2.5 shadow-sm uppercase tracking-wider">
+                TODAY
+              </span>
+            </div>
 
-                    <motion.span
-                      initial={{ opacity: 0, x: -4 }}
-                      whileInView={{ opacity: 1, x: 0 }}
+            {/* Timeline Rows with Sequential Scroll Motion Increase */}
+            <div className="space-y-2">
+              {TIMELINE_FACTS.map((tf, idx) => (
+                <motion.div
+                  key={tf.code}
+                  initial={{ opacity: 0, x: -12 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: false, amount: 0.15 }}
+                  transition={{
+                    duration: 0.45,
+                    delay: idx * 0.04,
+                    ease: "easeOut"
+                  }}
+                  className="flex items-center text-[10px] font-mono h-6 relative group"
+                >
+                  <span className="w-20 text-neutral-400 shrink-0 font-mono text-[11px] font-medium group-hover:text-white transition-colors">
+                    {tf.code}
+                  </span>
+                  <div className="flex-1 relative h-6 bg-[#121214] border border-neutral-800/40 rounded overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0, opacity: 0 }}
+                      whileInView={{ width: `${tf.width}%`, opacity: 1 }}
                       viewport={{ once: false, amount: 0.15 }}
                       transition={{
-                        duration: 0.35,
-                        delay: idx * 0.075 + 0.32
+                        duration: 0.85,
+                        delay: idx * 0.075,
+                        ease: [0.16, 1, 0.3, 1] // Fluid cubic-bezier expansion one by one
                       }}
-                      className="text-[9px] truncate select-none font-mono tracking-tight"
+                      style={{ left: `${tf.start}%` }}
+                      className={`absolute top-0 bottom-0 rounded px-2.5 flex items-center justify-end text-[9.5px] font-mono font-bold text-white whitespace-nowrap transition-all group-hover:brightness-110 ${
+                        tf.status === 'expired'
+                          ? 'bg-gradient-to-r from-[#dc2643] to-[#e62044] shadow-[0_0_16px_rgba(220,38,67,0.55)]'
+                          : 'bg-gradient-to-r from-[#00875a] to-[#009b66] shadow-[0_0_12px_rgba(0,155,102,0.35)]'
+                      }`}
                     >
-                      {tf.label}
-                    </motion.span>
-                  </motion.div>
-                </div>
-              </motion.div>
-            ))}
+                      {/* Active Leading Expansion Edge Shimmer */}
+                      <div className="absolute right-0 top-0 bottom-0 w-2.5 bg-white/25 rounded-r pointer-events-none blur-[0.5px]" />
+
+                      <motion.span
+                        initial={{ opacity: 0, x: -4 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: false, amount: 0.15 }}
+                        transition={{
+                          duration: 0.35,
+                          delay: idx * 0.075 + 0.32
+                        }}
+                        className="text-[9px] truncate select-none font-mono tracking-tight"
+                      >
+                        {tf.label}
+                      </motion.span>
+                    </motion.div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </motion.div>

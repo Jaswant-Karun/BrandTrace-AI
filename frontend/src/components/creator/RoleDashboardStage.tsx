@@ -510,40 +510,40 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
             )}
 
             {/* 4 Top KPI Metric Cards matching reference */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 space-y-1">
-                <div className="text-3xl sm:text-4xl font-extrabold text-white font-mono">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+              <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-3.5 sm:p-5 space-y-1">
+                <div className="text-2xl sm:text-4xl font-extrabold text-white font-mono">
                   {queuePosts.length}
                 </div>
-                <div className="text-xs font-mono text-neutral-400 uppercase font-semibold">
+                <div className="text-[10px] sm:text-xs font-mono text-neutral-400 uppercase font-semibold">
                   {role === 'brand-owner' ? 'AWAITING FINAL APPROVAL' : role === 'compliance' ? 'AWAITING AUDIT' : 'WAITING'}
                 </div>
               </div>
-              <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 space-y-1">
-                <div className="text-3xl sm:text-4xl font-extrabold text-[#ff6358] font-mono">
+              <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-3.5 sm:p-5 space-y-1">
+                <div className="text-2xl sm:text-4xl font-extrabold text-[#ff6358] font-mono">
                   {queuePosts.filter((p) => p.blockingCount > 0).length}
                 </div>
-                <div className="text-xs font-mono text-neutral-400 uppercase font-semibold">
+                <div className="text-[10px] sm:text-xs font-mono text-neutral-400 uppercase font-semibold">
                   {role === 'brand-owner' ? 'STATUTORY BLOCKERS' : role === 'compliance' ? 'STATUTORY BLOCKERS' : 'BLOCKING, STILL WAITING'}
                 </div>
               </div>
-              <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 space-y-1">
-                <div className="text-3xl sm:text-4xl font-extrabold text-sky-400 font-mono">
+              <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-3.5 sm:p-5 space-y-1">
+                <div className="text-2xl sm:text-4xl font-extrabold text-sky-400 font-mono">
                   {role === 'brand-owner'
                     ? queuePosts.filter((p) => p.status.includes('COMPLIANCE')).length
                     : role === 'compliance'
                     ? queuePosts.filter((p) => p.status.includes('EVIDENCE')).length
                     : 5}
                 </div>
-                <div className="text-xs font-mono text-neutral-400 uppercase font-semibold">
+                <div className="text-[10px] sm:text-xs font-mono text-neutral-400 uppercase font-semibold">
                   {role === 'brand-owner' ? 'COMPLIANCE CERTIFIED' : role === 'compliance' ? 'EVIDENCE REQUESTED' : 'NEED COMPLIANCE'}
                 </div>
               </div>
-              <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 space-y-1">
-                <div className="text-3xl sm:text-4xl font-extrabold text-emerald-400 font-mono">
+              <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-3.5 sm:p-5 space-y-1">
+                <div className="text-2xl sm:text-4xl font-extrabold text-emerald-400 font-mono">
                   {queuePosts.filter((p) => p.status.includes('RELEASE') || p.status === 'APPROVED').length}
                 </div>
-                <div className="text-xs font-mono text-neutral-400 uppercase font-semibold">
+                <div className="text-[10px] sm:text-xs font-mono text-neutral-400 uppercase font-semibold">
                   {role === 'brand-owner' ? 'IMMUTABLE RELEASES' : role === 'compliance' ? 'COMPLIANCE APPROVED' : 'APPROVED'}
                 </div>
               </div>
@@ -555,23 +555,23 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
                 <div
                   key={item.id}
                   onClick={() => handleOpenReview(item)}
-                  className="bg-neutral-950 border border-neutral-800 hover:border-neutral-700 rounded-2xl p-5 flex items-start justify-between gap-4 transition-colors cursor-pointer group"
+                  className="bg-neutral-950 border border-neutral-800 hover:border-neutral-700 rounded-2xl p-3.5 sm:p-5 flex items-start justify-between gap-2.5 sm:gap-4 transition-colors cursor-pointer group"
                 >
-                  <div className="flex items-start gap-4">
+                  <div className="flex items-start gap-2.5 sm:gap-4 flex-1 min-w-0">
                     {/* Left Blocking indicator */}
-                    <div className="flex flex-col items-center justify-center shrink-0 w-16 pt-0.5">
-                      <span className={`text-2xl font-black font-mono ${item.blockingCount > 0 ? 'text-[#ff6358]' : 'text-neutral-500'}`}>
+                    <div className="flex flex-col items-center justify-center shrink-0 w-12 sm:w-16 pt-0.5">
+                      <span className={`text-xl sm:text-2xl font-black font-mono ${item.blockingCount > 0 ? 'text-[#ff6358]' : 'text-neutral-500'}`}>
                         {item.blockingCount}
                       </span>
-                      <span className="text-[9px] font-mono uppercase tracking-wider text-neutral-400">
+                      <span className="text-[8px] sm:text-[9px] font-mono uppercase tracking-wider text-neutral-400">
                         BLOCKING
                       </span>
-                      <div className={`w-8 h-1 rounded-full mt-1.5 ${item.blockingCount > 0 ? 'bg-[#ff6358]' : 'bg-neutral-800'}`} />
+                      <div className={`w-6 sm:w-8 h-1 rounded-full mt-1.5 ${item.blockingCount > 0 ? 'bg-[#ff6358]' : 'bg-neutral-800'}`} />
                     </div>
 
                     {/* Middle: Content & Metadata */}
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 flex-wrap">
+                    <div className="space-y-2 flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                         <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider ${
                           item.statusColor === 'emerald'
                             ? 'bg-emerald-950/80 border border-emerald-500/40 text-emerald-300'

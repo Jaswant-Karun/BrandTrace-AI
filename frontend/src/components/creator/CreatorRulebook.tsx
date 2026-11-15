@@ -167,31 +167,31 @@ export const CreatorRulebook: React.FC<CreatorRulebookProps> = ({
         <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
           BRANDTRACE · {brandName.toUpperCase()}
         </div>
-        <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-white font-sans uppercase">
+        <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white font-sans uppercase">
           RULEBOOK
         </h1>
-        <p className="text-sm sm:text-base text-neutral-400 font-sans max-w-2xl leading-relaxed">
+        <p className="text-xs sm:text-base text-neutral-400 font-sans max-w-2xl leading-relaxed">
           Everything the checker looks for, where each rule comes from, and which rules are too vague to check.
         </p>
       </div>
 
       {/* 4 Metric Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 space-y-1">
-          <div className="text-3xl sm:text-4xl font-extrabold text-white font-mono">32</div>
-          <div className="text-xs font-mono font-bold text-neutral-400 uppercase tracking-wider">RULES</div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+        <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-3.5 sm:p-5 space-y-1">
+          <div className="text-2xl sm:text-4xl font-extrabold text-white font-mono">32</div>
+          <div className="text-[10px] sm:text-xs font-mono font-bold text-neutral-400 uppercase tracking-wider">RULES</div>
         </div>
-        <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 space-y-1">
-          <div className="text-3xl sm:text-4xl font-extrabold text-white font-mono">12</div>
-          <div className="text-xs font-mono font-bold text-neutral-400 uppercase tracking-wider">MANDATORY</div>
+        <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-3.5 sm:p-5 space-y-1">
+          <div className="text-2xl sm:text-4xl font-extrabold text-white font-mono">12</div>
+          <div className="text-[10px] sm:text-xs font-mono font-bold text-neutral-400 uppercase tracking-wider">MANDATORY</div>
         </div>
-        <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 space-y-1">
-          <div className="text-3xl sm:text-4xl font-extrabold text-white font-mono">20</div>
-          <div className="text-xs font-mono font-bold text-neutral-400 uppercase tracking-wider">BRAND</div>
+        <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-3.5 sm:p-5 space-y-1">
+          <div className="text-2xl sm:text-4xl font-extrabold text-white font-mono">20</div>
+          <div className="text-[10px] sm:text-xs font-mono font-bold text-neutral-400 uppercase tracking-wider">BRAND</div>
         </div>
-        <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 space-y-1">
-          <div className="text-3xl sm:text-4xl font-extrabold text-amber-400 font-mono">4</div>
-          <div className="text-xs font-mono font-bold text-neutral-400 uppercase tracking-wider">LINTER WARNINGS</div>
+        <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-3.5 sm:p-5 space-y-1">
+          <div className="text-2xl sm:text-4xl font-extrabold text-amber-400 font-mono">4</div>
+          <div className="text-[10px] sm:text-xs font-mono font-bold text-neutral-400 uppercase tracking-wider">LINTER WARNINGS</div>
         </div>
       </div>
 
@@ -282,7 +282,7 @@ export const CreatorRulebook: React.FC<CreatorRulebookProps> = ({
 
       {/* Rules Table */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="relative max-w-xs w-full">
             <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-neutral-500" />
             <input

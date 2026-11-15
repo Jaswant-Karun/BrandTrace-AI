@@ -85,17 +85,17 @@ export const CreatorGuidelineHealth: React.FC<CreatorGuidelineHealthProps> = ({
         <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
           BRANDTRACE · {brandName.toUpperCase()}
         </div>
-        <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-white font-sans uppercase">
+        <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white font-sans uppercase">
           GUIDELINE HEALTH
         </h1>
-        <p className="text-sm sm:text-base text-neutral-400 font-sans max-w-2xl leading-relaxed">
+        <p className="text-xs sm:text-base text-neutral-400 font-sans max-w-2xl leading-relaxed">
           How often reviewers agree with each rule. A rule they keep overruling is probably worded unclearly.
         </p>
       </div>
 
       {/* Emerald Green Status Banner */}
-      <div className="p-6 sm:p-7 rounded-2xl bg-neutral-950 border border-emerald-900/60 shadow-xl space-y-3">
-        <h2 className="text-2xl sm:text-3xl font-black font-sans text-emerald-400 uppercase tracking-tight">
+      <div className="p-5 sm:p-7 rounded-2xl bg-neutral-950 border border-emerald-900/60 shadow-xl space-y-3">
+        <h2 className="text-xl sm:text-3xl font-black font-sans text-emerald-400 uppercase tracking-tight">
           NO RULE LOOKS UNCLEAR YET
         </h2>
         <p className="text-xs sm:text-sm text-neutral-300 font-sans leading-relaxed max-w-3xl">

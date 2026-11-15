@@ -683,10 +683,10 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
         <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
           PLUMBLINE · {activeBrandName.toUpperCase()}
         </div>
-        <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white font-sans uppercase">
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white font-sans uppercase">
           CHECK A POST
         </h1>
-        <p className="text-sm sm:text-base text-neutral-400 font-sans max-w-2xl leading-relaxed">
+        <p className="text-xs sm:text-base text-neutral-400 font-sans max-w-2xl leading-relaxed">
           Paste a draft or upload a file. You'll see what breaks {activeBrandName}'s rules, which claims the evidence doesn't back, and the approved way to say it.
         </p>
       </div>
@@ -752,7 +752,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
         <div className="bg-[#f5f2eb] text-neutral-900 relative">
           
           {/* Card Top Label Bar inside the paper */}
-          <div className="px-6 pt-4 pb-2 flex items-center justify-between text-[11px] font-mono font-bold text-neutral-600 select-none">
+          <div className="px-4 sm:px-6 pt-3.5 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[10px] sm:text-[11px] font-mono font-bold text-neutral-600 select-none">
             <span className="uppercase tracking-wider">PASTE A POST, OR UPLOAD A FILE</span>
             <span className="uppercase tracking-wider text-neutral-500">
               {draftContent.length} CHARACTERS · {channel.toUpperCase()}
@@ -760,11 +760,11 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
           </div>
 
           {/* Notebook Paper with Red Margin Rule & Ruled Lines */}
-          <div className="relative min-h-[180px] px-6 pb-6 pt-2">
+          <div className="relative min-h-[180px] px-4 sm:px-6 pb-6 pt-2">
             {/* Left Vertical Red Margin Line */}
             <div 
               className="absolute top-0 bottom-0 pointer-events-none" 
-              style={{ left: '42px', width: '1px', backgroundColor: '#e28d8d' }} 
+              style={{ left: 'clamp(24px, 5vw, 42px)', width: '1px', backgroundColor: '#e28d8d' }} 
             />
 
             {/* Textarea */}
@@ -773,7 +773,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
               onChange={(e) => setDraftContent(e.target.value)}
               placeholder="Paste your draft here"
               rows={6}
-              className="w-full bg-transparent resize-y text-sm sm:text-base text-neutral-900 placeholder:text-neutral-400 leading-relaxed font-sans focus:outline-none border-0 p-0 pl-7"
+              className="w-full bg-transparent resize-y text-xs sm:text-base text-neutral-900 placeholder:text-neutral-400 leading-relaxed font-sans focus:outline-none border-0 p-0 pl-5 sm:pl-7"
               style={{
                 backgroundImage: 'repeating-linear-gradient(transparent, transparent 27px, #e3ded5 28px)',
                 lineHeight: '28px',
@@ -870,20 +870,20 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
       </div>
 
       {/* Buttons Row matching reference */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pt-1">
-        <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <button
             onClick={handleOpenSample}
-            className="px-4 py-2 rounded-lg border border-neutral-700 bg-neutral-950 hover:bg-neutral-900 text-xs font-mono font-medium text-white transition-colors cursor-pointer"
+            className="flex-1 sm:flex-none px-4 py-2.5 sm:py-2 rounded-lg border border-neutral-700 bg-neutral-950 hover:bg-neutral-900 text-xs font-mono font-medium text-white transition-colors cursor-pointer text-center"
           >
             Open the sample post
           </button>
 
-          <label className="flex items-center gap-2 text-xs font-mono text-neutral-400 cursor-pointer">
-            <span className="px-3.5 py-2 rounded-lg border border-neutral-700 bg-neutral-950 hover:bg-neutral-900 text-white font-medium transition-colors">
+          <label className="flex-1 sm:flex-none flex items-center justify-center gap-2 text-xs font-mono text-neutral-400 cursor-pointer">
+            <span className="px-3.5 py-2.5 sm:py-2 rounded-lg border border-neutral-700 bg-neutral-950 hover:bg-neutral-900 text-white font-medium transition-colors">
               Choose File
             </span>
-            <span className="text-neutral-500 text-[11px] truncate max-w-[150px]">
+            <span className="text-neutral-500 text-[11px] truncate max-w-[120px] sm:max-w-[150px]">
               {selectedFile ? selectedFile.name : 'No file chosen'}
             </span>
             <input
@@ -899,7 +899,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
         <button
           onClick={handleRunCheck}
           disabled={isChecking || (!draftContent.trim() && !selectedFile)}
-          className="px-7 py-2 rounded-lg bg-[#8c8983] hover:bg-[#a09c95] disabled:opacity-40 text-neutral-950 font-mono font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md flex items-center gap-2"
+          className="w-full sm:w-auto px-7 py-3 sm:py-2 rounded-lg bg-[#8c8983] hover:bg-[#a09c95] disabled:opacity-40 text-neutral-950 font-mono font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md flex items-center justify-center gap-2"
         >
           {isChecking ? (
             <>
@@ -1379,15 +1379,15 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
           {/* ========================================================================= */}
           {/* 5. APPLY FIXES AND CHECK AGAIN & 6. SUBMIT FOR REVIEW */}
           {/* ========================================================================= */}
-          <div className="pt-4 flex flex-wrap items-center justify-between gap-4 border-t border-neutral-800">
-            <div className="text-xs font-mono text-neutral-400">
+          <div className="pt-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-t border-neutral-800">
+            <div className="text-xs font-mono text-neutral-400 max-w-sm">
               Satisfied with the draft? Save privately or request reviewer sign-off.
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full md:w-auto">
               <button
                 onClick={handleSavePrivateVersion}
-                className="px-4 py-2 rounded-xl bg-neutral-900 border border-neutral-700 hover:bg-neutral-800 text-neutral-200 font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-neutral-900 border border-neutral-700 hover:bg-neutral-800 text-neutral-200 font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer text-center"
               >
                 Save Version (Private)
               </button>
@@ -1395,7 +1395,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
               <button
                 onClick={handleApplyFixesAndCheckAgain}
                 disabled={isChecking}
-                className="px-4 py-2 rounded-xl bg-neutral-800 border border-indigo-500/50 hover:bg-neutral-700 text-indigo-300 font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-1.5"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-neutral-800 border border-indigo-500/50 hover:bg-neutral-700 text-indigo-300 font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isChecking ? 'animate-spin' : ''}`} />
                 <span>Apply My Fixes and Check Again</span>
@@ -1403,7 +1403,7 @@ export const CreatorCheckPost: React.FC<CreatorCheckPostProps> = ({
 
               <button
                 onClick={() => setIsReviewModalOpen(true)}
-                className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-mono font-bold text-xs uppercase tracking-wider shadow-md transition-colors cursor-pointer flex items-center gap-1.5"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-mono font-bold text-xs uppercase tracking-wider shadow-md transition-colors cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>Submit for Human Review</span>

@@ -214,10 +214,10 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
             <span>Refresh Submissions</span>
           </button>
         </div>
-        <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-white font-sans uppercase">
+        <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white font-sans uppercase">
           {role === 'agency' ? 'CLIENT SUBMISSIONS' : 'MY SUBMISSIONS'}
         </h1>
-        <p className="text-sm sm:text-base text-neutral-400 font-sans max-w-2xl leading-relaxed">
+        <p className="text-xs sm:text-base text-neutral-400 font-sans max-w-2xl leading-relaxed">
           {role === 'agency'
             ? 'Track content submitted on behalf of your client brands. Review feedback, make requested revisions, and resubmit for approval.'
             : 'Track the status of your submitted posts. View reviewer comments, revise drafts, and track releases.'}

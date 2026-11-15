@@ -268,7 +268,7 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
             <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
               PLUMBLINE · {brandName.toUpperCase()} · {roleName.toUpperCase()}
             </div>
-            <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white font-sans uppercase">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white font-sans uppercase">
               {roleName === 'BRAND OWNER' ? 'FINAL RELEASE' : roleName === 'COMPLIANCE' ? 'COMPLIANCE' : 'REVIEW'}
             </h1>
             <p className="text-sm text-neutral-400 font-sans leading-relaxed">
@@ -711,21 +711,21 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
           </div>
 
           {/* Final Actions Bar */}
-          <div className="p-5 rounded-2xl bg-[#0f0f12] border border-neutral-800 flex flex-wrap items-center justify-between gap-3 shadow-2xl">
+          <div className="p-4 sm:p-5 rounded-2xl bg-[#0f0f12] border border-neutral-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-2xl">
             <button
               onClick={onBack}
               disabled={isSubmitting}
-              className="px-4 py-2.5 rounded-xl border border-neutral-800 text-neutral-400 hover:text-white text-xs font-mono font-bold uppercase cursor-pointer"
+              className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl border border-neutral-800 text-neutral-400 hover:text-white text-xs font-mono font-bold uppercase cursor-pointer text-center"
             >
               Cancel / Back to Queue
             </button>
 
             {roleName === 'BRAND OWNER' ? (
-              <div className="flex flex-wrap items-center gap-2.5">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2.5 w-full sm:w-auto">
                 <button
                   disabled={isSubmitting}
                   onClick={() => handleTriggerDecision('REJECT')}
-                  className="px-4 py-2.5 rounded-xl bg-rose-950/60 border border-rose-600/70 hover:bg-rose-900 text-rose-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl bg-rose-950/60 border border-rose-600/70 hover:bg-rose-900 text-rose-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer text-center"
                 >
                   Reject Release
                 </button>
@@ -733,7 +733,7 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
                 <button
                   disabled={isSubmitting}
                   onClick={() => handleTriggerDecision('REQUEST_CHANGES')}
-                  className="px-4 py-2.5 rounded-xl bg-neutral-900 border border-amber-600/70 hover:bg-neutral-800 text-amber-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl bg-neutral-900 border border-amber-600/70 hover:bg-neutral-800 text-amber-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer text-center"
                 >
                   Request Changes
                 </button>
@@ -741,18 +741,18 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
                 <button
                   disabled={isSubmitting}
                   onClick={() => handleTriggerDecision('APPROVE')}
-                  className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold uppercase shadow-lg transition-colors cursor-pointer flex items-center gap-1.5"
+                  className="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold uppercase shadow-lg transition-colors cursor-pointer flex items-center justify-center gap-1.5"
                 >
                   <ShieldCheck className="w-4 h-4" />
                   <span>Grant Final Approval & Release</span>
                 </button>
               </div>
             ) : roleName === 'COMPLIANCE' ? (
-              <div className="flex flex-wrap items-center gap-2.5">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2.5 w-full sm:w-auto">
                 <button
                   disabled={isSubmitting}
                   onClick={() => handleTriggerDecision('REJECT')}
-                  className="px-4 py-2.5 rounded-xl bg-rose-950/60 border border-rose-600/70 hover:bg-rose-900 text-rose-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl bg-rose-950/60 border border-rose-600/70 hover:bg-rose-900 text-rose-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer text-center"
                 >
                   Reject Compliance
                 </button>
@@ -760,7 +760,7 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
                 <button
                   disabled={isSubmitting}
                   onClick={() => handleTriggerDecision('REQUEST_CHANGES')}
-                  className="px-4 py-2.5 rounded-xl bg-neutral-900 border border-amber-600/70 hover:bg-neutral-800 text-amber-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl bg-neutral-900 border border-amber-600/70 hover:bg-neutral-800 text-amber-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer text-center"
                 >
                   Return for Revision
                 </button>
@@ -768,7 +768,7 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
                 <button
                   disabled={isSubmitting}
                   onClick={() => handleTriggerDecision('REQUEST_EVIDENCE')}
-                  className="px-4 py-2.5 rounded-xl bg-sky-950/60 border border-sky-500/70 hover:bg-sky-900 text-sky-200 text-xs font-mono font-bold uppercase transition-colors cursor-pointer flex items-center gap-1.5"
+                  className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl bg-sky-950/60 border border-sky-500/70 hover:bg-sky-900 text-sky-200 text-xs font-mono font-bold uppercase transition-colors cursor-pointer flex items-center justify-center gap-1.5"
                 >
                   <Clock className="w-3.5 h-3.5" />
                   <span>Request Evidence</span>
@@ -777,18 +777,18 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
                 <button
                   disabled={isSubmitting}
                   onClick={() => handleTriggerDecision('APPROVE')}
-                  className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold uppercase shadow-lg transition-colors cursor-pointer flex items-center gap-1.5"
+                  className="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold uppercase shadow-lg transition-colors cursor-pointer flex items-center justify-center gap-1.5"
                 >
                   <Check className="w-4 h-4" />
                   <span>Approve Compliance</span>
                 </button>
               </div>
             ) : (
-              <div className="flex flex-wrap items-center gap-2.5">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2.5 w-full sm:w-auto">
                 <button
                   disabled={isSubmitting}
                   onClick={() => handleTriggerDecision('REQUEST_CHANGES')}
-                  className="px-4 py-2.5 rounded-xl bg-neutral-900 border border-amber-600/70 hover:bg-neutral-800 text-amber-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl bg-neutral-900 border border-amber-600/70 hover:bg-neutral-800 text-amber-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer text-center"
                 >
                   Send Back for Revision
                 </button>
@@ -796,7 +796,7 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
                 <button
                   disabled={isSubmitting}
                   onClick={() => handleTriggerDecision('REJECT')}
-                  className="px-4 py-2.5 rounded-xl bg-rose-950/60 border border-rose-600/70 hover:bg-rose-900 text-rose-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-xl bg-rose-950/60 border border-rose-600/70 hover:bg-rose-900 text-rose-300 text-xs font-mono font-bold uppercase transition-colors cursor-pointer text-center"
                 >
                   Reject
                 </button>
@@ -804,7 +804,7 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
                 <button
                   disabled={isSubmitting}
                   onClick={() => handleTriggerDecision('APPROVE')}
-                  className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold uppercase shadow-lg transition-colors cursor-pointer flex items-center gap-1.5"
+                  className="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold uppercase shadow-lg transition-colors cursor-pointer flex items-center justify-center gap-1.5"
                 >
                   <Check className="w-4 h-4" />
                   <span>Approve Review</span>

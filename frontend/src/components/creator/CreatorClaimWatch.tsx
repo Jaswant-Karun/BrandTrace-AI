@@ -66,10 +66,10 @@ export const CreatorClaimWatch: React.FC<CreatorClaimWatchProps> = ({
         <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
           BRANDTRACE · {brandName.toUpperCase()}
         </div>
-        <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-white font-sans uppercase">
+        <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white font-sans uppercase">
           CLAIM WATCH
         </h1>
-        <p className="text-sm sm:text-base text-neutral-400 font-sans max-w-2xl leading-relaxed">
+        <p className="text-xs sm:text-base text-neutral-400 font-sans max-w-2xl leading-relaxed">
           Facts change after a post goes live. This shows the live posts whose facts moved, and the live pages that no longer match what was approved.
         </p>
       </div>
