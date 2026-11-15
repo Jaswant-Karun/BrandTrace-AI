@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings, Database, Cpu, RefreshCw, CheckCircle2, Bell, Shield } from 'lucide-react';
+import { Database, Cpu, RefreshCw, CheckCircle2, Bell, Shield } from 'lucide-react';
 import { BrandProfile, DatabaseStatus } from '../types';
 import { PageHeader } from './ui/PageHeader';
 
