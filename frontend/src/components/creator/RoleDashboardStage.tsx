@@ -296,7 +296,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
 
         {/* FACTS tab */}
         {activeTab === 'facts' && (
-          <CreatorFactsLedger brandName={brandName} />
+          <CreatorFactsLedger brandName={brandName} role={role} />
         )}
 
         {/* GUIDELINE HEALTH tab */}

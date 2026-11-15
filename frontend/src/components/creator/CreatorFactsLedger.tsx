@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 
 interface FactCardItem {
   id: string;
@@ -105,10 +106,12 @@ const SHELF_PRODUCTS = [
 
 interface CreatorFactsLedgerProps {
   brandName?: string;
+  role?: string;
 }
 
 export const CreatorFactsLedger: React.FC<CreatorFactsLedgerProps> = ({
   brandName = 'Aurelle Skin',
+  role = 'creator',
 }) => {
   const [selectedProduct, setSelectedProduct] = useState<string>('All 35 facts');
 
@@ -167,47 +170,92 @@ export const CreatorFactsLedger: React.FC<CreatorFactsLedgerProps> = ({
       </div>
 
       {/* Timeline Section: WHEN FACTS STOP BEING TRUE */}
-      <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 sm:p-7 space-y-4 shadow-xl">
-        <div>
-          <h3 className="text-sm font-bold font-mono text-white uppercase tracking-wider">
-            WHEN FACTS STOP BEING TRUE
-          </h3>
-          <p className="text-xs text-neutral-400 font-sans mt-0.5">
-            Each bar runs from the date a fact became valid to the date it ends. Past the line, a post can't use it.
-          </p>
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: false, amount: 0.1 }}
+        transition={{ duration: 0.5 }}
+        className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 sm:p-7 space-y-4 shadow-xl"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <h3 className="text-sm font-bold font-mono text-white uppercase tracking-wider">
+              WHEN FACTS STOP BEING TRUE
+            </h3>
+            <p className="text-xs text-neutral-400 font-sans mt-0.5">
+              Each bar runs from the date a fact became valid to the date it ends. Past the line, a post can't use it.
+            </p>
+          </div>
+          {role === 'agency' && (
+            <span className="self-start sm:self-auto px-2 py-0.5 rounded text-[9.5px] font-mono font-bold bg-neutral-900 border border-neutral-700 text-neutral-400 uppercase">
+              CONFIDENTIAL EMBARGOED FACTS HIDDEN
+            </span>
+          )}
         </div>
 
         {/* Timeline Chart Container */}
         <div className="relative pt-6 pb-2">
           {/* Vertical TODAY line */}
           <div className="absolute top-0 bottom-0 left-1/2 w-[1px] bg-white z-20 pointer-events-none flex flex-col items-center">
-            <span className="text-[9px] font-mono font-bold text-white bg-neutral-900 border border-neutral-700 px-1.5 py-0.5 rounded -mt-2.5">
+            <span className="text-[9px] font-mono font-bold text-white bg-neutral-900 border border-neutral-700 px-1.5 py-0.5 rounded -mt-2.5 shadow-sm">
               TODAY
             </span>
           </div>
 
-          {/* Timeline Rows */}
+          {/* Timeline Rows with Sequential Scroll Motion Increase */}
           <div className="space-y-2">
-            {TIMELINE_FACTS.map((tf) => (
-              <div key={tf.code} className="flex items-center text-[10px] font-mono h-6 relative group">
-                <span className="w-16 text-neutral-400 shrink-0">{tf.code}</span>
-                <div className="flex-1 relative h-4 bg-neutral-900/50 rounded overflow-hidden">
-                  <div
-                    style={{ left: `${tf.start}%`, width: `${tf.width}%` }}
-                    className={`absolute top-0 bottom-0 rounded px-1.5 flex items-center justify-end text-[9px] font-bold text-white whitespace-nowrap transition-all ${
+            {TIMELINE_FACTS.map((tf, idx) => (
+              <motion.div
+                key={tf.code}
+                initial={{ opacity: 0, x: -8 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: false, amount: 0.15 }}
+                transition={{
+                  duration: 0.35,
+                  delay: idx * 0.045,
+                  ease: "easeOut"
+                }}
+                className="flex items-center text-[10px] font-mono h-6 relative group"
+              >
+                <span className="w-16 text-neutral-400 shrink-0 font-medium group-hover:text-white transition-colors">
+                  {tf.code}
+                </span>
+                <div className="flex-1 relative h-4 bg-neutral-900/60 border border-neutral-800/60 rounded overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0, opacity: 0.2 }}
+                    whileInView={{ width: `${tf.width}%`, opacity: 1 }}
+                    viewport={{ once: false, amount: 0.15 }}
+                    transition={{
+                      duration: 0.8,
+                      delay: idx * 0.055,
+                      ease: [0.16, 1, 0.3, 1] // Fluid cubic-bezier expansion
+                    }}
+                    style={{ left: `${tf.start}%` }}
+                    className={`absolute top-0 bottom-0 rounded px-1.5 flex items-center justify-end text-[9px] font-bold text-white whitespace-nowrap transition-all group-hover:brightness-110 ${
                       tf.status === 'expired'
-                        ? 'bg-rose-600/90 shadow-[0_0_8px_rgba(225,29,72,0.6)]'
-                        : 'bg-emerald-600/80'
+                        ? 'bg-rose-600/90 shadow-[0_0_10px_rgba(225,29,72,0.7)]'
+                        : 'bg-emerald-600/80 shadow-[0_0_8px_rgba(16,185,129,0.3)]'
                     }`}
                   >
-                    <span className="text-[8.5px] truncate">{tf.label}</span>
-                  </div>
+                    <motion.span
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      viewport={{ once: false, amount: 0.15 }}
+                      transition={{
+                        duration: 0.25,
+                        delay: idx * 0.055 + 0.35
+                      }}
+                      className="text-[8.5px] truncate select-none font-mono"
+                    >
+                      {tf.label}
+                    </motion.span>
+                  </motion.div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* THE SHELF Product Filter */}
       <div className="space-y-4">

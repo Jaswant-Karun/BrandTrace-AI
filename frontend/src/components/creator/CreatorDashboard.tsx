@@ -88,7 +88,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
             )}
 
             {activeTab === 'facts' && (
-              <CreatorFactsLedger brandName={brandName} />
+              <CreatorFactsLedger brandName={brandName} role="creator" />
             )}
 
             {activeTab === 'health' && (

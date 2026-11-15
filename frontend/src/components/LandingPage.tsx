@@ -1359,11 +1359,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </p>
           </div>
 
-          {/* 5 Persona Cards Row (Directly matching Reference Image 1) */}
+          {/* 5 Persona Cards Row (Directly matching Reference Image 1 with Motion Increase on Scroll) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
 
             {/* Card 1: CREATOR */}
-            <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4">
+            <motion.div
+              initial={{ opacity: 0, y: 25, scale: 0.96 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 0.45, delay: 0.05, ease: 'easeOut' }}
+              className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4 shadow-lg hover:shadow-indigo-500/10"
+            >
               <div className="space-y-3">
                 <div className="w-9 h-9 rounded-xl bg-indigo-600/30 border border-indigo-500/50 flex items-center justify-center text-indigo-400">
                   <PenTool className="w-4 h-4" />
@@ -1385,10 +1391,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               >
                 TRY AS CREATOR
               </button>
-            </div>
+            </motion.div>
 
             {/* Card 2: AGENCY */}
-            <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4">
+            <motion.div
+              initial={{ opacity: 0, y: 25, scale: 0.96 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 0.45, delay: 0.15, ease: 'easeOut' }}
+              className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4 shadow-lg"
+            >
               <div className="space-y-3">
                 <div className="w-9 h-9 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400">
                   <Building2 className="w-4 h-4" />
@@ -1410,10 +1422,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               >
                 TRY AS AGENCY
               </button>
-            </div>
+            </motion.div>
 
             {/* Card 3: REVIEWER */}
-            <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4">
+            <motion.div
+              initial={{ opacity: 0, y: 25, scale: 0.96 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 0.45, delay: 0.25, ease: 'easeOut' }}
+              className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4 shadow-lg"
+            >
               <div className="space-y-3">
                 <div className="w-9 h-9 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400">
                   <CheckCircle2 className="w-4 h-4" />
@@ -1435,10 +1453,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               >
                 TRY AS REVIEWER
               </button>
-            </div>
+            </motion.div>
 
             {/* Card 4: COMPLIANCE */}
-            <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4">
+            <motion.div
+              initial={{ opacity: 0, y: 25, scale: 0.96 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 0.45, delay: 0.35, ease: 'easeOut' }}
+              className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4 shadow-lg"
+            >
               <div className="space-y-3">
                 <div className="w-9 h-9 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400">
                   <ClipboardCheck className="w-4 h-4" />
@@ -1460,10 +1484,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               >
                 TRY AS COMPLIANCE
               </button>
-            </div>
+            </motion.div>
 
             {/* Card 5: BRAND OWNER */}
-            <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4">
+            <motion.div
+              initial={{ opacity: 0, y: 25, scale: 0.96 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 0.45, delay: 0.45, ease: 'easeOut' }}
+              className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4 shadow-lg"
+            >
               <div className="space-y-3">
                 <div className="w-9 h-9 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400">
                   <Megaphone className="w-4 h-4" />
@@ -1485,7 +1515,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               >
                 TRY AS BRAND OWNER
               </button>
-            </div>
+            </motion.div>
 
           </div>
 
