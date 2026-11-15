@@ -674,41 +674,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     />
                   </motion.div>
                 </div>
-                  <motion.div
-                    key={`stamp-seal-${motionStep}`}
-                    initial={{ scale: 2.3, opacity: 0, rotate: -32 }}
-                    animate={{ scale: 1, opacity: 1, rotate: -12 }}
-                    transition={{
-                      delay: 0.35,
-                      duration: 0.45,
-                      type: 'spring',
-                      damping: 13,
-                      stiffness: 250
-                    }}
-                    className="relative flex items-center justify-center select-none"
-                  >
-                    {/* Concentric Double Rings */}
-                    <div className="w-34 h-34 sm:w-38 sm:h-38 lg:w-[150px] lg:h-[150px] rounded-full border-2 border-emerald-500/90 bg-[#06281e]/95 backdrop-blur-md shadow-[0_0_35px_rgba(16,185,129,0.35)] flex items-center justify-center p-2 hover:scale-105 transition-transform duration-200 cursor-default">
-                      <div className="w-full h-full rounded-full border border-dashed border-emerald-400/85 flex flex-col items-center justify-center text-center p-2.5">
-                        <span className="text-sm sm:text-[15px] lg:text-[16px] font-black tracking-widest text-emerald-300 uppercase font-sans">
-                          APPROVED
-                        </span>
-                        <div className="w-14 sm:w-16 h-[1.5px] bg-emerald-500/70 my-1" />
-                        <span className="text-[10px] sm:text-[11px] lg:text-xs font-mono font-extrabold tracking-widest text-emerald-400">
-                          VLM-SEALED
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Shockwave Impact Ring upon sealing */}
-                    <motion.span
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: [0.85, 1.45], opacity: [0.9, 0] }}
-                      transition={{ delay: 0.42, duration: 0.6, ease: 'easeOut' }}
-                      className="absolute inset-0 rounded-full border-2 border-emerald-400 pointer-events-none"
-                    />
-                  </motion.div>
-                </div>
 
               </div>
             </div>
