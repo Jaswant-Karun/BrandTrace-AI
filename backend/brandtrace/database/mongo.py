@@ -632,7 +632,9 @@ class MongoManager:
             return False
         if self.is_connected and self.db is not None:
             await self.db.brand_documents.delete_one({"doc_id": doc_id, "organisation_id": org_id, "workspace_id": workspace_id})
+            await self.db.knowledge_nodes.delete_one({"node_id": doc_id, "org_id": org_id})
         self._memory_documents.pop(doc_id, None)
+        self._memory_embeddings = [e for e in self._memory_embeddings if e.get("node_id") != doc_id]
         return True
 
     async def record_document_version(self, version_doc: Dict[str, Any]):

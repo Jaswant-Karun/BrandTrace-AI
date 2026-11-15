@@ -56,6 +56,7 @@ class VoicePersonaAgent:
                     d.get("organisation_id") == getattr(bkg, "org_id", ""))
                 and d.get("processing_status") == "INDEXED"
                 and d.get("category") == "BRAND_VOICE"
+                and not d.get("is_demo", False)
             ]
             for doc in indexed_voice_docs:
                 doc_id = doc.get("doc_id", "DOC-VOICE")
@@ -228,6 +229,62 @@ class ClaimSubstantiationAgent:
                         suggested_fix=f"{m.group(0)}* (*Tested under IEC 62133 standardized lab protocol. Actual results vary.)"
                     )
                 )
+
+        # Dynamic User-Created Brand Documents Grounding (Phase 2)
+        try:
+            from brandtrace.database.mongo import mongo_manager
+            indexed_docs = [
+                d for d in mongo_manager._memory_documents.values()
+                if (d.get("workspace_id") == getattr(bkg, "brand_id", "") or 
+                    d.get("organisation_id") == getattr(bkg, "org_id", ""))
+                and d.get("processing_status") == "INDEXED"
+                and not d.get("is_demo", False)
+            ]
+            for doc in indexed_docs:
+                doc_id = doc.get("doc_id", "DOC-USER")
+                ver = doc.get("version_number", "1.0")
+                title = doc.get("title", "Approved Document")
+                content = doc.get("raw_content", "")
+                cat = doc.get("category", "")
+                
+                # Check for pricing policies in user documents
+                if cat == "PRICING_POLICIES" or "price" in title.lower():
+                    title_keywords = [
+                        w.lower() for w in re.findall(r"\b[A-Za-z0-9]+\b", title) 
+                        if w.lower() not in ["aurelle", "apex", "pricing", "policies", "policy", "special", "directive", "guidelines", "standards", "q1", "q2", "q3", "q4", "2026", "the", "for", "and", "in"]
+                    ]
+                    subject_matches = any(kw in text.lower() for kw in title_keywords) if title_keywords else False
+                    if subject_matches:
+                        price_matches = re.findall(r"([₹\$€]\s*\d+(?:[,\.]\d+)?)", content)
+                        if price_matches:
+                            approved_price = price_matches[0].replace(" ", "")
+                            for pm in re.finditer(r"([₹\$€]\s*\d+(?:[,\.]\d+)?)", text):
+                                claimed_price = pm.group(1).replace(" ", "")
+                                if claimed_price != approved_price and any(k in text.lower() for k in ["month", "price", "subscription", "cost", "fee"]):
+                                    risk_spans.append(
+                                        RiskSpan(
+                                            start_char=pm.start(),
+                                            end_char=pm.end(),
+                                            matched_text=pm.group(0),
+                                            category="CLAIM",
+                                            severity=SeverityLevel.CRITICAL,
+                                            explanation=f"Pricing claim '{claimed_price}' contradicts certified price '{approved_price}' mandated in {title}.",
+                                            rule_citation=f"Certified Policy {doc_id} (v{ver}): {title}",
+                                            suggested_fix=approved_price
+                                        )
+                                    )
+                                elif claimed_price == approved_price:
+                                    citation_str = f"{doc_id} (v{ver}): {title} (Approved Price: {approved_price})"
+                                    if citation_str not in citations:
+                                        citations.append(citation_str)
+                                    
+                # Check for document title / explicit fact references
+                if title.lower() in text.lower() or doc_id.lower() in text.lower():
+                    citation_entry = f"{doc_id} (v{ver}): {title}"
+                    if citation_entry not in citations:
+                        citations.append(citation_entry)
+        except Exception:
+            pass
 
         score = max(0.0, 100.0 - (len(risk_spans) * 35.0))
         status = "PASSED" if score >= 80 else ("WARNING" if score >= 50 else "FAILED")
