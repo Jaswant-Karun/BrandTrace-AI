@@ -188,13 +188,15 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
 
   const filteredSubmissions = submissions.filter((sub) => {
     if (filter === 'ALL') return true;
-    if (filter === 'CHANGES_REQUESTED') return sub.status === 'CHANGES_REQUESTED';
+    if (filter === 'CHANGES_REQUESTED') return sub.status === 'CHANGES_REQUESTED' || sub.status === 'RETURNED_TO_CREATOR' || sub.status === 'RETURNED_TO_AGENCY';
     if (filter === 'PENDING') return sub.status === 'PENDING_REVIEW' || sub.status === 'SUBMITTED' || sub.status === 'IN_REVIEW';
-    if (filter === 'APPROVED') return sub.status === 'APPROVED' || sub.status === 'REVIEW_APPROVED' || sub.status === 'COMPLIANCE_APPROVED';
+    if (filter === 'APPROVED') return sub.status === 'APPROVED' || sub.status === 'RELEASED' || sub.status === 'REVIEW_APPROVED' || sub.status === 'COMPLIANCE_APPROVED';
     return true;
   });
 
-  const changesRequestedCount = submissions.filter((s) => s.status === 'CHANGES_REQUESTED').length;
+  const changesRequestedCount = submissions.filter(
+    (s) => s.status === 'CHANGES_REQUESTED' || s.status === 'RETURNED_TO_CREATOR' || s.status === 'RETURNED_TO_AGENCY'
+  ).length;
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto py-6 px-4 sm:px-6">
@@ -285,8 +287,16 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
         ) : (
           filteredSubmissions.map((sub) => {
             const isExpanded = expandedId === sub.submission_id;
-            const isChangesReq = sub.status === 'CHANGES_REQUESTED';
-            const isApproved = sub.status === 'APPROVED';
+            const isChangesReq =
+              sub.status === 'CHANGES_REQUESTED' ||
+              sub.status === 'RETURNED_TO_CREATOR' ||
+              sub.status === 'RETURNED_TO_AGENCY';
+            const isApproved =
+              sub.status === 'APPROVED' ||
+              sub.status === 'RELEASED' ||
+              sub.status === 'COMPLIANCE_APPROVED' ||
+              sub.status === 'REVIEW_APPROVED';
+            const isRejected = sub.status === 'REJECTED';
 
             return (
               <div
@@ -294,6 +304,8 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
                 className={`bg-neutral-950 border rounded-2xl p-5 space-y-4 transition-all ${
                   isChangesReq
                     ? 'border-amber-600/60 shadow-lg shadow-amber-950/20'
+                    : isRejected
+                    ? 'border-rose-600/60 shadow-lg shadow-rose-950/20'
                     : isApproved
                     ? 'border-emerald-700/50'
                     : 'border-neutral-800 hover:border-neutral-700'
@@ -306,12 +318,14 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
                       className={`px-2.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider ${
                         isChangesReq
                           ? 'bg-amber-950 border border-amber-500/50 text-amber-300'
+                          : isRejected
+                          ? 'bg-rose-950 border border-rose-500/50 text-rose-300'
                           : isApproved
                           ? 'bg-emerald-950 border border-emerald-500/50 text-emerald-300'
                           : 'bg-purple-950 border border-purple-500/50 text-purple-300'
                       }`}
                     >
-                      {sub.status.replace('_', ' ')}
+                      {sub.status.replace(/_/g, ' ')}
                     </span>
 
                     <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-neutral-900 border border-neutral-800 text-neutral-300 uppercase">

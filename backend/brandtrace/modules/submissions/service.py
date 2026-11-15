@@ -347,9 +347,19 @@ _SEED_SUBMISSION_AGENCY_1 = {
     ]
 }
 
+_SEED_SUBMISSION_1["id"] = "sub-001"
+_SEED_SUBMISSION_2["id"] = "sub-002"
+_SEED_SUBMISSION_AGENCY_1["id"] = "sub-agency-001"
+
 _SUBMISSIONS_STORE[_SEED_SUBMISSION_1["submission_id"]] = _SEED_SUBMISSION_1
 _SUBMISSIONS_STORE[_SEED_SUBMISSION_2["submission_id"]] = _SEED_SUBMISSION_2
 _SUBMISSIONS_STORE[_SEED_SUBMISSION_AGENCY_1["submission_id"]] = _SEED_SUBMISSION_AGENCY_1
+
+# Additional aliases for frontend resilience
+_SUBMISSIONS_STORE["sub-001"] = _SEED_SUBMISSION_1
+_SUBMISSIONS_STORE["sub-002"] = _SEED_SUBMISSION_2
+_SUBMISSIONS_STORE["sub-agency-001"] = _SEED_SUBMISSION_AGENCY_1
+_SUBMISSIONS_STORE["sub-seed-1"] = _SEED_SUBMISSION_1
 
 class SubmissionsService:
     """Centralized service managing Creator drafts, content verification, submissions, and review lifecycle."""
@@ -605,11 +615,40 @@ class SubmissionsService:
         return submission_doc
 
     async def get_submission(self, submission_id: str) -> Optional[Dict[str, Any]]:
+        if not submission_id:
+            return None
+
+        clean_id = submission_id.strip()
+
         if mongo_manager.is_connected and mongo_manager.db is not None:
-            doc = await mongo_manager.db.submissions.find_one({"submission_id": submission_id}, {"_id": 0})
+            doc = await mongo_manager.db.submissions.find_one({
+                "$or": [
+                    {"submission_id": clean_id},
+                    {"id": clean_id},
+                    {"task_id": clean_id},
+                    {"submission_id": clean_id.upper()},
+                    {"id": clean_id.upper()}
+                ]
+            }, {"_id": 0})
             if doc:
                 return doc
-        return _SUBMISSIONS_STORE.get(submission_id)
+
+        # Check direct in-memory lookup
+        if clean_id in _SUBMISSIONS_STORE:
+            return _SUBMISSIONS_STORE[clean_id]
+        if clean_id.upper() in _SUBMISSIONS_STORE:
+            return _SUBMISSIONS_STORE[clean_id.upper()]
+
+        # Search by id, submission_id, or task_id (case-insensitive)
+        for s in _SUBMISSIONS_STORE.values():
+            if (
+                s.get("submission_id", "").lower() == clean_id.lower()
+                or s.get("id", "").lower() == clean_id.lower()
+                or s.get("task_id", "").lower() == clean_id.lower()
+            ):
+                return s
+
+        return None
 
     async def list_submissions(
         self,

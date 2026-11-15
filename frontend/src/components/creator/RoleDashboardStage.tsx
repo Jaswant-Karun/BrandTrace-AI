@@ -16,6 +16,7 @@ export type DashboardRole = 'agency' | 'reviewer' | 'compliance' | 'brand-owner'
 
 interface QueueItem {
   id: string;
+  submission_id?: string;
   blockingCount: number;
   status: string;
   statusColor: 'emerald' | 'purple' | 'amber' | 'rose';
@@ -34,7 +35,8 @@ interface QueueItem {
 
 const DEFAULT_QUEUE_POSTS: QueueItem[] = [
   {
-    id: 'sub-001',
+    id: 'SUB-SEED-001',
+    submission_id: 'SUB-SEED-001',
     blockingCount: 6,
     status: 'APPROVED',
     statusColor: 'emerald',
@@ -43,6 +45,8 @@ const DEFAULT_QUEUE_POSTS: QueueItem[] = [
     badges: ['REVIEW', 'COMPLIANCE'],
     content: `Meet the NEW Aurelle Vitamin-C serum!!! 100% natural, eco-friendly and clinically proven to fade dark spots by 60% in just 2 weeks. Dermatologist approved for ₹499 only! Link in bio to buy now.`,
     creatorName: 'Creator Asha',
+    creatorType: 'creator',
+    orgId: 'ORG-AURELLE',
     channel: 'instagram',
     version: 2,
     findings: [
@@ -79,7 +83,8 @@ const DEFAULT_QUEUE_POSTS: QueueItem[] = [
     ],
   },
   {
-    id: 'sub-002',
+    id: 'SUB-SEED-002',
+    submission_id: 'SUB-SEED-002',
     blockingCount: 5,
     status: 'SUBMITTED',
     statusColor: 'purple',
@@ -88,6 +93,8 @@ const DEFAULT_QUEUE_POSTS: QueueItem[] = [
     badges: ['1 REVIEW', '2 COMPLIANCE'],
     content: `Ceramide Barrier Cream is the treatment for eczema and dry, itchy skin. Doctor approved and guaranteed relief in 48 hours. Formulated with 5 ceramides.`,
     creatorName: 'Creator Asha',
+    creatorType: 'creator',
+    orgId: 'ORG-AURELLE',
     channel: 'web',
     version: 2,
     findings: [
@@ -99,6 +106,44 @@ const DEFAULT_QUEUE_POSTS: QueueItem[] = [
         rejectedText: 'treatment for eczema',
         approvedText: 'barrier support for dry skin',
         recommendation: 'Cosmetics cannot claim treatment or cure of medical conditions under FDA 21 CFR §201.',
+        status: 'PENDING',
+      },
+    ],
+  },
+  {
+    id: 'SUB-AGENCY-001',
+    submission_id: 'SUB-AGENCY-001',
+    blockingCount: 2,
+    status: 'SUBMITTED',
+    statusColor: 'purple',
+    title: 'Agency Teaser: Aurelle Next-Gen Environmental Defense Formulation',
+    meta: 'Agency Sana · agency · instagram · version 1 · 2 blocking',
+    badges: ['REVIEW', 'COMPLIANCE'],
+    content: `Something game-changing is dropping this Friday. Aurelle Skin is launching the ultimate defense against environmental pollution and premature aging. 100% natural, zero toxins, guaranteed glass skin in 7 days.`,
+    creatorName: 'Agency Sana',
+    creatorType: 'agency',
+    orgId: 'ORG-AGENCY-PULSE',
+    channel: 'instagram',
+    version: 1,
+    findings: [
+      {
+        number: 1,
+        ruleCitation: 'REG-01',
+        title: 'ASCI Greenwashing Directive',
+        severity: 'BLOCKING',
+        rejectedText: '100% natural, zero toxins',
+        approvedText: 'formulated with 94% naturally derived ingredients',
+        recommendation: 'Absolute unquantified 100% natural claims are prohibited without lifecycle documentation.',
+        status: 'PENDING',
+      },
+      {
+        number: 2,
+        ruleCitation: 'GL-AUR-03',
+        title: 'Prohibited Absolute Guarantees',
+        severity: 'BLOCKING',
+        rejectedText: 'guaranteed glass skin in 7 days',
+        approvedText: 'visibly brighter skin with daily use',
+        recommendation: 'Time-bound cosmetic outcome guarantees are prohibited by Aurelle Brand Book.',
         status: 'PENDING',
       },
     ],
@@ -314,9 +359,11 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
   ) => {
     if (!selectedPost) return;
 
+    const targetSubId = selectedPost.submission_id || selectedPost.id;
+
     try {
       if (role === 'brand-owner') {
-        const res = await apiClient.request<any>(`/api/submissions/${selectedPost.id}/final-approval`, {
+        const res = await apiClient.request<any>(`/api/submissions/${targetSubId}/final-approval`, {
           method: 'POST',
           body: JSON.stringify({
             decision: decision === 'APPROVE' ? 'FINAL_APPROVE' : decision,
@@ -334,7 +381,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
             : `Submission rejected by Brand Owner.`;
         setFeedbackToast(toastMsg);
       } else if (role === 'compliance') {
-        await apiClient.request(`/api/submissions/${selectedPost.id}/compliance`, {
+        await apiClient.request(`/api/submissions/${targetSubId}/compliance`, {
           method: 'POST',
           body: JSON.stringify({
             compliance_name: roleConfig.userName,
@@ -356,7 +403,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
             : `Compliance rejection recorded.`;
         setFeedbackToast(toastMsg);
       } else {
-        await apiClient.request(`/api/submissions/${selectedPost.id}/review`, {
+        await apiClient.request(`/api/submissions/${targetSubId}/review`, {
           method: 'POST',
           body: JSON.stringify({
             reviewer_name: roleConfig.userName,

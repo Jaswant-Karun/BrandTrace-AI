@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Download, Copy, Check } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Download, Copy, Check, RefreshCw } from 'lucide-react';
+import { apiClient } from '../../services/apiClient';
 
 export interface AuditEvent {
   id: string;
@@ -73,8 +74,34 @@ export const CreatorAuditLog: React.FC<CreatorAuditLogProps> = ({
   onRestoreDraft,
 }) => {
   const [copiedHash, setCopiedHash] = useState<string | null>(null);
+  const [backendEvents, setBackendEvents] = useState<AuditEvent[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const allEvents = [...customEvents, ...DEFAULT_AUDIT_EVENTS];
+  const loadAuditEvents = async () => {
+    setIsLoading(true);
+    try {
+      const data = await apiClient.request<AuditEvent[]>('/api/audit/events?limit=50');
+      if (Array.isArray(data) && data.length > 0) {
+        setBackendEvents(data);
+      }
+    } catch {
+      // Fallback to local events
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadAuditEvents();
+  }, []);
+
+  const allEvents = [
+    ...customEvents,
+    ...backendEvents,
+    ...DEFAULT_AUDIT_EVENTS.filter(
+      (de) => !backendEvents.some((be) => be.hash === de.hash || be.id === de.id)
+    ),
+  ];
 
   const handleCopy = (fullHash: string) => {
     navigator.clipboard.writeText(fullHash);
@@ -102,8 +129,27 @@ export const CreatorAuditLog: React.FC<CreatorAuditLogProps> = ({
       
       {/* Breadcrumb & Section Header */}
       <div className="space-y-2">
-        <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
-          BRANDTRACE · {brandName.toUpperCase()}
+        <div className="flex items-center justify-between">
+          <div className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
+            BRANDTRACE · {brandName.toUpperCase()}
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={loadAuditEvents}
+              disabled={isLoading}
+              className="flex items-center gap-1.5 text-[11px] font-mono text-neutral-400 hover:text-white transition-colors cursor-pointer"
+            >
+              <RefreshCw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
+              <span>Refresh</span>
+            </button>
+            <button
+              onClick={handleExportCSV}
+              className="flex items-center gap-1.5 text-[11px] font-mono text-neutral-400 hover:text-white transition-colors cursor-pointer"
+            >
+              <Download className="w-3 h-3" />
+              <span>Export CSV</span>
+            </button>
+          </div>
         </div>
         <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white font-sans uppercase">
           AUDIT LOG
