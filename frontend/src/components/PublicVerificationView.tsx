@@ -161,7 +161,7 @@ export const PublicVerificationView: React.FC<PublicVerificationViewProps> = ({
 
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                 Every piece {brandName} approves gets a signed seal. Paste a post, upload an image or enter a seal code. 
-                Canon tells you if it's <strong className="font-semibold text-emerald-800">approved</strong>, <strong className="font-semibold text-amber-800">outdated</strong>, or <strong className="font-semibold text-rose-800">modified</strong> after approval, and shows exactly what changed.
+                BrandTrace tells you if it's <strong className="font-semibold text-emerald-800">approved</strong>, <strong className="font-semibold text-amber-800">outdated</strong>, or <strong className="font-semibold text-rose-800">modified</strong> after approval, and shows exactly what changed.
               </p>
 
               {/* Brand quick switcher */}
@@ -481,7 +481,7 @@ export const PublicVerificationView: React.FC<PublicVerificationViewProps> = ({
                   1
                 </span>
                 <span>
-                  When a reviewer approves a piece, Canon signs it with HMAC-SHA256 over the exact text, the image file and the version.
+                  When a reviewer approves a piece, BrandTrace signs it with SHA-256 tamper-evident digest chaining over the exact text, the image file and the version.
                 </span>
               </li>
 
