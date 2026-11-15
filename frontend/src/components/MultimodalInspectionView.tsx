@@ -179,18 +179,23 @@ export const MultimodalInspectionView: React.FC<MultimodalInspectionViewProps> =
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 flex flex-wrap items-center justify-between gap-4 shadow-xs">
+      {/* Standardized Enterprise Page Header */}
+      <PageHeader
+        title="Multimodal & Creative Inspection"
+        description="Inspect multi-format marketing collateral (PDF, DOCX, TXT, MD, images), verify logo safe-zone clearances, and enforce WCAG AA accessibility contrast."
+        category="Creative Assurance"
+        workspaceName={brandId}
+      />
+
+      {/* Tab Switcher & Modes */}
+      <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-xs">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <Eye className="w-5 h-5 text-slate-800" />
-            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-              Multimodal Content Intelligence Workspace
-            </h2>
-          </div>
-          <p className="text-xs text-slate-500 max-w-2xl">
-            Enterprise inspection across TXT, MD, PDF, DOCX, PNG, JPG, and video frames. Discovers tone drift, unverified claims, logo clearances, and WCAG AA contrast.
-          </p>
+          <span className="text-xs font-bold text-slate-900 uppercase tracking-wider block">
+            Inspection Workspaces
+          </span>
+          <span className="text-[11px] text-slate-500">
+            Switch between raw document parsing and visual design token analysis
+          </span>
         </div>
 
         {/* Tab Switcher */}

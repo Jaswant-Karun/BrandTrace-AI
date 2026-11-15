@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BarChart3, ArrowUpRight } from 'lucide-react';
+import { PageHeader } from './ui/PageHeader';
 
 interface GovernanceAnalyticsViewProps {
   brandId: string;
@@ -25,20 +26,13 @@ export const GovernanceAnalyticsView: React.FC<GovernanceAnalyticsViewProps> = (
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 flex flex-wrap items-center justify-between gap-4 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <BarChart3 className="w-5 h-5 text-slate-800" />
-            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-              Governance Analytics &amp; Velocity Telemetry
-            </h2>
-          </div>
-          <p className="text-xs text-slate-500">
-            Quantitative metrics: Compliance rate trends, release gate velocity, and violation type distribution across brand assets.
-          </p>
-        </div>
-      </div>
+      {/* Standardized Enterprise Page Header */}
+      <PageHeader
+        title="Governance Analytics & Velocity Telemetry"
+        description="Quantitative compliance indices, gate release velocity, violation distribution, and department-level adherence metrics."
+        category="Governance Telemetry"
+        workspaceName={brandId}
+      />
 
       {isLoading ? (
         <div className="p-12 text-center text-xs text-slate-500 bg-white border border-slate-200 rounded-xl shadow-xs">
