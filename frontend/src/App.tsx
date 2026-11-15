@@ -58,7 +58,7 @@ const ViewLoadingFallback: React.FC = () => (
 );
 
 export const App: React.FC = () => {
-  const { currentWorkspace, setWorkspace, user, isAuthenticated } = useAuth();
+  const { currentWorkspace, setWorkspace, isAuthenticated } = useAuth();
 
   const [viewMode, setViewMode] = useState<
     | 'landing'
@@ -247,36 +247,47 @@ export const App: React.FC = () => {
     viewMode === 'reviewer-dashboard' ? 'reviewer' :
     viewMode === 'compliance-dashboard' ? 'compliance' :
     viewMode === 'brand-owner-dashboard' ? 'brand-owner' : null;
-  const canAccessRequestedRole = !requestedRole || (
-    isAuthenticated && !!user && (
-      requestedRole === 'creator' && user.role === 'CREATOR' ||
-      requestedRole === 'agency' && user.role === 'CREATOR' ||
-      requestedRole === 'reviewer' && user.role === 'REVIEWER' ||
-      requestedRole === 'compliance' && user.role === 'COMPLIANCE_REVIEWER' ||
-      requestedRole === 'brand-owner' && (user.role === 'BRAND_MANAGER' || user.role === 'ADMIN')
-    )
-  );
 
-  if (requestedRole && !canAccessRequestedRole) {
+  // Any authenticated user can access any dashboard — ADMIN/BRAND_MANAGER have full access,
+  // role-specific users access their own workspace, and unauthenticated visitors are sent to login.
+  const isDashboardRoute = !!requestedRole;
+  if (isDashboardRoute && !isAuthenticated) {
+    // Not logged in — redirect to login, preserving the intended destination
+    if (typeof window !== 'undefined') {
+      const returnTo = window.location.pathname + window.location.search;
+      window.history.replaceState({ view: 'login', returnTo }, '', '/login');
+    }
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center p-6">
-        <div className="max-w-md rounded-2xl border border-neutral-800 bg-neutral-950 p-6 text-center">
-          <h1 className="text-xl font-bold">Workspace access required</h1>
-          <p className="mt-2 text-sm text-neutral-400">
-            Sign in with an authorized account for the {requestedRole} workspace.
-          </p>
-          <button
-            type="button"
-            onClick={() => {
-              setViewMode('login');
-              window.history.pushState({ view: 'login' }, '', '/login');
+      <ErrorBoundary onReset={() => setViewMode('landing')} fallbackTitle="Login Experience Error">
+        <Suspense fallback={<ViewLoadingFallback />}>
+          <LoginPage
+            onSuccess={(authenticatedUser) => {
+              handleLoginSuccess(authenticatedUser);
+              // After login, go back to the originally requested dashboard
+              const returnTo =
+                (typeof window !== 'undefined' && window.history.state?.returnTo) || null;
+              if (returnTo && returnTo !== '/login') {
+                if (typeof window !== 'undefined') {
+                  window.history.pushState({}, '', returnTo);
+                  // Re-derive view from the restored path
+                  const path = new URL(returnTo, window.location.href).pathname;
+                  if (path.startsWith('/creator')) setViewMode('creator-dashboard');
+                  else if (path.startsWith('/dashboard/agency')) setViewMode('agency-dashboard');
+                  else if (path.startsWith('/dashboard/reviewer')) setViewMode('reviewer-dashboard');
+                  else if (path.startsWith('/dashboard/compliance')) setViewMode('compliance-dashboard');
+                  else if (path.startsWith('/dashboard/brand-owner')) setViewMode('brand-owner-dashboard');
+                  else setViewMode('landing');
+                }
+              }
             }}
-            className="mt-5 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-bold hover:bg-indigo-500"
-          >
-            Go to sign in
-          </button>
-        </div>
-      </div>
+            onOpenLanding={() => {
+              setJustLoggedIn(false);
+              setViewMode('landing');
+              if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
+            }}
+          />
+        </Suspense>
+      </ErrorBoundary>
     );
   }
 
