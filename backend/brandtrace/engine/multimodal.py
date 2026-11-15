@@ -430,8 +430,23 @@ class MultimodalContentEngine:
         # Branch by MIME category
         if ext in ["txt", "md", "pdf", "docx"]:
             extracted_text = self.parse_document_text(filename, file_bytes)
-            text_findings = self.analyze_text_content(extracted_text, bkg)
-            findings.extend(text_findings)
+            if extracted_text.startswith("Error extracting"):
+                findings.append(
+                    MultimodalFinding(
+                        id="ERR-DOC-CORRUPT",
+                        location=f"Document Stream Decoder ({ext.upper()})",
+                        category="TEXT_INTELLIGENCE",
+                        severity=SeverityLevel.CRITICAL,
+                        explanation=f"Corrupted document payload: {extracted_text}. File structure is incomplete or unreadable.",
+                        rule_citation="Document File Format Integrity Mandate",
+                        verification_status=ClaimVerificationStatus.CONTRADICTED,
+                        suggested_fix="Re-export uncorrupted document file and ensure file is not password-protected.",
+                        confidence=1.0
+                    )
+                )
+            else:
+                text_findings = self.analyze_text_content(extracted_text, bkg)
+                findings.extend(text_findings)
 
         elif ext in ["png", "jpg", "jpeg", "webp"]:
             img_findings, palette, access_summary = self.analyze_image_bytes(file_bytes, bkg, filename)
