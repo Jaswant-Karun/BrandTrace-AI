@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import {
   ShieldCheck, GitFork, ArrowRight, Lock, 
-  Sparkles, Layers, FileCheck, CheckCircle2, ChevronRight,
+  Sparkles, CheckCircle2, ChevronRight,
   Database, Network, Eye, LineChart
 } from 'lucide-react';
 

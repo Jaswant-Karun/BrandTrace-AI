@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AlertTriangle, ShieldCheck, Scale, FileText, CheckCircle2 } from 'lucide-react';
+import { AlertTriangle, ShieldCheck, Scale } from 'lucide-react';
 
 interface RiskIntelligenceViewProps {
   brandId: string;

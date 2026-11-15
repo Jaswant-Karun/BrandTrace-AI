@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BarChart3, TrendingUp, CheckCircle2, ShieldAlert, ArrowUpRight } from 'lucide-react';
+import { BarChart3, ArrowUpRight } from 'lucide-react';
 
 interface GovernanceAnalyticsViewProps {
   brandId: string;
