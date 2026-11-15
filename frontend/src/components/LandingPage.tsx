@@ -1407,11 +1407,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Card 1: CREATOR */}
             <motion.div
-              initial={{ opacity: 0, y: 25, scale: 0.96 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 20, scale: 0.98 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: false, amount: 0.2 }}
-              transition={{ duration: 0.45, delay: 0.05, ease: 'easeOut' }}
-              className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4 shadow-lg hover:shadow-indigo-500/10"
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: 0.4, delay: shouldReduceMotion ? 0 : 0.05, ease: 'easeOut' }}
+              className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-200 space-y-4 shadow-lg"
             >
               <div className="space-y-3">
                 <div className="w-9 h-9 rounded-xl bg-indigo-600/30 border border-indigo-500/50 flex items-center justify-center text-indigo-400">
@@ -1438,11 +1438,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Card 2: AGENCY */}
             <motion.div
-              initial={{ opacity: 0, y: 25, scale: 0.96 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 20, scale: 0.98 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: false, amount: 0.2 }}
-              transition={{ duration: 0.45, delay: 0.15, ease: 'easeOut' }}
-              className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4 shadow-lg"
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: 0.4, delay: shouldReduceMotion ? 0 : 0.12, ease: 'easeOut' }}
+              className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-200 space-y-4 shadow-lg"
             >
               <div className="space-y-3">
                 <div className="w-9 h-9 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400">
@@ -1469,11 +1469,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Card 3: REVIEWER */}
             <motion.div
-              initial={{ opacity: 0, y: 25, scale: 0.96 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 20, scale: 0.98 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: false, amount: 0.2 }}
-              transition={{ duration: 0.45, delay: 0.25, ease: 'easeOut' }}
-              className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4 shadow-lg"
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: 0.4, delay: shouldReduceMotion ? 0 : 0.19, ease: 'easeOut' }}
+              className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-200 space-y-4 shadow-lg"
             >
               <div className="space-y-3">
                 <div className="w-9 h-9 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400">
@@ -1500,11 +1500,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Card 4: COMPLIANCE */}
             <motion.div
-              initial={{ opacity: 0, y: 25, scale: 0.96 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 20, scale: 0.98 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: false, amount: 0.2 }}
-              transition={{ duration: 0.45, delay: 0.35, ease: 'easeOut' }}
-              className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4 shadow-lg"
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: 0.4, delay: shouldReduceMotion ? 0 : 0.26, ease: 'easeOut' }}
+              className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-200 space-y-4 shadow-lg"
             >
               <div className="space-y-3">
                 <div className="w-9 h-9 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400">
@@ -1531,11 +1531,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Card 5: BRAND OWNER */}
             <motion.div
-              initial={{ opacity: 0, y: 25, scale: 0.96 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 20, scale: 0.98 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: false, amount: 0.2 }}
-              transition={{ duration: 0.45, delay: 0.45, ease: 'easeOut' }}
-              className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-700 transition-colors space-y-4 shadow-lg"
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: 0.4, delay: shouldReduceMotion ? 0 : 0.33, ease: 'easeOut' }}
+              className="bg-neutral-950 border border-neutral-800 rounded-2xl p-5 flex flex-col justify-between hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-200 space-y-4 shadow-lg"
             >
               <div className="space-y-3">
                 <div className="w-9 h-9 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400">

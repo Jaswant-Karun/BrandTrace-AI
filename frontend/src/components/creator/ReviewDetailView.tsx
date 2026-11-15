@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { 
   ArrowLeft, CheckCircle2, AlertTriangle, ShieldCheck, 
   Clock, Check, X
@@ -64,6 +64,7 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
   onBack,
   onSubmitDecision,
 }) => {
+  const shouldReduceMotion = useReducedMotion();
   const [contentMode, setContentMode] = useState<'submitted' | 'suggested'>('submitted');
   const [selectedFindingId, setSelectedFindingId] = useState<string | null>(null);
   const [overallFeedback, setOverallFeedback] = useState<string>(post.reviewerFeedback || '');
@@ -558,10 +559,10 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
                   id={`review-finding-card-${finding.id}`}
                   key={finding.id}
                   onClick={() => setSelectedFindingId(finding.id)}
-                  className={`rounded-2xl border transition-all p-5 space-y-3.5 shadow-xl ${
+                  className={`rounded-2xl border transition-all duration-200 p-5 space-y-3.5 shadow-xl ${
                     isSelected
-                      ? 'border-indigo-500 bg-[#161619]'
-                      : 'border-neutral-800 bg-[#111114] hover:border-neutral-700'
+                      ? 'border-blue-500 ring-2 ring-blue-500/30 bg-[#161619]'
+                      : 'border-neutral-800 bg-[#111114] hover:border-blue-500/40 hover:bg-[#131317]'
                   }`}
                 >
                   {/* Card Top Row: Number, Severity Badge, Rule Citation */}
@@ -661,24 +662,28 @@ export const ReviewDetailView: React.FC<ReviewDetailViewProps> = ({
                     </div>
 
                     {/* Overrule Reason Input (Required when Overturn is selected) */}
-                    {currentDecision === 'OVERRULED' && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        className="space-y-1.5 p-3 rounded-xl bg-amber-950/20 border border-amber-700/50"
-                      >
-                        <label className="block text-[11px] font-mono font-bold text-amber-300 uppercase">
-                          Reason for Overturning Finding (Required for Compliance Audit):
-                        </label>
-                        <input
-                          type="text"
-                          value={overruleReason}
-                          onChange={(e) => handleUpdateOverruleReason(finding.id, e.target.value)}
-                          placeholder="e.g. Permitted clinical trial protocol AUR-LAB-014 annexure exception"
-                          className="w-full px-3 py-2 rounded-lg bg-black border border-amber-700/70 text-xs font-mono text-amber-100 placeholder:text-neutral-500 focus:outline-none focus:border-amber-400"
-                        />
-                      </motion.div>
-                    )}
+                    <AnimatePresence>
+                      {currentDecision === 'OVERRULED' && (
+                        <motion.div
+                          initial={shouldReduceMotion ? false : { opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={shouldReduceMotion ? undefined : { opacity: 0, height: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="space-y-1.5 p-3 rounded-xl bg-amber-950/20 border border-amber-700/50 overflow-hidden"
+                        >
+                          <label className="block text-[11px] font-mono font-bold text-amber-300 uppercase">
+                            Reason for Overturning Finding (Required for Compliance Audit):
+                          </label>
+                          <input
+                            type="text"
+                            value={overruleReason}
+                            onChange={(e) => handleUpdateOverruleReason(finding.id, e.target.value)}
+                            placeholder="e.g. Permitted clinical trial protocol AUR-LAB-014 annexure exception"
+                            className="w-full px-3 py-2 rounded-lg bg-black border border-amber-700/70 text-xs font-mono text-amber-100 placeholder:text-neutral-500 focus:outline-none focus:border-amber-400"
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
 
                     {/* Optional Comment Input per Finding */}
                     <div className="pt-1">

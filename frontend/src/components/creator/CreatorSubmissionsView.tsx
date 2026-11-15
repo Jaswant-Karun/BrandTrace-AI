@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { 
   CheckCircle2, AlertTriangle, Clock, RefreshCw, 
   Edit3, ShieldCheck, ChevronDown, ChevronUp, FileText
@@ -160,6 +160,7 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
   brandName = 'Aurelle Skin',
   onEditAndResubmit,
 }) => {
+  const shouldReduceMotion = useReducedMotion();
   const [submissions, setSubmissions] = useState<SubmissionItem[]>(DEFAULT_SUBMISSIONS);
   const [filter, setFilter] = useState<'ALL' | 'CHANGES_REQUESTED' | 'PENDING' | 'APPROVED'>('ALL');
   const [expandedId, setExpandedId] = useState<string | null>('SUB-AGENCY-001');
@@ -285,7 +286,7 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
             </p>
           </div>
         ) : (
-          filteredSubmissions.map((sub) => {
+          filteredSubmissions.map((sub, idx) => {
             const isExpanded = expandedId === sub.submission_id;
             const isChangesReq =
               sub.status === 'CHANGES_REQUESTED' ||
@@ -299,16 +300,20 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
             const isRejected = sub.status === 'REJECTED';
 
             return (
-              <div
+              <motion.div
                 key={sub.submission_id}
-                className={`bg-neutral-950 border rounded-2xl p-5 space-y-4 transition-all ${
+                layout
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.22, delay: shouldReduceMotion ? 0 : Math.min(idx * 0.05, 0.2) }}
+                className={`bg-neutral-950 border rounded-2xl p-5 space-y-4 transition-all duration-200 ${
                   isChangesReq
                     ? 'border-amber-600/60 shadow-lg shadow-amber-950/20'
                     : isRejected
                     ? 'border-rose-600/60 shadow-lg shadow-rose-950/20'
                     : isApproved
                     ? 'border-emerald-700/50'
-                    : 'border-neutral-800 hover:border-neutral-700'
+                    : 'border-neutral-800 hover:border-blue-500/40 hover:bg-[#121217]'
                 }`}
               >
                 {/* Header: Status, Channel, Version, ID, Date */}
@@ -472,7 +477,7 @@ export const CreatorSubmissionsView: React.FC<CreatorSubmissionsViewProps> = ({
                   )}
                 </AnimatePresence>
 
-              </div>
+              </motion.div>
             );
           })
         )}

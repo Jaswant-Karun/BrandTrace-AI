@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { CreatorHeader, CreatorTab, TabItem } from './CreatorHeader';
 import { CreatorCheckPost } from './CreatorCheckPost';
 import { CreatorAuditLog } from './CreatorAuditLog';
@@ -269,6 +270,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
     },
   }[role];
 
+  const shouldReduceMotion = useReducedMotion();
   const [activeTab, setActiveTab] = useState<CreatorTab>(roleConfig.defaultTab);
   const [queuePosts, setQueuePosts] = useState<QueueItem[]>(DEFAULT_QUEUE_POSTS);
   const [selectedPost, setSelectedPost] = useState<QueueItem | null>(null);
@@ -496,6 +498,14 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
 
       {/* Main Content Area */}
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={shouldReduceMotion ? undefined : { opacity: 0, y: -6 }}
+            transition={{ duration: 0.22, ease: 'easeOut' }}
+          >
         
         {/* CHECK A POST tab */}
         {activeTab === 'check' && (
@@ -581,7 +591,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
 
             {/* 4 Top KPI Metric Cards matching reference */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
-              <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-3.5 sm:p-5 space-y-1">
+              <div className="bg-neutral-950 border border-neutral-800 hover:border-blue-500/40 transition-all duration-200 rounded-2xl p-3.5 sm:p-5 space-y-1">
                 <div className="text-2xl sm:text-4xl font-extrabold text-white font-mono">
                   {queuePosts.length}
                 </div>
@@ -589,7 +599,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
                   {role === 'brand-owner' ? 'AWAITING FINAL APPROVAL' : role === 'compliance' ? 'AWAITING AUDIT' : 'WAITING'}
                 </div>
               </div>
-              <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-3.5 sm:p-5 space-y-1">
+              <div className="bg-neutral-950 border border-neutral-800 hover:border-rose-500/40 transition-all duration-200 rounded-2xl p-3.5 sm:p-5 space-y-1">
                 <div className="text-2xl sm:text-4xl font-extrabold text-[#ff6358] font-mono">
                   {queuePosts.filter((p) => p.blockingCount > 0).length}
                 </div>
@@ -597,7 +607,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
                   {role === 'brand-owner' ? 'STATUTORY BLOCKERS' : role === 'compliance' ? 'STATUTORY BLOCKERS' : 'BLOCKING, STILL WAITING'}
                 </div>
               </div>
-              <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-3.5 sm:p-5 space-y-1">
+              <div className="bg-neutral-950 border border-neutral-800 hover:border-sky-500/40 transition-all duration-200 rounded-2xl p-3.5 sm:p-5 space-y-1">
                 <div className="text-2xl sm:text-4xl font-extrabold text-sky-400 font-mono">
                   {role === 'brand-owner'
                     ? queuePosts.filter((p) => p.status.includes('COMPLIANCE')).length
@@ -609,7 +619,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
                   {role === 'brand-owner' ? 'COMPLIANCE CERTIFIED' : role === 'compliance' ? 'EVIDENCE REQUESTED' : 'NEED COMPLIANCE'}
                 </div>
               </div>
-              <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-3.5 sm:p-5 space-y-1">
+              <div className="bg-neutral-950 border border-neutral-800 hover:border-emerald-500/40 transition-all duration-200 rounded-2xl p-3.5 sm:p-5 space-y-1">
                 <div className="text-2xl sm:text-4xl font-extrabold text-emerald-400 font-mono">
                   {queuePosts.filter((p) => p.status.includes('RELEASE') || p.status === 'APPROVED').length}
                 </div>
@@ -621,11 +631,14 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
 
             {/* Posts List matching reference */}
             <div className="space-y-3 pt-2">
-              {queuePosts.map((item) => (
-                <div
+              {queuePosts.map((item, idx) => (
+                <motion.div
                   key={item.id}
+                  initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.22, delay: shouldReduceMotion ? 0 : Math.min(idx * 0.05, 0.2) }}
                   onClick={() => handleOpenReview(item)}
-                  className="bg-neutral-950 border border-neutral-800 hover:border-neutral-700 rounded-2xl p-3.5 sm:p-5 flex items-start justify-between gap-2.5 sm:gap-4 transition-colors cursor-pointer group"
+                  className="bg-neutral-950 border border-neutral-800 hover:border-blue-500/50 hover:bg-[#121217] rounded-2xl p-3.5 sm:p-5 flex items-start justify-between gap-2.5 sm:gap-4 transition-all duration-200 cursor-pointer group active:scale-[0.99]"
                 >
                   <div className="flex items-start gap-2.5 sm:gap-4 flex-1 min-w-0">
                     {/* Left Blocking indicator */}
@@ -662,15 +675,15 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
                             INTERNAL CREATOR · {item.orgId || 'ORG-AURELLE'}
                           </span>
                         )}
-                        {item.badges.map((b, idx) => (
-                          <span key={idx} className="inline-flex items-center gap-1 text-[10px] font-mono text-neutral-400 bg-neutral-900 px-2 py-0.5 rounded border border-neutral-800">
+                        {item.badges.map((b, idxBadge) => (
+                          <span key={idxBadge} className="inline-flex items-center gap-1 text-[10px] font-mono text-neutral-400 bg-neutral-900 px-2 py-0.5 rounded border border-neutral-800">
                             {b.includes('REVIEW') && <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />}
                             {b}
                           </span>
                         ))}
                       </div>
 
-                      <h3 className="text-sm font-semibold text-white group-hover:text-indigo-300 transition-colors leading-snug">
+                      <h3 className="text-sm font-semibold text-white group-hover:text-blue-300 transition-colors leading-snug">
                         {item.title}
                       </h3>
 
@@ -684,7 +697,7 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
                   <div className="text-neutral-500 group-hover:text-white transition-colors shrink-0 pt-2">
                     <ExternalLink className="w-4 h-4" />
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -753,6 +766,8 @@ export const RoleDashboardStage: React.FC<RoleDashboardStageProps> = ({
           </div>
         )}
 
+          </motion.div>
+        </AnimatePresence>
       </main>
 
 

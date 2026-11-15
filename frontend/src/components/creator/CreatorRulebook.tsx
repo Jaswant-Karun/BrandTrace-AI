@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { AlertTriangle, Search } from 'lucide-react';
 
 interface RuleItem {
@@ -125,6 +126,7 @@ interface CreatorRulebookProps {
 export const CreatorRulebook: React.FC<CreatorRulebookProps> = ({
   brandName = 'Aurelle Skin',
 }) => {
+  const shouldReduceMotion = useReducedMotion();
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [dynamicRules, setDynamicRules] = useState<RuleItem[]>([]);
 
@@ -300,8 +302,14 @@ export const CreatorRulebook: React.FC<CreatorRulebookProps> = ({
 
         <div className="bg-neutral-950 border border-neutral-800/90 rounded-2xl overflow-hidden shadow-2xl">
           <div className="divide-y divide-neutral-800/80">
-            {filteredRules.map((rule) => (
-              <div key={rule.code} className="p-4 sm:p-5 hover:bg-neutral-900/30 transition-colors space-y-2.5">
+            {filteredRules.map((rule, idx) => (
+              <motion.div
+                key={rule.code}
+                initial={shouldReduceMotion ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.18, delay: shouldReduceMotion ? 0 : Math.min(idx * 0.02, 0.2) }}
+                className="p-4 sm:p-5 hover:bg-neutral-900/60 hover:border-l-2 hover:border-blue-500 transition-all duration-150 space-y-2.5"
+              >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                   <div className="flex items-start sm:items-center gap-2.5">
                     <span className="font-mono font-bold text-xs text-neutral-300 px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800 shrink-0">
@@ -357,7 +365,7 @@ export const CreatorRulebook: React.FC<CreatorRulebookProps> = ({
                     <span>{rule.linterWarning}</span>
                   </div>
                 )}
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>

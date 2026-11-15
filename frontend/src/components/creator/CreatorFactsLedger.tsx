@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { ChevronDown, ChevronUp, Copy, Check, ShieldCheck } from 'lucide-react';
 
 interface FactCardItem {
@@ -114,6 +114,7 @@ export const CreatorFactsLedger: React.FC<CreatorFactsLedgerProps> = ({
   brandName = 'Aurelle Skin',
   role = 'creator',
 }) => {
+  const shouldReduceMotion = useReducedMotion();
   const [selectedProduct, setSelectedProduct] = useState<string>('All 35 facts');
   const [dynamicFacts, setDynamicFacts] = useState<FactCardItem[]>([]);
 
@@ -335,7 +336,7 @@ export const CreatorFactsLedger: React.FC<CreatorFactsLedgerProps> = ({
             return (
               <div
                 key={fact.id}
-                className="bg-neutral-950 border border-neutral-800 rounded-2xl p-4 sm:p-5 space-y-3 hover:border-neutral-700 transition-colors shadow-lg flex flex-col justify-between"
+                className="bg-neutral-950 border border-neutral-800 rounded-2xl p-4 sm:p-5 space-y-3 hover:border-blue-500/40 hover:bg-[#121217] transition-all duration-200 shadow-lg flex flex-col justify-between active:scale-[0.99]"
               >
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-2">
