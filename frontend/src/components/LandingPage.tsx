@@ -231,7 +231,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ------------------------------------------------------------------- */}
       {/* SECTION 2 — HERO SECTION (Matching Reference Visual Design & Motion) */}
       {/* ------------------------------------------------------------------- */}
-      <section id="overview" className="relative pt-8 sm:pt-14 pb-16 sm:pb-24 overflow-hidden">
+      <section id="overview" className="relative pt-3 sm:pt-6 pb-14 sm:pb-20 overflow-hidden">
         {/* Subtle background ambient gradients */}
         <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
           <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-gradient-to-b from-indigo-100/50 via-purple-50/20 to-transparent dark:from-indigo-950/30 dark:via-purple-950/10 dark:to-transparent rounded-full blur-3xl" />
@@ -253,12 +253,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
-          {/* Top Hanging Plumb Bob Motif with Natural Physics & Scroll Shake Motion */}
-          <div className="flex justify-end pr-8 sm:pr-16 lg:pr-24 -mt-6 sm:-mt-8 mb-2 pointer-events-none select-none z-20">
-            <PlumbBob stringLength={190} />
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-start pt-1 sm:pt-2">
             
             {/* Left Column: Bold Editorial Typography & CTA */}
             <div className="lg:col-span-7 space-y-6 text-left">
@@ -377,7 +372,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Right Column: Visual Product Inspection Mockup Card (Inspired by reference) */}
-            <div className="lg:col-span-5">
+            <div className="lg:col-span-5 relative">
+              {/* Plumb Bob Motif hanging along the left edge of the card, matching Plumbline reference composition */}
+              <div className="hidden lg:block absolute -top-8 -left-5 pointer-events-none select-none z-20">
+                <PlumbBob stringLength={150} />
+              </div>
+
               <div className="relative rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden p-5 sm:p-6 space-y-4">
                 
                 {/* Header bar of visual card */}
