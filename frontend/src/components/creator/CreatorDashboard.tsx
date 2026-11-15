@@ -23,6 +23,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<CreatorTab>(initialTab);
   const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([]);
+  const [restoredDraft, setRestoredDraft] = useState<string | null>(null);
 
   // Automatically switch role/persona to Creator if user is in another role
   useEffect(() => {
@@ -39,6 +40,11 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
       hash: event.hash,
     };
     setAuditEvents((prev) => [newEvt, ...prev]);
+  };
+
+  const handleRestoreDraft = (content: string) => {
+    setRestoredDraft(content);
+    setActiveTab('check');
   };
 
   const handleSignOut = () => {
@@ -72,6 +78,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
             {activeTab === 'check' && (
               <CreatorCheckPost
                 brandName={brandName}
+                initialContent={restoredDraft || undefined}
                 onSaveAuditVersion={handleSaveAuditVersion}
               />
             )}
@@ -80,6 +87,7 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
               <CreatorAuditLog
                 brandName={brandName}
                 customEvents={auditEvents}
+                onRestoreDraft={handleRestoreDraft}
               />
             )}
 

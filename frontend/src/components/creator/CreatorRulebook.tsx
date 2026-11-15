@@ -126,8 +126,32 @@ export const CreatorRulebook: React.FC<CreatorRulebookProps> = ({
   brandName = 'Aurelle Skin',
 }) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [dynamicRules, setDynamicRules] = useState<RuleItem[]>([]);
 
-  const filteredRules = RULES_DATA.filter((r) => {
+  React.useEffect(() => {
+    fetch('/api/guidelines?brand_id=aurelle-tech')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data: any[]) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const liveRules: RuleItem[] = data.map((g) => ({
+            code: g.guideline_id || 'GL-LIVE',
+            title: g.title || g.rule_statement || 'Brand Guideline',
+            citation: g.source_citation || `Aurelle Master Guidelines §${g.category || 'POLICY'}`,
+            type: g.severity === 'CRITICAL' || g.severity === 'HIGH' ? 'MANDATORY' : 'BRAND',
+            engine: 'A - code',
+            pattern: 'policy',
+            severity: g.severity === 'CRITICAL' || g.severity === 'HIGH' ? 'BLOCKING' : 'ADVISORY',
+            owner: g.category === 'REGULATORY' ? 'compliance' : 'brand',
+          }));
+          setDynamicRules(liveRules);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const allRules = [...RULES_DATA, ...dynamicRules.filter((dr) => !RULES_DATA.some((r) => r.code === dr.code))];
+
+  const filteredRules = allRules.filter((r) => {
     const matchesSearch =
       r.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
       r.title.toLowerCase().includes(searchTerm.toLowerCase()) ||

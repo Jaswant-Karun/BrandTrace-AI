@@ -114,8 +114,34 @@ export const CreatorFactsLedger: React.FC<CreatorFactsLedgerProps> = ({
   role = 'creator',
 }) => {
   const [selectedProduct, setSelectedProduct] = useState<string>('All 35 facts');
+  const [dynamicFacts, setDynamicFacts] = useState<FactCardItem[]>([]);
 
-  const filteredFacts = FACTS_DATA.filter((f) => {
+  React.useEffect(() => {
+    fetch('/api/facts?brand_id=aurelle-tech')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data: any[]) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const mapped: FactCardItem[] = data.map((f) => ({
+            id: f.id || `f-${Date.now()}`,
+            code: f.id || 'FACT-LIVE',
+            title: f.description ? `${f.name}: ${f.description}` : f.name,
+            meta: `${f.department_owner || 'Brand'} · valid ${f.last_verified || '2026-01-01'}`,
+            category: f.category || 'Specification',
+            product: 'Brand-wide',
+            approvedWording: {
+              code: `${f.id || 'FACT'}-AW`,
+              text: `"${f.current_value} ${f.unit || ''}"`,
+            },
+          }));
+          setDynamicFacts(mapped);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const allFacts = [...FACTS_DATA, ...dynamicFacts.filter((df) => !FACTS_DATA.some((f) => f.code === df.code))];
+
+  const filteredFacts = allFacts.filter((f) => {
     if (selectedProduct === 'All 35 facts') return true;
     return f.product === selectedProduct;
   });

@@ -13,6 +13,7 @@ export interface AuditEvent {
 interface CreatorAuditLogProps {
   customEvents?: AuditEvent[];
   brandName?: string;
+  onRestoreDraft?: (content: string) => void;
 }
 
 const DEFAULT_AUDIT_EVENTS: AuditEvent[] = [
@@ -69,6 +70,7 @@ const DEFAULT_AUDIT_EVENTS: AuditEvent[] = [
 export const CreatorAuditLog: React.FC<CreatorAuditLogProps> = ({
   customEvents = [],
   brandName = 'Aurelle Skin',
+  onRestoreDraft,
 }) => {
   const [copiedHash, setCopiedHash] = useState<string | null>(null);
 
@@ -164,7 +166,15 @@ export const CreatorAuditLog: React.FC<CreatorAuditLogProps> = ({
                     <td className="py-3.5 px-4 text-neutral-500 max-w-xs truncate">
                       {evt.reason || '—'}
                     </td>
-                    <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                    <td className="py-3.5 px-4 text-right whitespace-nowrap flex items-center justify-end gap-3">
+                      {onRestoreDraft && (
+                        <button
+                          onClick={() => onRestoreDraft(`Make every brand decision count this Diwali. Aurelle Skin helps teams review marketing content against approved brand guidelines (Restored from Audit ${evt.id}).`)}
+                          className="px-2 py-0.5 rounded bg-neutral-900 border border-neutral-700 hover:border-neutral-500 text-neutral-300 text-[10px] uppercase font-mono transition-colors cursor-pointer"
+                        >
+                          Load Draft
+                        </button>
+                      )}
                       <button
                         onClick={() => handleCopy(evt.hash)}
                         className="inline-flex items-center gap-1.5 text-indigo-400 hover:text-indigo-300 text-[11px] cursor-pointer"

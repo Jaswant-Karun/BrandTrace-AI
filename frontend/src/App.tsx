@@ -50,7 +50,7 @@ export const App: React.FC = () => {
   >(() => {
     if (typeof window !== 'undefined') {
       const pathname = window.location.pathname;
-      if (pathname === '/dashboard/creator' || pathname.startsWith('/dashboard/creator')) return 'creator-dashboard';
+      if (pathname === '/creator/check' || pathname.startsWith('/creator') || pathname === '/dashboard/creator' || pathname.startsWith('/dashboard/creator')) return 'creator-dashboard';
       if (pathname === '/dashboard/agency' || pathname.startsWith('/dashboard/agency')) return 'agency-dashboard';
       if (pathname === '/dashboard/reviewer' || pathname.startsWith('/dashboard/reviewer')) return 'reviewer-dashboard';
       if (pathname === '/dashboard/compliance' || pathname.startsWith('/dashboard/compliance')) return 'compliance-dashboard';
@@ -90,7 +90,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     const handlePopState = () => {
       const pathname = window.location.pathname;
-      if (pathname === '/dashboard/creator' || pathname.startsWith('/dashboard/creator')) {
+      if (pathname === '/creator/check' || pathname.startsWith('/creator') || pathname === '/dashboard/creator' || pathname.startsWith('/dashboard/creator')) {
         setViewMode('creator-dashboard');
       } else if (pathname === '/dashboard/agency' || pathname.startsWith('/dashboard/agency')) {
         setViewMode('agency-dashboard');
@@ -115,7 +115,7 @@ export const App: React.FC = () => {
   const handleOpenCreatorDashboard = () => {
     setViewMode('creator-dashboard');
     if (typeof window !== 'undefined') {
-      window.history.pushState({ view: 'creator-dashboard' }, '', '/dashboard/creator');
+      window.history.pushState({ view: 'creator-dashboard' }, '', '/creator/check');
     }
   };
 
@@ -130,7 +130,8 @@ export const App: React.FC = () => {
     const targetMode = routeMap[role];
     setViewMode(targetMode);
     if (typeof window !== 'undefined') {
-      window.history.pushState({ view: targetMode }, '', `/dashboard/${role}`);
+      const targetPath = role === 'creator' ? '/creator/check' : `/dashboard/${role}`;
+      window.history.pushState({ view: targetMode }, '', targetPath);
     }
   };
 
